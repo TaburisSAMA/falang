@@ -1,0 +1,58 @@
+<html>
+ <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title> Tina </title>
+	<link rel="stylesheet" media="screen" type="text/css" href="css/popup.css">
+	<script type="text/javascript" > window.theViewName = 'popup'; </script>
+	<script type="text/javascript" src="scripts/jquery-1.4.js" ></script>
+	<script type="text/javascript" src="scripts/Base64.js" ></script>
+	<script type="text/javascript" src="scripts/utili.js" ></script>
+	<script type="text/javascript" src="scripts/s8api.js" ></script>
+	<script type="text/javascript" src="scripts/sinaApi.js" ></script>
+	<script type="text/javascript" src="scripts/ui.js" ></script>
+	<script type="text/javascript" src="scripts/popup.js" ></script>
+ </head>
+
+ <body onload="initOnLoad();">
+	<div><textarea id="txtContent" style="width:100%;" rows="1" class="padDoing" ></textarea>
+		<a href="javascript:void(0);" id="doing" class="doing" title="分享你正在看的网页" ><img src="images/bc.gif" /></a>
+	</div>
+	<div id="submitWarp" style="display:none;">
+		<input id="btnSend" type="button" value="发浪!" title="ctrl+enter" />    
+		<span id="doingWarp"></span>
+		<span id="wordCount">140</span>
+	</div>
+	<div class="warp">
+	  <ul class="tabs">
+		<li class="tab-0 active" href="#sinaFriendsTimeline">我跟随的人<span class="unreadCount"></span></li>
+		<li class="tab-1" href="#sinaReplies">@回应<span class="unreadCount"></span></li>
+		<li class="tab-2" href="#sinaMessages">悄悄话<span class="unreadCount"></span></li>
+	  </ul>
+	  <ul id='sinaFriendsTimeline' class="list">
+	  </ul>
+	  <ul id="sinaReplies" class="list" style="display:none;">
+	  </ul>
+	  <ul id="sinaMessages" class="list" style="display:none;">
+	  </ul>
+	  <span id="loading"><img src="images/loader.gif" /></span>
+	</div>
+
+	<div id="ye_dialog_window" >
+		<a title="关闭" href="javascript:void(0);" id="ye_dialog_close"></a>
+		<div id="ye_dialog_title"></div>
+		<div id="ye_dialog_body" >
+			<div class="replyDialog">
+				<textarea class="uTextarea" id="replyTextarea"></textarea><br/>
+				<span id="replyInputCount" class="conTinge">还可以输入140字</span>
+				<button id="replySubmit" type="button" title="ctrl+enter" style="float: right;">发浪!</button>
+			</div>
+		</div>
+		<input type="hidden" id="replyTweetId" value="" />
+		<input type="hidden" id="replyUserName" value="" />
+		<input type="hidden" id="isWhisper" value="0" />
+		<input type="hidden" id="whisperToUserId" value="" />
+	</div>
+
+	<div id="msgInfoWarp" style=""></div>
+ </body>
+</html>

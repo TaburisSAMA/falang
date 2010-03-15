@@ -1,0 +1,124 @@
+
+* { margin:0; padding:0;} 
+body { font:12px "ËÎÌå"; /*color:#049; padding:8px;*/ width:350px; color:#182A58;}
+a { text-decoration:none; color:#049;} 
+a:hover { text-decoration:underline;}
+ul { list-style:none;} 
+li { line-height:16px;} 
+.warp { width:350px; /*border:1px solid #ace;*/ padding-bottom:10px;} 
+.tabs { overflow:hidden; background:#f1f7fc;height:24px;}
+.tabs li {line-height:23px; height:23px; border:1px solid #ace; border-width:0 1px 1px 0; background:#f1f7fc; padding:0 5px; text-align:center; float:left; cursor:pointer;} 
+.tabs li.active { background:#fff; border-bottom-color:#fff; font-weight:bold;} 
+.tabs li.tab-r { /*width:118px; border-right:0; text-align:right;*/ padding-right:10px;} 
+.tabs li.tab-r a { color:#F06; font-weight:bold; font-family:Georgia;}
+div.usericon {float:left; padding:2px 0 0 2px;}
+div.usericon img {border: solid 1px #A0A0A0}
+div.mainContent {margin:0 2px 0 60px;} 
+div.userName {font-weight:bold;} 
+div.userName a {color:green;}
+div.msgInfo {color:#A0A0A0; padding-top:3px;} 
+.list { margin:0; height: 400px; overflow:auto;} 
+.list li {border-bottom:1px solid #ddd; padding:5px 0 5px 0;overflow:hidden;}
+.list li .msg a{color:#F77004;}
+.unread-item{background-color: #FFFFDF;}
+.list li.activeTweet{background-color: #FFFFEF;color:black;}
+.list li .edit{display:none; float:right;}
+.list li .edit a{margin:0 3px;}
+.readMore{display:none;text-align:center;background: #ccc; color:green; margin: 2px 0; padding:3px; border:solid 1px #ccc; font-size:14px;font-weight:bold;}
+.readMore:hover{text-decoration: none;}
+
+#txtContent{resize: none;}
+#diguReplies { display:none;}
+
+#changeUser{float:right; margin-right:20px; padding:0; font-size:12px;}
+#changeUser:hover{cursor:pointer;background-color:#fff;}
+#changeUser .userName{font-weight:bold;}
+#changeUser div{
+	right: 20px;
+	position:absolute;
+}
+#changeUser li{ float:none; border:solid 1px #AACCEE;}
+#changeUser li.current{ list-style-type:disc;}
+
+#submitWarp{border-bottom:solid 1px #AACCEE;}
+#btnSend{border:solid 1px #AACCEE; padding:0 5px;}
+#wordCount{float:right;font-size:13px;font-weight: bold;}
+
+.doing{position:absolute; left:3px; top:1px;}
+.padDoing{padding-left:18px;}
+.unreadCount{color:red;}
+
+#msgInfoWarp{
+   position:absolute;
+   bottom:0;
+}
+.messageInfo{
+   width: 320px;
+   margin: 2px 0;
+   padding: .5em;
+   background: #ffa;
+   border: 1px solid #a00;
+   color: #a00;
+   font-weight: bold;
+   display: none;
+}
+#loading{
+	position:absolute;
+	top:17px;
+	right:20px;
+}
+
+/*>>>> reply start <<<<*/
+#ye_dialog_window {
+	border-bottom-left-radius: 5px 5px;
+	border-bottom-right-radius: 5px 5px;
+	border-top-left-radius: 5px 5px;
+	border-top-right-radius: 5px 5px;
+	background-color:#FFFFFF;
+	border:1px solid #666666;
+	display:none;
+	height:150px;
+	left:10px;
+	padding-bottom:8px;
+	position:fixed;
+	top:30%;
+	z-index:1000;
+}
+#ye_dialog_close {
+	background: url(../images/close.gif) no-repeat;
+	color: black;
+	display: block;
+	height: 13px;
+	position: absolute;
+	right: 9px;
+	text-decoration: none;
+	top: 7px;
+	width: 13px;
+}
+
+#ye_dialog_title {
+	color:#333333;
+	font-size:14px;
+	font-weight:bold;
+	height:28px;
+	line-height:25px;
+	padding:0 10px;
+}
+#ye_dialog_body {
+	width:100%;
+}
+#replyInputCount{float:left;color:#999999}
+.replyDialog {
+	margin:10px;
+}
+.replyDialog .uTextarea {
+	background:#FFFFFF url(../images/dot.gif) repeat-x scroll 0 -1px;
+	border:1px solid #999999;
+	font-size:14px;
+	height:80px;
+	margin-bottom:10px;
+	overflow-y:auto;
+	padding:5px;
+	width:290px;
+}
+/*>>>> reply end <<<<*/

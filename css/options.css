@@ -1,0 +1,31 @@
+ol, ul {
+	line-height:125%;
+	margin:0.5em 0 0 15px;
+	padding:0;
+}
+li{list-style-type:none;}
+h3{
+	background-color:#E5ECF9;
+	border-bottom:medium none;
+	border-top:1px solid #3366CC;
+	margin:0 8px 1em 0;
+	padding:2px;
+}
+
+
+.messageInfo{
+   width: 320px;
+   margin: 2px 0;
+   padding: .5em;
+   background: #ffa;
+   border: 1px solid #a00;
+   color: #a00;
+   font-weight: bold;
+   display: none;
+}
+
+#msgInfoWarp{
+	right:20px;
+	position:fixed;
+	top:0;
+}

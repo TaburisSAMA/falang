@@ -1,0 +1,18 @@
+{
+	"extName": {
+		"message": "i嘀(iDi)",
+		"description": "该插件的名称"
+	},
+	"extDes": {
+		"message": "i嘀，嘀咕(digu.com)的Chrome插件。当前版本为预览版。有问题请到嘀咕找 @i_D_i 反馈。",
+		"description": "该插件的简单描述"
+	},
+	"parserErrorMsg": {
+		"message": "服务器返回内容错误",
+		"description": "当缩短url的时候服务器返回内容为非JSON的时候提示的信息"
+	},
+	"extName2": {
+		"message": "",
+		"description": ""
+	}
+}

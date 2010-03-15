@@ -1,0 +1,36 @@
+{
+  // Required
+  "name": "__MSG_extName__",
+  "version": "0.1",
+
+  // Recommended
+  "description": "__MSG_extDes__",
+  "icons":{ "48": "icons/icon48.jpg",
+          "128": "icons/icon128.png" },
+  "default_locale": "zh_CN",
+
+  // Pick one (or none)
+  "browser_action": {
+    "default_icon": "icons/icon48.jpg", // required
+    "default_title": "iDi(i嘀) for 嘀咕(digu.com)",      // optional; shown in tooltip
+    "popup": "popup.html"                // optional
+  },
+  //"page_action": {...},
+  //"theme": {...},
+
+  // Add any of these that you need
+  "background_page": "background.html",
+  //"chrome_url_overrides": {...},
+  //"content_scripts": [...],
+  //"minimum_chrome_version": "x.y",
+  "options_page": "options.html",
+  "permissions": [
+                   "tabs",
+                   "bookmarks",
+                   "http://s8.hk/",
+                   "http://api.t.sina.com.cn/",
+                   "http://api.minicloud.com.cn/"
+                 ],
+  //"plugins": [...],
+  "update_url": "http://path/to/updateInfo.xml"
+}
