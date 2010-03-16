@@ -27,7 +27,8 @@ function bildMsgLi(sinaMsg, isNew){
 			+'	<div class="mainContent">'
 			+'		<div class="userName"><a target="_blank" href="' + domain_sina + '/' + (user.domain||user.id) + '">' + user.screen_name + inreplyBtn
             +'</a><span class="edit"><a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');">回复</a>' 
-            +'<a class="rtweet" href="javascript:void(0);" onclick="doRT(this);">转发</a>' 
+            +'<a class="rtweet" href="javascript:void(0);" onclick="doRT(this);">RT</a>' 
+            +'<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');">转发</a>'
             +'<a class="newMessage" href="javascript:void(0);" onclick="doNewMessage(this,\'' + user.screen_name + '\',' + user.id + ');">私信</a>'
             + delBtn.replace('tweetId', sinaMsg.id) + '</span></div>'
 			+'		<div class="msg">' + processMsg(sinaMsg.text);

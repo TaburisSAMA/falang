@@ -1,15 +1,15 @@
 {
 	"extName": {
-		"message": "iàÖ(iDi)",
-		"description": "¸Ã²å¼şµÄÃû³Æ"
+		"message": "å‘æµª(FaWave)",
+		"description": "name"
 	},
 	"extDes": {
-		"message": "iàÖ£¬àÖ¹¾(digu.com)µÄChrome²å¼ş¡£µ±Ç°°æ±¾ÎªÔ¤ÀÀ°æ¡£ÓĞÎÊÌâÇëµ½àÖ¹¾ÕÒ @i_D_i ·´À¡¡£",
-		"description": "¸Ã²å¼şµÄ¼òµ¥ÃèÊö"
+		"message": "å‘æµª(FaWave)ï¼Œæ–°æµªå¾®åš(t.sina.com.cn)çš„Chromeæ’ä»¶ã€‚å½“å‰ç‰ˆæœ¬ä¸ºé¢„è§ˆç‰ˆã€‚æœ‰é—®é¢˜è¯·åˆ°æ–°æµªå¾®åšæ‰¾ @QLeelulu åé¦ˆã€‚",
+		"description": "è¯¥æ’ä»¶çš„ç®€å•æè¿°"
 	},
 	"parserErrorMsg": {
-		"message": "·şÎñÆ÷·µ»ØÄÚÈİ´íÎó",
-		"description": "µ±Ëõ¶ÌurlµÄÊ±ºò·şÎñÆ÷·µ»ØÄÚÈİÎª·ÇJSONµÄÊ±ºòÌáÊ¾µÄĞÅÏ¢"
+		"message": "æœåŠ¡å™¨è¿”å›å†…å®¹é”™è¯¯",
+		"description": "å½“ç¼©çŸ­urlçš„æ—¶å€™æœåŠ¡å™¨è¿”å›å†…å®¹ä¸ºéJSONçš„æ—¶å€™æç¤ºçš„ä¿¡æ¯"
 	},
 	"extName2": {
 		"message": "",
