@@ -1,18 +1,18 @@
 {
   // Required
   "name": "__MSG_extName__",
-  "version": "0.1",
+  "version": "0.0.0.1",
 
   // Recommended
   "description": "__MSG_extDes__",
-  "icons":{ "48": "icons/icon48.jpg",
+  "icons":{ "48": "icons/icon48.png",
           "128": "icons/icon128.png" },
   "default_locale": "zh_CN",
 
   // Pick one (or none)
   "browser_action": {
-    "default_icon": "icons/icon48.jpg", // required
-    "default_title": "iDi(i嘀) for 嘀咕(digu.com)",      // optional; shown in tooltip
+    "default_icon": "icons/icon48.png", // required
+    "default_title": "发浪(FaWave) For 新浪微博(t.sina.com.cn)",      // optional; shown in tooltip
     "popup": "popup.html"                // optional
   },
   //"page_action": {...},

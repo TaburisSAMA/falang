@@ -1,10 +1,10 @@
 {
 	"extName": {
-		"message": "i嘀(iDi)",
-		"description": "该插件的名称"
+		"message": "发浪(FaWave)",
+		"description": "name"
 	},
 	"extDes": {
-		"message": "i嘀，嘀咕(digu.com)的Chrome插件。当前版本为预览版。有问题请到嘀咕找 @i_D_i 反馈。",
+		"message": "发浪(FaWave)，新浪微博(t.sina.com.cn)的Chrome插件。当前版本为预览版。有问题请到新浪微博找 @QLeelulu 反馈。",
 		"description": "该插件的简单描述"
 	},
 	"parserErrorMsg": {

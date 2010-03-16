@@ -11,15 +11,15 @@
 </head>
 
 <body>
-<a href="http://t.sina.com.cn/qleelulu" target="_blank" style="position:absolute;right:0;top:0;">
+<a href="http://t.sina.com.cn/falang" target="_blank" style="position:absolute;right:0;top:0;">
 	<img src="images/follow-me.png" border="0" title="跟随发浪" />
 </a>
 <div>
 	<div class="logo">
-		<a target="_blank" href="http://t.sina.com.cn/qleelulu" title="跟随发浪"><img src="icons/icon64.png" /></a>
+		<a target="_blank" href="http://t.sina.com.cn/falang" title="跟随发浪"><img src="icons/icon64.png" /></a>
 	</div>
 	<h3>用户账号设置</h3>
-	<div class="info">用户、密码为明文保存在本地。在公共电脑上使用时请慎重。</div>
+	<div class="info">用户、密码为<b style="color:red;">明文</b>保存在本地。在公共电脑上使用时请慎重。对于OAuth还不熟悉，找时间再改吧。</div>
 	<table>
 		<tr>
 			<td><select id="account-list" size="6" style="width:120px;"></select></td>
@@ -34,6 +34,7 @@
 
 	<div id="new-account" style="display:none;">
 	<ul>
+		<li>由于cookie信息会干扰Basic Authentcation的认证，所以在添加或者编辑用户信息的时候，为了确保你可以正确设置你的账号信息，请你先<b><a href="http://t.sina.com.cn/logout.php?backurl=/" target="_blank">退出新浪微博</a></b></li>
 		<li>
 			<label for="account-name">用户名：</label>
 			<input type="text" id="account-name" />
@@ -90,6 +91,9 @@
 </div>
 <br>
 <input type="button" id="save-all" value="保存" />
+<div style="color:green;">注：本插件改自我写的另外一个嘀咕的插件，对于新浪微博的一些其他的操作还不熟悉，只是简单的修改过来，基本的功能能用，先放上来，等大伙提意见，功能再慢慢完善吧。有什么建议可以直接找我<a target="_blank" href="http://t.sina.com.cn/qleelulu" >@QLeelulu</a>
+<div>PS: 哪位好心的设计大师可以帮忙设计一个logo，还有把右上角的“上digu跟随我”改成“到围脖跟随我”就万分感谢了。</div>
+</div>
 <div id="msgInfoWarp"></div>
 </body>
 </html>

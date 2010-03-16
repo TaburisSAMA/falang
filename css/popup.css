@@ -17,6 +17,7 @@ div.mainContent {margin:0 2px 0 60px;}
 div.userName {font-weight:bold;} 
 div.userName a {color:green;}
 div.msgInfo {color:#A0A0A0; padding-top:3px;} 
+div.retweeted{border-left:5px solid #487858;margin:0px 0px 5px 8px;padding-left:2px;}
 .list { margin:0; height: 400px; overflow:auto;} 
 .list li {border-bottom:1px solid #ddd; padding:5px 0 5px 0;overflow:hidden;}
 .list li .msg a{color:#F77004;}

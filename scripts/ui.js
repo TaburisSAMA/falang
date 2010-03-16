@@ -31,8 +31,15 @@ function bildMsgLi(sinaMsg, isNew){
             +'<a class="newMessage" href="javascript:void(0);" onclick="doNewMessage(this,\'' + user.screen_name + '\',' + user.id + ');">私信</a>'
             + delBtn.replace('tweetId', sinaMsg.id) + '</span></div>'
 			+'		<div class="msg">' + processMsg(sinaMsg.text);
-    for(j in sinaMsg.picPath){
-        tp = tp + '<div><a target="_blank" href="' + apiUrl.sina.detailUrl + sinaMsg.id + '" ><img src="' + sinaMsg.picPath[j] +'" /></a></div>';
+    if(sinaMsg.thumbnail_pic){
+        tp = tp + '<div><a target="_blank" href="' + sinaMsg.original_pic + '" ><img src="' + sinaMsg.thumbnail_pic +'" /></a></div>';
+    }
+    if(sinaMsg.retweeted_status){
+        tp = tp + '<div class="retweeted">' + processMsg('@' + sinaMsg.retweeted_status.user.screen_name + ' ' + sinaMsg.retweeted_status.text);
+        if(sinaMsg.retweeted_status.thumbnail_pic){
+            tp = tp + '<div><a target="_blank" href="' + sinaMsg.retweeted_status.original_pic + '" ><img src="' + sinaMsg.retweeted_status.thumbnail_pic +'" /></a></div>';
+        }
+        tp += '</div>';
     }
     tp = tp +          '</div>'
 			+'		<div class="msgInfo">' + new Date(sinaMsg.created_at).format("yyyy-MM-dd hh:mm:ss") + ' 通过 ' + (sinaMsg.source||'网站') + '</div>'
