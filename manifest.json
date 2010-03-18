@@ -1,28 +1,16 @@
 {
-  // Required
   "name": "__MSG_extName__",
-  "version": "0.0.0.1",
-
-  // Recommended
+  "version": "0.0.0.2",
   "description": "__MSG_extDes__",
   "icons":{ "48": "icons/icon48.png",
           "128": "icons/icon128.png" },
   "default_locale": "zh_CN",
-
-  // Pick one (or none)
   "browser_action": {
-    "default_icon": "icons/icon48.png", // required
-    "default_title": "发浪(FaWave) For 新浪微博(t.sina.com.cn)",      // optional; shown in tooltip
-    "popup": "popup.html"                // optional
+    "default_icon": "icons/icon48.png",
+    "default_title": "发浪(FaWave) For 新浪微博(t.sina.com.cn)",
+    "popup": "popup.html"
   },
-  //"page_action": {...},
-  //"theme": {...},
-
-  // Add any of these that you need
   "background_page": "background.html",
-  //"chrome_url_overrides": {...},
-  //"content_scripts": [...],
-  //"minimum_chrome_version": "x.y",
   "options_page": "options.html",
   "permissions": [
                    "tabs",
@@ -30,7 +18,5 @@
                    "http://s8.hk/",
                    "http://api.t.sina.com.cn/",
                    "http://api.minicloud.com.cn/"
-                 ],
-  //"plugins": [...],
-  "update_url": "http://path/to/updateInfo.xml"
+                 ]
 }
