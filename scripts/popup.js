@@ -133,19 +133,7 @@ function initTxtContentEven(){
     $("#replyTextarea").keydown(function(event){
         var c = $.trim($(this).val());
         if(event.ctrlKey && event.keyCode==13){
-            if(c){
-                var isWhisper = $('#isWhisper').val();
-                var isRepost = $('#isRepost').val();
-                if(isWhisper == '1'){
-                    sendWhisper(c);
-                }else if(isRepost == '1'){
-                    sendRepost(c);
-                }else{
-                    sendSinaMsg(c, true);
-                }
-            }else{
-                showMsg('请输入要发送的内容');
-            }
+            sendMsgByActionType(c);
             return false;
         }
     });
@@ -153,22 +141,34 @@ function initTxtContentEven(){
     $("#replySubmit").click(function(){
         var txt = $("#replyTextarea");
         var c = $.trim(txt.val());
-        if(c){
-            var isWhisper = $('#isWhisper').val();
-            var isRepost = $('#isRepost').val();
-            if(isWhisper == '1'){
-                sendWhisper(c);
-            }else if(isRepost == '1'){
-                sendRepost(c);
-            }else{
-                sendSinaMsg(c, true);
-            }
-        }else{
-            showMsg('请输入要发送的内容');
-        }
+        sendMsgByActionType(c);
     });
 //>>>回复结束<<<
 };
+
+function sendMsgByActionType(c){//c:要发送的内容
+    if(c){
+        var actionType = $('#actionType').val();
+        switch(actionType){
+            case 'newmsg':
+                sendWhisper(c);
+                break;
+            case 'repost':
+                sendRepost(c);
+                break;
+            case 'comment':
+                sendComment(c);
+                break;
+            case 'reply':
+                sendSinaMsg(c, true);
+                break;
+            default:
+                showMsg('检查发送类型出错。');
+        }
+    }else{
+        showMsg('请输入要发送的内容');
+    }
+}
 
 //统计字数
 function countInputText(){
@@ -530,8 +530,6 @@ function sendSinaMsg(msg, isReply){
                 hideMsgInput();
             }
             txt.val('');
-            //var li = bildMsgLi(sinaMsg);
-            //$("#sinaFriendsTimeline").prepend(li);
             setTimeout(callCheckNewMsg, 1000);
             showMsg('发送成功！');
         }else if(sinaMsg.error){
@@ -555,7 +553,7 @@ function sendWhisper(msg){
         if(sinaMsg.id){
             hideReplyInput();
             txt.val('');
-            setTimeout(callCheckNewMsg, 1000);
+            //setTimeout(callCheckNewMsg, 1000);
             showMsg('发送成功！');
         }else if(sinaMsg.error){
             showMsg('error: ' + sinaMsg.error);
@@ -588,6 +586,29 @@ function sendRepost(msg){
     });
 };
 
+function sendComment(msg){
+    var btn, txt, data;
+    btn = $("#replySubmit");
+    txt = $("#replyTextarea");
+    var commentTweetId = $('#commentTweetId').val();
+    data = {comment: msg, id:commentTweetId};
+    
+    btn.attr('disabled','true');
+    txt.attr('disabled','true');
+    sinaApi.comment(data, function(sinaMsg, textStatus){
+        if(sinaMsg.id){
+            hideReplyInput();
+            txt.val('');
+            //setTimeout(callCheckNewMsg, 1000);
+            showMsg('发送成功！');
+        }else if(sinaMsg.error){
+            showMsg('error: ' + sinaMsg.error);
+        }
+        btn.removeAttr('disabled');
+        txt.removeAttr('disabled');
+    });
+};
+
 function callCheckNewMsg(){
     var b_view = getBackgroundView();
     if(b_view){
@@ -598,7 +619,10 @@ function callCheckNewMsg(){
 function showMsgInput(){
     $(".list").css('height', '320');
     $("#doing").removeClass("doing").appendTo('#doingWarp');
-    $("#txtContent").attr('rows', 5).removeClass('padDoing');
+    var t = $("#txtContent");
+    var v = t.val();
+    t.attr('rows', 5).removeClass('padDoing').focus();
+    t.val('').val(v);//负值，使光标定于文字最后面
     $("#submitWarp").show();
 };
 
@@ -615,8 +639,7 @@ function hideReplyInput(){
 
 //====>>>>>>>>>>>>>>>
 function doReply(ele, userName, tweetId){//回复
-    $('#isWhisper').val('0');
-    $('#isRepost').val('0');
+    $('#actionType').val('reply');
     $('#replyTweetId').val(tweetId);
     $('#replyUserName').val(userName);
     $('#ye_dialog_title').html('@' + userName);
@@ -626,8 +649,7 @@ function doReply(ele, userName, tweetId){//回复
 };
 
 function doRepost(ele, userName, tweetId){//转发
-    $('#isWhisper').val('0');
-    $('#isRepost').val('1'); //是转发
+    $('#actionType').val('repost');
     $('#repostTweetId').val(tweetId);
     $('#replyUserName').val(userName);
     $('#ye_dialog_title').html('转发@' + userName + ' 的信息');
@@ -636,9 +658,18 @@ function doRepost(ele, userName, tweetId){//转发
     countReplyText();
 };
 
+function doComment(ele, userName, tweetId){//评论
+    $('#actionType').val('comment');
+    $('#commentTweetId').val(tweetId);
+    $('#replyUserName').val(userName);
+    $('#ye_dialog_title').html('评论@' + userName + ' 的信息');
+    $('#ye_dialog_window').show();
+    $('#replyTextarea').val('').focus();
+    countReplyText();
+};
+
 function doNewMessage(ele, userName, toUserId){//悄悄话
-    $('#isWhisper').val('1'); //是悄悄话
-    $('#isRepost').val('0');
+    $('#actionType').val('newmsg');
     $('#whisperToUserId').val(toUserId);
     $('#replyUserName').val(userName);
     $('#ye_dialog_title').html('给@' + userName + ' 悄悄话');

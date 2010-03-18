@@ -15,10 +15,12 @@ var apiUrl = {
     sina : {
         public_timeline:        api_domain_sina + '/statuses/public_timeline' + result_format,
         friends_timeline:       api_domain_sina + '/statuses/friends_timeline' + result_format,
+        comments_timeline:      api_domain_sina + '/statuses/comments_timeline' + result_format,
         user_timeline:          api_domain_sina + '/statuses/user_timeline' + result_format,
         mentions:               api_domain_sina + '/statuses/mentions' + result_format,
         update:                 api_domain_sina + '/statuses/update' + result_format,
         repost:                 api_domain_sina + '/statuses/repost' + result_format,
+        comment:                api_domain_sina + '/statuses/comment' + result_format,
         destroy:                api_domain_sina + '/direct_messages/destroy' + result_format,
         direct_messages:        api_domain_sina + '/direct_messages' + result_format, //0 表示悄悄话，1 表示戳一下，2 表示升级通知，3 表示代发通知，4 表示系统消息。100表示不分类，都查询。
         new_message:            api_domain_sina + '/direct_messages/new' + result_format,
@@ -54,6 +56,16 @@ var sinaApi = {
 		if(!callbackFn) return;
         var params = {
             url: apiUrl.sina.friends_timeline,
+            type: 'get',
+            data: (data||{})
+        };
+        _sendRequest(params, callbackFn);
+	},
+
+    comments_timeline: function(data, callbackFn){
+		if(!callbackFn) return;
+        var params = {
+            url: apiUrl.sina.comments_timeline,
             type: 'get',
             data: (data||{})
         };
@@ -115,7 +127,17 @@ var sinaApi = {
         };
         _sendRequest(params, callbackFn);
     },
-    
+
+    comment: function(data, callbackFn){
+        if(!callbackFn) return;
+        var params = {
+            url: apiUrl.sina.comment,
+            type: 'post',
+            data: (data||{})
+        };
+        _sendRequest(params, callbackFn);
+    },
+
     destroy: function(data, callbackFn){
         if(!callbackFn) return;
         var params = {
@@ -133,6 +155,12 @@ function _sendRequest(params, callbackFn){
     if(!user) return;
     params.data['source'] = SOURCE;
     params.data['count'] = 100;
+    if(params.data.status){
+        params.data.status = encodeURIComponent(params.data.status);
+    }
+    if(params.data.comment){
+        params.data.comment = encodeURIComponent(params.data.comment);
+    }
     $.ajax({
         url: params.url,
         username: user.userName,
