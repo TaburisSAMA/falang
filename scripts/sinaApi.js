@@ -140,9 +140,10 @@ var sinaApi = {
     },
 
     destroy: function(data, callbackFn){
-        if(!callbackFn) return;
+        if(!data || !data.id){return;}
+        if(!callbackFn){ return; }
         var params = {
-            url: apiUrl.sina.destroy,
+            url: apiUrl.sina.destroy.replace(result_format, '/' + data.id + result_format),
             type: 'POST',
             data: (data||{})
         };
