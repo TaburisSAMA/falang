@@ -21,7 +21,8 @@ var apiUrl = {
         update:                 api_domain_sina + '/statuses/update' + result_format,
         repost:                 api_domain_sina + '/statuses/repost' + result_format,
         comment:                api_domain_sina + '/statuses/comment' + result_format,
-        destroy:                api_domain_sina + '/direct_messages/destroy' + result_format,
+        destroy:                api_domain_sina + '/statuses/destroy' + result_format,
+        destroy_msg:            api_domain_sina + '/direct_messages/destroy' + result_format,
         direct_messages:        api_domain_sina + '/direct_messages' + result_format, //0 表示悄悄话，1 表示戳一下，2 表示升级通知，3 表示代发通知，4 表示系统消息。100表示不分类，都查询。
         new_message:            api_domain_sina + '/direct_messages/new' + result_format,
         verify_credentials:     api_domain_sina + '/account/verify_credentials' + result_format,

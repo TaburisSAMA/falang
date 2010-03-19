@@ -619,10 +619,7 @@ function callCheckNewMsg(){
 function showMsgInput(){
     $(".list").css('height', '320');
     $("#doing").removeClass("doing").appendTo('#doingWarp');
-    var t = $("#txtContent");
-    var v = t.val();
-    t.attr('rows', 5).removeClass('padDoing').focus();
-    t.val('').val(v);//负值，使光标定于文字最后面
+    $("#txtContent").attr('rows', 5).removeClass('padDoing');
     $("#submitWarp").show();
 };
 
@@ -654,7 +651,20 @@ function doRepost(ele, userName, tweetId){//转发
     $('#replyUserName').val(userName);
     $('#ye_dialog_title').html('转发@' + userName + ' 的信息');
     $('#ye_dialog_window').show();
-    $('#replyTextarea').val('').focus();
+    var d = $(ele).parent().parent().parent().parent().find('.msgObjJson').text();
+    try{
+        d = JSON.parse(d);
+    }
+    catch(err){
+        d = null;
+    }
+    var v = '';
+    if(d && d.retweeted_status){
+        v = '//' + d.text;
+    }
+    var t = $('#replyTextarea');
+    t.focus().val('').blur();
+    t.val(v).focus();
     countReplyText();
 };
 
@@ -682,8 +692,10 @@ function doRT(ele){//转嘀
     var data = $(ele).closest('li').find('.msgObjJson').text();
     data = JSON.parse(data);
     var t = $("#txtContent");
+    t.focus();
     t.val('转: ' + '@' + data.user.name + ' ' + data.text);
     showMsgInput();
+
     countInputText();
 };
 

@@ -32,18 +32,17 @@ function bildMsgLi(sinaMsg, isNew){
             +'<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');">评论</a>'
             +'<a class="newMessage" href="javascript:void(0);" onclick="doNewMessage(this,\'' + user.screen_name + '\',' + user.id + ');">私信</a>'
             + delBtn.replace('tweetId', sinaMsg.id) + '</span></div>'
-			+'		<div class="msg">' + processMsg(sinaMsg.text);
+			+'		<div class="msg"><div class="tweet">' + processMsg(sinaMsg.text);
     if(sinaMsg.thumbnail_pic){
         tp = tp + '<div><a target="_blank" href="' + sinaMsg.original_pic + '" ><img src="' + sinaMsg.thumbnail_pic +'" /></a></div>';
     }
     if(sinaMsg.retweeted_status){
-        tp = tp + '<div class="retweeted">' + processMsg('@' + sinaMsg.retweeted_status.user.screen_name + ' ' + sinaMsg.retweeted_status.text);
+        tp = tp + '</div><div class="retweeted">' + processMsg('@' + sinaMsg.retweeted_status.user.screen_name + ' ' + sinaMsg.retweeted_status.text);
         if(sinaMsg.retweeted_status.thumbnail_pic){
             tp = tp + '<div><a target="_blank" href="' + sinaMsg.retweeted_status.original_pic + '" ><img src="' + sinaMsg.retweeted_status.thumbnail_pic +'" /></a></div>';
         }
-        tp += '</div>';
     }
-    tp = tp +          '</div>'
+    tp = tp +          '</div></div>'
 			+'		<div class="msgInfo">' + new Date(sinaMsg.created_at).format("yyyy-MM-dd hh:mm:ss") + ' 通过 ' + (sinaMsg.source||'网站') + '</div>'
 			+'	</div><div class="msgObjJson" style="display:none;">' + JSON.stringify(sinaMsg) + '</div>'
 			+'</li>';   
