@@ -10,6 +10,7 @@ var USER_LIST_KEY = 'idi_userlist';
 var CURRENT_USER_KEY = 'idi_current_user';
 var REFRESH_TIME_KEY = 'idi_REFRESH_TIME_KEY';
 
+var LAST_MSG_ID = 'idi_last_msg_id';
 var LAST_FRIENDS_TIMELINE_MSG_ID = 'idi_last_friends_timeline_msg_id';
 var LAST_REPLIES_MSG_ID = 'idi_last_replies_msg_id';
 var LAST_MESSAGES_MSG_ID = 'idi_last_messages_msg_id';
@@ -177,29 +178,14 @@ function removeUnreadMessagesCount(){
 };
 
 //===>>>>>>>>>>>>>>>>>>>>>>>
-function setLastFriendsTimeLineMsgId(id){
-    localStorage.setObject(getUser().userName + LAST_FRIENDS_TIMELINE_MSG_ID, id);
+function setLastMsgId(id, t){
+    localStorage.setObject(getUser().userName + t + LAST_MSG_ID, id);
 }
 
-function setLastRepliesMsgId(id){
-    localStorage.setObject(getUser().userName + LAST_REPLIES_MSG_ID, id);
+function getLastMsgId(t){
+    return localStorage.getObject(getUser().userName + t + LAST_MSG_ID);
 }
 
-function setLastMessagesMsgId(id){
-    localStorage.setObject(getUser().userName + LAST_MESSAGES_MSG_ID, id);
-}
-
-function getLastFriendsTimeLineMsgId(){
-    return localStorage.getObject(getUser().userName + LAST_FRIENDS_TIMELINE_MSG_ID);
-}
-
-function getLastRepliesMsgId(){
-    return localStorage.getObject(getUser().userName + LAST_REPLIES_MSG_ID);
-}
-
-function getLastMessagesMsgId(){
-    return localStorage.getObject(getUser().userName + LAST_MESSAGES_MSG_ID);
-}
 //<<<<<<<<<<<<<<<<=========
 
 //====>>>>>>>>>>>

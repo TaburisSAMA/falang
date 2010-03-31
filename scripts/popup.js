@@ -40,10 +40,13 @@ function init(){
 
     initChangeUserList();
 
-    getSinaFriendsTimeline();
+    getSinaTimeline('friends_timeline');
+    getSinaTimeline('mentions');
+    getSinaTimeline('direct_messages');
+    //getSinaFriendsTimeline();
     initMsgHover();
-    getSinaReplies();
-    getSinaMessages();
+    //getSinaReplies();
+    //getSinaMessages();
 
     addUnreadCountToTabs();
     initChangeChannel();
@@ -55,7 +58,7 @@ function init(){
 }
 
 function initTabs(){
-    window.currentTab = '#sinaFriendsTimeline';
+    window.currentTab = '#friends_timeline_timeline';
     $('.tabs li').click(function() {
         var t = $(this);
         //不进行任何操作							 
@@ -66,7 +69,7 @@ function initTabs(){
         t.siblings().removeClass('active').end()
                 .addClass('active');
         //切换tab
-        $('.list').hide();
+        $('.list_p').hide();
         $(t.attr('href')).show();
         window.currentTab = t.attr('href');
     });
@@ -261,25 +264,25 @@ function initChangeUserList(){
 
 //切换tab
 function initChangeChannel(){
-    $(".tab-1").click(function(){
+    $(".tab-mentions").click(function(){
         removeUnreadRepliesCount();
-        $(".tab-1 .unreadCount").html('');
+        $(".tab-mentions .unreadCount").html('');
     });
 
-    $(".tab-2").click(function(){
+    $(".tab-direct_messages").click(function(){
         removeUnreadMessagesCount();
-        $(".tab-2 .unreadCount").html('');
+        $(".tab-direct_messages .unreadCount").html('');
     });
 }
 
 function addUnreadCountToTabs(){
     var ur = getUnreadRepliesCount();
     if(ur>0){
-        $(".tab-1 .unreadCount").html('(' + ur + ')');
+        $(".tab-mentions .unreadCount").html('(' + ur + ')');
     }
     var um = getUnreadMessagesCount();
     if(um>0){
-        $(".tab-2 .unreadCount").html('(' + um + ')');
+        $(".tab-direct_messages .unreadCount").html('(' + um + ')');
     }
 }
 
@@ -298,99 +301,122 @@ function initMsgHover(){
 };
 
 //====>>>>>>>>>>>>>>>>>>>>>>
-function getSinaFriendsTimeline(){
-    showLoading();
-    var sina_ul = $("#sinaFriendsTimeline");
-    var c_user = getUser(CURRENT_USER_KEY);
-    var cacheNew = localStorage.getObject(SINA + c_user.userName + FRIENDS_TIMELINE_KEY + LOCAL_STORAGE_NEW_TWEET_LIST_KEY);
-    if(cacheNew){
-        sina_ul.append(cacheNew.join(''));
-        localStorage.setObject(SINA + c_user.userName + FRIENDS_TIMELINE_KEY + LOCAL_STORAGE_NEW_TWEET_LIST_KEY, '');
-    }
-    var cache = localStorage.getObject(SINA + c_user.userName + FRIENDS_TIMELINE_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY);
-    if(cache){
-        sina_ul.append(cache.slice(0, pageSize).join(''));
-        if(cache.length > pageSize){
-            showFReadMore();
-        }
-    }
-    if(cacheNew){
-        for(i in cacheNew){
-            var temp = cacheNew[i].replace(/<li class="unread-item/g, '<li class="');
-            cacheNew[i] = temp;
-        }
-        friendsTimeline_offset += cacheNew.length;
-        if(!cache){ cache = []; }
-        cacheNew = cacheNew.concat(cache);
-        cacheNew = cacheNew.slice(0, getCacheCount());
-        localStorage.setObject(SINA + c_user.userName + FRIENDS_TIMELINE_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY, 
-                cacheNew);
-    }
-    removeUnreadFriendsTimelineCount();
-    hideLoading();
-};
 
-function getSinaReplies(){
+//获取时间线微博列表
+//@t : 类型
+function getSinaTimeline(t){
     showLoading();
-    var sina_ul = $("#sinaReplies");
+    var _ul = $("#" + t + "_timeline ul.list");
     var c_user = getUser(CURRENT_USER_KEY);
-    var cacheNew = localStorage.getObject(SINA + c_user.userName + REPLIES_KEY + LOCAL_STORAGE_NEW_TWEET_LIST_KEY);
-    if(cacheNew){
-        sina_ul.append(cacheNew.join(''));
-        localStorage.setObject(SINA + c_user.userName + REPLIES_KEY + LOCAL_STORAGE_NEW_TWEET_LIST_KEY, '');
-    }
-    var cache = localStorage.getObject(SINA + c_user.userName + REPLIES_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY);
-    if(cache){
-        sina_ul.append(cache.slice(0, pageSize).join(''));
-        if(cache.length > pageSize){
-            showRReadMore();
+    var b_view = getBackgroundView();
+    var _key = c_user.userName + t + '_tweets';
+    if(b_view && b_view.tweets[_key]){
+        var tweets = b_view.tweets[_key];
+        tweets = tweets.slice(0, pageSize);
+        var html = '';
+        for(i in tweets){
+            html += bildMsgLi(tweets[i], t);
         }
+        _ul.append(html);
+    }else{
+        b_view.checkTimeline(t);
     }
-    if(cacheNew){
-        for(i in cacheNew){
-            cacheNew[i] = cacheNew[i].replace(/<li class="unread-item/g, '<li class="');
-        }
-        replys_offset += cacheNew.length;
-        if(!cache){ cache = []; }
-        cacheNew = cacheNew.concat(cache);
-        cacheNew = cacheNew.slice(0, getCacheCount());
-        localStorage.setObject(SINA + c_user.userName + REPLIES_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY, 
-                cacheNew );
-    }
-    //removeUnreadRepliesCount();
     hideLoading();
-};
+}
 
-function getSinaMessages(){
-    showLoading();
-    var sina_ul = $("#sinaMessages");
-    var c_user = getUser(CURRENT_USER_KEY);
-    var cacheNew = localStorage.getObject(SINA + c_user.userName + MESSAGES_KEY + LOCAL_STORAGE_NEW_TWEET_LIST_KEY);
-    if(cacheNew){
-        sina_ul.append(cacheNew.join(''));
-        localStorage.setObject(SINA + c_user.userName + MESSAGES_KEY + LOCAL_STORAGE_NEW_TWEET_LIST_KEY, '');
-    }
-    var cache = localStorage.getObject(SINA + c_user.userName + MESSAGES_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY);
-    if(cache){
-        sina_ul.append(cache.slice(0, pageSize).join(''));
-        if(cache.length > pageSize){
-            showMReadMore();
-        }
-    }
-    if(cacheNew){
-        for(i in cacheNew){
-            cacheNew[i] = cacheNew[i].replace(/<li class="unread-item/g, '<li class="');
-        }
-        messages_offset = cacheNew.length;
-        if(!cache){ cache = []; }
-        cacheNew = cacheNew.concat(cache);
-        cacheNew = cacheNew.slice(0, getCacheCount());
-        localStorage.setObject(SINA + c_user.userName + MESSAGES_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY, 
-                cacheNew );
-    }
-    //removeUnreadMessagesCount();
-    hideLoading();
-};
+//function getSinaFriendsTimeline(){
+//    showLoading();
+//    var sina_ul = $("#sinaFriendsTimeline");
+//    var c_user = getUser(CURRENT_USER_KEY);
+//    var cacheNew = localStorage.getObject(SINA + c_user.userName + FRIENDS_TIMELINE_KEY + LOCAL_STORAGE_NEW_TWEET_LIST_KEY);
+//    if(cacheNew){
+//        sina_ul.append(cacheNew.join(''));
+//        localStorage.setObject(SINA + c_user.userName + FRIENDS_TIMELINE_KEY + LOCAL_STORAGE_NEW_TWEET_LIST_KEY, '');
+//    }
+//    var cache = localStorage.getObject(SINA + c_user.userName + FRIENDS_TIMELINE_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY);
+//    if(cache){
+//        sina_ul.append(cache.slice(0, pageSize).join(''));
+//        if(cache.length > pageSize){
+//            showFReadMore();
+//        }
+//    }
+//    if(cacheNew){
+//        for(i in cacheNew){
+//            var temp = cacheNew[i].replace(/<li class="unread-item/g, '<li class="');
+//            cacheNew[i] = temp;
+//        }
+//        friendsTimeline_offset += cacheNew.length;
+//        if(!cache){ cache = []; }
+//        cacheNew = cacheNew.concat(cache);
+//        cacheNew = cacheNew.slice(0, getCacheCount());
+//        localStorage.setObject(SINA + c_user.userName + FRIENDS_TIMELINE_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY, 
+//                cacheNew);
+//    }
+//    removeUnreadFriendsTimelineCount();
+//    hideLoading();
+//};
+//
+//function getSinaReplies(){
+//    showLoading();
+//    var sina_ul = $("#sinaReplies");
+//    var c_user = getUser(CURRENT_USER_KEY);
+//    var cacheNew = localStorage.getObject(SINA + c_user.userName + REPLIES_KEY + LOCAL_STORAGE_NEW_TWEET_LIST_KEY);
+//    if(cacheNew){
+//        sina_ul.append(cacheNew.join(''));
+//        localStorage.setObject(SINA + c_user.userName + REPLIES_KEY + LOCAL_STORAGE_NEW_TWEET_LIST_KEY, '');
+//    }
+//    var cache = localStorage.getObject(SINA + c_user.userName + REPLIES_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY);
+//    if(cache){
+//        sina_ul.append(cache.slice(0, pageSize).join(''));
+//        if(cache.length > pageSize){
+//            showRReadMore();
+//        }
+//    }
+//    if(cacheNew){
+//        for(i in cacheNew){
+//            cacheNew[i] = cacheNew[i].replace(/<li class="unread-item/g, '<li class="');
+//        }
+//        replys_offset += cacheNew.length;
+//        if(!cache){ cache = []; }
+//        cacheNew = cacheNew.concat(cache);
+//        cacheNew = cacheNew.slice(0, getCacheCount());
+//        localStorage.setObject(SINA + c_user.userName + REPLIES_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY, 
+//                cacheNew );
+//    }
+//    //removeUnreadRepliesCount();
+//    hideLoading();
+//};
+//
+//function getSinaMessages(){
+//    showLoading();
+//    var sina_ul = $("#sinaMessages");
+//    var c_user = getUser(CURRENT_USER_KEY);
+//    var cacheNew = localStorage.getObject(SINA + c_user.userName + MESSAGES_KEY + LOCAL_STORAGE_NEW_TWEET_LIST_KEY);
+//    if(cacheNew){
+//        sina_ul.append(cacheNew.join(''));
+//        localStorage.setObject(SINA + c_user.userName + MESSAGES_KEY + LOCAL_STORAGE_NEW_TWEET_LIST_KEY, '');
+//    }
+//    var cache = localStorage.getObject(SINA + c_user.userName + MESSAGES_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY);
+//    if(cache){
+//        sina_ul.append(cache.slice(0, pageSize).join(''));
+//        if(cache.length > pageSize){
+//            showMReadMore();
+//        }
+//    }
+//    if(cacheNew){
+//        for(i in cacheNew){
+//            cacheNew[i] = cacheNew[i].replace(/<li class="unread-item/g, '<li class="');
+//        }
+//        messages_offset = cacheNew.length;
+//        if(!cache){ cache = []; }
+//        cacheNew = cacheNew.concat(cache);
+//        cacheNew = cacheNew.slice(0, getCacheCount());
+//        localStorage.setObject(SINA + c_user.userName + MESSAGES_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY, 
+//                cacheNew );
+//    }
+//    //removeUnreadMessagesCount();
+//    hideLoading();
+//};
 //<<<<<<<<<<<<<<<<<<<<<<<========
 
 //======>>>>>>>>>>>>>>>>
@@ -436,9 +462,14 @@ function showMReadMore(){
 
 //====>>>>>>>>>>>>>>>>>>
 /*如果当前tab是激活的，就返回true，否则返回false(即为未读)*/
-function addSinaFriendsTimeline(msgs){
-    $("#sinaFriendsTimeline").prepend(msgs.join(''));
-    var li = $('.tab-0');
+function addTimelineMsgs(msgs, t){
+    var html = '';
+    for(i in msgs){
+        html += bildMsgLi(msgs[i]);
+    }
+    var _ul = $("#" + t + "_timeline ul.list");
+    _ul.prepend(html);
+    var li = $('.tab-' + t);
     if(!li.hasClass('active')){
         var ur = getUnreadFriendsTimelineCount();
         ur += msgs.length;
@@ -450,33 +481,47 @@ function addSinaFriendsTimeline(msgs){
     return true;
 };
 
-function addSinaReplies(msgs){
-    $("#sinaReplies").prepend(msgs.join(''));
-    var li = $('.tab-1');
-    if(!li.hasClass('active')){
-        var ur = getUnreadRepliesCount();
-        ur += msgs.length;
-        if(ur>0){
-            li.find('.unreadCount').html('(' + ur + ')');
-        }
-        return false;
-    }
-    return true;
-};
-
-function addSinaMessages(msgs){
-    $("#sinaMessages").prepend(msgs.join(''));
-    var li = $('.tab-2');
-    if(!li.hasClass('active')){
-        var ur = getUnreadMessagesCount();
-        ur += msgs.length;
-        if(ur>0){
-            li.find('.unreadCount').html('(' + ur + ')');
-        }
-        return false;
-    }
-    return true;
-};
+//function addSinaFriendsTimeline(msgs){
+//    $("#sinaFriendsTimeline").prepend(msgs.join(''));
+//    var li = $('.tab-0');
+//    if(!li.hasClass('active')){
+//        var ur = getUnreadFriendsTimelineCount();
+//        ur += msgs.length;
+//        if(ur>0){
+//            li.find('.unreadCount').html('(' + ur + ')');
+//        }
+//        return false;
+//    }
+//    return true;
+//};
+//
+//function addSinaReplies(msgs){
+//    $("#sinaReplies").prepend(msgs.join(''));
+//    var li = $('.tab-1');
+//    if(!li.hasClass('active')){
+//        var ur = getUnreadRepliesCount();
+//        ur += msgs.length;
+//        if(ur>0){
+//            li.find('.unreadCount').html('(' + ur + ')');
+//        }
+//        return false;
+//    }
+//    return true;
+//};
+//
+//function addSinaMessages(msgs){
+//    $("#sinaMessages").prepend(msgs.join(''));
+//    var li = $('.tab-2');
+//    if(!li.hasClass('active')){
+//        var ur = getUnreadMessagesCount();
+//        ur += msgs.length;
+//        if(ur>0){
+//            li.find('.unreadCount').html('(' + ur + ')');
+//        }
+//        return false;
+//    }
+//    return true;
+//};
 //<<<<<<<<<<<<<<<<====
 
 function changeUser(userName){

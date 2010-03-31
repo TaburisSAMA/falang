@@ -104,7 +104,7 @@ function saveAccount(){
             }else{
                 var temp_username = $("#edit-account-name").val();
                 delete userList[temp_username];
-                data.userName = data.email;//兼容预览版
+                data.userName = user.userName;//兼容预览版
                 data.password = user.password;
                 userList[userName] = data;
                 localStorage.setObject(USER_LIST_KEY, userList);
@@ -245,7 +245,7 @@ function refreshAccountWarp(userList, r_user, stat){
             userList[user.userName] = user;
             stat.errorCount++;
         }else{
-            data.userName = data.name.toLowerCase();//兼容预览版
+            data.userName = user.userName;//兼容预览版
             data.password = user.password;
             userList[data.userName] = data;
             stat.successCount++;
@@ -271,5 +271,9 @@ function cleanLocalStorageData(){
                 localStorage.removeItem(key);
             }
         }
+    }
+    var b_view = getBackgroundView();
+    if(b_view){
+        b_view.tweets = {};
     }
 }

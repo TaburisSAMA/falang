@@ -1,3 +1,29 @@
+//var tp = '<li class="{#if $T.read} read {#else} unread-item {#/if}" id="tweet{$T.id}" did="{$T.id}">'
+//            +'  <div class="usericon"><a target="_blank" href="{$P.domain_sina}/' + (user.domain||user.id) + '"><img src="' + user.profile_image_url.replace('24x24', '48x48') + '" /></a></div>'
+//			+'	<div class="mainContent">'
+//			+'		<div class="userName"><a target="_blank" href="' + domain_sina + '/' + (user.domain||user.id) + '">' + user.screen_name + inreplyBtn
+//            +'</a><span class="edit"><a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');">回复</a>' 
+//            +'<a class="rtweet" href="javascript:void(0);" onclick="doRT(this);">RT</a>' 
+//            +'<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');">转发</a>'
+//            +'<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');">评论</a>'
+//            +'<a class="newMessage" href="javascript:void(0);" onclick="doNewMessage(this,\'' + user.screen_name + '\',' + user.id + ');">私信</a>'
+//            + delBtn.replace('tweetId', sinaMsg.id) + '</span></div>'
+//			+'		<div class="msg"><div class="tweet">' + processMsg(sinaMsg.text);
+//    if(sinaMsg.thumbnail_pic){
+//        tp = tp + '<div><a target="_blank" href="' + sinaMsg.original_pic + '" ><img src="' + sinaMsg.thumbnail_pic +'" /></a></div>';
+//    }
+//    if(sinaMsg.retweeted_status){
+//        tp = tp + '</div><div class="retweeted">' + processMsg('@' + sinaMsg.retweeted_status.user.screen_name + ' ' + sinaMsg.retweeted_status.text);
+//        if(sinaMsg.retweeted_status.thumbnail_pic){
+//            tp = tp + '<div><a target="_blank" href="' + sinaMsg.retweeted_status.original_pic + '" ><img src="' + sinaMsg.retweeted_status.thumbnail_pic +'" /></a></div>';
+//        }
+//    }
+//    tp = tp +          '</div></div>'
+//			+'		<div class="msgInfo">' + new Date(sinaMsg.created_at).format("yyyy-MM-dd hh:mm:ss") + ' 通过 ' + (sinaMsg.source||'网站') + '</div>'
+//			+'	</div><div class="msgObjJson" style="display:none;">' + JSON.stringify(sinaMsg) + '</div>'
+//			+'</li>'; 
+
+
 
 var emotionalDict={
     "微笑": "01", "我晕": "02", "口水": "03", "开心": "04", "鄙视": "05", 
@@ -10,28 +36,47 @@ var emotionalDict={
 }
 
 
-function bildMsgLi(sinaMsg, isNew){
+function bildMsgLi(sinaMsg, t){
     if(!sinaMsg){ return ''; }
-    var newItem = delBtn = inreplyBtn = '';
-    if(isNew){ newItem = ' class="unread-item" '; }
+    var newItem = delTweetBtn = inreplyBtn = '';
+    if(!sinaMsg.readed){ newItem = ' class="unread-item" '; }
     var c_user = getUser();
     var user = sinaMsg.user || sinaMsg.sender;
-    if(c_user.userName.toLowerCase() == user.name.toLowerCase()){
-        delBtn = '<a class="deltweet" href="javascript:void(0);" onclick="doDelTweet(tweetId, this);">删除</a>';
+    if(c_user.id == user.id){
+        delTweetBtn = '<a class="deltweet" href="javascript:void(0);" onclick="doDelTweet(' + sinaMsg.id + ', this);">删除</a>';
     }
     if(sinaMsg.in_reply_to_user_id && sinaMsg.in_reply_to_screen_name){
-        inreplyBtn = ' <a target="_blank" class="inreply" href="http://sina.com/relatedDialogue/' + sinaMsg.id + '" title="查看与 @'
+        inreplyBtn = ' <a target="_blank" class="inreply" href="http://t.sina.com/relatedDialogue/' + sinaMsg.id + '" title="查看与 @'
             + sinaMsg.in_reply_to_screen_name + ' 的相关对话" ><img src="images/inreply.png" /></a>';
+    }
+    var replyBtn = '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');">回复</a>';
+    var rtBtn = '<a class="rtweet" href="javascript:void(0);" onclick="doRT(this);">RT</a>';
+    var repostBtn = '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');">转发</a>';
+    var commentBtn = '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');">评论</a>';
+    var new_msgBtn = '<a class="newMessage" href="javascript:void(0);" onclick="doNewMessage(this,\'' + user.screen_name + '\',' + user.id + ');">私信</a>';
+    switch(t){
+        case 'friends_timeline':
+            break;
+        case 'mentions':
+            break;
+        case 'comments_timeline':
+            break;
+        case 'comments_by_me':
+            break;
+        case 'direct_messages':
+            repostBtn = commentBtn = '';
+            break;
+        case 'favorites':
+            break;
+        default:
+            //
     }
     var tp = '<li' + newItem + ' id="tweet' + sinaMsg.id + '" did="' + sinaMsg.id + '"><div class="usericon"><a target="_blank" href="' + domain_sina + '/' + (user.domain||user.id) + '"><img src="' + user.profile_image_url.replace('24x24', '48x48') + '" /></a></div>'
 			+'	<div class="mainContent">'
 			+'		<div class="userName"><a target="_blank" href="' + domain_sina + '/' + (user.domain||user.id) + '">' + user.screen_name + inreplyBtn
-            +'</a><span class="edit"><a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');">回复</a>' 
-            +'<a class="rtweet" href="javascript:void(0);" onclick="doRT(this);">RT</a>' 
-            +'<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');">转发</a>'
-            +'<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');">评论</a>'
-            +'<a class="newMessage" href="javascript:void(0);" onclick="doNewMessage(this,\'' + user.screen_name + '\',' + user.id + ');">私信</a>'
-            + delBtn.replace('tweetId', sinaMsg.id) + '</span></div>'
+            +'</a><span class="edit">' 
+            + replyBtn + rtBtn + repostBtn + commentBtn + new_msgBtn + delTweetBtn 
+            + '</span></div>'
 			+'		<div class="msg"><div class="tweet">' + processMsg(sinaMsg.text);
     if(sinaMsg.thumbnail_pic){
         tp = tp + '<div><a target="_blank" href="' + sinaMsg.original_pic + '" ><img src="' + sinaMsg.thumbnail_pic +'" /></a></div>';
@@ -46,8 +91,49 @@ function bildMsgLi(sinaMsg, isNew){
 			+'		<div class="msgInfo">' + new Date(sinaMsg.created_at).format("yyyy-MM-dd hh:mm:ss") + ' 通过 ' + (sinaMsg.source||'网站') + '</div>'
 			+'	</div><div class="msgObjJson" style="display:none;">' + JSON.stringify(sinaMsg) + '</div>'
 			+'</li>';   
+     sinaMsg.readed = true;
      return tp;
 };
+
+//function bildMsgLi(sinaMsg, isNew){
+//    if(!sinaMsg){ return ''; }
+//    var newItem = delBtn = inreplyBtn = '';
+//    if(isNew){ newItem = ' class="unread-item" '; }
+//    var c_user = getUser();
+//    var user = sinaMsg.user || sinaMsg.sender;
+//    if(c_user.userName.toLowerCase() == user.name.toLowerCase()){
+//        delBtn = '<a class="deltweet" href="javascript:void(0);" onclick="doDelTweet(tweetId, this);">删除</a>';
+//    }
+//    if(sinaMsg.in_reply_to_user_id && sinaMsg.in_reply_to_screen_name){
+//        inreplyBtn = ' <a target="_blank" class="inreply" href="http://sina.com/relatedDialogue/' + sinaMsg.id + '" title="查看与 @'
+//            + sinaMsg.in_reply_to_screen_name + ' 的相关对话" ><img src="images/inreply.png" /></a>';
+//    }
+//    var tp = '<li' + newItem + ' id="tweet' + sinaMsg.id + '" did="' + sinaMsg.id + '"><div class="usericon"><a target="_blank" href="' + domain_sina + '/' + (user.domain||user.id) + '"><img src="' + user.profile_image_url.replace('24x24', '48x48') + '" /></a></div>'
+//			+'	<div class="mainContent">'
+//			+'		<div class="userName"><a target="_blank" href="' + domain_sina + '/' + (user.domain||user.id) + '">' + user.screen_name + inreplyBtn
+//            +'</a><span class="edit"><a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');">回复</a>' 
+//            +'<a class="rtweet" href="javascript:void(0);" onclick="doRT(this);">RT</a>' 
+//            +'<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');">转发</a>'
+//            +'<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');">评论</a>'
+//            +'<a class="newMessage" href="javascript:void(0);" onclick="doNewMessage(this,\'' + user.screen_name + '\',' + user.id + ');">私信</a>'
+//            + delBtn.replace('tweetId', sinaMsg.id) + '</span></div>'
+//			+'		<div class="msg"><div class="tweet">' + processMsg(sinaMsg.text);
+//    if(sinaMsg.thumbnail_pic){
+//        tp = tp + '<div><a target="_blank" href="' + sinaMsg.original_pic + '" ><img src="' + sinaMsg.thumbnail_pic +'" /></a></div>';
+//    }
+//    if(sinaMsg.retweeted_status){
+//        tp = tp + '</div><div class="retweeted">' + processMsg('@' + sinaMsg.retweeted_status.user.screen_name + ' ' + sinaMsg.retweeted_status.text);
+//        if(sinaMsg.retweeted_status.thumbnail_pic){
+//            tp = tp + '<div><a target="_blank" href="' + sinaMsg.retweeted_status.original_pic + '" ><img src="' + sinaMsg.retweeted_status.thumbnail_pic +'" /></a></div>';
+//        }
+//    }
+//    tp = tp +          '</div></div>'
+//			+'		<div class="msgInfo">' + new Date(sinaMsg.created_at).format("yyyy-MM-dd hh:mm:ss") + ' 通过 ' + (sinaMsg.source||'网站') + '</div>'
+//			+'	</div><div class="msgObjJson" style="display:none;">' + JSON.stringify(sinaMsg) + '</div>'
+//			+'</li>';   
+//     return tp;
+//};
+
 
 /**
  * 处理内容
