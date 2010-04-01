@@ -49,7 +49,7 @@ function checkTimeline(t){
             var popupView = getPopupView();
             if(popupView){
                 if(!popupView.addTimelineMsgs(tweets[_key].slice(0, sinaMsgs.length), t)){
-                    setUnreadFriendsTimelineCount(sinaMsgs.length, true);
+                    setUnreadTimelineCount(sinaMsgs.length, t, true);
                 }
             }
 
@@ -57,7 +57,7 @@ function checkTimeline(t){
                 setLastMsgId(_last_id, t);
             }
         }else{
-            setUnreadFriendsTimelineCount(0, true);
+            setUnreadTimelineCount(0, t, true);
         }
         window.checking[t] = false;
     });
@@ -243,8 +243,9 @@ function onChangeUser(){
     if(c_user){
         //window.c_user = c_user;
     }
-    setUnreadFriendsTimelineCount(0, true);
-    setUnreadRepliesCount(0, true);
+    for(i in T_LIST){
+        setUnreadTimelineCount(0, T_LIST[i], true);
+    }
     checkNewMsg();
     itv = setInterval(checkNewMsg, 1000 * 60);
 };

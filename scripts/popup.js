@@ -12,7 +12,16 @@ var t_changeUser = '<table id="changeUser" class="tab-none" cellspacing="0" ><tr
             + '<td><img style="width:24px;height:24px;" class="userImg" src="{{profile_image_url}}" /></td></tr></table>';
 
 var pageSize = 20;
-var friendsTimeline_offset = replys_offset = messages_offset = pageSize;
+var timeline_offset = {};
+function getTimelineOffset(t){
+    return timeline_offset[t] || pageSize;
+}
+function setTimelineOffset(t, offset){
+    var n = getTimelineOffset(t);
+    timeline_offset[t] = n + offset;
+}
+
+//var friendsTimeline_offset = replys_offset = messages_offset = pageSize;
 
 function initOnLoad(){
     setTimeout(init, 100);
@@ -40,9 +49,9 @@ function init(){
 
     initChangeUserList();
 
-    getSinaTimeline('friends_timeline');
-    getSinaTimeline('mentions');
-    getSinaTimeline('direct_messages');
+    for(i in T_LIST){
+        getSinaTimeline(T_LIST[i]);
+    }
     //getSinaFriendsTimeline();
     initMsgHover();
     //getSinaReplies();
@@ -264,25 +273,34 @@ function initChangeUserList(){
 
 //切换tab
 function initChangeChannel(){
+    $(".tab-friends_timeline").click(function(){
+        removeUnreadTimelineCount('friends_timeline');
+        $(".tab-friends_timeline .unreadCount").html('');
+    });
+
     $(".tab-mentions").click(function(){
-        removeUnreadRepliesCount();
+        removeUnreadTimelineCount('mentions');
         $(".tab-mentions .unreadCount").html('');
     });
 
     $(".tab-direct_messages").click(function(){
-        removeUnreadMessagesCount();
+        removeUnreadTimelineCount('direct_messages');
         $(".tab-direct_messages .unreadCount").html('');
     });
 }
 
 function addUnreadCountToTabs(){
-    var ur = getUnreadRepliesCount();
-    if(ur>0){
-        $(".tab-mentions .unreadCount").html('(' + ur + ')');
-    }
-    var um = getUnreadMessagesCount();
-    if(um>0){
-        $(".tab-direct_messages .unreadCount").html('(' + um + ')');
+    var ur = 0;
+    var tab = '';
+    for(i in T_LIST){
+        ur = getUnreadTimelineCount(T_LIST[i]);
+        if(ur>0){
+            tab = $(".tab-" + T_LIST[i]);
+            if(tab.length == 1 && !tab.hasClass('active')){
+                tab.find('.unreadCount').html('(' + ur + ')');
+            }
+        }
+        ur = 0;
     }
 }
 
@@ -420,44 +438,59 @@ function getSinaTimeline(t){
 //<<<<<<<<<<<<<<<<<<<<<<<========
 
 //======>>>>>>>>>>>>>>>>
-function showFReadMore(){
-    $('<a href="javascript:void(0);" id="FReadMore" class="readMore">更多</a>')
-        .appendTo("#sinaFriendsTimeline").css("display", "block");
-    $("#FReadMore").click(function(){
-        var cache = localStorage.getObject(SINA + getUser().userName + FRIENDS_TIMELINE_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY);
-        $(this).before(cache.slice(friendsTimeline_offset, friendsTimeline_offset + pageSize).join(''));
-        friendsTimeline_offset += pageSize;
-        if(friendsTimeline_offset > cache.length){
+function showReadMore(t){
+    $('<a href="javascript:void(0);" id="' + t + 'ReadMore" class="readMore">更多</a>')
+        .appendTo("#" + t + '_timeline .list').css("display", "block");
+    $("#" + t + "ReadMore").click(function(){
+        //var cache = localStorage.getObject(SINA + getUser().userName + FRIENDS_TIMELINE_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY);
+        var _key = getUser().userName + t + '_tweets';
+        var cache = getBackgroundView().tweets[_key];
+        $(this).before(cache.slice(getTimelineOffset(t), getTimelineOffset(t) + pageSize).join(''));
+        getTimelineOffset(t, pageSize);
+        if(getTimelineOffset(t) > cache.length){
             $(this).hide();
         }
     });
 };
 
-function showRReadMore(){
-    $('<a href="javascript:void(0);" id="RReadMore" class="readMore">更多</a>')
-        .appendTo("#sinaReplies").css("display", "block");
-    $("#RReadMore").click(function(){
-        var cache = localStorage.getObject(SINA + getUser().userName + REPLIES_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY);
-        $(this).before(cache.slice(friendsTimeline_offset, friendsTimeline_offset + pageSize).join(''));
-        friendsTimeline_offset += pageSize;
-        if(friendsTimeline_offset > cache.length){
-            $(this).hide();
-        }
-    });
-};
-
-function showMReadMore(){
-    $('<a href="javascript:void(0);" id="MReadMore" class="readMore">更多</a>')
-        .appendTo("#sinaMessages").css("display", "block");
-    $("#MReadMore").click(function(){
-        var cache = localStorage.getObject(SINA + getUser().userName + MESSAGES_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY);
-        $(this).before(cache.slice(friendsTimeline_offset, friendsTimeline_offset + pageSize).join(''));
-        friendsTimeline_offset += pageSize;
-        if(friendsTimeline_offset > cache.length){
-            $(this).hide();
-        }
-    });
-};
+//function showFReadMore(){
+//    $('<a href="javascript:void(0);" id="FReadMore" class="readMore">更多</a>')
+//        .appendTo("#sinaFriendsTimeline").css("display", "block");
+//    $("#FReadMore").click(function(){
+//        var cache = localStorage.getObject(SINA + getUser().userName + FRIENDS_TIMELINE_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY);
+//        $(this).before(cache.slice(friendsTimeline_offset, friendsTimeline_offset + pageSize).join(''));
+//        friendsTimeline_offset += pageSize;
+//        if(friendsTimeline_offset > cache.length){
+//            $(this).hide();
+//        }
+//    });
+//};
+//
+//function showRReadMore(){
+//    $('<a href="javascript:void(0);" id="RReadMore" class="readMore">更多</a>')
+//        .appendTo("#sinaReplies").css("display", "block");
+//    $("#RReadMore").click(function(){
+//        var cache = localStorage.getObject(SINA + getUser().userName + REPLIES_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY);
+//        $(this).before(cache.slice(friendsTimeline_offset, friendsTimeline_offset + pageSize).join(''));
+//        friendsTimeline_offset += pageSize;
+//        if(friendsTimeline_offset > cache.length){
+//            $(this).hide();
+//        }
+//    });
+//};
+//
+//function showMReadMore(){
+//    $('<a href="javascript:void(0);" id="MReadMore" class="readMore">更多</a>')
+//        .appendTo("#sinaMessages").css("display", "block");
+//    $("#MReadMore").click(function(){
+//        var cache = localStorage.getObject(SINA + getUser().userName + MESSAGES_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY);
+//        $(this).before(cache.slice(friendsTimeline_offset, friendsTimeline_offset + pageSize).join(''));
+//        friendsTimeline_offset += pageSize;
+//        if(friendsTimeline_offset > cache.length){
+//            $(this).hide();
+//        }
+//    });
+//};
 //<<<<<<<<<<<======
 
 //====>>>>>>>>>>>>>>>>>>
@@ -471,7 +504,7 @@ function addTimelineMsgs(msgs, t){
     _ul.prepend(html);
     var li = $('.tab-' + t);
     if(!li.hasClass('active')){
-        var ur = getUnreadFriendsTimelineCount();
+        var ur = getUnreadTimelineCount(t);
         ur += msgs.length;
         if(ur>0){
             li.find('.unreadCount').html('(' + ur + ')');
@@ -535,15 +568,18 @@ function changeUser(userName){
         }
     }
     if(to_user){
-        $("#sinaFriendsTimeline").html('');
-        $("#sinaReplies").html('');
-        $("#sinaMessages").html('');
+        for(i in T_LIST){
+            $("#" + T_LIST[i] + '_timeline .list').html('');
+        }
         $("#changeUser .userName").html(to_user.screen_name || to_user.userName);
         $("#changeUser .userImg").attr('src', to_user.profile_image_url || '');
         setUser(to_user);
-        getSinaFriendsTimeline();
-        getSinaReplies();
-        getSinaMessages();
+        for(i in T_LIST){
+            getSinaTimeline(T_LIST[i]);
+        }
+        //getSinaFriendsTimeline();
+        //getSinaReplies();
+        //getSinaMessages();
         var b_view = getBackgroundView();
         b_view.onChangeUser();
     }

@@ -1,6 +1,6 @@
 var SINA = 'idi_sina';
 
-var UNSEND_TWEET_KEY = 'idi_UNSEND_TWEET_KEY';
+var UNSEND_TWEET_KEY = 'idi_UNSEND_TWEET_KEY';//未发送的tweet，保存下次显示
 
 var FRIENDS_TIMELINE_KEY = 'idi_friends_timeline';
 var REPLIES_KEY = 'idi_replies';
@@ -11,21 +11,24 @@ var CURRENT_USER_KEY = 'idi_current_user';
 var REFRESH_TIME_KEY = 'idi_REFRESH_TIME_KEY';
 
 var LAST_MSG_ID = 'idi_last_msg_id';
-var LAST_FRIENDS_TIMELINE_MSG_ID = 'idi_last_friends_timeline_msg_id';
-var LAST_REPLIES_MSG_ID = 'idi_last_replies_msg_id';
-var LAST_MESSAGES_MSG_ID = 'idi_last_messages_msg_id';
+//var LAST_FRIENDS_TIMELINE_MSG_ID = 'idi_last_friends_timeline_msg_id';
+//var LAST_REPLIES_MSG_ID = 'idi_last_replies_msg_id';
+//var LAST_MESSAGES_MSG_ID = 'idi_last_messages_msg_id';
 
 var LOCAL_STORAGE_NUM_KEY = 'idi_LOCAL_STORAGE_NUM_KEY';
 var LOCAL_STORAGE_NEW_TWEET_LIST_KEY = 'idi_LOCAL_STORAGE_NEW_TWEET_LIST_KEY';
 var LOCAL_STORAGE_TWEET_LIST_HTML_KEY = 'idi_LOCAL_STORAGE_TWEET_LIST_HTML_KEY';
 
-
-var UNREAD_FRIENDS_TIMELINE_COUNT_KEY = 'idi_UNREAD_FRIENDS_TIMELINE_COUNT_KEY';
-var UNREAD_REPLIES_COUNT_KEY = 'idi_UNREAD_REPLIES_COUNT_KEY';
-var UNREAD_MESSAGES_COUNT_KEY = 'idi_UNREAD_MESSAGES_COUNT_KEY';
+var UNREAD_TIMELINE_COUNT_KEY = 'idi_UNREAD_TIMELINE_COUNT_KEY';
+//var UNREAD_FRIENDS_TIMELINE_COUNT_KEY = 'idi_UNREAD_FRIENDS_TIMELINE_COUNT_KEY';
+//var UNREAD_REPLIES_COUNT_KEY = 'idi_UNREAD_REPLIES_COUNT_KEY';
+//var UNREAD_MESSAGES_COUNT_KEY = 'idi_UNREAD_MESSAGES_COUNT_KEY';
 
 var AUTO_SHORT_URL = 'idi_SHORT_URL';//是否缩短URL
 var AUTO_SHORT_URL_WORD_COUNT = 'idi_SHORT_URL_WORD_COUNT'; //URL长度超过多少自动缩短
+
+//['friends_timeline','mentions','comments_timeline','comments_by_me','direct_messages','favorites']
+var T_LIST = ['friends_timeline','mentions',,'direct_messages']; //timeline的分类列表
 
 function showMsg(msg){
     $('<div class="messageInfo">' + msg + '</div>')
@@ -84,19 +87,22 @@ function setUser(user){
     window.c_user = user;
 };
 
-function getUnreadFriendsTimelineCount(){
-    var count = localStorage.getObject(getUser().userName + UNREAD_FRIENDS_TIMELINE_COUNT_KEY);
+function getUnreadTimelineCount(t){
+    var count = localStorage.getObject(getUser().userName + t + UNREAD_TIMELINE_COUNT_KEY);
     if(!count){
         count = 0;
     }
     return count;
 };
 
-function setUnreadFriendsTimelineCount(count, setBadgeText){
-    count += getUnreadFriendsTimelineCount();
-    localStorage.setObject(getUser().userName + UNREAD_FRIENDS_TIMELINE_COUNT_KEY, count);
+function setUnreadTimelineCount(count, t, setBadgeText){
+    count += getUnreadTimelineCount(t);
+    localStorage.setObject(getUser().userName + t + UNREAD_TIMELINE_COUNT_KEY, count);
     if(setBadgeText){
-        var total = count + getUnreadRepliesCount() + getUnreadMessagesCount();
+        var total = 0;
+        for(i in T_LIST){
+            total += getUnreadTimelineCount(T_LIST[i]);
+        }
         if(total > 0){
             total = total.toString();
             chrome.browserAction.setBadgeText({text: total});
@@ -104,9 +110,15 @@ function setUnreadFriendsTimelineCount(count, setBadgeText){
     }
 };
 
-function removeUnreadFriendsTimelineCount(){
-    localStorage.setObject(getUser().userName + UNREAD_FRIENDS_TIMELINE_COUNT_KEY, 0);
-    var total = getUnreadRepliesCount() + getUnreadMessagesCount();
+function removeUnreadTimelineCount(t){
+    localStorage.setObject(getUser().userName + t + UNREAD_TIMELINE_COUNT_KEY, 0);
+    var total = 0;
+    for(i in T_LIST){
+        if(T_LIST[i]==t){
+            continue;
+        }
+        total += getUnreadTimelineCount(T_LIST[i]);
+    }
     if(total > 0){
         total = total.toString();
         chrome.browserAction.setBadgeText({text: total});
@@ -115,67 +127,98 @@ function removeUnreadFriendsTimelineCount(){
     }
 };
 
-function getUnreadRepliesCount(){
-    var count = localStorage.getObject(getUser().userName + UNREAD_REPLIES_COUNT_KEY);
-    if(!count){
-        count = 0;
-    }
-    return count;
-};
-
-function setUnreadRepliesCount(count, setBadgeText){
-    count += getUnreadRepliesCount();
-    localStorage.setObject(getUser().userName + UNREAD_REPLIES_COUNT_KEY, count);
-    if(setBadgeText){
-        var total = count + getUnreadFriendsTimelineCount() + getUnreadMessagesCount();
-        if(total > 0){
-            total = total.toString();
-            chrome.browserAction.setBadgeText({text: total});
-        }
-    }
-};
-
-function removeUnreadRepliesCount(){
-    localStorage.setObject(getUser().userName + UNREAD_REPLIES_COUNT_KEY, 0);
-    var total = getUnreadFriendsTimelineCount() + getUnreadMessagesCount();
-    if(total > 0){
-        total = total.toString();
-        chrome.browserAction.setBadgeText({text: total});
-    }else{
-        chrome.browserAction.setBadgeText({text: ''});
-    }
-};
-
-function getUnreadMessagesCount(){
-    var count = localStorage.getObject(getUser().userName + UNREAD_MESSAGES_COUNT_KEY);
-    if(!count){
-        count = 0;
-    }
-    return count;
-};
-
-function setUnreadMessagesCount(count, setBadgeText){
-    count += getUnreadMessagesCount();
-    localStorage.setObject(getUser().userName + UNREAD_MESSAGES_COUNT_KEY, count);
-    if(setBadgeText){
-        var total = count + getUnreadFriendsTimelineCount() + getUnreadRepliesCount();
-        if(total > 0){
-            total = total.toString();
-            chrome.browserAction.setBadgeText({text: total});
-        }
-    }
-};
-
-function removeUnreadMessagesCount(){
-    localStorage.setObject(getUser().userName + UNREAD_MESSAGES_COUNT_KEY, 0);
-    var total = getUnreadFriendsTimelineCount() + getUnreadRepliesCount();
-    if(total > 0){
-        total = total.toString();
-        chrome.browserAction.setBadgeText({text: total});
-    }else{
-        chrome.browserAction.setBadgeText({text: ''});
-    }
-};
+//function getUnreadFriendsTimelineCount(){
+//    var count = localStorage.getObject(getUser().userName + UNREAD_FRIENDS_TIMELINE_COUNT_KEY);
+//    if(!count){
+//        count = 0;
+//    }
+//    return count;
+//};
+//
+//function setUnreadFriendsTimelineCount(count, setBadgeText){
+//    count += getUnreadFriendsTimelineCount();
+//    localStorage.setObject(getUser().userName + UNREAD_FRIENDS_TIMELINE_COUNT_KEY, count);
+//    if(setBadgeText){
+//        var total = count + getUnreadRepliesCount() + getUnreadMessagesCount();
+//        if(total > 0){
+//            total = total.toString();
+//            chrome.browserAction.setBadgeText({text: total});
+//        }
+//    }
+//};
+//
+//function removeUnreadFriendsTimelineCount(){
+//    localStorage.setObject(getUser().userName + UNREAD_FRIENDS_TIMELINE_COUNT_KEY, 0);
+//    var total = getUnreadRepliesCount() + getUnreadMessagesCount();
+//    if(total > 0){
+//        total = total.toString();
+//        chrome.browserAction.setBadgeText({text: total});
+//    }else{
+//        chrome.browserAction.setBadgeText({text: ''});
+//    }
+//};
+//
+//function getUnreadRepliesCount(){
+//    var count = localStorage.getObject(getUser().userName + UNREAD_REPLIES_COUNT_KEY);
+//    if(!count){
+//        count = 0;
+//    }
+//    return count;
+//};
+//
+//function setUnreadRepliesCount(count, setBadgeText){
+//    count += getUnreadRepliesCount();
+//    localStorage.setObject(getUser().userName + UNREAD_REPLIES_COUNT_KEY, count);
+//    if(setBadgeText){
+//        var total = count + getUnreadFriendsTimelineCount() + getUnreadMessagesCount();
+//        if(total > 0){
+//            total = total.toString();
+//            chrome.browserAction.setBadgeText({text: total});
+//        }
+//    }
+//};
+//
+//function removeUnreadRepliesCount(){
+//    localStorage.setObject(getUser().userName + UNREAD_REPLIES_COUNT_KEY, 0);
+//    var total = getUnreadFriendsTimelineCount() + getUnreadMessagesCount();
+//    if(total > 0){
+//        total = total.toString();
+//        chrome.browserAction.setBadgeText({text: total});
+//    }else{
+//        chrome.browserAction.setBadgeText({text: ''});
+//    }
+//};
+//
+//function getUnreadMessagesCount(){
+//    var count = localStorage.getObject(getUser().userName + UNREAD_MESSAGES_COUNT_KEY);
+//    if(!count){
+//        count = 0;
+//    }
+//    return count;
+//};
+//
+//function setUnreadMessagesCount(count, setBadgeText){
+//    count += getUnreadMessagesCount();
+//    localStorage.setObject(getUser().userName + UNREAD_MESSAGES_COUNT_KEY, count);
+//    if(setBadgeText){
+//        var total = count + getUnreadFriendsTimelineCount() + getUnreadRepliesCount();
+//        if(total > 0){
+//            total = total.toString();
+//            chrome.browserAction.setBadgeText({text: total});
+//        }
+//    }
+//};
+//
+//function removeUnreadMessagesCount(){
+//    localStorage.setObject(getUser().userName + UNREAD_MESSAGES_COUNT_KEY, 0);
+//    var total = getUnreadFriendsTimelineCount() + getUnreadRepliesCount();
+//    if(total > 0){
+//        total = total.toString();
+//        chrome.browserAction.setBadgeText({text: total});
+//    }else{
+//        chrome.browserAction.setBadgeText({text: ''});
+//    }
+//};
 
 //===>>>>>>>>>>>>>>>>>>>>>>>
 function setLastMsgId(id, t){
