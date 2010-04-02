@@ -156,7 +156,7 @@ function _sendRequest(params, callbackFn){
     var user = params.user || localStorage.getObject(CURRENT_USER_KEY);
     if(!user) return;
     params.data['source'] = SOURCE;
-    params.data['count'] = 100;
+    //params.data['count'] = 100;
     if(params.data.status){
         params.data.status = encodeURIComponent(params.data.status);
     }

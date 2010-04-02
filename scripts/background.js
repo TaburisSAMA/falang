@@ -1,14 +1,91 @@
 
 var itv; //Interval
 var tweets = {};
+var MAX_MSG_ID = {};
 window.checking={};
 
+function getMaxMsgId(t){
+    var c_user = getUser(CURRENT_USER_KEY);
+    var _key = c_user.userName + t + '_max_msg_id';
+    return tweets[_key];
+}
+
+function setMaxMsgId(t, id){
+    var c_user = getUser(CURRENT_USER_KEY);
+    var _key = c_user.userName + t + '_max_msg_id';
+    tweets[_key] = id;
+}
+
+//获取微博
+// @t : 获取timeline的类型
 function checkTimeline(t){
     //var t = 'friends_timeline';
     if(window.checking[t]){ return; }
     window.checking[t] = true;
+    var params = {count:100}
     var last_id = getLastMsgId(t);
-    var params = {count:200, fromplace:30}
+    if(last_id){
+        params['since_id'] = last_id;
+    }
+    var m = ''
+    switch(t){
+        case 'friends_timeline':
+            m = 'friends_timeline';
+            break;
+        case 'mentions':
+            m = 'mentions';
+            break;
+        case 'comments_timeline':
+            m = 'comments_timeline';
+            break;
+        case 'comments_by_me':
+            m = 'comments_by_me';
+            break;
+        case 'direct_messages':
+            m = 'direct_messages';
+            break;
+        case 'favorites':
+            m = 'favorites';
+            break;
+        default:
+            //
+    }
+    sinaApi[m](params, function(sinaMsgs, textStatus){
+        if(sinaMsgs && sinaMsgs.length > 0){
+            var _last_id = '';
+            var c_user = getUser(CURRENT_USER_KEY);
+            var _key = c_user.userName + t + '_tweets';
+            if(!tweets[_key]){
+                tweets[_key] = [];
+            }
+            tweets[_key] = sinaMsgs.concat(tweets[_key]);
+            _last_id = sinaMsgs[0].id;
+            
+            var popupView = getPopupView();
+            if(popupView){
+                if(!popupView.addTimelineMsgs(tweets[_key].slice(0, sinaMsgs.length), t)){
+                    setUnreadTimelineCount(sinaMsgs.length, t, true);
+                }
+            }
+
+            if(_last_id){
+                setLastMsgId(_last_id, t);
+            }
+        }else{
+            setUnreadTimelineCount(0, t, true);
+        }
+        window.checking[t] = false;
+    });
+};
+
+//获取微博
+// @t : 获取timeline的类型
+function getTimelinePage(t){
+    //var t = 'friends_timeline';
+    if(window.checking[t]){ return; }
+    window.checking[t] = true;
+    var params = {count:20}
+    var last_id = getLastMsgId(t);
     if(last_id){
         params['since_id'] = last_id;
     }

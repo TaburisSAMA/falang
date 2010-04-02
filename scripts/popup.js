@@ -329,18 +329,21 @@ function getSinaTimeline(t){
     var b_view = getBackgroundView();
     var _key = c_user.userName + t + '_tweets';
     if(b_view && b_view.tweets[_key]){
-        var tweets = b_view.tweets[_key];
-        tweets = tweets.slice(0, pageSize);
+        var tweetsAll = b_view.tweets[_key];
+        var tweets = tweetsAll.slice(0, pageSize);
         var html = '';
         for(i in tweets){
             html += bildMsgLi(tweets[i], t);
         }
         _ul.append(html);
+        if(tweetsAll.length>pageSize){
+            showReadMore(t);
+        }
     }else{
         b_view.checkTimeline(t);
     }
     hideLoading();
-}
+};
 
 //function getSinaFriendsTimeline(){
 //    showLoading();
@@ -445,8 +448,13 @@ function showReadMore(t){
         //var cache = localStorage.getObject(SINA + getUser().userName + FRIENDS_TIMELINE_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY);
         var _key = getUser().userName + t + '_tweets';
         var cache = getBackgroundView().tweets[_key];
-        $(this).before(cache.slice(getTimelineOffset(t), getTimelineOffset(t) + pageSize).join(''));
-        getTimelineOffset(t, pageSize);
+        var tweets = cache.slice(getTimelineOffset(t), getTimelineOffset(t) + pageSize);
+        var _html = '';
+        for(i in tweets){
+            _html += bildMsgLi(tweets[i], t);
+        }
+        $(this).before(_html);
+        setTimelineOffset(t, pageSize);
         if(getTimelineOffset(t) > cache.length){
             $(this).hide();
         }
