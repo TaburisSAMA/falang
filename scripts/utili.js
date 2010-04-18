@@ -277,7 +277,7 @@ function getRefreshTime(){
         }
         t = t * 1000 * 60;
     }else{
-        t = 5 * 1000 * 60;//默认5分钟
+        t = 3 * 1000 * 60;//默认3分钟
     }
     return t;
 }

@@ -2,8 +2,8 @@
 var itv; //Interval
 var tweets = {};
 var MAX_MSG_ID = {};
-window.checking={}; //ÕıÔÚ¼ì²éÊÇ·ñÓĞ×îĞÂÎ¢²©
-window.paging={}; //ÕıÔÚ»ñÈ¡·ÖÒ³Î¢²©
+window.checking={}; //æ­£åœ¨æ£€æŸ¥æ˜¯å¦æœ‰æœ€æ–°å¾®åš
+window.paging={}; //æ­£åœ¨è·å–åˆ†é¡µå¾®åš
 
 function getMaxMsgId(t){
     var c_user = getUser(CURRENT_USER_KEY);
@@ -17,8 +17,8 @@ function setMaxMsgId(t, id){
     MAX_MSG_ID[_key] = Number(id)-1;
 }
 
-//»ñÈ¡×îĞÂµÄ(Î´¿´µÄ)Î¢²©
-// @t : »ñÈ¡timelineµÄÀàĞÍ
+//è·å–æœ€æ–°çš„(æœªçœ‹çš„)å¾®åš
+// @t : è·å–timelineçš„ç±»å‹
 function checkTimeline(t){
     //var t = 'friends_timeline';
     if(window.checking[t]){ return; }
@@ -60,7 +60,7 @@ function checkTimeline(t){
         var _key = c_user.userName + t + '_tweets';
         if(!tweets[_key]){
             tweets[_key] = [];
-            isFirstTime = true;//Èç¹û²»´æÔÚ£¬ÔòÎªµÚÒ»´Î»ñÈ¡Î¢²©
+            isFirstTime = true;//å¦‚æœä¸å­˜åœ¨ï¼Œåˆ™ä¸ºç¬¬ä¸€æ¬¡è·å–å¾®åš
         }
         var popupView = getPopupView();
 
@@ -73,7 +73,8 @@ function checkTimeline(t){
             if(popupView){
                 if(!popupView.addTimelineMsgs(tweets[_key].slice(0, sinaMsgs.length), t)){
                     setUnreadTimelineCount(sinaMsgs.length, t, true);
-                    popupView._showMsg('ÓĞĞÂÎ¢²©');
+                }else{
+                    popupView._showMsg('æœ‰æ–°å¾®åš');
                 }
             }else{
                 setUnreadTimelineCount(sinaMsgs.length, t, true);
@@ -90,7 +91,7 @@ function checkTimeline(t){
             setUnreadTimelineCount(0, t, true);
         }
         window.checking[t] = false;
-        if(isFirstTime){//Èç¹ûÊÇµÚÒ»´Î,Ôò»ñÈ¡ÒÔÇ°µÄÎ¢±¡
+        if(isFirstTime){//å¦‚æœæ˜¯ç¬¬ä¸€æ¬¡,åˆ™è·å–ä»¥å‰çš„å¾®è–„
             if(!tweets[_key] || tweets[_key].length < PAGE_SIZE){
                 getTimelinePage(t);
             }else{
@@ -106,8 +107,8 @@ function checkTimeline(t){
     });
 };
 
-//·ÖÒ³»ñÈ¡ÒÔÇ°µÄÎ¢²©
-// @t : »ñÈ¡timelineµÄÀàĞÍ
+//åˆ†é¡µè·å–ä»¥å‰çš„å¾®åš
+// @t : è·å–timelineçš„ç±»å‹
 function getTimelinePage(t){
     //var t = 'friends_timeline';
     if(window.paging[t]){ return; }

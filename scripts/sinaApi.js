@@ -208,7 +208,11 @@ var sinaApi = {
 function _sendRequest(params, callbackFn){
     if(!callbackFn) return;
     var user = params.user || localStorage.getObject(CURRENT_USER_KEY);
-    if(!user) return;
+    if(!user){
+        showMsg('用户未指定');
+        callbackFn({}, 'error', '400');
+        return;
+    }
     params.data['source'] = SOURCE;
     //params.data['count'] = 100;
     if(params.data.status){
