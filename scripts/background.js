@@ -2,26 +2,28 @@
 var itv; //Interval
 var tweets = {};
 var MAX_MSG_ID = {};
-window.checking={};
+window.checking={}; //正在检查是否有最新微博
+window.paging={}; //正在获取分页微博
 
 function getMaxMsgId(t){
     var c_user = getUser(CURRENT_USER_KEY);
     var _key = c_user.userName + t + '_max_msg_id';
-    return tweets[_key];
+    return MAX_MSG_ID[_key];
 }
 
 function setMaxMsgId(t, id){
     var c_user = getUser(CURRENT_USER_KEY);
     var _key = c_user.userName + t + '_max_msg_id';
-    tweets[_key] = id;
+    MAX_MSG_ID[_key] = Number(id)-1;
 }
 
-//获取微博
+//获取最新的(未看的)微博
 // @t : 获取timeline的类型
 function checkTimeline(t){
     //var t = 'friends_timeline';
     if(window.checking[t]){ return; }
     window.checking[t] = true;
+    showLoading();
     var params = {count:100}
     var last_id = getLastMsgId(t);
     if(last_id){
@@ -51,43 +53,72 @@ function checkTimeline(t){
             //
     }
     sinaApi[m](params, function(sinaMsgs, textStatus){
+        var isFirstTime = false;
+        var _last_id = '';
+        var _max_id = '';
+        var c_user = getUser(CURRENT_USER_KEY);
+        var _key = c_user.userName + t + '_tweets';
+        if(!tweets[_key]){
+            tweets[_key] = [];
+            isFirstTime = true;//如果不存在，则为第一次获取微博
+        }
+        var popupView = getPopupView();
+
         if(sinaMsgs && sinaMsgs.length > 0){
-            var _last_id = '';
-            var c_user = getUser(CURRENT_USER_KEY);
-            var _key = c_user.userName + t + '_tweets';
-            if(!tweets[_key]){
-                tweets[_key] = [];
-            }
-            tweets[_key] = sinaMsgs.concat(tweets[_key]);
-            _last_id = sinaMsgs[0].id;
             
-            var popupView = getPopupView();
+            _last_id = sinaMsgs[0].id;
+            _max_id = sinaMsgs[sinaMsgs.length-1].id;
+            tweets[_key] = sinaMsgs.concat(tweets[_key]);
+            
             if(popupView){
                 if(!popupView.addTimelineMsgs(tweets[_key].slice(0, sinaMsgs.length), t)){
                     setUnreadTimelineCount(sinaMsgs.length, t, true);
+                    popupView._showMsg('有新微博');
                 }
+            }else{
+                setUnreadTimelineCount(sinaMsgs.length, t, true);
             }
 
             if(_last_id){
                 setLastMsgId(_last_id, t);
             }
+            if(_max_id && !getMaxMsgId(t)){
+                setMaxMsgId(t, _max_id);
+            }
+
         }else{
             setUnreadTimelineCount(0, t, true);
         }
         window.checking[t] = false;
+        if(isFirstTime){//如果是第一次,则获取以前的微薄
+            if(!tweets[_key] || tweets[_key].length < PAGE_SIZE){
+                getTimelinePage(t);
+            }else{
+                popupView.showReadMore(t);
+                popupView.setTimelineOffset(t, sinaMsgs.length);
+            }
+        }else if(popupView && sinaMsgs && sinaMsgs.length >= PAGE_SIZE){
+            popupView.showReadMore(t);
+            popupView.setTimelineOffset(t, sinaMsgs.length);
+        }
+
+        hideLoading();
     });
 };
 
-//获取微博
+//分页获取以前的微博
 // @t : 获取timeline的类型
 function getTimelinePage(t){
     //var t = 'friends_timeline';
-    if(window.checking[t]){ return; }
-    window.checking[t] = true;
-    var params = {count:20}
-    var last_id = getLastMsgId(t);
-    if(last_id){
-        params['since_id'] = last_id;
+    if(window.paging[t]){ return; }
+    window.paging[t] = true;
+    
+    showLoading();
+
+    var params = {count:PAGE_SIZE}
+    var max_id = getMaxMsgId(t);
+    if(max_id){
+        params['max_id'] = max_id;
     }
     var m = ''
     switch(t){
@@ -114,200 +145,56 @@ function getTimelinePage(t){
     }
     sinaApi[m](params, function(sinaMsgs, textStatus){
         if(sinaMsgs && sinaMsgs.length > 0){
-            var _last_id = '';
+            var _max_id = '';
             var c_user = getUser(CURRENT_USER_KEY);
             var _key = c_user.userName + t + '_tweets';
             if(!tweets[_key]){
                 tweets[_key] = [];
             }
-            tweets[_key] = sinaMsgs.concat(tweets[_key]);
-            _last_id = sinaMsgs[0].id;
+            sinaMsgs = sinaMsgs.slice(0, PAGE_SIZE);
+            for(i in sinaMsgs){
+                sinaMsgs[i].readed = true
+            }
+            tweets[_key] = tweets[_key].concat(sinaMsgs);
+            _max_id = sinaMsgs[sinaMsgs.length-1].id;
+
+            log('get page ' + t + ': ' + sinaMsgs.length);/////
             
             var popupView = getPopupView();
             if(popupView){
-                if(!popupView.addTimelineMsgs(tweets[_key].slice(0, sinaMsgs.length), t)){
-                    setUnreadTimelineCount(sinaMsgs.length, t, true);
+                popupView.addPageMsgs(sinaMsgs, t);
+                if(sinaMsgs.length >= (PAGE_SIZE/2)){
+                    popupView.showReadMore(t);
+                }else{
+                    popupView.hideReadMore(t);
                 }
             }
 
-            if(_last_id){
-                setLastMsgId(_last_id, t);
+            if(_max_id){
+                setMaxMsgId(t, _max_id);
             }
         }else{
-            setUnreadTimelineCount(0, t, true);
+            var popupView = getPopupView();
+            if(popupView){
+                popupView.hideReadMore(t);
+                popupView.hideLoading();
+            }
         }
-        window.checking[t] = false;
+
+        hideLoading();
+        window.paging[t] = false;
     });
 };
 
-//function checkSinaFriendsTimeline(){
-//    var last_id = getLastFriendsTimeLineMsgId();
-//    var params = {count:200, fromplace:30}
-//    if(last_id){
-//        params['since_id'] = last_id;
-//    }
-//    sinaApi.friends_timeline(params, function(sinaMsgs, textStatus){
-//        if(sinaMsgs && sinaMsgs.length > 0){
-//            var tt, m;
-//            var last_id = '';
-//            var list = [];
-//            for(i in sinaMsgs){
-//                m = sinaMsgs[i];
-//                if(!last_id){
-//                    last_id = m.id;
-//                }
-//                tt = bildMsgLi(m, true);
-//                list.push(tt);
-//            }
-//            var c_user = getUser(CURRENT_USER_KEY);
-//            var popupView = getPopupView();
-//            if(popupView){
-//                if(!popupView.addSinaFriendsTimeline(list)){
-//                    setUnreadFriendsTimelineCount(sinaMsgs.length, true);
-//                }
-//                for(i in list){
-//                    list[i] = list[i].replace(/<li class="unread-item/g, '<li class="');
-//                }
-//                var cache = localStorage.getObject(SINA + c_user.userName + FRIENDS_TIMELINE_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY);
-//                if(cache){
-//                    list = list.concat(cache);
-//                }
-//                localStorage.setObject(SINA + c_user.userName + FRIENDS_TIMELINE_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY, 
-//                    list);
-//            }else{
-//                var cache = localStorage.getObject(SINA + c_user.userName + FRIENDS_TIMELINE_KEY + LOCAL_STORAGE_NEW_TWEET_LIST_KEY);
-//                if(cache){
-//                    list = list.concat(cache);
-//                }
-//                localStorage.setObject(SINA + c_user.userName + FRIENDS_TIMELINE_KEY + LOCAL_STORAGE_NEW_TWEET_LIST_KEY, 
-//                    list);
-//                setUnreadFriendsTimelineCount(sinaMsgs.length, true);
-//            }
-//            if(last_id){
-//                setLastFriendsTimeLineMsgId(last_id);
-//            }
-//        }else{
-//            setUnreadFriendsTimelineCount(0, true);
-//        }
-//    });
-//};
-
-//function checkSinaReplies(){
-//    var last_id = getLastRepliesMsgId();
-//    var params = {count:200, fromplace:30}
-//    if(last_id){
-//        params['since_id'] = last_id;
-//    }
-//    sinaApi.mentions(params, function(sinaMsgs, textStatus){
-//        if(sinaMsgs && sinaMsgs.length > 0){
-//            var popupView = getPopupView();
-//            var tt, m;
-//            var tts = '';
-//            var last_id = '';
-//            var list = [];
-//            for(i in sinaMsgs){
-//                m = sinaMsgs[i];
-//                if(!last_id){
-//                    last_id = m.id;
-//                }
-//                tt = bildMsgLi(m, true);
-//                list.push(tt);
-//            }
-//            var c_user = getUser(CURRENT_USER_KEY);
-//            var popupView = getPopupView();
-//            if(popupView){
-//                if(!popupView.addSinaReplies(list)){
-//                    setUnreadRepliesCount(sinaMsgs.length, true);
-//                }
-//                for(i in list){
-//                    list[i] = list[i].replace(/<li class="unread-item/g, '<li class="');
-//                }
-//                var cache = localStorage.getObject(SINA + c_user.userName + REPLIES_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY);
-//                if(cache){
-//                    list = list.concat(cache);
-//                }
-//                localStorage.setObject(SINA + c_user.userName + REPLIES_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY, 
-//                    list);
-//            }else{
-//                var cache = localStorage.getObject(SINA + c_user.userName + REPLIES_KEY + LOCAL_STORAGE_NEW_TWEET_LIST_KEY);
-//                if(cache){
-//                    list = list.concat(cache);
-//                }
-//                localStorage.setObject(SINA + c_user.userName + REPLIES_KEY + LOCAL_STORAGE_NEW_TWEET_LIST_KEY, 
-//                    list);
-//                setUnreadRepliesCount(sinaMsgs.length, true);
-//            }
-//            if(last_id){
-//                setLastRepliesMsgId(last_id);
-//            }
-//        }else{
-//            setUnreadRepliesCount(0, true);
-//        }
-//    });
-//};
-//
-//function checkSinaMessages(){
-//    var last_id = getLastMessagesMsgId();
-//    var params = {count:200, fromplace:30}
-//    if(last_id){
-//        params['since_id'] = last_id;
-//    }
-//    sinaApi.direct_messages(params, function(sinaMsgs, textStatus){
-//        if(sinaMsgs && sinaMsgs.length > 0){
-//            var popupView = getPopupView();
-//            var tt, m;
-//            var tts = '';
-//            var last_id = '';
-//            var list = [];
-//            for(i in sinaMsgs){
-//                m = sinaMsgs[i];
-//                if(!last_id){
-//                    last_id = m.id;
-//                }
-//                tt = bildMsgLi(m, true);
-//                list.push(tt);
-//            }
-//            var c_user = getUser(CURRENT_USER_KEY);
-//            var popupView = getPopupView();
-//            if(popupView){
-//                if(!popupView.addSinaMessages(list)){
-//                    setUnreadMessagesCount(sinaMsgs.length, true);
-//                }
-//                for(i in list){
-//                    list[i] = list[i].replace(/<li class="unread-item/g, '<li class="');
-//                }
-//                var cache = localStorage.getObject(SINA + c_user.userName + MESSAGES_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY);
-//                if(cache){
-//                    list = list.concat(cache);
-//                }
-//                localStorage.setObject(SINA + c_user.userName + MESSAGES_KEY + LOCAL_STORAGE_TWEET_LIST_HTML_KEY, 
-//                    list);
-//            }else{
-//                var cache = localStorage.getObject(SINA + c_user.userName + MESSAGES_KEY + LOCAL_STORAGE_NEW_TWEET_LIST_KEY);
-//                if(cache){
-//                    list = list.concat(cache);
-//                }
-//                localStorage.setObject(SINA + c_user.userName + MESSAGES_KEY + LOCAL_STORAGE_NEW_TWEET_LIST_KEY, 
-//                    list);
-//                setUnreadMessagesCount(sinaMsgs.length, true);
-//            }
-//            if(last_id){
-//                setLastMessagesMsgId(last_id);
-//            }
-//        }else{
-//            setUnreadMessagesCount(0, true);
-//        }
-//    });
-//};
 
 function checkNewMsg(){
     try{
-        //checkSinaFriendsTimeline();
-        //checkSinaReplies();
-        //checkSinaMessages();
-        checkTimeline('friends_timeline');
-        checkTimeline('mentions');
-        checkTimeline('direct_messages');
+        //checkTimeline('friends_timeline');
+        //checkTimeline('mentions');
+        //checkTimeline('direct_messages');
+        for(i in T_LIST){
+            checkTimeline(T_LIST[i]);
+        }
     }catch(err){
 
     }

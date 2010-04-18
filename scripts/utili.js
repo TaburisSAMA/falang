@@ -1,3 +1,7 @@
+// @author qleelulu@gmail.com
+
+var PAGE_SIZE = 20;
+
 var SINA = 'idi_sina';
 
 var UNSEND_TWEET_KEY = 'idi_UNSEND_TWEET_KEY';//未发送的tweet，保存下次显示
@@ -28,9 +32,16 @@ var AUTO_SHORT_URL = 'idi_SHORT_URL';//是否缩短URL
 var AUTO_SHORT_URL_WORD_COUNT = 'idi_SHORT_URL_WORD_COUNT'; //URL长度超过多少自动缩短
 
 //['friends_timeline','mentions','comments_timeline','comments_by_me','direct_messages','favorites']
-var T_LIST = ['friends_timeline','mentions',,'direct_messages']; //timeline的分类列表
+var T_LIST = ['friends_timeline','mentions','comments_timeline','direct_messages']; //timeline的分类列表
+
 
 function showMsg(msg){
+    var popupView = getPopupView();
+    if(popupView){
+        popupView._showMsg(msg);
+    }
+}
+function _showMsg(msg){
     $('<div class="messageInfo">' + msg + '</div>')
     .appendTo('#msgInfoWarp')
     .fadeIn('slow')
@@ -41,11 +52,17 @@ function showMsg(msg){
 };
 
 function showLoading(){
-    $("#loading").show();
+    var popupView = getPopupView();
+    if(popupView){
+        popupView._showLoading();
+    }
 };
 
 function hideLoading(){
-    $("#loading").hide();
+    var popupView = getPopupView();
+    if(popupView){
+        popupView._hideLoading();
+    }
 };
 
 ///获取在本地保存的信息数
@@ -375,3 +392,8 @@ function ubbCode(str)	{
     reg2 = null;
     return result;
 };
+
+//在Chrome上输出log信息，用于调试
+function log(msg){
+    console.log(msg);
+}

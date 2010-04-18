@@ -18,11 +18,15 @@ var apiUrl = {
         comments_timeline:      api_domain_sina + '/statuses/comments_timeline' + result_format,
         user_timeline:          api_domain_sina + '/statuses/user_timeline' + result_format,
         mentions:               api_domain_sina + '/statuses/mentions' + result_format,
+        favorite:               api_domain_sina + '/favorite' + result_format,
+        favorites_create:       api_domain_sina + '/favorites/create' + result_format,
+        favorites_destroy:      api_domain_sina + '/favorites/destroy/{id}' + result_format,
         update:                 api_domain_sina + '/statuses/update' + result_format,
         repost:                 api_domain_sina + '/statuses/repost' + result_format,
         comment:                api_domain_sina + '/statuses/comment' + result_format,
+        comment_destroy:        api_domain_sina + '/statuses/comment_destroy/{id}' + result_format,
         destroy:                api_domain_sina + '/statuses/destroy' + result_format,
-        destroy_msg:            api_domain_sina + '/direct_messages/destroy' + result_format,
+        destroy_msg:            api_domain_sina + '/direct_messages/destroy/{id}' + result_format,
         direct_messages:        api_domain_sina + '/direct_messages' + result_format, //0 表示悄悄话，1 表示戳一下，2 表示升级通知，3 表示代发通知，4 表示系统消息。100表示不分类，都查询。
         new_message:            api_domain_sina + '/direct_messages/new' + result_format,
         verify_credentials:     api_domain_sina + '/account/verify_credentials' + result_format,
@@ -83,11 +87,51 @@ var sinaApi = {
         _sendRequest(params, callbackFn);
 	},
 
+    favorite: function(data, callbackFn){
+		if(!callbackFn) return;
+        var params = {
+            url: apiUrl.sina.favorite,
+            type: 'get',
+            data: (data||{})
+        };
+        _sendRequest(params, callbackFn);
+	},
+
+    favorites_create: function(data, callbackFn){
+		if(!callbackFn) return;
+        var params = {
+            url: apiUrl.sina.favorites_create,
+            type: 'post',
+            data: (data||{})
+        };
+        _sendRequest(params, callbackFn);
+	},
+
+    favorites_destroy: function(data, callbackFn){
+		if(!callbackFn) return;
+        var params = {
+            url: apiUrl.sina.favorites_destroy.replace('{id}', data.id),
+            type: 'post',
+            data: (data||{})
+        };
+        _sendRequest(params, callbackFn);
+	},
+
     direct_messages: function(data, callbackFn){
 		if(!callbackFn) return;
         var params = {
             url: apiUrl.sina.direct_messages,
             type: 'get',
+            data: (data||{})
+        };
+        _sendRequest(params, callbackFn);
+	},
+
+    destroy_msg: function(data, callbackFn){
+		if(!callbackFn) return;
+        var params = {
+            url: apiUrl.sina.destroy_msg.replace('{id}',data.id),
+            type: 'post',
             data: (data||{})
         };
         _sendRequest(params, callbackFn);
@@ -139,6 +183,16 @@ var sinaApi = {
         _sendRequest(params, callbackFn);
     },
 
+    comment_destroy: function(data, callbackFn){
+        if(!callbackFn) return;
+        var params = {
+            url: apiUrl.sina.comment_destroy.replace('{id}', data.id),
+            type: 'post',
+            data: (data||{})
+        };
+        _sendRequest(params, callbackFn);
+    },
+
     destroy: function(data, callbackFn){
         if(!data || !data.id){return;}
         if(!callbackFn){ return; }
@@ -167,6 +221,8 @@ function _sendRequest(params, callbackFn){
         url: params.url,
         username: user.userName,
         password: user.password,
+        cache: false,
+        timeout: 60*1000, //一分钟超时
         type : params.type,
         data: params.data,
         beforeSend: function(req) {

@@ -1,7 +1,7 @@
 <html>
  <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title> Tina </title>
+	<title> 发浪--新浪微博插件 </title>
 	<link rel="stylesheet" media="screen" type="text/css" href="css/popup.css">
 	<script type="text/javascript" > window.theViewName = 'popup'; </script>
 	<script type="text/javascript" src="scripts/jquery-1.4.js" ></script>
@@ -25,17 +25,33 @@
 	<div class="warp">
 	  <ul class="tabs">
 		<li class="tab-friends_timeline active" href="#friends_timeline_timeline">我跟随的人<span class="unreadCount"></span></li>
-		<li class="tab-mentions" href="#mentions_timeline">@回应<span class="unreadCount"></span></li>
-		<li class="tab-direct_messages" href="#direct_messages_timeline">悄悄话<span class="unreadCount"></span></li>
+		<li class="tab-mentions" href="#mentions_timeline">@我<span class="unreadCount"></span></li>
+		<li class="tab-comments_timeline" href="#comments_timeline_timeline">评论<span class="unreadCount"></span></li>
+		<li class="tab-direct_messages" href="#direct_messages_timeline">私信<span class="unreadCount"></span></li>
 	  </ul>
 	  <div id='friends_timeline_timeline' class="list_p">
-		<ul class="list"></ul>
+		<div class="list_warp">
+			<ul class="list"></ul>
+			<a href="javascript:void(0);" id="friends_timelineReadMore" class="readMore" onclick="readMore('friends_timeline');">更多</a>
+		</div>
 	  </div>
 	  <div id="mentions_timeline" class="list_p" style="display:none;">
-		<ul class="list"></ul>
+		<div class="list_warp">
+			<ul class="list"></ul>
+			<a href="javascript:void(0);" id="mentionsReadMore" class="readMore" onclick="readMore('mentions');">更多</a>
+		</div>
+	  </div>
+	  <div id="comments_timeline_timeline" class="list_p" style="display:none;">
+		<div class="list_warp">
+			<ul class="list"></ul>
+			<a href="javascript:void(0);" id="comments_timelineReadMore" class="readMore" onclick="readMore('comments_timeline');">更多</a>
+		</div>
 	  </div>
 	  <div id="direct_messages_timeline" class="list_p" style="display:none;">
-		<ul class="list"></ul>
+		<div class="list_warp">
+			<ul class="list"></ul>
+			<a href="javascript:void(0);" id="direct_messagesReadMore" class="readMore" onclick="readMore('direct_messages');">更多</a>
+		</div>
 	  </div>
 	  <span id="loading"><img src="images/loader.gif" /></span>
 	</div>
