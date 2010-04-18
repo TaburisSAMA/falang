@@ -22,6 +22,10 @@ function setMaxMsgId(t, id){
 function checkTimeline(t){
     //var t = 'friends_timeline';
     if(window.checking[t]){ return; }
+    var c_user = getUser(CURRENT_USER_KEY);
+    if(!c_user){
+        return;
+    }
     window.checking[t] = true;
     showLoading();
     var params = {count:100}
@@ -57,6 +61,10 @@ function checkTimeline(t){
         var _last_id = '';
         var _max_id = '';
         var c_user = getUser(CURRENT_USER_KEY);
+        if(!c_user){
+            window.checking[t] = false;
+            return;
+        }
         var _key = c_user.userName + t + '_tweets';
         if(!tweets[_key]){
             tweets[_key] = [];
@@ -112,6 +120,10 @@ function checkTimeline(t){
 function getTimelinePage(t){
     //var t = 'friends_timeline';
     if(window.paging[t]){ return; }
+    var c_user = getUser(CURRENT_USER_KEY);
+    if(!c_user){
+        return;
+    }
     window.paging[t] = true;
     
     showLoading();
@@ -148,6 +160,10 @@ function getTimelinePage(t){
         if(sinaMsgs && sinaMsgs.length > 0){
             var _max_id = '';
             var c_user = getUser(CURRENT_USER_KEY);
+            if(!c_user){
+                window.paging[t] = false;
+                return;
+            }
             var _key = c_user.userName + t + '_tweets';
             if(!tweets[_key]){
                 tweets[_key] = [];
