@@ -21,10 +21,12 @@ var apiUrl = {
         favorite:               api_domain_sina + '/favorite' + result_format,
         favorites_create:       api_domain_sina + '/favorites/create' + result_format,
         favorites_destroy:      api_domain_sina + '/favorites/destroy/{id}' + result_format,
+        counts:                 api_domain_sina + '/statuses/counts' + result_format,
         update:                 api_domain_sina + '/statuses/update' + result_format,
         repost:                 api_domain_sina + '/statuses/repost' + result_format,
         comment:                api_domain_sina + '/statuses/comment' + result_format,
         comment_destroy:        api_domain_sina + '/statuses/comment_destroy/{id}' + result_format,
+        comments:               api_domain_sina + '/statuses/comments' + result_format,
         destroy:                api_domain_sina + '/statuses/destroy' + result_format,
         destroy_msg:            api_domain_sina + '/direct_messages/destroy/{id}' + result_format,
         direct_messages:        api_domain_sina + '/direct_messages' + result_format, //0 表示悄悄话，1 表示戳一下，2 表示升级通知，3 表示代发通知，4 表示系统消息。100表示不分类，都查询。
@@ -117,6 +119,16 @@ var sinaApi = {
         _sendRequest(params, callbackFn);
 	},
 
+    counts: function(data, callbackFn){
+        if(!callbackFn) return;
+        var params = {
+            url: apiUrl.sina.counts,
+            type: 'get',
+            data: (data||{})
+        };
+        _sendRequest(params, callbackFn);
+    },
+
     direct_messages: function(data, callbackFn){
 		if(!callbackFn) return;
         var params = {
@@ -178,6 +190,16 @@ var sinaApi = {
         var params = {
             url: apiUrl.sina.comment,
             type: 'post',
+            data: (data||{})
+        };
+        _sendRequest(params, callbackFn);
+    },
+
+    comments: function(data, callbackFn){
+        if(!callbackFn) return;
+        var params = {
+            url: apiUrl.sina.comments,
+            type: 'get',
             data: (data||{})
         };
         _sendRequest(params, callbackFn);

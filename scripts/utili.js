@@ -1,6 +1,7 @@
 // @author qleelulu@gmail.com
 
 var PAGE_SIZE = 20;
+var COMMENT_PAGE_SIZE = 8;
 
 var SINA = 'idi_sina';
 

@@ -49,9 +49,11 @@ function init(){
 
     initChangeUserList();
 
-    for(i in T_LIST){
-        getSinaTimeline(T_LIST[i]);
-    }
+    //for(i in T_LIST){
+    //    getSinaTimeline(T_LIST[i]);
+    //}
+    getSinaTimeline('friends_timeline');
+
     initMsgHover();
 
     addUnreadCountToTabs();
@@ -75,11 +77,17 @@ function initTabs(){
                 .addClass('active');
         //切换tab
         $('.list_p').hide();
-        $(t.attr('href')).show();
+        var c_t = t.attr('href').replace('#','').replace(/_timeline$/i,'');
+        var c_ul = $(t.attr('href'));
+        c_ul.show();
         window.currentTab = t.attr('href');
+        if(!c_ul.find('ul.list').html()){
+            getSinaTimeline(c_t);
+        }
+        
 
-        var temp = t.attr('href').replace('#','').replace(/_timeline$/i,'');
-        removeUnreadTimelineCount(temp);
+        
+        removeUnreadTimelineCount(c_t);
         t.find(".unreadCount").html('');
     });
 };
@@ -316,10 +324,18 @@ function getSinaTimeline(t){
         var tweetsAll = b_view.tweets[_key];
         var tweets = tweetsAll.slice(0, PAGE_SIZE);
         var html = '';
+        var ids = [];
         for(i in tweets){
             html += bildMsgLi(tweets[i], t);
+            ids.push(tweets[i].id);
+            if(tweets[i].retweeted_status){
+                ids.push(tweets[i].retweeted_status.id);
+            }else if(tweets[i].status){
+                ids.push(tweets[i].status.id);
+            }
         }
         _ul.append(html);
+        showCounts(t, ids.join(','));
         if(tweetsAll.length >= (PAGE_SIZE/2)){
             showReadMore(t);
         }
@@ -329,6 +345,106 @@ function getSinaTimeline(t){
     hideLoading();
 };
 //<<<<<<<<<<<<<<<<<<<<<<<========
+
+//显示评论数和回复数
+function showCounts(t, ids){
+    //if(window.currentTab != '#'+t+'_timeline'){return;}
+    if(['direct_messages'].indexOf(t) >= 0){return;}
+
+    showLoading();
+    var data = {ids:ids}
+    sinaApi.counts(data, function(counts, textStatus){
+        if(textStatus != 'error' && counts && !counts.error){
+            if(counts.length && counts.length>0){
+                for(i in counts){
+                    $('#'+ t +'_timeline .showCounts_'+counts[i].id).each(function(){
+                        var _li = $(this);
+                        var _edit = _li.find('.edit:eq(0)');
+                        if(_edit){
+                            _edit.find('.repostCounts').html('('+ counts[i].rt +')');
+                            var _comm_txt = '(0)';
+                            if(counts[i].comments>0){
+                                _comm_txt = '(<a href="javascript:void(0);" title="点击查看评论" onclick="showComments(this,' + counts[i].id + ')">' +counts[i].comments + '</a>)';
+                            }
+                            _edit.find('.commentCounts').html(_comm_txt);
+                        }
+                    });
+                }
+            }
+        }
+        hideLoading();
+    });
+}//<<<<<===========
+
+//======>>>>>>> 查看评论 <<<<<<<
+//@ele: 触发该事件的元素
+//@tweetId: 微博ID
+//@page: 分页
+//@notHide: 不要隐藏评论列表
+function showComments(ele,tweetId, page, notHide){
+    if(tweetId){
+        var tweetItem = $(ele).closest('.tweetItem');
+        var tweetWrap = tweetItem.children('.mainContent');
+        tweetWrap = tweetWrap.length>0 ? tweetWrap : tweetItem;
+        var commentWrap = tweetWrap.children('.comments');
+        if(!notHide && commentWrap.css('display') != 'none'){
+            commentWrap.hide();
+            return;
+        }else if(!notHide && commentWrap.children('.comment_list').html()){
+            commentWrap.show();
+            return;
+        }
+        showLoading();
+        page = page || 1;
+        var data = {id:tweetId, page:page, count:COMMENT_PAGE_SIZE};
+        sinaApi.comments(data, function(comments, textStatus){
+            if(textStatus != 'error' && comments && !comments.error){
+                if(comments.length && comments.length>0){
+                    var _html = '';
+                    for(i in comments){
+                        var comment_li = buildComment(comments[i]);
+                        _html += comment_li;
+                    }
+                    commentWrap.children('.comment_list').html(_html);
+                    commentWrap.show();
+                    if(page<2){
+                        commentWrap.find('.comment_paging a:eq(0)').hide();
+                    }else{
+                        commentWrap.find('.comment_paging a:eq(0)').show();
+                    }
+                    if(comments.length < COMMENT_PAGE_SIZE){
+                        commentWrap.find('.comment_paging a:eq(1)').hide();
+                    }else{
+                        commentWrap.find('.comment_paging a:eq(1)').show();
+                    }
+                    commentWrap.find('.comment_paging').attr('page',page).show();
+                }else{
+                    if(page==1){
+                        commentWrap.find('.comment_paging').hide();
+                    }else{
+                        commentWrap.find('.comment_paging a:eq(1)').hide();
+                    }
+                }
+            }
+            hideLoading();
+        });
+    }
+};
+
+function commentPage(ele, tweetId, is_pre){
+    var $this = $(ele);
+    var page_wrap = $this.parent();
+    var page = Number(page_wrap.attr('page'));
+    if(isNaN(page)){page=1;}
+    if(page==1 && is_pre){
+        $this.hide();
+        return;
+    }
+    page = is_pre ? page-1 : page+1;
+    page_wrap.hide();
+    showComments(ele, tweetId, page, true);
+}
+//<<<<<<<<<<<======
 
 //======>>>>>>> 更多(分页) <<<<<<<
 function showReadMore(t){
@@ -351,14 +467,22 @@ function readMore(t){
     }else{
         var tweets = cache.slice(getTimelineOffset(t), getTimelineOffset(t) + PAGE_SIZE);
         var _html = '';
+        var ids = [];
         for(i in tweets){
             _html += bildMsgLi(tweets[i], t);
+            ids.push(tweets[i].id);
+            if(tweets[i].retweeted_status){
+                ids.push(tweets[i].retweeted_status.id);
+            }else if(tweets[i].status){
+                ids.push(tweets[i].status.id);
+            }
         }
         //moreEle.before(_html);
         $("#" + t + "_timeline ul.list").append(_html);
         setTimelineOffset(t, PAGE_SIZE);
         showReadMore(t);
         hideLoading();
+        showCounts(t, ids.join(','));
     }
 };
 //<<<<<<<<<<<======
@@ -367,11 +491,19 @@ function readMore(t){
 /*如果当前tab是激活的，就返回true，否则返回false(即为未读)*/
 function addTimelineMsgs(msgs, t){
     var html = '';
+    var ids = [];
     for(i in msgs){
         html += bildMsgLi(msgs[i], t);
+        ids.push(msgs[i].id);
+        if(msgs[i].retweeted_status){
+            ids.push(msgs[i].retweeted_status.id);
+        }else if(msgs[i].status){
+            ids.push(msgs[i].status.id);
+        }
     }
     var _ul = $("#" + t + "_timeline ul.list");
     _ul.prepend(html);
+    showCounts(t, ids.join(','));
     var li = $('.tab-' + t);
     if(!li.hasClass('active')){
         var ur = getUnreadTimelineCount(t);
@@ -387,11 +519,19 @@ function addTimelineMsgs(msgs, t){
 function addPageMsgs(msgs, t){
     setTimelineOffset(t, msgs.length);
     var html = '';
+    var ids = [];
     for(i in msgs){
         html += bildMsgLi(msgs[i], t);
+        ids.push(msgs[i].id);
+        if(msgs[i].retweeted_status){
+            ids.push(msgs[i].retweeted_status.id);
+        }else if(msgs[i].status){
+            ids.push(msgs[i].status.id);
+        }
     }
     var _ul = $("#" + t + "_timeline ul.list");
     _ul.append(html);
+    showCounts(t, ids.join(','));
     hideLoading();
 };
 //<<<<<<<<<<<<<<<<====
@@ -589,13 +729,14 @@ function doRepost(ele, userName, tweetId){//转发
     countReplyText();
 };
 
-function doComment(ele, userName, tweetId){//评论
+function doComment(ele, userName, tweetId, replyUserName){//评论
     $('#actionType').val('comment');
     $('#commentTweetId').val(tweetId);
     $('#replyUserName').val(userName);
     $('#ye_dialog_title').html('评论@' + userName + ' 的信息');
     $('#ye_dialog_window').show();
-    $('#replyTextarea').val('').focus();
+    var _txt = replyUserName ? ('回 @'+replyUserName+':') : '';
+    $('#replyTextarea').focus().val(_txt);
     countReplyText();
 };
 
