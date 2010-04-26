@@ -126,27 +126,27 @@ function bildMsgLi(sinaMsg, t){
         default:
             //
     }
-    var tp = '<li class="tweetItem showCounts_' + sinaMsg.id + newItem + '" id="tweet' + sinaMsg.id + '" did="' + sinaMsg.id + '"><div class="usericon"><a target="_blank" href="' + domain_sina + '/' + (user.domain||user.id) + '"><img src="' + user.profile_image_url.replace('24x24', '48x48') + '" /></a></div>'
+    var tp = '<li class="tweetItem showCounts_' + sinaMsg.id + newItem + '" id="tweet' + sinaMsg.id + '" did="' + sinaMsg.id + '"><div class="usericon"><a target="_blank" href="' + domain_sina + '/' + (user.domain||user.id) + '" title="' + user.description +'"><img src="' + user.profile_image_url.replace('24x24', '48x48') + '" /></a></div>'
 			+'	<div class="mainContent">'
-			+'		<div class="userName"><a target="_blank" href="' + domain_sina + '/' + (user.domain||user.id) + '">' + user.screen_name 
+			+'		<div class="userName"><a target="_blank" href="' + domain_sina + '/' + (user.domain||user.id) + '" title="' + getUserCountsInfo(user) +'">' + user.screen_name 
             + (user.verified ? '<img title="新浪认证" src="images/verified.gif" />':'') //V标识
             +'</a><span class="edit">' 
             + addFavoritesMsgBtn + delFavoritesMsgBtn + replyBtn + rtBtn + repostBtn + repostCounts + commentBtn + commentCounts + new_msgBtn + delTweetBtn + delCommentBtn + delDirectMsgBtn 
             + '</span></div>'
 			+'		<div class="msg"><div class="tweet">' + processMsg(sinaMsg.text);
     if(sinaMsg.thumbnail_pic){
-        tp = tp + '<div><a target="_blank" href="' + sinaMsg.original_pic + '" ><img src="' + sinaMsg.thumbnail_pic +'" /></a></div>';
+        tp = tp + '<div><a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="' + sinaMsg.bmiddle_pic + '" ><img class="imgicon" src="' + sinaMsg.thumbnail_pic +'" /></a></div>';
     }
     if(sinaMsg.retweeted_status){//转发status
         tp = tp + '</div><div class="msg"><div class="tweetItem retweeted showCounts_' + sinaMsg.retweeted_status.id + '" id="tweet' + sinaMsg.retweeted_status.id + '">' 
-            + processMsg('<div class="userName">转 @' 
-                + sinaMsg.retweeted_status.user.screen_name 
-                + (sinaMsg.retweeted_status.user.verified ? '<img title="新浪认证" src="images/verified.gif" />':'')
-                + ' 的微博: <span class="edit">'
+                + '<div class="userName">转<a target="_blank" href="' + domain_sina + '/' + (sinaMsg.retweeted_status.user.domain||sinaMsg.retweeted_status.user.id) + '" title="' + getUserCountsInfo(sinaMsg.retweeted_status.user) +'">@' + sinaMsg.retweeted_status.user.screen_name 
+                + (sinaMsg.retweeted_status.user.verified ? '<img title="新浪认证" src="images/verified.gif" />':'') //V标识
+                + '</a>'
+                + processMsg(' 的微博: <span class="edit">'
                 + rtRepostBtn + rtRepostCounts + rtCommentBtn + rtCommentCounts
                 + '</span></div>' + sinaMsg.retweeted_status.text);
         if(sinaMsg.retweeted_status.thumbnail_pic){
-            tp = tp + '<div><a target="_blank" href="' + sinaMsg.retweeted_status.original_pic + '" ><img src="' + sinaMsg.retweeted_status.thumbnail_pic +'" /></a></div>';
+            tp = tp + '<div><a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="' + sinaMsg.retweeted_status.bmiddle_pic + '" ><img class="imgicon" src="' + sinaMsg.retweeted_status.thumbnail_pic +'" /></a></div>';
         }
         //评论列表模板
         tp = tp + '<div class="comments"><ul class="comment_list"></ul>'
@@ -157,14 +157,14 @@ function bildMsgLi(sinaMsg, t){
             +     '</div>';
     }else if(sinaMsg.status){//评论
         tp = tp + '</div><div class="msg"><div class="tweetItem retweeted showCounts_' + sinaMsg.status.id + '" id="tweet' + sinaMsg.status.id + '">' 
-            + processMsg('<div class="userName">评 @' 
-                + sinaMsg.status.user.screen_name 
-                + (sinaMsg.status.user.verified ? '<img title="新浪认证" src="images/verified.gif" />':'')
-                + ' 的微博: <span class="edit">'
+                + '<div class="userName">转<a target="_blank" href="' + domain_sina + '/' + (sinaMsg.status.user.domain||sinaMsg.status.user.id) + '" title="' + getUserCountsInfo(sinaMsg.status.user) +'">@' + sinaMsg.status.user.screen_name 
+                + (sinaMsg.status.user.verified ? '<img title="新浪认证" src="images/verified.gif" />':'') //V标识
+                + '</a>'
+                + processMsg(' 的微博: <span class="edit">'
                 + rtRepostBtn + rtRepostCounts + rtCommentBtn + rtCommentCounts
                 + '</span></div>' + sinaMsg.status.text);
         if(sinaMsg.status.thumbnail_pic){
-            tp = tp + '<div><a target="_blank" href="' + sinaMsg.status.original_pic + '" ><img src="' + sinaMsg.status.thumbnail_pic +'" /></a></div>';
+            tp = tp + '<div><a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="' + sinaMsg.status.bmiddle_pic + '" ><img class="imgicon" src="' + sinaMsg.status.thumbnail_pic +'" /></a></div>';
         }
         //评论列表模板
         tp = tp + '<div class="comments"><ul class="comment_list"></ul>'
@@ -205,6 +205,12 @@ function buildComment(comment){
     return tp;
 }
 
+function getUserCountsInfo(user){
+    var tp = '关注：' + user.friends_count + '个\r\n'
+           + '粉丝：' + user.followers_count + '个\r\n'
+           + '微博：' + user.statuses_count + '条';
+    return tp;
+}
 
 /**
  * 处理内容

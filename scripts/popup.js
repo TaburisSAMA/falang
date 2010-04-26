@@ -41,6 +41,8 @@ function init(){
         }
     });
 
+
+
     $('#ye_dialog_close').click(function(){ hideReplyInput(); });
 
     initTabs();
@@ -335,7 +337,9 @@ function getSinaTimeline(t){
             }
         }
         _ul.append(html);
-        showCounts(t, ids.join(','));
+        if(ids.length>0){
+            showCounts(t, ids.join(','));
+        }
         if(tweetsAll.length >= (PAGE_SIZE/2)){
             showReadMore(t);
         }
@@ -482,7 +486,9 @@ function readMore(t){
         setTimelineOffset(t, PAGE_SIZE);
         showReadMore(t);
         hideLoading();
-        showCounts(t, ids.join(','));
+        if(ids.length>0){
+            showCounts(t, ids.join(','));
+        }
     }
 };
 //<<<<<<<<<<<======
@@ -503,7 +509,9 @@ function addTimelineMsgs(msgs, t){
     }
     var _ul = $("#" + t + "_timeline ul.list");
     _ul.prepend(html);
-    showCounts(t, ids.join(','));
+    if(ids.length>0){
+            showCounts(t, ids.join(','));
+        }
     var li = $('.tab-' + t);
     if(!li.hasClass('active')){
         var ur = getUnreadTimelineCount(t);
@@ -531,7 +539,9 @@ function addPageMsgs(msgs, t){
     }
     var _ul = $("#" + t + "_timeline ul.list");
     _ul.append(html);
-    showCounts(t, ids.join(','));
+    if(ids.length>0){
+        showCounts(t, ids.join(','));
+    }
     hideLoading();
 };
 //<<<<<<<<<<<<<<<<====
@@ -901,6 +911,10 @@ function delFavorites(ele, screen_name, tweetId){//删除私信
     });
 };
 //<<<<<<<<<<<<<=====
+
+function showFacebox(ele){
+    jQuery.facebox({ image: $(ele).attr('bmiddle') })
+}
 
 //====>>>>
 function _showLoading(){

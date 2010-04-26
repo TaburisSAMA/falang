@@ -79,8 +79,8 @@
     settings: {
       opacity      : 0,
       overlay      : true,
-      loadingImage : '/facebox/loading.gif',
-      closeImage   : '/facebox/closelabel.gif',
+      loadingImage : 'css/facebox/loading.gif',
+      closeImage   : 'css/facebox/closelabel.gif',
       imageTypes   : [ 'png', 'jpg', 'jpeg', 'gif' ],
       faceboxHtml  : '\
     <div id="facebox" style="display:none;"> \
@@ -265,7 +265,7 @@
   function fillFaceboxFromImage(href, klass) {
     var image = new Image()
     image.onload = function() {
-      $.facebox.reveal('<div class="image"><img src="' + image.src + '" /></div>', klass)
+      $.facebox.reveal('<div class="image"><a target="_blank" href="' + image.src.replace('/bmiddle/','/orignal/') +'">查看原图</a><br/><img src="' + image.src + '" /></div>', klass)
     }
     image.src = href
   }
