@@ -91,7 +91,7 @@ div.msgInfo {padding-top:3px;}
 	background-color:#FFFFFF;
 	border:1px solid #666666;
 	display:none;
-	height:220px;
+	min-height:230px;
 	left:10px;
 	padding-bottom:8px;
 	position:fixed;
@@ -121,7 +121,7 @@ div.msgInfo {padding-top:3px;}
 #ye_dialog_body {
 	width:100%;
 }
-#replyInputCount{float:left;color:#999999}
+#replyInputCount{color:#999999}
 .replyDialog {
 	margin:10px;
 }

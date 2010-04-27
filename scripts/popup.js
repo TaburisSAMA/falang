@@ -205,9 +205,9 @@ function countReplyText(){
     var len = c.length || 0;
     len = 140 - len;
     if(len>0){
-        len = '你还可以输入' + len + '字';
+        len = '(你还可以输入' + len + '字)';
     }else{
-        len = '<em style="color:red;">已超出' + (-len) + '字</em>';
+        len = '(<em style="color:red;">已超出' + (-len) + '字</em>)';
     }
     $("#replyInputCount").html(len);
 }
@@ -706,7 +706,7 @@ function hideReplyInput(){
 };
 
 //====>>>>>>>>>>>>>>>
-function doReply(ele, userName, tweetId){//回复
+function doReply(ele, userName, tweetId){//@回复
     $('#actionType').val('reply');
     $('#replyTweetId').val(tweetId);
     $('#replyUserName').val(userName);
@@ -716,11 +716,27 @@ function doReply(ele, userName, tweetId){//回复
     countReplyText();
 };
 
-function doRepost(ele, userName, tweetId){//转发
+/*
+    @ele: 触发该事件的元素
+    @userName: 当前微博的用户名
+    @tweetId: 微博的id
+    @rtUserName: 转发微博的用户名
+    @reTweetId: 转发的微薄id
+*/
+function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
     $('#actionType').val('repost');
     $('#repostTweetId').val(tweetId);
     $('#replyUserName').val(userName);
     $('#ye_dialog_title').html('转发@' + userName + ' 的信息');
+    $('#chk_sendOneMore').val(tweetId);
+    $('#txt_sendOneMore').text('同时给 @' + userName + ' 评论');
+    if(rtUserName && reTweetId){
+        $('#chk_sendOneMore2').val(reTweetId).show();
+        $('#txt_sendOneMore2').text('同时给 @' + rtUserName + ' 评论').show();
+    }else{
+        $('#chk_sendOneMore2').val('').hide();
+        $('#txt_sendOneMore2').text('').hide();
+    }
     $('#ye_dialog_window').show();
     var d = $(ele).parent().parent().parent().parent().find('.msgObjJson').text();
     try{
@@ -746,6 +762,10 @@ function doComment(ele, userName, tweetId, replyUserName){//评论
     $('#ye_dialog_title').html('评论@' + userName + ' 的信息');
     $('#ye_dialog_window').show();
     var _txt = replyUserName ? ('回 @'+replyUserName+':') : '';
+    $('#chk_sendOneMore').val(tweetId);
+    $('#txt_sendOneMore').text('同时发一条微博');
+    $('#chk_sendOneMore2').val('').hide();
+    $('#txt_sendOneMore2').text('').hide();
     $('#replyTextarea').focus().val(_txt);
     countReplyText();
 };
