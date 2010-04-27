@@ -82,6 +82,14 @@ function init(){
     }
     var asuwc = getAutoShortUrlWordCount();
     $("#autoShortUrlCount").val(asuwc);
+
+    initSetBadgeText();
+};
+
+function initSetBadgeText(){
+    for(i in T_LIST){
+        $("#set_badge_" + T_LIST[i]).attr("checked", isSetBadgeText(T_LIST[i]));
+    }
 }
 
 function saveAccount(){
@@ -97,9 +105,9 @@ function saveAccount(){
         sinaApi.verify_credentials(user,function(data, textStatus, errorCode){
             if(errorCode){
                 if(errorCode==400||errorCode==401||errorCode==403){
-                    showMsg('用户名或者密码不正确，请修改');
+                    _showMsg('用户名或者密码不正确，请修改');
                 }else{
-                    showMsg('出现错误，保存失败。');
+                    _showMsg('出现错误，保存失败。');
                 }
             }else{
                 var temp_username = $("#edit-account-name").val();
@@ -130,13 +138,13 @@ function saveAccount(){
                 $("#new-account").hide();
                 $("#account-name").val('');
                 $("#account-pwd").val('');
-                showMsg(btnVal + '用户"' + userName + '"成功！');
+                _showMsg(btnVal + '用户"' + userName + '"成功！');
             }
         });
 
         
     }else{
-        showMsg('请输入用户名和密码！');
+        _showMsg('请输入用户名和密码！');
     }
 }
 
@@ -181,7 +189,7 @@ function delAccount(userName){
                 break;
             }
         }
-        showMsg('成功删除账号"' + userName + '"！');
+        _showMsg('成功删除账号"' + userName + '"！');
     }
 }
 
@@ -209,8 +217,18 @@ function saveAll(){
     }else{
         localStorage.setObject(AUTO_SHORT_URL_WORD_COUNT, 15);
     }
-    showMsg('保存成功！');
-}
+
+    saveSetBadgeText();
+
+    _showMsg('保存成功！');
+};
+
+function saveSetBadgeText(){
+    $("#set_badge_wrap :checkbox").each(function(){
+        var $this = $(this);
+        setSetBadgeText($this.attr('id').replace('set_badge_',''), ($this.attr("checked") ? 1 : 0));
+    });
+};
 
 function refreshAccountInfo(){
     var stat = {};
@@ -237,9 +255,9 @@ function refreshAccountWarp(userList, r_user, stat){
     sinaApi.verify_credentials(user,function(data, textStatus, errorCode){
         if(errorCode){
             if(errorCode==400){
-                showMsg('刷新“' + user.userName + '”的信息失败，原因：用户名或者密码不正确，请修改。');
+                _showMsg('刷新“' + user.userName + '”的信息失败，原因：用户名或者密码不正确，请修改。');
             }else{
-                showMsg('刷新“' + user.userName + '”的信息失败，原因：出现未知错误。');
+                _showMsg('刷新“' + user.userName + '”的信息失败，原因：出现未知错误。');
             }
             user.userName = (user.userName||user.name).toLowerCase();
             userList[user.userName] = user;
@@ -249,7 +267,7 @@ function refreshAccountWarp(userList, r_user, stat){
             data.password = user.password;
             userList[data.userName] = data;
             stat.successCount++;
-            showMsg('成功刷新“' + user.userName + '”的信息，');
+            _showMsg('成功刷新“' + user.userName + '”的信息，');
         }
         if((stat.errorCount + stat.successCount) == stat.len){
             localStorage.setObject(USER_LIST_KEY, userList);
@@ -258,7 +276,7 @@ function refreshAccountWarp(userList, r_user, stat){
                 c_user = userList[c_user.userName.toLowerCase()];
                 localStorage.setObject(CURRENT_USER_KEY, c_user);
             }
-            showMsg('刷新用户信息完成。成功' + stat.successCount + '个，失败' + stat.errorCount + '个。');
+            _showMsg('刷新用户信息完成。成功' + stat.successCount + '个，失败' + stat.errorCount + '个。');
             $("#refresh-account").removeAttr("disabled");
         }
     });

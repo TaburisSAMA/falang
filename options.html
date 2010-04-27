@@ -59,6 +59,7 @@
 			<span>
 				<select id="selRefreshTime">
 					<option value="1">每1分钟</option>
+					<option value="2">每2分钟</option>
 					<option value="3" selected="true">每3分钟</option>
 					<option value="5">每5分钟</option>
 					<option value="10">每10分钟</option>
@@ -74,6 +75,14 @@
 				<label for="autoShortUrlCount">URL超过多少个字符自动缩短:</label><input type="text" id="autoShortUrlCount" value="15" />
 				<span>(短址服务由<a target="_blank" href="http://s8.hk">缩吧</a>提供)</span>
 			</span>
+		</li>
+		<li>
+			<p id="set_badge_wrap">未读提示：
+				<input type="checkbox" id="set_badge_friends_timeline" value="1" /><label for="set_badge_friends_timeline">最新微博</label>
+				<input type="checkbox" id="set_badge_mentions" value="1" /><label for="set_badge_mentions">@我的</label>
+				<input type="checkbox" id="set_badge_comments_timeline" value="1" /><label for="set_badge_comments_timeline">评论</label>
+				<input type="checkbox" id="set_badge_direct_messages" value="1" /><label for="set_badge_direct_messages">私信</label>
+			</p>
 		</li>
 		<li>
 			<!--<label>本地缓存信息数：</label>

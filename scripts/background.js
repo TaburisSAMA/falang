@@ -228,7 +228,7 @@ function onChangeUser(){
         setUnreadTimelineCount(0, T_LIST[i], true);
     }
     checkNewMsg();
-    itv = setInterval(checkNewMsg, 1000 * 60);
+    itv = setInterval(checkNewMsg, getRefreshTime());
 };
 
 function refreshInterval(){

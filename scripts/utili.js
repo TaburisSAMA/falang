@@ -16,21 +16,17 @@ var CURRENT_USER_KEY = 'idi_current_user';
 var REFRESH_TIME_KEY = 'idi_REFRESH_TIME_KEY';
 
 var LAST_MSG_ID = 'idi_last_msg_id';
-//var LAST_FRIENDS_TIMELINE_MSG_ID = 'idi_last_friends_timeline_msg_id';
-//var LAST_REPLIES_MSG_ID = 'idi_last_replies_msg_id';
-//var LAST_MESSAGES_MSG_ID = 'idi_last_messages_msg_id';
 
 var LOCAL_STORAGE_NUM_KEY = 'idi_LOCAL_STORAGE_NUM_KEY';
 var LOCAL_STORAGE_NEW_TWEET_LIST_KEY = 'idi_LOCAL_STORAGE_NEW_TWEET_LIST_KEY';
 var LOCAL_STORAGE_TWEET_LIST_HTML_KEY = 'idi_LOCAL_STORAGE_TWEET_LIST_HTML_KEY';
 
 var UNREAD_TIMELINE_COUNT_KEY = 'idi_UNREAD_TIMELINE_COUNT_KEY';
-//var UNREAD_FRIENDS_TIMELINE_COUNT_KEY = 'idi_UNREAD_FRIENDS_TIMELINE_COUNT_KEY';
-//var UNREAD_REPLIES_COUNT_KEY = 'idi_UNREAD_REPLIES_COUNT_KEY';
-//var UNREAD_MESSAGES_COUNT_KEY = 'idi_UNREAD_MESSAGES_COUNT_KEY';
 
 var AUTO_SHORT_URL = 'idi_SHORT_URL';//是否缩短URL
 var AUTO_SHORT_URL_WORD_COUNT = 'idi_SHORT_URL_WORD_COUNT'; //URL长度超过多少自动缩短
+
+var SET_BADGE_TEXT = 'idi_SET_BADGE_TEXT'; //设置未读信息提示
 
 //['friends_timeline','mentions','comments_timeline','comments_by_me','direct_messages','favorites']
 var T_LIST = ['friends_timeline','mentions','comments_timeline','direct_messages']; //timeline的分类列表
@@ -114,18 +110,22 @@ function getUnreadTimelineCount(t){
 };
 
 function setUnreadTimelineCount(count, t, setBadgeText){
+    setBadgeText = isSetBadgeText(t);
     count += getUnreadTimelineCount(t);
     localStorage.setObject(getUser().userName + t + UNREAD_TIMELINE_COUNT_KEY, count);
     if(setBadgeText){
         var total = 0;
         for(i in T_LIST){
-            total += getUnreadTimelineCount(T_LIST[i]);
+            if(isSetBadgeText(T_LIST[i])){
+                total += getUnreadTimelineCount(T_LIST[i]);
+            }
         }
         if(total > 0){
             total = total.toString();
             chrome.browserAction.setBadgeText({text: total});
         }
     }
+    chrome.browserAction.setTitle({title:getTooltip()});
 };
 
 function removeUnreadTimelineCount(t){
@@ -135,7 +135,9 @@ function removeUnreadTimelineCount(t){
         if(T_LIST[i]==t){
             continue;
         }
-        total += getUnreadTimelineCount(T_LIST[i]);
+        if(isSetBadgeText(T_LIST[i])){
+            total += getUnreadTimelineCount(T_LIST[i]);
+        }
     }
     if(total > 0){
         total = total.toString();
@@ -145,98 +147,14 @@ function removeUnreadTimelineCount(t){
     }
 };
 
-//function getUnreadFriendsTimelineCount(){
-//    var count = localStorage.getObject(getUser().userName + UNREAD_FRIENDS_TIMELINE_COUNT_KEY);
-//    if(!count){
-//        count = 0;
-//    }
-//    return count;
-//};
-//
-//function setUnreadFriendsTimelineCount(count, setBadgeText){
-//    count += getUnreadFriendsTimelineCount();
-//    localStorage.setObject(getUser().userName + UNREAD_FRIENDS_TIMELINE_COUNT_KEY, count);
-//    if(setBadgeText){
-//        var total = count + getUnreadRepliesCount() + getUnreadMessagesCount();
-//        if(total > 0){
-//            total = total.toString();
-//            chrome.browserAction.setBadgeText({text: total});
-//        }
-//    }
-//};
-//
-//function removeUnreadFriendsTimelineCount(){
-//    localStorage.setObject(getUser().userName + UNREAD_FRIENDS_TIMELINE_COUNT_KEY, 0);
-//    var total = getUnreadRepliesCount() + getUnreadMessagesCount();
-//    if(total > 0){
-//        total = total.toString();
-//        chrome.browserAction.setBadgeText({text: total});
-//    }else{
-//        chrome.browserAction.setBadgeText({text: ''});
-//    }
-//};
-//
-//function getUnreadRepliesCount(){
-//    var count = localStorage.getObject(getUser().userName + UNREAD_REPLIES_COUNT_KEY);
-//    if(!count){
-//        count = 0;
-//    }
-//    return count;
-//};
-//
-//function setUnreadRepliesCount(count, setBadgeText){
-//    count += getUnreadRepliesCount();
-//    localStorage.setObject(getUser().userName + UNREAD_REPLIES_COUNT_KEY, count);
-//    if(setBadgeText){
-//        var total = count + getUnreadFriendsTimelineCount() + getUnreadMessagesCount();
-//        if(total > 0){
-//            total = total.toString();
-//            chrome.browserAction.setBadgeText({text: total});
-//        }
-//    }
-//};
-//
-//function removeUnreadRepliesCount(){
-//    localStorage.setObject(getUser().userName + UNREAD_REPLIES_COUNT_KEY, 0);
-//    var total = getUnreadFriendsTimelineCount() + getUnreadMessagesCount();
-//    if(total > 0){
-//        total = total.toString();
-//        chrome.browserAction.setBadgeText({text: total});
-//    }else{
-//        chrome.browserAction.setBadgeText({text: ''});
-//    }
-//};
-//
-//function getUnreadMessagesCount(){
-//    var count = localStorage.getObject(getUser().userName + UNREAD_MESSAGES_COUNT_KEY);
-//    if(!count){
-//        count = 0;
-//    }
-//    return count;
-//};
-//
-//function setUnreadMessagesCount(count, setBadgeText){
-//    count += getUnreadMessagesCount();
-//    localStorage.setObject(getUser().userName + UNREAD_MESSAGES_COUNT_KEY, count);
-//    if(setBadgeText){
-//        var total = count + getUnreadFriendsTimelineCount() + getUnreadRepliesCount();
-//        if(total > 0){
-//            total = total.toString();
-//            chrome.browserAction.setBadgeText({text: total});
-//        }
-//    }
-//};
-//
-//function removeUnreadMessagesCount(){
-//    localStorage.setObject(getUser().userName + UNREAD_MESSAGES_COUNT_KEY, 0);
-//    var total = getUnreadFriendsTimelineCount() + getUnreadRepliesCount();
-//    if(total > 0){
-//        total = total.toString();
-//        chrome.browserAction.setBadgeText({text: total});
-//    }else{
-//        chrome.browserAction.setBadgeText({text: ''});
-//    }
-//};
+function getTooltip(){
+    var tip = '发浪(FaWave) For 新浪微博\r\n'
+            + '新微博: ' + getUnreadTimelineCount('friends_timeline') + ',    '
+            + '新@我: ' + getUnreadTimelineCount('mentions') + '\r\n'
+            + '新评论: ' + getUnreadTimelineCount('comments_timeline') + ',    '
+            + '新私信: ' + getUnreadTimelineCount('direct_messages');
+    return tip;
+};
 
 //===>>>>>>>>>>>>>>>>>>>>>>>
 function setLastMsgId(id, t){
@@ -252,7 +170,7 @@ function getLastMsgId(t){
 //====>>>>>>>>>>>
 function isAutoShortUrl(){
     var asu = localStorage.getObject(AUTO_SHORT_URL);
-    if(!asu && asu == 0){
+    if(!asu || asu == 0){
         return false;
     }
     return true;
@@ -265,9 +183,17 @@ function getAutoShortUrlWordCount(){
     }
     return 15; //默认值
 }
-
-
 //<<<<<<<<<<<====
+
+//-->>
+function isSetBadgeText(t){
+    return localStorage.getObject(t + SET_BADGE_TEXT) === 0 ? false : true;
+};
+
+function setSetBadgeText(t, v){
+    return localStorage.setObject(t + SET_BADGE_TEXT, v);
+};
+//<<--
 
 function getRefreshTime(){
     var t = localStorage.getObject(REFRESH_TIME_KEY);

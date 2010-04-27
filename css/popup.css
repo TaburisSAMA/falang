@@ -1,6 +1,6 @@
 
 * { margin:0; padding:0;} 
-body { font:12px "ËÎÌו"; /*color:#049; padding:8px;*/ width:480px; color:#182A58;}
+body { font:12px "ËÎÌו"; /*color:#049; padding:8px;*/ width:480px; color:#182A58;overflow-y:auto;}
 a { text-decoration:none; color:#049;} 
 a:hover { text-decoration:underline;}
 ul { list-style:none;} 
