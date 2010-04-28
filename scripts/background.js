@@ -86,6 +86,7 @@ function checkTimeline(t){
                 }
             }else{
                 setUnreadTimelineCount(sinaMsgs.length, t, true);
+                showNewMsg(sinaMsgs, t);
             }
 
             if(_last_id){
@@ -203,6 +204,12 @@ function getTimelinePage(t){
     });
 };
 
+function showNewMsg(msgs, t){
+    chrome.tabs.getSelected(null, function(tab) {
+        chrome.tabs.sendRequest(tab.id, {msgs: msgs, t:t}, function handler(response) {
+        });
+    });
+};
 
 function checkNewMsg(){
     try{

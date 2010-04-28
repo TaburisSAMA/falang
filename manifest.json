@@ -1,6 +1,6 @@
 {
   "name": "__MSG_extName__",
-  "version": "0.0.0.8",
+  "version": "0.0.0.9",
   "description": "__MSG_extDes__",
   "icons":{ "48": "icons/icon48.png",
           "128": "icons/icon128.png" },
@@ -12,6 +12,13 @@
   },
   "background_page": "background.html",
   "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": ["http://*/*"],
+      "css": ["css/page.css"],
+      "js": ["scripts/jquery-1.4.js", "scripts/page.js"]
+    }
+  ],
   "permissions": [
                    "tabs",
                    "bookmarks",

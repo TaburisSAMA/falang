@@ -1,0 +1,18 @@
+
+#fa_wave_msg_wrap{
+   position:fixed;
+   z-index: 100000;
+   top:0;
+   right:0;
+}
+#fa_wave_msg_wrap .msgRemind{
+   width: 320px;
+   margin: 2px 0;
+   padding: .5em;
+   background: #ffa;
+   border: 1px solid #a00;
+   color: #960;/*#a00;*/
+   font-weight: bold;
+}
+
+#fa_wave_msg_wrap .msgRemind .username{color:blue;}
