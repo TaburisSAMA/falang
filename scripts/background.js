@@ -78,15 +78,22 @@ function checkTimeline(t){
             _max_id = sinaMsgs[sinaMsgs.length-1].id;
             tweets[_key] = sinaMsgs.concat(tweets[_key]);
             
+            var _unreadCount = 0, _msg_user = null;
+            for(i in sinaMsgs){
+                _msg_user = sinaMsgs[i].user || sinaMsgs[i].sender;
+                if(_msg_user.id != c_user.id){
+                    _unreadCount += 1;
+                }
+            }
             if(popupView){
                 if(!popupView.addTimelineMsgs(tweets[_key].slice(0, sinaMsgs.length), t)){
-                    setUnreadTimelineCount(sinaMsgs.length, t, true);
+                    setUnreadTimelineCount(_unreadCount, t, true);
                 }else{
                     popupView._showMsg('有新微博');
                 }
             }else{
-                setUnreadTimelineCount(sinaMsgs.length, t, true);
-                showNewMsg(sinaMsgs, t);
+                setUnreadTimelineCount(_unreadCount, t, true);
+                showNewMsg(sinaMsgs, t, c_user.id);
             }
 
             if(_last_id){
@@ -204,9 +211,10 @@ function getTimelinePage(t){
     });
 };
 
-function showNewMsg(msgs, t){
+//@userId: 插件当前登录的用户ID
+function showNewMsg(msgs, t, userId){
     chrome.tabs.getSelected(null, function(tab) {
-        chrome.tabs.sendRequest(tab.id, {msgs: msgs, t:t}, function handler(response) {
+        chrome.tabs.sendRequest(tab.id, {msgs: msgs, t:t, userId:userId}, function handler(response) {
         });
     });
 };

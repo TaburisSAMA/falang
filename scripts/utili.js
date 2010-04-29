@@ -27,6 +27,7 @@ var AUTO_SHORT_URL = 'idi_SHORT_URL';//是否缩短URL
 var AUTO_SHORT_URL_WORD_COUNT = 'idi_SHORT_URL_WORD_COUNT'; //URL长度超过多少自动缩短
 
 var SET_BADGE_TEXT = 'idi_SET_BADGE_TEXT'; //设置未读信息提示
+var IS_SHOW_IN_PAGE = 'idi_IS_SHOW_IN_PAGE_'; //新消息是否在页面提示
 
 //['friends_timeline','mentions','comments_timeline','comments_by_me','direct_messages','favorites']
 var T_LIST = ['friends_timeline','mentions','comments_timeline','direct_messages']; //timeline的分类列表
@@ -185,13 +186,23 @@ function getAutoShortUrlWordCount(){
 }
 //<<<<<<<<<<<====
 
-//-->>
+//-- 未读提示 --
 function isSetBadgeText(t){
     return localStorage.getObject(t + SET_BADGE_TEXT) === 0 ? false : true;
 };
 
 function setSetBadgeText(t, v){
     return localStorage.setObject(t + SET_BADGE_TEXT, v);
+};
+//<<--
+
+//-- 在页面提示新消息 --
+function isShowInPage(t){
+    return localStorage.getObject(t + IS_SHOW_IN_PAGE) === 0 ? false : true;
+};
+
+function setShowInPage(t, v){
+    return localStorage.setObject(t + IS_SHOW_IN_PAGE, v);
 };
 //<<--
 

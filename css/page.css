@@ -4,15 +4,22 @@
    z-index: 100000;
    top:0;
    right:0;
+   font-size:12px;
+}
+#fa_wave_msg_wrap .close_fawave_remind{
+	display: block;
+	background: #E7F9FF;
+	border: 1px solid #A8E4FA;
+	color:green;
+	text-align: center;
 }
 #fa_wave_msg_wrap .msgRemind{
    width: 320px;
-   margin: 2px 0;
+   margin: 2px;
    padding: .5em;
-   background: #ffa;
-   border: 1px solid #a00;
-   color: #960;/*#a00;*/
-   font-weight: bold;
+   background: #F8F8F8;
+   border: 5px solid gainsboro;
+   color: #2B4A78;/*#a00;*/
 }
 
-#fa_wave_msg_wrap .msgRemind .username{color:blue;}
+#fa_wave_msg_wrap .msgRemind .username{color:#a00;font-weight: bold;}

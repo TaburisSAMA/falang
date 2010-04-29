@@ -84,11 +84,19 @@ function init(){
     $("#autoShortUrlCount").val(asuwc);
 
     initSetBadgeText();
+    initShowInPage();
 };
-
+//初始化设置未读提示信息
 function initSetBadgeText(){
     for(i in T_LIST){
         $("#set_badge_" + T_LIST[i]).attr("checked", isSetBadgeText(T_LIST[i]));
+    }
+}
+
+//初始化设置新消息是否在页面显示
+function initShowInPage(){
+    for(i in T_LIST){
+        $("#set_show_in_page_" + T_LIST[i]).attr("checked", isShowInPage(T_LIST[i]));
     }
 }
 
@@ -219,10 +227,12 @@ function saveAll(){
     }
 
     saveSetBadgeText();
+    saveSetShowInPage();
 
     _showMsg('保存成功！');
 };
 
+//保存未读提示
 function saveSetBadgeText(){
     $("#set_badge_wrap :checkbox").each(function(){
         var $this = $(this);
@@ -230,6 +240,15 @@ function saveSetBadgeText(){
     });
 };
 
+//保存是否在页面提示新消息
+function saveSetShowInPage(){
+    $("#set_show_in_page_wrap :checkbox").each(function(){
+        var $this = $(this);
+        setShowInPage($this.attr('id').replace('set_show_in_page_',''), ($this.attr("checked") ? 1 : 0));
+    });
+};
+
+//刷新账号信息
 function refreshAccountInfo(){
     var stat = {};
     stat.len = 0;
@@ -282,6 +301,7 @@ function refreshAccountWarp(userList, r_user, stat){
     });
 }
 
+//清空本地缓存数据
 function cleanLocalStorageData(){
     for(key in localStorage){
         if(key.indexOf('idi')>-1){

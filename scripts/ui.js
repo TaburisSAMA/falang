@@ -120,6 +120,7 @@ function bildMsgLi(sinaMsg, t){
             break;
         case 'direct_messages':
             repostBtn = repostCounts = commentBtn = commentCounts = delCommentBtn = delTweetBtn = addFavoritesMsgBtn = delFavoritesMsgBtn = '';
+            new_msgBtn = new_msgBtn.replace('>私<', '>回复<');
             break;
         case 'favorites':
             break;
