@@ -16,12 +16,14 @@
  </head>
 
  <body onload="initOnLoad();">
-	<div><textarea id="txtContent" style="width:100%;" rows="1" class="padDoing" ></textarea>
+	<div><textarea id="txtContent" style="width:100%;" rows="1" class="padDoing" >     点此输入您要分享的内容</textarea>
 		<a href="javascript:void(0);" id="doing" class="doing" title="分享你正在看的网页" ><img src="images/bc.gif" /></a>
 	</div>
 	<div id="submitWarp" style="display:none;">
-		<input id="btnSend" type="button" value="发浪!" title="ctrl+enter" />    
-		<span id="doingWarp"></span>
+		<input id="btnSend" type="button" value="发浪!" title="ctrl+enter" />&nbsp;
+		<span id="doingWarp"></span>&nbsp;
+		<input type="button" value="清空" onclick="cleanTxtContent();"/>&nbsp;
+		<input type="button" value="↑↑收起↑↑" onclick="hideMsgInput();"/>
 		<span id="wordCount">140</span>
 	</div>
 	<span id="loading"><img src="images/loader.gif" /></span>

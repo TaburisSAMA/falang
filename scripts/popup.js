@@ -96,32 +96,42 @@ function initTabs(){
 
 function initOnUnload(){
     var c = $("#txtContent").val();
+    if(c=='     点此输入您要分享的内容'){
+        c='';
+    }
     localStorage.setObject(UNSEND_TWEET_KEY, c||'');
 }
 
 function initTxtContentEven(){
-//>>>发送嘀咕开始<<<
+//>>>发送微博开始<<<
     var unsendTweet = localStorage.getObject(UNSEND_TWEET_KEY);
     if(unsendTweet){
         $("#txtContent").val(unsendTweet);
-        showMsgInput();
-        countInputText();
+        //showMsgInput();
+        //countInputText();
     }
 
     $("#txtContent").keyup(function(){
         var c = $(this).val();
-        if(c){
-            showMsgInput();
-
-            countInputText();
-        }
+        countInputText();
+        //if(c){
+        //    showMsgInput();
+        //}
     });
 
     $("#txtContent").blur(function(){
         var c = $.trim($(this).val());
         if(!c){
-            hideMsgInput();
+            //hideMsgInput();
         }
+    });
+
+    $("#txtContent").focus(function(){
+        if($(this).val()=='     点此输入您要分享的内容'){
+            $(this).val('');
+        }
+        showMsgInput();
+        countInputText();
     });
 
     $("#txtContent").keydown(function(event){
@@ -210,6 +220,10 @@ function countReplyText(){
         len = '(<em style="color:red;">已超出' + (-len) + '字</em>)';
     }
     $("#replyInputCount").html(len);
+}
+
+function cleanTxtContent(){
+    $("#txtContent").val('');
 }
 
 //我正在看
@@ -496,36 +510,41 @@ function readMore(t){
 //====>>>>>>>>>>>>>>>>>>
 /*如果当前tab是激活的，就返回true，否则返回false(即为未读)*/
 function addTimelineMsgs(msgs, t){
-    var html = '';
-    var ids = [];
-    var c_user = getUser(CURRENT_USER_KEY), _msg_user = null;
-    var _unreadCount = 0;
-    for(i in msgs){
-        html += bildMsgLi(msgs[i], t);
-        ids.push(msgs[i].id);
-        if(msgs[i].retweeted_status){
-            ids.push(msgs[i].retweeted_status.id);
-        }else if(msgs[i].status){
-            ids.push(msgs[i].status.id);
-        }
-        _msg_user = msgs[i].user || msgs[i].sender;
-        if(_msg_user.id != c_user.id){
-            _unreadCount += 1;
-        }
-    }
-    var _ul = $("#" + t + "_timeline ul.list");
-    _ul.prepend(html);
-    if(ids.length>0){
-            showCounts(t, ids.join(','));
-        }
+    
     var li = $('.tab-' + t);
-    if(!li.hasClass('active') && _unreadCount>0){
+    if(!li.hasClass('active')){
+        $("#" + t + "_timeline ul.list").html('');
+        var c_user = getUser(CURRENT_USER_KEY), _msg_user = null, _unreadCount = 0;
+        for(i in msgs){
+            _msg_user = msgs[i].user || msgs[i].sender;
+            if(_msg_user.id != c_user.id){
+                _unreadCount += 1;
+            }
+        }
         var ur = getUnreadTimelineCount(t);
         ur += _unreadCount;
         if(ur>0){
             li.find('.unreadCount').html('(' + ur + ')');
         }
         return false;
+    }else{
+        var html = '';
+        var ids = [];
+        var _unreadCount = 0;
+        for(i in msgs){
+            html += bildMsgLi(msgs[i], t);
+            ids.push(msgs[i].id);
+            if(msgs[i].retweeted_status){
+                ids.push(msgs[i].retweeted_status.id);
+            }else if(msgs[i].status){
+                ids.push(msgs[i].status.id);
+            }
+        }
+        var _ul = $("#" + t + "_timeline ul.list");
+        _ul.prepend(html);
+        if(ids.length>0){
+            showCounts(t, ids.join(','));
+        }
     }
     return true;
 };
@@ -716,8 +735,9 @@ function showMsgInput(){
 };
 
 function hideMsgInput(){
+    var v = $("#txtContent").val() || '     点此输入您要分享的内容';
     $("#submitWarp").hide();
-    $("#txtContent").attr('rows', 1).val('').addClass('padDoing');
+    $("#txtContent").attr('rows', 1).val(v).addClass('padDoing');
     $(".list_warp").css('height', '470');
     $("#doing").addClass("doing").appendTo('body');
 };
@@ -777,10 +797,13 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
     var v = '';
     if(d && d.retweeted_status){
         v = '//@' + userName + ':' + d.text;
+    }else{
+        v = '转发微博.';
     }
     var t = $('#replyTextarea');
     t.focus().val('').blur();
     t.val(v).focus();
+    if(v=='转发微博.'){t.select();}
     countReplyText();
 };
 
