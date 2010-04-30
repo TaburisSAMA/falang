@@ -18,7 +18,7 @@
    margin: 2px;
    padding: .5em;
    background: #F8F8F8;
-   border: 5px solid gainsboro;
+   border: 5px solid #fcc7c7;/*gainsboro;*/
    color: #2B4A78;/*#a00;*/
 }
 

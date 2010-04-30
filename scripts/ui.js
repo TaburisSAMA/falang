@@ -158,7 +158,7 @@ function bildMsgLi(sinaMsg, t){
             +     '</div>';
     }else if(sinaMsg.status){//评论
         tp = tp + '</div><div class="msg"><div class="tweetItem retweeted showCounts_' + sinaMsg.status.id + '" id="tweet' + sinaMsg.status.id + '">' 
-                + '<div class="userName">转<a target="_blank" href="' + domain_sina + '/' + (sinaMsg.status.user.domain||sinaMsg.status.user.id) + '" title="' + getUserCountsInfo(sinaMsg.status.user) +'">@' + sinaMsg.status.user.screen_name 
+                + '<div class="userName">评<a target="_blank" href="' + domain_sina + '/' + (sinaMsg.status.user.domain||sinaMsg.status.user.id) + '" title="' + getUserCountsInfo(sinaMsg.status.user) +'">@' + sinaMsg.status.user.screen_name 
                 + (sinaMsg.status.user.verified ? '<img title="新浪认证" src="images/verified.gif" />':'') //V标识
                 + '</a>'
                 + processMsg(' 的微博: <span class="edit">'

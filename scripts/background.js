@@ -110,7 +110,7 @@ function checkTimeline(t){
         if(isFirstTime){//如果是第一次,则获取以前的微薄
             if(!tweets[_key] || tweets[_key].length < PAGE_SIZE){
                 getTimelinePage(t);
-            }else{
+            }else if(popupView){
                 popupView.showReadMore(t);
                 popupView.setTimelineOffset(t, sinaMsgs.length);
             }
@@ -213,10 +213,12 @@ function getTimelinePage(t){
 
 //@userId: 插件当前登录的用户ID
 function showNewMsg(msgs, t, userId){
-    chrome.tabs.getSelected(null, function(tab) {
-        chrome.tabs.sendRequest(tab.id, {msgs: msgs, t:t, userId:userId}, function handler(response) {
+    if(isShowInPage(t)){
+        chrome.tabs.getSelected(null, function(tab) {
+            chrome.tabs.sendRequest(tab.id, {msgs: msgs, t:t, userId:userId}, function handler(response) {
+            });
         });
-    });
+    }
 };
 
 function checkNewMsg(){

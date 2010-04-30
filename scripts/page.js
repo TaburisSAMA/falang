@@ -3,9 +3,9 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     if(request.msgs && request.msgs.length>0){
         var msg_wrap = $("#fa_wave_msg_wrap");
         if(msg_wrap.length < 1){
-            msg_wrap = $('<div id="fa_wave_msg_wrap"><a href="javascript:void(0)" onclick="close_fawave_remind();" class="close_fawave_remind">关闭</a><div class="fa_wave_list"></div></div>').appendTo('body');
+            msg_wrap = $('<div id="fa_wave_msg_wrap"><a href="javascript:void(0)" class="close_fawave_remind">关闭</a><div class="fa_wave_list"></div></div>').appendTo('body');
+            msg_wrap.find('.close_fawave_remind').click(function(){ close_fawave_remind(); });
         }
-        msg_wrap.show();
         var msg_list_wrap = msg_wrap.find('.fa_wave_list');
         var len = request.msgs.length>5 ? 5 : request.msgs.length;
         var showCount = 0;//已经提示的信息数
@@ -14,6 +14,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
             _msg_user = request.msgs[i].user || request.msgs[i].sender;
             if(_msg_user.id != request.userId){
                 showCount += 1;
+                if(showCount == 1){msg_wrap.show();}//有可显示的信息，就显示
                 $(builFawaveTip(request.msgs[i]))
                     .appendTo(msg_list_wrap)
                     .fadeIn('slow')
@@ -41,4 +42,4 @@ function builFawaveTip(msg){
 function close_fawave_remind(){
     $("#fa_wave_msg_wrap .fa_wave_list").html('');
     $("#fa_wave_msg_wrap").hide();
-}
+};

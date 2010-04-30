@@ -222,19 +222,19 @@ function initIamDoing(){
                 if(isAutoShortUrl() && loc_url.replace(/^https?:\/\//i, '').length > getAutoShortUrlWordCount()){
                     s8Api.shorten({longUrl: loc_url}, function(data){
                         if(data && data.shortUrl){
-                            $("#txtContent").val('我正在看 [url=' + data.shortUrl + ']' + (title||data.shortUrl) + '[/url]');
+                            $("#txtContent").val('我正在看 [url=' + data.shortUrl + ' ]' + (title||data.shortUrl) + '[/url]');
                         }else{
-                            $("#txtContent").val('我正在看 [url=' + loc_url + ']' + (title||loc_url) + '[/url]');
+                            $("#txtContent").val('我正在看 [url=' + loc_url + ' ]' + (title||loc_url) + '[/url]');
                         }
                         showMsgInput();
                         countInputText();
                     },function(xhr, textStatus, errorThrown){
-                        $("#txtContent").val('我正在看 [url=' + loc_url + ']' + (title||loc_url) + '[/url]');
+                        $("#txtContent").val('我正在看 [url=' + loc_url + ' ]' + (title||loc_url) + '[/url]');
                         showMsgInput();
                         countInputText();
                     });
                 }else{
-                    $("#txtContent").val('我正在看 [url=' + loc_url + ']' + (title||loc_url) + '[/url]');
+                    $("#txtContent").val('我正在看 [url=' + loc_url + ' ]' + (title||loc_url) + '[/url]');
                     showMsgInput();
                     countInputText();
                 }
