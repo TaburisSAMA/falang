@@ -21,12 +21,13 @@ function setMaxMsgId(t, id){
 // @t : 获取timeline的类型
 function checkTimeline(t){
     //var t = 'friends_timeline';
-    if(window.checking[t]){ return; }
+    if(isDoChecking(t, 'checking')){ return; }
     var c_user = getUser(CURRENT_USER_KEY);
     if(!c_user){
         return;
     }
-    window.checking[t] = true;
+    //window.checking[t] = true;
+    setDoChecking(t, 'checking', true);
     showLoading();
     var params = {count:100}
     var last_id = getLastMsgId(t);
@@ -62,7 +63,8 @@ function checkTimeline(t){
         var _max_id = '';
         var c_user = getUser(CURRENT_USER_KEY);
         if(!c_user){
-            window.checking[t] = false;
+            //window.checking[t] = false;
+            setDoChecking(t, 'checking', false);
             return;
         }
         var _key = c_user.userName + t + '_tweets';
@@ -106,7 +108,8 @@ function checkTimeline(t){
         }else{
             setUnreadTimelineCount(0, t, true);
         }
-        window.checking[t] = false;
+        //window.checking[t] = false;
+        setDoChecking(t, 'checking', false);
         if(isFirstTime){//如果是第一次,则获取以前的微薄
             if(!tweets[_key] || tweets[_key].length < PAGE_SIZE){
                 getTimelinePage(t);
@@ -127,12 +130,13 @@ function checkTimeline(t){
 // @t : 获取timeline的类型
 function getTimelinePage(t){
     //var t = 'friends_timeline';
-    if(window.paging[t]){ return; }
+    if(isDoChecking(t, 'paging')){ return; }
     var c_user = getUser(CURRENT_USER_KEY);
     if(!c_user){
         return;
     }
-    window.paging[t] = true;
+    //window.paging[t] = true;
+    setDoChecking(t, 'paging', true);
     
     showLoading();
 
@@ -169,7 +173,8 @@ function getTimelinePage(t){
             var _max_id = '';
             var c_user = getUser(CURRENT_USER_KEY);
             if(!c_user){
-                window.paging[t] = false;
+                //window.paging[t] = false;
+                setDoChecking(t, 'paging', false);
                 return;
             }
             var _key = c_user.userName + t + '_tweets';
@@ -207,9 +212,27 @@ function getTimelinePage(t){
         }
 
         hideLoading();
-        window.paging[t] = false;
+        //window.paging[t] = false;
+        setDoChecking(t, 'paging', false);
     });
 };
+
+//检查是否正在获取
+function isDoChecking(t, c_t){
+    if(window[c_t][t]){
+        var d = new Date().getTime();
+        var _d = d - window[c_t][t+'_time'];
+        if(_d < 60*1000){ //如果还没有超过一分钟
+            return true;
+        }
+    }
+    return false;
+}
+
+function setDoChecking(t, c_t, v){
+    window[c_t][t] = v;
+    window[c_t][t+'_time'] = new Date().getTime();
+}
 
 //@userId: 插件当前登录的用户ID
 function showNewMsg(msgs, t, userId){
