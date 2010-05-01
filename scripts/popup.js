@@ -11,6 +11,7 @@ var t_changeUser = '<table id="changeUser" class="tab-none" cellspacing="0" ><tr
             + '<div style="display:none;"><ul>{{user_list}}</lu></div></td>'
             + '<td><img style="width:24px;height:24px;" class="userImg" src="{{profile_image_url}}" /></td></tr></table>';
 
+var fawave = {};
 //var PAGE_SIZE = 20;
 var timeline_offset = {};
 function getTimelineOffset(t){
@@ -236,19 +237,23 @@ function initIamDoing(){
                 if(isAutoShortUrl() && loc_url.replace(/^https?:\/\//i, '').length > getAutoShortUrlWordCount()){
                     s8Api.shorten({longUrl: loc_url}, function(data){
                         if(data && data.shortUrl){
-                            $("#txtContent").val('我正在看 [url=' + data.shortUrl + ' ]' + (title||data.shortUrl) + '[/url]');
+                            $("#txtContent").val('我正在看: ' + (title||'') + ' ' + data.shortUrl + ' ');
+                            //$("#txtContent").val('我正在看 [url=' + data.shortUrl + ' ]' + (title||data.shortUrl) + '[/url]');
                         }else{
-                            $("#txtContent").val('我正在看 [url=' + loc_url + ' ]' + (title||loc_url) + '[/url]');
+                            $("#txtContent").val('我正在看: ' + (title||'') + ' ' + loc_url + ' ');
+                            //$("#txtContent").val('我正在看 [url=' + loc_url + ' ]' + (title||loc_url) + '[/url]');
                         }
                         showMsgInput();
                         countInputText();
                     },function(xhr, textStatus, errorThrown){
-                        $("#txtContent").val('我正在看 [url=' + loc_url + ' ]' + (title||loc_url) + '[/url]');
+                        $("#txtContent").val('我正在看: ' + (title||'') + ' ' + loc_url + ' ');
+                        //$("#txtContent").val('我正在看 [url=' + loc_url + ' ]' + (title||loc_url) + '[/url]');
                         showMsgInput();
                         countInputText();
                     });
                 }else{
-                    $("#txtContent").val('我正在看 [url=' + loc_url + ' ]' + (title||loc_url) + '[/url]');
+                    $("#txtContent").val('我正在看: ' + (title||'') + ' ' + loc_url + ' ');
+                    //$("#txtContent").val('我正在看 [url=' + loc_url + ' ]' + (title||loc_url) + '[/url]');
                     showMsgInput();
                     countInputText();
                 }
@@ -336,7 +341,7 @@ function getSinaTimeline(t){
     var c_user = getUser(CURRENT_USER_KEY);
     var b_view = getBackgroundView();
     var _key = c_user.userName + t + '_tweets';
-    if(b_view && b_view.tweets[_key] != undefined){
+    if(b_view && b_view.tweets[_key] != undefined && b_view.tweets[_key].length>0){
         var tweetsAll = b_view.tweets[_key];
         var tweets = tweetsAll.slice(0, PAGE_SIZE);
         var html = '';
@@ -357,10 +362,11 @@ function getSinaTimeline(t){
         if(tweetsAll.length >= (PAGE_SIZE/2)){
             showReadMore(t);
         }
+        hideLoading();
     }else{
         b_view.checkTimeline(t);
     }
-    hideLoading();
+    //hideLoading();
 };
 //<<<<<<<<<<<<<<<<<<<<<<<========
 
@@ -735,6 +741,7 @@ function showMsgInput(){
 };
 
 function hideMsgInput(){
+    fawave.face.hide();
     var v = $("#txtContent").val() || '     点此输入您要分享的内容';
     $("#submitWarp").hide();
     $("#txtContent").attr('rows', 1).val(v).addClass('padDoing');
@@ -743,6 +750,7 @@ function hideMsgInput(){
 };
 
 function hideReplyInput(){
+    fawave.face.hide();
     $("#ye_dialog_window").hide();
 };
 
@@ -996,6 +1004,32 @@ function delFavorites(ele, screen_name, tweetId){//删除私信
 function showFacebox(ele){
     jQuery.facebox({ image: $(ele).attr('bmiddle') })
 }
+
+//====>>>>
+//表情插入
+fawave.face = {
+    show: function($this, target_id){
+        $("#face_box_target_id").val(target_id);
+        var offset = $($this).offset();
+        $("#face_box").css({"top":offset.top+20, "left":offset.left-25}).show();
+    },
+    hide: function(){
+        $("#face_box").hide();
+        $("#face_box_target_id").val('');
+    },
+    insert: function($this){
+        var target_textbox = $("#" + $("#face_box_target_id").val());
+        if(target_textbox.length==1){
+            var tb = target_textbox[0], str = $($this).attr('value');
+            var newstart = tb.selectionStart+str.length;
+            tb.value=tb.value.substr(0,tb.selectionStart)+str+tb.value.substring(tb.selectionEnd);
+            tb.selectionStart = newstart;
+            tb.selectionEnd = newstart;
+        }
+        this.hide();
+    }
+};
+//<<<<=====
 
 //====>>>>
 function _showLoading(){

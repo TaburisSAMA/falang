@@ -313,5 +313,8 @@ function cleanLocalStorageData(){
     var b_view = getBackgroundView();
     if(b_view){
         b_view.tweets = {};
+        b_view.MAX_MSG_ID = {};
+        b_view.checking={};
+        b_view.paging={};
     }
 }

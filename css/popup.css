@@ -83,6 +83,8 @@ div.msgInfo {padding-top:3px;}
 	left:250px;
 }
 
+#facebox_overlay{cursor:url(../images/small.cur), auto;}
+
 /*>>>> reply start <<<<*/
 #ye_dialog_window {
 	border-bottom-left-radius: 5px 5px;
@@ -137,3 +139,24 @@ div.msgInfo {padding-top:3px;}
 	width:380px;
 }
 /*>>>> reply end <<<<*/
+
+/*>>>> face start <<<<*/
+.clearFix{ display:block;}
+.clearFix:after {content:"."; display:block;visibility:hidden;height:0;clear:both;}
+.layerMedia_close a.close {background:url(../images/sicon.gif) no-repeat scroll -18px 0;float:right;height:8px;overflow:hidden;width:7px;}
+.layerMedia_close a.close:hover{background:transparent url(../images/sicon.gif) no-repeat scroll -18px -8px;}
+.layerArrow{ width:16px; height:8px; overflow:hidden; position:absolute; left:134px; top:-8px; background:url(../images/layerArrow.gif) no-repeat left top; }
+.layerBox{border:1px solid #A0A0A0;background:#fff; position: absolute; z-index: 1001; zoom: 1; }
+.layerBox .layerBoxTop{height:27px; line-height:27px; padding:1px;}
+.layerBox .layerBoxTop .topCon{ background:url('../images/layerctbg.gif') repeat-x; height:27px; line-height:27px; padding:0 10px;}
+.layerBoxTop .topCon strong{float:left;font-weight:bold;}
+.layerBoxTop .topCon span{float:right;padding-right:20px;}
+.layerBoxTop a.close{float:right; background:url('../images/sicon.gif') no-repeat -18px 0; width:7px; height:8px; margin-top:9px; overflow:hidden;}
+.layerBoxTop a.close:hover{background:url('../images/sicon.gif') no-repeat -18px -8px; overflow:hidden;}
+.faceItem{ padding:10px 10px 5px; position:relative;}
+.faceItem .layerArrow{ left:25px;}
+.faceItem .faceItemPicbg{ width:330px;}
+.faceItem .faceItemPicbg li{ float:left; height:28px; width:28px; padding:0px 5px 5px 0px;}
+.faceItem .faceItemPicbg li a:link,.faceItem .faceItemPicbg li a:visited{ width:26px; height:26px; text-align:center; display:block; border:1px dashed #ddd;}
+.faceItem .faceItemPicbg li a:hover{ border:1px dashed #999;}
+/*>>>> face end <<<<*/

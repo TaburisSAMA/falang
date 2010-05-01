@@ -251,38 +251,52 @@ function _sendRequest(params, callbackFn){
         timeout: 60*1000, //一分钟超时
         type : params.type,
         data: params.data,
+        dataType: 'text',
         beforeSend: function(req) {
             req.setRequestHeader('Authorization', make_base_auth_header(user.userName, user.password));
         },
         success: function (data, textStatus) {
-            error_code = null;
+            try{
+                data = JSON.parse(data);
+            }
+            catch(err){
+                //data = null;
+                data = {error:'服务器返回结果错误，本地解析错误。', error_code:500};
+                textStatus = 'error';
+            }
+            var error_code = null;
             if(data){
                 if(data.error || data.error_code){
                     showMsg('error: ' + data.error + ', error_code: ' + data.error_code);
                     error_code = data.error_code || error_code;
                 }
             }else{error_code = 400;}
-            callbackFn(data, textStatus);
+            callbackFn(data, textStatus, error_code);
             hideLoading();
         },
         error: function (xhr, textStatus, errorThrown) {
-            var r = null;
-            if(xhr.responseText){
-                var r = xhr.responseText
-                try{
-                    r = JSON.parse(r);
+            var r = null, status = 'unknow';
+            if(xhr){
+                if(xhr.status){
+                    status = xhr.status;
                 }
-                catch(err){
-                    r = null;
+                if(xhr.responseText){
+                    var r = xhr.responseText
+                    try{
+                        r = JSON.parse(r);
+                    }
+                    catch(err){
+                        r = null;
+                    }
+                    if(r){showMsg('error_code:' + r.error_code + ', error:' + r.error);}
                 }
-                if(r){showMsg('error_code:' + r.error_code + ', error:' + r.error);}
             }
             if(!r){
                 textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';
                 errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
-                showMsg('error: ' + textStatus + errorThrown + 'statuCode: ' + xhr.status);
+                showMsg('error: ' + textStatus + errorThrown + 'statuCode: ' + status);
             }
-            callbackFn({}, textStatus, xhr.status);
+            callbackFn({}, 'error', status); //不管什么状态，都返回 error
             hideLoading();
         }
     });
