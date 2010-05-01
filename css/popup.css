@@ -59,7 +59,7 @@ div.msgInfo {padding-top:3px;}
 #wordCount{float:right;font-size:13px;font-weight: bold;}
 
 .doing{position:absolute; left:3px; top:1px;}
-.padDoing{padding-left:18px;color:#888;}
+.padDoing{padding-left:18px;color:#ccc;}
 .unreadCount{color:red;}
 .imgicon{cursor: url(../images/big.cur), auto;}
 
