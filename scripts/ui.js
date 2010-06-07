@@ -190,6 +190,7 @@ function bildMsgLi(sinaMsg, t){
      sinaMsg.readed = true;
      return tp;
    }catch(err){
+     console.log(err);
      return '';
    }
 };
