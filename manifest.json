@@ -16,7 +16,7 @@
     {
       "matches": ["http://*/*"],
       "css": ["css/page.css"],
-      "js": ["scripts/jquery-1.4.js", "scripts/page.js"]
+      "js": ["scripts/lib/jquery-1.4.js", "scripts/page.js"]
     }
   ],
   "permissions": [

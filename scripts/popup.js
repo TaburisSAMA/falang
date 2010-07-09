@@ -1,15 +1,8 @@
-var __tt = '<li class="unread-item" did="{{id}}"><div class="usericon"><a target="_blank" href="{{user.url}}"><img src="{{user.profile_image_url.replace("24x24", "32x32")}}" /></a></div>'
-			+'	<div class="mainContent">'
-			+'		<div class="userName"><a target="_blank" href="{{user.url}}">{{user.screen_name}}</a><span class="edit"><a>回复</a><a>转发</a></span></div>'
-			+'		<div class="msg"></div>'
-			+'		<div class="msgInfo"></div>'
-			+'	</div>'
-			+'</li>';
 
 var t_changeUser = '<table id="changeUser" class="tab-none" cellspacing="0" ><tr><td>'
-            + '<span class="userName">{{screen_name}}</span>'
+            + '<span class="userName" title="点击切换用户">{{screen_name}}</span>'
             + '<div style="display:none;"><ul>{{user_list}}</lu></div></td>'
-            + '<td><img style="width:24px;height:24px;" class="userImg" src="{{profile_image_url}}" /></td></tr></table>';
+            + '<td><a target="_blank" href="http://t.sina.com.cn/{{domain}}" title="点击打开我的主页"><img style="width:24px;height:24px;" class="userImg" src="{{profile_image_url}}" /></a></td></tr></table>';
 
 var fawave = {};
 //var PAGE_SIZE = 20;
@@ -282,8 +275,8 @@ function initChangeUserList(){
             c_user.screen_name = c_user.screen_name || c_user.userName;
             c_user.user_list = li.join('');
             $('.tabs').append(formatText(t_changeUser, c_user));
-            $("#changeUser").click(function(){
-                $(this).find('div').toggle();
+            $("#changeUser .userName").click(function(){
+                $("#changeUser").find('div').toggle();
             });
             $("#changeUser ul li[class!=current]").click(function(){
                 var li = $(this);
@@ -347,7 +340,7 @@ function getSinaTimeline(t){
         var html = '';
         var ids = [];
         for(i in tweets){
-            html += bildMsgLi(tweets[i], t);
+            html += bildMsgLi(tweets[i], t); //TODO: 待优化
             ids.push(tweets[i].id);
             if(tweets[i].retweeted_status){
                 ids.push(tweets[i].retweeted_status.id);

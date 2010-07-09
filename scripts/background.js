@@ -2,8 +2,19 @@
 var itv; //Interval
 var tweets = {};
 var MAX_MSG_ID = {};
+//var THEME = localStorage.getObject('popup_theme') || 'default';
 window.checking={}; //正在检查是否有最新微博
 window.paging={}; //正在获取分页微博
+
+//点击的时候，主题选择
+//chrome.browserAction.onClicked.addListener(function(tab) {
+//    chrome.browserAction.setPopup({popup: 'themes/' + THEME + '/popup.html'});
+//});
+
+//function setTheme(theme){
+//    THEME = theme;
+//    localStorage.setObject('popup_theme', theme);
+//};
 
 function getMaxMsgId(t){
     var c_user = getUser(CURRENT_USER_KEY);

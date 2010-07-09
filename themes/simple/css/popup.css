@@ -1,6 +1,6 @@
 
 * { margin:0; padding:0;} 
-body { font-family: "å¾®è½¯é›…é»‘", "é›…é»‘", "Arial"; font-size:12px; /*color:#049; padding:8px;*/ width:480px; color:#182A58;overflow-y:auto;overflow-x:hidden;}
+body { font:12px "ËÎÌå"; /*color:#049; padding:8px;*/ width:480px; color:#182A58;overflow-y:auto;overflow-x:hidden;}
 a { text-decoration:none; color:#049;} 
 a:hover { text-decoration:underline;}
 ul { list-style:none;} 
@@ -64,7 +64,7 @@ div.msgInfo {padding-top:3px;}
 .doing{position:absolute; left:3px; top:1px;}
 .padDoing{padding-left:18px;color:#ccc;}
 .unreadCount{color:red;}
-.imgicon{cursor: url(../images/big.cur), auto;}
+.imgicon{cursor: url(/images/big.cur), auto;}
 
 #msgInfoWarp{
    position:absolute;
@@ -86,7 +86,7 @@ div.msgInfo {padding-top:3px;}
 	left:250px;
 }
 
-#facebox_overlay, .cur_min{cursor:url(../images/small.cur), auto;}
+#facebox_overlay{cursor:url(/images/small.cur), auto;}
 
 /*>>>> reply start <<<<*/
 #ye_dialog_window {
@@ -105,7 +105,7 @@ div.msgInfo {padding-top:3px;}
 	z-index:1000;
 }
 #ye_dialog_close {
-	background: url(../images/close.gif) no-repeat;
+	background: url(/images/close.gif) no-repeat;
 	color: black;
 	display: block;
 	height: 13px;
@@ -132,7 +132,7 @@ div.msgInfo {padding-top:3px;}
 	margin:10px;
 }
 .replyDialog .uTextarea {
-	background:#FFFFFF url(../images/dot.gif) repeat-x scroll 0 -1px;
+	background:#FFFFFF url(/images/dot.gif) repeat-x scroll 0 -1px;
 	border:1px solid #999999;
 	font-size:13px;
 	height:150px;
@@ -146,16 +146,16 @@ div.msgInfo {padding-top:3px;}
 /*>>>> face start <<<<*/
 .clearFix{ display:block;}
 .clearFix:after {content:"."; display:block;visibility:hidden;height:0;clear:both;}
-.layerMedia_close a.close {background:url(../images/sicon.gif) no-repeat scroll -18px 0;float:right;height:8px;overflow:hidden;width:7px;}
-.layerMedia_close a.close:hover{background:transparent url(../images/sicon.gif) no-repeat scroll -18px -8px;}
-.layerArrow{ width:16px; height:8px; overflow:hidden; position:absolute; left:134px; top:-8px; background:url(../images/layerArrow.gif) no-repeat left top; }
+.layerMedia_close a.close {background:url(/images/sicon.gif) no-repeat scroll -18px 0;float:right;height:8px;overflow:hidden;width:7px;}
+.layerMedia_close a.close:hover{background:transparent url(/images/sicon.gif) no-repeat scroll -18px -8px;}
+.layerArrow{ width:16px; height:8px; overflow:hidden; position:absolute; left:134px; top:-8px; background:url(/images/layerArrow.gif) no-repeat left top; }
 .layerBox{border:1px solid #A0A0A0;background:#fff; position: absolute; z-index: 1001; zoom: 1; }
 .layerBox .layerBoxTop{height:27px; line-height:27px; padding:1px;}
-.layerBox .layerBoxTop .topCon{ background:url('../images/layerctbg.gif') repeat-x; height:27px; line-height:27px; padding:0 10px;}
+.layerBox .layerBoxTop .topCon{ background:url('/images/layerctbg.gif') repeat-x; height:27px; line-height:27px; padding:0 10px;}
 .layerBoxTop .topCon strong{float:left;font-weight:bold;}
 .layerBoxTop .topCon span{float:right;padding-right:20px;}
-.layerBoxTop a.close{float:right; background:url('../images/sicon.gif') no-repeat -18px 0; width:7px; height:8px; margin-top:9px; overflow:hidden;}
-.layerBoxTop a.close:hover{background:url('../images/sicon.gif') no-repeat -18px -8px; overflow:hidden;}
+.layerBoxTop a.close{float:right; background:url('/images/sicon.gif') no-repeat -18px 0; width:7px; height:8px; margin-top:9px; overflow:hidden;}
+.layerBoxTop a.close:hover{background:url('/images/sicon.gif') no-repeat -18px -8px; overflow:hidden;}
 .faceItem{ padding:10px 10px 5px; position:relative;}
 .faceItem .layerArrow{ left:25px;}
 .faceItem .faceItemPicbg{ width:330px;}
