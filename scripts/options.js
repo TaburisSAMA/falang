@@ -85,20 +85,55 @@ function init(){
 
     initSetBadgeText();
     initShowInPage();
+    initTheme();
+    initWidthAndHeight();
+    initFont();
 };
 //初始化设置未读提示信息
 function initSetBadgeText(){
     for(i in T_LIST){
         $("#set_badge_" + T_LIST[i]).attr("checked", isSetBadgeText(T_LIST[i]));
     }
-}
+};
 
 //初始化设置新消息是否在页面显示
 function initShowInPage(){
     for(i in T_LIST){
         $("#set_show_in_page_" + T_LIST[i]).attr("checked", isShowInPage(T_LIST[i]));
     }
-}
+};
+
+//初始化主题选择
+function initTheme(){
+    var theme = getTheme();
+    if(theme){
+        $("#selTheme").val(theme);
+        $("#themePreview").attr("src", '/themes/'+ theme +'/theme.png');
+    }
+    $("#selTheme").change(function(){
+        $("#themePreview").attr("src", '/themes/'+ $(this).val() +'/theme.png');
+    });
+};
+
+//初始化字体选择
+function initFont(){
+    var font = getFont();
+    if(font){
+        $("#selFont").val(font);
+    }
+
+    var fontSize = getFontSize();
+    if(fontSize){
+        $("#selFontSize").val(fontSize);
+    }
+};
+
+//初始化宽高
+function initWidthAndHeight(){
+    var wh = getWidthAndHeight();
+    $("#set_main_width").val(wh[0]);
+    $("#set_main_height").val(wh[1]);
+};
 
 function saveAccount(){
     var userName = $.trim($("#account-name").val());
@@ -202,7 +237,7 @@ function delAccount(userName){
 }
 
 function saveAll(){
-    var t = $("#selRefreshTime").val();
+    var t = $("#selRefreshTime").val(); //刷新频率
     if(t){
         localStorage.setObject(REFRESH_TIME_KEY, t);
 
@@ -218,7 +253,7 @@ function saveAll(){
     }else{
         localStorage.setObject(AUTO_SHORT_URL, 0);
     }
-    var asuwc = $("#autoShortUrlCount").val();
+    var asuwc = $("#autoShortUrlCount").val(); //自动缩短网址
     asuwc = Number(asuwc);
     if(!isNaN(asuwc) && asuwc>0){
         localStorage.setObject(AUTO_SHORT_URL_WORD_COUNT, asuwc);
@@ -228,6 +263,9 @@ function saveAll(){
 
     saveSetBadgeText();
     saveSetShowInPage();
+    saveTheme();
+    saveWidthAndHeight();
+    saveFont();
 
     _showMsg('保存成功！');
 };
@@ -246,6 +284,29 @@ function saveSetShowInPage(){
         var $this = $(this);
         setShowInPage($this.attr('id').replace('set_show_in_page_',''), ($this.attr("checked") ? 1 : 0));
     });
+};
+
+//保存主题
+function saveTheme(){
+    var theme = $("#selTheme").val();
+    setTheme(theme);
+};
+
+//保存字体
+function saveFont(){
+    var font = $("#selFont").val();
+    setFont(font);
+    var fontSize = $("#selFontSize").val();
+    setFontSize(fontSize);
+};
+
+//保存宽高
+function saveWidthAndHeight(){
+    var w = $("#set_main_width").val();
+    var h = $("#set_main_height").val();
+    var wh = setWidthAndHeight(w, h);
+    $("#set_main_width").val(wh[0]);
+    $("#set_main_height").val(wh[1]);
 };
 
 //刷新账号信息

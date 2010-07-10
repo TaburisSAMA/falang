@@ -12,6 +12,16 @@ h3{
 	padding:2px;
 }
 
+#themePreview{
+	-webkit-box-shadow: #AAA 0px 0px 8px;
+	margin:5px;
+	padding:3px;
+	width:100px;
+	height:100px;
+	cursor: url(/images/big.cur), auto;
+}
+#facebox img{max-width:none;}
+#facebox .image a{display:none;}
 
 .messageInfo{
    width: 320px;

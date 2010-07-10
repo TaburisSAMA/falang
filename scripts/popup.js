@@ -727,7 +727,8 @@ function callCheckNewMsg(){
 }
 
 function showMsgInput(){
-    $(".list_warp").css('height', '390');
+    var h = WH[1] - 40 - 79;
+    $(".list_warp").css('height', h);
     $("#doing").removeClass("doing").appendTo('#doingWarp');
     $("#txtContent").attr('rows', 5).removeClass('padDoing');
     $("#submitWarp").show();
@@ -738,7 +739,8 @@ function hideMsgInput(){
     var v = $("#txtContent").val() || '     点此输入您要分享的内容';
     $("#submitWarp").hide();
     $("#txtContent").attr('rows', 1).val(v).addClass('padDoing');
-    $(".list_warp").css('height', '470');
+    var h = WH[1] - 40;
+    $(".list_warp").css('height', h);
     $("#doing").addClass("doing").appendTo('body');
 };
 

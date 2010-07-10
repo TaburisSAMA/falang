@@ -29,6 +29,15 @@ var AUTO_SHORT_URL_WORD_COUNT = 'idi_SHORT_URL_WORD_COUNT'; //URL长度超过多
 var SET_BADGE_TEXT = 'idi_SET_BADGE_TEXT'; //设置未读信息提示
 var IS_SHOW_IN_PAGE = 'idi_IS_SHOW_IN_PAGE_'; //新消息是否在页面提示
 
+var THEME_KEY = 'idi_THEME_KEY'; //主题样式的KEY
+var THEME_LIST = {'default':'default', simple:'simple'}; //主题列表
+
+var FONT_KEY = 'idi_FONT_KEY'; //字体样式的KEY
+var FONT_SIZE_KEY = 'idi_FONT_SIZE_KEY'; //字体大小的KEY
+
+var WIDTH_AND_HEIGHT_KEY = 'idi_WIDTH_AND_HEIGHT_KEY'; //宽高
+var DEFAULT_WIDTH_AND_HEIGHT = [480, 520]; //默认宽高
+
 //['friends_timeline','mentions','comments_timeline','comments_by_me','direct_messages','favorites']
 var T_LIST = ['friends_timeline','mentions','comments_timeline','direct_messages']; //timeline的分类列表
 
@@ -203,6 +212,68 @@ function isShowInPage(t){
 
 function setShowInPage(t, v){
     return localStorage.setObject(t + IS_SHOW_IN_PAGE, v);
+};
+//<<--
+
+//-- 主题 --
+function getTheme(){
+    var t = localStorage.getObject(THEME_KEY);
+    if(t){
+        if(THEME_LIST[t]){
+            return t;
+        }
+    }
+    return 'default';
+};
+
+function setTheme(theme){
+    localStorage.setObject(THEME_KEY, theme);
+};
+//<<--
+
+//-- 字体 --
+function getFont(){
+    var t = localStorage.getObject(FONT_KEY);
+    return t || '微软雅黑';
+};
+
+function setFont(font){
+    localStorage.setObject(FONT_KEY, font);
+};
+
+function getFontSize(){
+    var t = localStorage.getObject(FONT_SIZE_KEY);
+    return t || '12';
+};
+
+function setFontSize(fontSize){
+    localStorage.setObject(FONT_SIZE_KEY, fontSize);
+};
+//<<--
+
+//-- 宽高设置 --
+function getWidthAndHeight(){
+    var wh = localStorage.getObject(WIDTH_AND_HEIGHT_KEY);
+    return wh || DEFAULT_WIDTH_AND_HEIGHT;
+};
+
+function setWidthAndHeight(width, height){
+    width = Number(width);
+    height = Number(height);
+    if(isNaN(width) || width<300){
+        width = DEFAULT_WIDTH_AND_HEIGHT[0];
+    }
+    if(isNaN(height) || height<350){
+        height = DEFAULT_WIDTH_AND_HEIGHT[1];
+    }
+    var wh = [width, height];
+    localStorage.setObject(WIDTH_AND_HEIGHT_KEY, wh);
+    return wh;
+};
+//<<--
+
+function setThteme(v){
+    return localStorage.setObject(THEME_KEY, v);
 };
 //<<--
 

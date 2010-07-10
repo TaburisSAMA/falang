@@ -1,13 +1,15 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>发浪设置</title>
-<link rel="stylesheet" media="screen" type="text/css" href="css/options.css">
-<script type="text/javascript" src="scripts/lib/jquery-1.4.js" ></script>
-<script type="text/javascript" src="scripts/lib/Base64.js" ></script>
-<script type="text/javascript" src="scripts/utili.js" ></script>
-<script type="text/javascript" src="scripts/sinaApi.js" ></script>
-<script type="text/javascript" src="scripts/options.js" ></script>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>发浪设置</title>
+	<link rel="stylesheet" media="screen" type="text/css" href="/css/facebox/facebox.css">
+	<link rel="stylesheet" media="screen" type="text/css" href="/css/options.css" />
+	<script type="text/javascript" src="/scripts/lib/jquery-1.4.js" ></script>
+	<script type="text/javascript" src="/scripts/lib/facebox.js" ></script>
+	<script type="text/javascript" src="/scripts/lib/Base64.js" ></script>
+	<script type="text/javascript" src="/scripts/utili.js" ></script>
+	<script type="text/javascript" src="/scripts/sinaApi.js" ></script>
+	<script type="text/javascript" src="/scripts/options.js" ></script>
 </head>
 
 <body>
@@ -55,18 +57,20 @@
 	<h3>其他设置</h3>
 	<ul>
 		<li>
-			<label>获取信息间隔时间：</label>
-			<span>
-				<select id="selRefreshTime">
-					<option value="1">每1分钟</option>
-					<option value="2">每2分钟</option>
-					<option value="3" selected="true">每3分钟</option>
-					<option value="5">每5分钟</option>
-					<option value="10">每10分钟</option>
-					<option value="20">每20分钟</option>
-					<option value="30">每30分钟</option>
-				</select>
-			</span>
+			<p>
+				<label>获取信息间隔时间：</label>
+				<span>
+					<select id="selRefreshTime">
+						<option value="1">每1分钟</option>
+						<option value="2">每2分钟</option>
+						<option value="3" selected="true">每3分钟</option>
+						<option value="5">每5分钟</option>
+						<option value="10">每10分钟</option>
+						<option value="20">每20分钟</option>
+						<option value="30">每30分钟</option>
+					</select>
+				</span>
+			</p>
 		</li>
 		<li>
 			<label>是否自动缩短URL：</label>
@@ -93,16 +97,60 @@
 			</p>
 		</li>
 		<li>
-			<!--<label>本地缓存信息数：</label>
-			<span>
-				<select id="selLocalStorageNum">
-					<option value="50">50</option>
-					<option value="100">100</option>
-					<option value="200" selected="true">200</option>
-					<option value="300">300</option>
-				</select>
-			</span>-->
-			<div><input type="button" id="cleanLocalStorage" value="清空本地缓存数据" /></div>
+			<p>
+				<label>字体设置：</label>
+				<span>
+					<select id="selFont">
+						<option value="微软雅黑">微软雅黑</option>
+						<option value="宋体">宋体</option>
+						<option value="Arial">Arial</option>
+						<option value="Tahoma">Tahoma</option>
+						<option value="Lucida Console">Lucida Console</option>
+					</select>
+				</span>
+				<span>
+					<select id="selFontSize">
+						<option value="12">12px</option>
+						<option value="13">13px</option>
+						<option value="14">14px</option>
+					</select>
+				</span>
+			</p>
+		</li>
+		<li>
+			<p>
+				<label>高宽设置：</label>
+				<span>
+					<label for="set_main_height">高度:</label>
+					<input type="text" id="set_main_height" value="520" />
+					<label for="set_main_width">宽度:</label>
+					<input type="text" id="set_main_width" value="480" />
+				</span>
+			</li>
+			<li>
+				<label>主题选择：</label>
+				<span>
+					<select id="selTheme">
+						<option value="default">默认</option>
+						<option value="simple">简洁</option>
+					</select>
+				</span>
+				<div><img id="themePreview" src="/themes/default/theme.png" onclick="jQuery.facebox({image:this.src});return false;" /></div>
+			</p>
+		</li>
+		<li>
+			<p>
+				<!--<label>本地缓存信息数：</label>
+				<span>
+					<select id="selLocalStorageNum">
+						<option value="50">50</option>
+						<option value="100">100</option>
+						<option value="200" selected="true">200</option>
+						<option value="300">300</option>
+					</select>
+				</span>-->
+				<div><input type="button" id="cleanLocalStorage" value="清空本地缓存数据" /></div>
+			</p>
 		</li>
 	</ul>
 </div>
