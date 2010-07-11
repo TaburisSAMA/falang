@@ -23,6 +23,7 @@ li { line-height:16px;}
 #changeUser div{
 	right: 20px;
 	position:absolute;
+	z-index: 10;
 }
 #changeUser li{ float:none; border:solid 1px #AACCEE;}
 #changeUser li.current{ list-style-type:disc;}
