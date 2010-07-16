@@ -1,4 +1,8 @@
 {
+	"defaultTitle": {
+		"message": "发浪(FaWave) For 新浪微博(t.sina.com.cn)",
+		"description": "default title"
+	},
 	"extName": {
 		"message": "发浪(FaWave)",
 		"description": "name"
