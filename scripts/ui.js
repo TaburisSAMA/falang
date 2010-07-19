@@ -10,10 +10,11 @@
 //}
 
 var emotionalDict={
-    "哈哈": "laugh", "呵呵": "smile", "泪": "cry", "汗": "sweat", "爱你": "love", 
-    "嘻嘻": "tooth", "哼": "hate", "心": "heart", "晕": "dizzy", "怒": "angry", 
-    "蛋糕": "cake", "花": "flower", "抓狂": "crazy", "困": "sleepy", "干杯": "cheer", 
-    "太阳": "sun", "下雨": "rain", "伤心": "sad", "月亮": "moon", "猪头": "pig"
+    "足球":"football", "哨子":"shao", "红牌":"redcard", "黄牌":"yellowcard", "哈哈":"laugh", 
+    "呵呵":"smile", "衰":"cry", "汗":"sweat", "爱你":"love", "嘻嘻":"tooth", "哼":"hate", 
+    "心":"heart", "晕":"dizzy", "怒":"angry", "蛋糕":"cake", "花":"flower", "抓狂":"crazy", 
+    "困":"sleepy", "干杯":"cheer", "太阳":"sun", "下雨":"rain", "泪":"sad", "月亮":"moon", 
+    "猪头":"pig", "蜡烛":"candle", "伤心":"unheart", "风扇":"fan", "冰棍":"ice", "西瓜":"watermelon"
 }
 
 function bildMsgLi(sinaMsg, t){
@@ -116,12 +117,12 @@ function bildMsgLi(sinaMsg, t){
                    };
     //var tp = $("#tp_time_line").val();
     var r = '';
-    //try{
+    try{
         var r = Shotenjin.render(TEMPLATE, context);
-    //}catch(err){
-    //    console.log(err);
-    //    return '';
-    //}
+    }catch(err){
+        console.log(err);
+        return '';
+    }
     sinaMsg.readed = true;
     return r;
 };

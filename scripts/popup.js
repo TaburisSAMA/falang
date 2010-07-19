@@ -218,6 +218,7 @@ function countReplyText(){
 
 function cleanTxtContent(){
     $("#txtContent").val('');
+    countInputText();
 }
 
 //我正在看
@@ -1004,9 +1005,14 @@ function showFacebox(ele){
 //表情插入
 fawave.face = {
     show: function($this, target_id){
-        $("#face_box_target_id").val(target_id);
-        var offset = $($this).offset();
-        $("#face_box").css({"top":offset.top+20, "left":offset.left-25}).show();
+        var f = $("#face_box");
+        if(f.css('display')=='none' || $("#face_box_target_id").val()!=target_id){
+            $("#face_box_target_id").val(target_id);
+            var offset = $($this).offset();
+            f.css({"top":offset.top+20, "left":offset.left-25}).show();
+        }else{
+            f.hide();
+        }
     },
     hide: function(){
         $("#face_box").hide();

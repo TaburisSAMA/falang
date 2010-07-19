@@ -13,6 +13,18 @@ li { line-height:16px;}
 .tabs li.tab-r { /*width:118px; border-right:0; text-align:right;*/ padding-right:10px;} 
 .tabs li.tab-r a { color:#F06; font-weight:bold; font-family:Georgia;}
 
+.btn{
+	background:-webkit-gradient(linear,0 0,0 100%,from(#0C7823),to(#219A44));
+    color:#fff;
+    -webkit-border-radius:3px;
+	margin:2px;
+	padding:3px 5px;
+	border:none;
+	cursor: pointer;
+}
+.btn:hover{
+	background:-webkit-gradient(linear,0 0,0 100%,from(#219A44),to(#0C7823));
+}
 
 #txtContent{resize: none;}
 #diguReplies { display:none;}
@@ -29,8 +41,6 @@ li { line-height:16px;}
 #changeUser li.current{ list-style-type:disc;}
 
 #submitWarp{border-bottom:solid 1px #AACCEE;}
-#submitWarp input{border:solid 1px #AACCEE;}
-#btnSend{border:solid 1px #AACCEE; padding:0 5px;}
 #wordCount{float:right;font-size:13px;font-weight: bold;}
 
 .doing{position:absolute; left:3px; top:1px;}
@@ -53,9 +63,9 @@ li { line-height:16px;}
    display: none;
 }
 #loading{
-	position:absolute;
-	/*top:1px;*/
-	right:5px;
+	/*position:absolute;
+	right:5px;*/
+	padding-left:10px;
 }
 
 #facebox_overlay, .cur_min{cursor:url(../images/small.cur), auto;}
