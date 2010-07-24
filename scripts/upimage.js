@@ -1,9 +1,20 @@
+function checkChrome(){
+    if(!window.BlobBuilder){
+        $("body").html($("#needUpdateChrome")[0].outerHTML);
+        $("#needUpdateChrome").show();
+        return false;
+    }
+    return true;
+};
 
 function initOnLoad(){
-    init();
+    if(checkChrome()){
+        init();
+    }
 };
 
 function init(){
+    $("#txtContent").focus();
 
     initTxtContentEven();
 
@@ -52,13 +63,6 @@ function initTxtContentEven(){
 //>>>发送嘀咕结束<<<
 };
 
-function imageFileChange(){
-    var fileEle = $("#imageFile")[0];
-    var file = fileEle.files[0]
-    if(file){
-        //
-    }
-};
 
 function sendSinaMsg(){
 
@@ -90,23 +94,6 @@ function sendSinaMsg(){
     builder += dashdash;
     builder += boundary;
     builder += crlf;
-    
-    var xhr = new XMLHttpRequest();
-    var upload = xhr.upload;
-    xhr.onreadystatechange = function(){
-        if(xhr.readyState==4){
-            //
-        }
-    };
-
-　　if(upload){
-        upload.onprogress = function(ev){
-            onprogress(ev);
-        };
-    }
-    
-
-
 
     /* Generate headers. [SOURCE KEY] */            
     builder += 'Content-Disposition: form-data; name="source"';
@@ -147,104 +134,131 @@ function sendSinaMsg(){
     builder += crlf;
     builder += crlf; 
 
-    var reader = new FileReader();
-    reader.onload = r_loaded;
-    reader.readAsBinaryString(file);
-    /* Append binary data. 
+    //var reader = new FileReader();
+    //reader.onload = r_loaded;
+    //reader.readAsBinaryString(file);
+    /* Append binary data.
     builder += file.getAsBinary();
-    builder += crlf;*/
+    builder += crlf;*/ 
 
-    /* Write boundary. 
+    
+    var bb = new BlobBuilder(); //NOTE
+    bb.append(builder);
+    bb.append(file);
+    builder = crlf;
+    
+    /* Mark end of the request.*/ 
     builder += dashdash;
     builder += boundary;
-    builder += crlf;*/
-    
-    /* Mark end of the request. 
     builder += dashdash;
-    builder += boundary;
-    builder += dashdash;
-    builder += crlf;*/
+    builder += crlf;
 
-    xhr.open("POST", apiUrl.sina.upload, true);
-    xhr.setRequestHeader('content-type', 'multipart/form-data; boundary=' + boundary);
-    //xhr.setRequestHeader('content-type', 'multipart/form-data');
-    xhr.setRequestHeader('Authorization', make_base_auth_header(user.userName, user.password));
-    //xhr.sendAsBinary(builder);
-    //xhr.send('source='+SOURCE + '&status='+msg);
+    bb.append(builder);
     
-    xhr.onload = function(event) { 
-        /* If we got an error display it. */
-        if (xhr.responseText) {
-            console.log(xhr.responseText);
+    _showLoading();
+    disabledUpload();
+
+    $.ajax({
+        url: apiUrl.sina.upload,
+        username: user.userName,
+        password: user.password,
+        cache: false,
+        timeout: 5*60*1000, //5分钟超时
+        type : 'post',
+        data: bb.getBlob(),
+        dataType: 'text',
+        contentType: 'multipart/form-data; boundary=' + boundary,
+        processData: false,
+        beforeSend: function(req) {
+            req.setRequestHeader('Authorization', make_base_auth_header(user.userName, user.password));
+            if(req.upload){
+                req.upload.onprogress = function(ev){
+                    onprogress(ev);
+                };
+            }
+        },
+        success: function (data, textStatus) {
+            try{
+                data = JSON.parse(data);
+            }
+            catch(err){
+                //data = null;
+                data = {error:'服务器返回结果错误，本地解析错误。', error_code:500};
+                textStatus = 'error';
+            }
+            var error_code = null;
+            if(data){
+                if(data.error || data.error_code){
+                    _showMsg('error: ' + data.error + ', error_code: ' + data.error_code);
+                    error_code = data.error_code || error_code;
+                }
+            }else{error_code = 400;}
+            processUploadResult(data, textStatus, error_code);
+            _hideLoading();
+        },
+        error: function (xhr, textStatus, errorThrown) {
+            var r = null, status = 'unknow';
+            if(xhr){
+                if(xhr.status){
+                    status = xhr.status;
+                }
+                if(xhr.responseText){
+                    var r = xhr.responseText
+                    try{
+                        r = JSON.parse(r);
+                    }
+                    catch(err){
+                        r = null;
+                    }
+                    if(r){_showMsg('error_code:' + r.error_code + ', error:' + r.error);}
+                }
+            }
+            if(!r){
+                textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';
+                errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
+                _showMsg('error: ' + textStatus + errorThrown + 'statuCode: ' + status);
+            }
+            processUploadResult({}, 'error', status); //不管什么状态，都返回 error
+            _hideLoading();
+        }
+    });
+
+    /*var xhr = new XMLHttpRequest();
+    var upload = xhr.upload;
+
+　　if(upload){
+        upload.onprogress = function(ev){
+            onprogress(ev);
+        };
+    }
+
+    xhr.onreadystatechange = function(){
+        if(xhr.readyState==4){
+            if(xhr.status==200) //http状态200表示OK
+            {
+                _showMsg('发送成功');
+                processUploadResult(xhr);
+            }
+            else //http返回状态失败
+            {
+                _showMsg("发送失败。服务端返回状态" + req.statusText);
+            }
+            $("#btnSend").removeAttr('disabled');
         }
     };
 
-    function r_loaded(evt) {  
-        // Obtain the read file data    
-        var fileString = evt.target.result;
-      
-        /* Append binary data. */
-        builder += fileString;
-        builder += crlf;
-
-        /* Write boundary. 
-        builder += dashdash;
-        builder += boundary;
-        builder += crlf;*/
-        
-        /* Mark end of the request. */
-        builder += dashdash;
-        builder += boundary;
-        builder += dashdash;
-        builder += crlf;
-
-        //xhr.sendAsBinary(builder);     
-        xhr.send(builder);
-    }
-
-
-
-
-
-
-
-
-
-
-/*
-    var btn, txt, data;
-    if(isReply){
-        btn = $("#replySubmit");
-        txt = $("#replyTextarea");
-        var userName = $("#ye_dialog_title").text();
-        msg = userName + ' ' + msg;
-        var tweetId = $("#replyTweetId").val();
-        data = {sina_id: tweetId};
-    }else{
-        btn = $("#btnSend");
-        txt = $("#txtContent");
-        data = {};
-    }
+    xhr.open("POST", apiUrl.sina.upload, true);
+    xhr.setRequestHeader('content-type', 'multipart/form-data; boundary=' + boundary);
+    xhr.setRequestHeader('Authorization', make_base_auth_header(user.userName, user.password));
+    //xhr.sendAsBinary(builder);
+    //$("#btnSend").attr('disabled', true);
+    //xhr.send(bb.getBlob());
     
-    btn.attr('disabled','true');
-    txt.attr('disabled','true');
-    data['status'] = msg;
-    sinaApi.update(data, function(sinaMsg, textStatus){
-        if(sinaMsg.id){
-            if(isReply){
-                hideReplyInput();
-            }else{
-                hideMsgInput();
-            }
-            txt.val('');
-            setTimeout(callCheckNewMsg, 1000);
-            showMsg('发送成功！');
-        }else if(sinaMsg.error){
-            showMsg('error: ' + sinaMsg.error);
+    xhr.onload = function(event) { 
+        if (xhr.responseText) {
+            //console.log(xhr.responseText);
         }
-        btn.removeAttr('disabled');
-        txt.removeAttr('disabled');
-    }); */
+    }; */
 };
 
 var FILECHECK = {maxFileSize: 1024000,
@@ -275,7 +289,10 @@ function onprogress(rpe){
          "Sent: " + size(rpe.loaded) + " of " + size(rpe.total)
         ].join("<br />")
     );
-    $("#progressBar")[0].style.width = ((rpe.loaded * 200 / rpe.total) >> 0) + "px";
+    //$("#progressBar")[0].style.width = ((rpe.loaded * 200 / rpe.total) >> 0) + "px";
+    var precent = parseInt((rpe.loaded / rpe.total) * 100);
+    $("#progressBar")[0].style.width = precent + "%";
+    $("#progressBar span").html(precent + "%");
 };
 
 function size(bytes){   // simple function to show a friendly size
@@ -286,3 +303,47 @@ function size(bytes){   // simple function to show a friendly size
     };
     return  i ? bytes.toFixed(2) + ["", " Kb", " Mb", " Gb", " Tb"][i] : bytes + " bytes";
 };
+
+
+function selectFile(fileEle){
+    var file = fileEle.files[0];
+    if(file){
+        $("#imgPreview").html('');
+        $("#progressInfo").html('');
+        $("#progressBar")[0].style.width = "0%";
+        $("#progressBar span").html("");
+
+        var check = checkFile(file);
+        if(check){
+            var reader = new FileReader();
+            reader.onload = function(e){
+                $("#imgPreview").html('<img class="pic" src="' + e.target.result + '" />');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+};
+
+function processUploadResult(tweet, textStatus, statusCode){
+    if(textStatus != 'error' && tweet && !tweet.error){
+        _showMsg('发送成功');
+        $("#txtContent").val('');
+        $("#imgPreview").html('');
+        $("#progressInfo").html('');
+        $("#progressBar")[0].style.width = "0%";
+        $("#progressBar span").html("");
+    }else{
+    }
+    enabledUpload();
+};
+
+
+function disabledUpload(){
+    $("#btnSend").attr('disabled', true);
+    $("#imageFile").attr('disabled', true);
+};
+
+function enabledUpload(){
+    $("#btnSend").removeAttr('disabled');
+    $("#imageFile").removeAttr('disabled');
+}

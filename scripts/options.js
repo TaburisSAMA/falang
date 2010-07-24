@@ -108,10 +108,10 @@ function initTheme(){
     var theme = getTheme();
     if(theme){
         $("#selTheme").val(theme);
-        $("#themePreview").attr("src", '/themes/'+ theme +'/theme.png');
+        $("#themePreview").attr("src", '/themes/'+ theme +'/theme.gif');
     }
     $("#selTheme").change(function(){
-        $("#themePreview").attr("src", '/themes/'+ $(this).val() +'/theme.png');
+        $("#themePreview").attr("src", '/themes/'+ $(this).val() +'/theme.gif');
     });
 };
 

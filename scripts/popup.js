@@ -1002,6 +1002,15 @@ function showFacebox(ele){
 }
 
 //====>>>>
+//打开上传图片窗口
+function openUploadImage(){
+    initOnUnload();
+    var l = (window.screen.availWidth-510)/2;
+    window.open('upimage.html', '_blank', 'left=' + l + ',top=30,width=510,height=600,menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
+};
+//<<<<=====
+
+//====>>>>
 //表情插入
 fawave.face = {
     show: function($this, target_id){
