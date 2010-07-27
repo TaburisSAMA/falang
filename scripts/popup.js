@@ -1011,7 +1011,7 @@ function openUploadImage(){
 //<<<<=====
 
 //====>>>>
-//表情插入
+//表情添加
 fawave.face = {
     show: function($this, target_id){
         var f = $("#face_box");
