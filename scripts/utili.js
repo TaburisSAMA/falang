@@ -158,7 +158,12 @@ function removeUnreadTimelineCount(t){
 };
 
 function getTooltip(){
-    var tip = '发浪(FaWave) For 新浪微博\r\n'
+    var c_user = getUser();
+    var u = '';
+    if(c_user){
+        u = c_user.userName + ' 的';
+    }
+    var tip = u + '发微(FaWave)\r\n'
             + '新微博: ' + getUnreadTimelineCount('friends_timeline') + ',    '
             + '新@我: ' + getUnreadTimelineCount('mentions') + '\r\n'
             + '新评论: ' + getUnreadTimelineCount('comments_timeline') + ',    '

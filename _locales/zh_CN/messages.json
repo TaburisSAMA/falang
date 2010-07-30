@@ -1,14 +1,14 @@
 {
 	"defaultTitle": {
-		"message": "发浪(FaWave) For 新浪微博(t.sina.com.cn)",
+		"message": "发微(FaWave) For 新浪微博(t.sina.com.cn)",
 		"description": "default title"
 	},
 	"extName": {
-		"message": "发浪(FaWave)",
+		"message": "发微(FaWave)",
 		"description": "name"
 	},
 	"extDes": {
-		"message": "发浪(FaWave)，新浪微博(t.sina.com.cn)的Chrome插件。当前版本为Beta版。有问题请到新浪微博找 @QLeelulu 反馈。",
+		"message": "发微(FaWave)，新浪微博(t.sina.com.cn)的Chrome插件。当前版本为Beta版。有问题请到新浪微博找 @QLeelulu 反馈。",
 		"description": "该插件的简单描述"
 	},
 	"parserErrorMsg": {
