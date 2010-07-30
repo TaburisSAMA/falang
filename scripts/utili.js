@@ -161,7 +161,7 @@ function getTooltip(){
     var c_user = getUser();
     var u = '';
     if(c_user){
-        u = c_user.userName + ' 的';
+        u = (c_user.screen_name||c_user.userName) + ' 的';
     }
     var tip = u + '发微(FaWave)\r\n'
             + '新微博: ' + getUnreadTimelineCount('friends_timeline') + ',    '
