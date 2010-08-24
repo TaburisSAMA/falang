@@ -14,7 +14,10 @@ var emotionalDict={
     "呵呵":"smile", "衰":"cry", "汗":"sweat", "爱你":"love", "嘻嘻":"tooth", "哼":"hate", 
     "心":"heart", "晕":"dizzy", "怒":"angry", "蛋糕":"cake", "花":"flower", "抓狂":"crazy", 
     "困":"sleepy", "干杯":"cheer", "太阳":"sun", "下雨":"rain", "泪":"sad", "月亮":"moon", 
-    "猪头":"pig", "蜡烛":"candle", "伤心":"unheart", "风扇":"fan", "冰棍":"ice", "西瓜":"watermelon"
+    "猪头":"pig", "蜡烛":"candle", "伤心":"unheart", "风扇":"fan", "冰棍":"ice", "西瓜":"watermelon",
+    "织":"zhi", "围观":"wg", "威武":"v5", "害羞":"shame", "睡觉":"sleep", "钱":"money", "偷笑":"touxiao",
+    "奥特曼":"otm", "宅":"z", "酷":"cool", "微风":"wind", "话筒":"maiphone", "爱心专递":"axcd",
+    "馋嘴":"cz", "来":"come", "便便":"shi"
 }
 
 function bildMsgLi(sinaMsg, t){
