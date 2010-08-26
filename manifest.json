@@ -1,6 +1,6 @@
 {
   "name": "__MSG_extName__",
-  "version": "0.2010.7.24",
+  "version": "0.2010.7.25",
   "description": "__MSG_extDes__",
   "icons":{ "48": "icons/icon48.png",
           "128": "icons/icon128.png" },
@@ -21,7 +21,6 @@
   ],
   "permissions": [
                    "tabs",
-                   "bookmarks",
                    "http://s8.hk/",
                    "http://api.t.sina.com.cn/",
                    "http://api.minicloud.com.cn/"
