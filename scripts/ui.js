@@ -57,7 +57,7 @@ function bildMsgLi(sinaMsg, t){
             case 'friends_timeline':
                 crlBtn.delDirectMsgBtn = crlBtn.delCommentBtn = '';
                 if(c_user.id == user.id){
-                    crlBtn.repostBtn = '<a>转</a>';
+                    //crlBtn.repostBtn = '<a>转</a>';
                     crlBtn.new_msgBtn = '';
                 }else{
                     crlBtn.delTweetBtn = '';
@@ -71,7 +71,7 @@ function bildMsgLi(sinaMsg, t){
             case 'mentions':
                 crlBtn.delDirectMsgBtn = crlBtn.delCommentBtn = '';
                 if(c_user.id == user.id){
-                    crlBtn.repostBtn = '<a>转</a>';
+                    //crlBtn.repostBtn = '<a>转</a>';
                     crlBtn.new_msgBtn = '';
                 }else{
                     crlBtn.delTweetBtn = '';

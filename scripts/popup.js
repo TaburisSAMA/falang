@@ -817,7 +817,7 @@ function doComment(ele, userName, tweetId, replyUserName){//评论
     $('#replyUserName').val(userName);
     $('#ye_dialog_title').html('评论@' + userName + ' 的信息');
     $('#ye_dialog_window').show();
-    var _txt = replyUserName ? ('回 @'+replyUserName+':') : '';
+    var _txt = replyUserName ? ('回复 @'+replyUserName+':') : '';
 
     $('#chk_sendOneMore').val(tweetId);
     $('#txt_sendOneMore').text('同时发一条微博');
