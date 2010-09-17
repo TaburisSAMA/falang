@@ -682,21 +682,22 @@ function sendRepost(msg, repostTweetId, notSendMord){
     });
 
     if(!notSendMord){
-        if($('#chk_sendOneMore').attr("checked") && $('#chk_sendOneMore').val()){
+        if($('#chk_sendOneMore').attr("checked") && $('#chk_sendOneMore').val()){ //同时给XXX评论
             sendComment(msg, $('#chk_sendOneMore').val(), true);
         }
-        if($('#chk_sendOneMore2').attr("checked") && $('#chk_sendOneMore2').val()){
+        if($('#chk_sendOneMore2').attr("checked") && $('#chk_sendOneMore2').val()){ //同时给XXX评论
             sendComment(msg, $('#chk_sendOneMore2').val(), true);
         }
     }
 };
 
 function sendComment(msg, commentTweetId, notSendMord){
-    var btn, txt, data;
+    var btn, txt, cid, data;
     btn = $("#replySubmit");
     txt = $("#replyTextarea");
+    cid = $('#commentCommentId').val();
     commentTweetId = commentTweetId || $('#commentTweetId').val();
-    data = {comment: msg, id:commentTweetId};
+    data = {comment: msg, id:commentTweetId, cid:cid};
     
     btn.attr('disabled','true');
     txt.attr('disabled','true');
@@ -811,10 +812,11 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
     countReplyText();
 };
 
-function doComment(ele, userName, tweetId, replyUserName){//评论
+function doComment(ele, userName, tweetId, replyUserName, cid){//评论 cid:回复的评论ID
     $('#actionType').val('comment');
     $('#commentTweetId').val(tweetId);
     $('#replyUserName').val(userName);
+    $('#commentCommentId').val(cid||'');
     $('#ye_dialog_title').html('评论@' + userName + ' 的信息');
     $('#ye_dialog_window').show();
     var _txt = replyUserName ? ('回复 @'+replyUserName+':') : '';

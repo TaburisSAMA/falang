@@ -135,7 +135,7 @@ function bildMsgLi(sinaMsg, t){
  */
 function buildComment(comment){
     var c_user = getUser();
-    var commentBtn = '<a class="replyComment" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + comment.status.user.screen_name + '\',' + comment.status.id + ',\''+ comment.user.screen_name + '\');" title="评论回复">回复</a>';
+    var commentBtn = '<a class="replyComment" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + comment.status.user.screen_name + '\',' + comment.status.id + ',\''+ comment.user.screen_name + '\',' + comment.id + ');" title="评论回复">回复</a>';
     
     var tp = '<li>' 
             + processMsg('@'
@@ -163,14 +163,14 @@ var processMsg = function (str) {
     //str = str.replace(/(http:\/\/[\w|\.|\/|\-|\=|\+|\?|\%|#]+)/g, '<a target="_blank" href="$1" title="$1">$1</a>');
     var re = new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&\-/#=;:!\\+]+)\\s*(?:\\](.+)\\[/url\\]|)', 'ig');
     str = str.replace(re, replaceUrl);
-    str = str.replace(/^@([\w\u4e00-\u9fa5|\_]+)/g, ' <a target="_blank" href="'+ domain_sina +'/n/$1" title="$1\'s Homepage">@$1</a>');
+    str = str.replace(/^@([\w\-\u4e00-\u9fa5|\_]+)/g, ' <a target="_blank" href="'+ domain_sina +'/n/$1" title="$1\'s Homepage">@$1</a>');
     str = str.replace(/#([^#]+)#/g, '<a target="_blank" href="'+ domain_sina +'/k/$1" title="Search #$1">#$1#</a>');
     
     //str = str.replace(/([^\w]|^)#([\w\u4e00-\u9fa5|\_\~]+)/g, ' <a target="_blank" href="'+ domain_sina +'/k/$2" title="Search #$2">#$2</a>');
     //str = str.replace(/\[:(\d{2})\]|\{([\u4e00-\u9fa5,\uff1f]{2,})\}/g, replaceEmotional); //嘀咕的表情
     
     str = str.replace(/\[([\u4e00-\u9fff,\uff1f]{1,4})\]/g, replaceEmotional);
-    return str.replace(/([^\w])@([\w\u4e00-\u9fa5|\_]+)/g, '$1<a target="_blank" href="'+ domain_sina +'/n/$2" title="$2\'s Homepage">@$2</a>');
+    return str.replace(/([^\w])@([\w\-\u4e00-\u9fa5|\_]+)/g, '$1<a target="_blank" href="'+ domain_sina +'/n/$2" title="$2\'s Homepage">@$2</a>');
 };
 
 function replaceUrl(m, g1, g2){
