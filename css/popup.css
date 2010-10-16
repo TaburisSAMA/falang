@@ -3,6 +3,8 @@
 body { font-family: "微软雅黑", "雅黑", "Arial"; font-size:12px; /*color:#049; padding:8px;*/ width:480px; color:#182A58;overflow-y:auto;overflow-x:hidden;}
 a { text-decoration:none; color:#049;} 
 a:hover { text-decoration:underline;}
+.nowrap{word-break:keep-all;white-space:nowrap;}
+.green{color:green;}
 ul { list-style:none;} 
 li { line-height:16px;} 
 .warp { width:480px; /*border:1px solid #ace;*/ padding-bottom:10px;} 
@@ -145,3 +147,61 @@ li { line-height:16px;}
 .faceItem .faceItemPicbg li a:link,.faceItem .faceItemPicbg li a:visited{ width:26px; height:26px; text-align:center; display:block; border:1px dashed #ddd;}
 .faceItem .faceItemPicbg li a:hover{ border:1px dashed #999;}
 /*>>>> face end <<<<*/
+
+/*sicon*/
+.small_icon{background: url('../images/sicon.gif') no-repeat 0px 0px;}
+.sicon_gender_m, .sicon_gender_f, .sicon_gender_n{
+	height: 12px;
+	margin-right: 10px;
+	width: 9px;
+}
+.sicon_gender_m{background-position: 0px -20px;}
+.sicon_gender_n{background-position: 0px -48px;}
+
+/*toltip*/
+.showtip:hover .tipbox{display:block;}
+
+.tipbox{
+	display:none;
+	font-size:12px;
+	color:#000;
+	position:absolute;
+	z-index:9999;
+	margin:-3px 0 0 -8px;
+	padding:6px;
+	background:#fff;
+	-webkit-border-radius:3px;
+	-webkit-box-shadow:0 0 9px #000;
+}
+.tipbox .user_head, .userinfo_detail .user_head{
+	float:left;
+	border:solid 1px #ccc;
+	padding:2px;
+	/*margin-right: 8px;*/
+}
+.tipbox .user_info, .userinfo_detail .user_info{padding-left: 62px; min-height:55px;}
+.tipbox .des, .userinfo_detail .des{color:#888;}
+
+/* userinfo_detail */
+.userinfo_detail{
+	margin:6px 3px;
+	padding:6px;
+	-webkit-border-radius:3px;
+	-webkit-box-shadow:0 0 9px #000;
+}
+.userinfo_detail p{margin:3px 0;}
+.userinfo_detail .follow{
+	float:right;
+	background: white;
+	border: 1px solid #408CD9;
+	color: #06C;
+	padding: 1px 2px;
+	text-decoration:none;
+}
+.userinfo_detail .follow:hover{
+	background: #7BB0E5;
+	border: 1px solid #408CD9;
+	color: white;
+}
+.userinfo_detail .plus{}
+.userinfo_detail .des{margin-top: 8px;}

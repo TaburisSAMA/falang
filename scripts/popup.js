@@ -27,11 +27,19 @@ function init(){
         return;
     }
     //$('a').attr('target', '_blank');
-    $('a').live('click', function(){
+    $('a').live('click', function(e){
         var url = $.trim($(this).attr('href'));
         if(url && !url.toLowerCase().indexOf('javascript')==0){
             chrome.tabs.create({url:$(this).attr('href'), selected:false});
             return false;
+        }
+    }).live('mousedown', function(e){
+        if(e.button == 2){ //右键点击
+            console.log(e.button);
+            var url = $.trim($(this).attr('rhref'));
+            if(url){
+                chrome.tabs.create({url:url, selected:false});
+            }
         }
     });
 
@@ -58,7 +66,7 @@ function init(){
     //callCheckNewMsg();
 
     $(window).unload(function(){ initOnUnload(); }); 
-}
+};
 
 function initTabs(){
     window.currentTab = '#friends_timeline_timeline';
@@ -71,18 +79,26 @@ function initTabs(){
         //添加当前激活的状态
         t.siblings().removeClass('active').end()
                 .addClass('active');
+        //切换tab前先保护滚动条位置
+        var old_t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
+        saveScrollTop(old_t);
         //切换tab
         $('.list_p').hide();
         var c_t = t.attr('href').replace('#','').replace(/_timeline$/i,'');
         var c_ul = $(t.attr('href'));
         c_ul.show();
         window.currentTab = t.attr('href');
+        if(c_t =='user_timeline'){ //用户自己的微薄，清空内容。防止查看别人的微薄的时候内容混合
+            $("#user_timeline_timeline ul.list").html('');
+        }
         if(!c_ul.find('ul.list').html()){
             getSinaTimeline(c_t);
+        }else if(c_t =='user_timeline'){ //用户自己的微薄，不定期自己获取更新，所以要通知后台去取一下
+            showLoading();
+            var b_view = getBackgroundView();
+            b_view.checkTimeline(c_t);
         }
-        
-
-        
+        resetScrollTop(c_t); //复位到上次滚动条的位置
         removeUnreadTimelineCount(c_t);
         t.find(".unreadCount").html('');
     });
@@ -327,6 +343,66 @@ function initMsgHover(){
 
 //====>>>>>>>>>>>>>>>>>>>>>>
 
+//滚动条位置
+var SCROLL_TOP_CACHE = {};
+//@t : timeline类型
+function saveScrollTop(t){
+    SCROLL_TOP_CACHE[t] = $("#" + t + "_timeline .list_warp").scrollTop();
+};
+
+//复位到上次的位置
+//@t : timeline类型
+function resetScrollTop(t){
+    if(t == 'user_timeline'){
+        $("#" + t + "_timeline .list_warp").scrollTop(0);
+    }else{
+        $("#" + t + "_timeline .list_warp").scrollTop(SCROLL_TOP_CACHE[t]);
+    }
+};
+//====>>>>>>>>>>>>>>>>>>>>>>
+
+//查看用户的微薄
+function getUserTimeline(screen_name){
+    var c_user = getUser(CURRENT_USER_KEY);
+    if(!c_user){
+        return;
+    }
+    showLoading();
+    var params = {count:60, screen_name:screen_name};
+    
+    var m = 'user_timeline';
+    sinaApi[m](params, function(sinaMsgs, textStatus){
+        if(sinaMsgs && sinaMsgs.length > 0){
+            var t = $(".tabs .tab-user_timeline");
+            //添加当前激活的状态
+            t.siblings().removeClass('active').end()
+                    .addClass('active');
+            //切换tab前先保护滚动条位置
+            var old_t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
+            saveScrollTop(old_t);
+            //切换tab
+            $('.list_p').hide();
+            
+            $("#user_timeline_timeline").show();
+            $("#user_timeline_timeline ul.list").html('');
+
+            window.currentTab = "#user_timeline_timeline";
+
+            addTimelineMsgs(sinaMsgs, m);
+
+            $("#user_timelineReadMore").hide();
+
+            var user = sinaMsgs[0].user || sinaMsgs[0].sender;
+            var userinfo_html = buildUserInfo(user);
+            $("#user_timeline_timeline ul.list").prepend(userinfo_html);
+
+            resetScrollTop(m);
+        }
+
+        hideLoading();
+    });
+};
+
 //获取时间线微博列表
 //@t : 类型
 function getSinaTimeline(t){
@@ -357,6 +433,9 @@ function getSinaTimeline(t){
             showReadMore(t);
         }
         hideLoading();
+        if(t=="user_timeline"){ //用户
+            b_view.checkTimeline(t);
+        }
     }else{
         b_view.checkTimeline(t);
     }

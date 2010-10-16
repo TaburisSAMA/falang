@@ -115,11 +115,14 @@
     loading: function() {
       init()
       if ($('#facebox .loading').length == 1) return true
-      showOverlay()
+      //showOverlay() //修改为图片显示再block
 
       $('#facebox .content').empty()
       $('#facebox .body').children().hide().end().
-        append('<div class="loading"><img src="'+$.facebox.settings.loadingImage+'"/></div>')
+        append('<div class="loading"><img src="'+$.facebox.settings.loadingImage+'"/> \
+                    <br/> \
+                    <a href="javascript:" onclick="$(document).trigger(\'close.facebox\');return false;"><img src="/css/facebox/closelabel.gif" title="close" /></a> \
+                </div>')
 
       $('#facebox').css({
         top:	getPageScroll()[1] + (getPageHeight() / 10),
@@ -265,6 +268,7 @@
   function fillFaceboxFromImage(href, klass) {
     var image = new Image()
     image.onload = function() {
+      showOverlay();
       $.facebox.reveal('<div class="image"><a target="_blank" href="' + image.src.replace('/bmiddle/','/orignal/') +'">查看原图</a><br/><img src="' + image.src + '" class="cur_min" onclick="$(document).trigger(\'close.facebox\')" /></div>', klass)
     }
     image.src = href

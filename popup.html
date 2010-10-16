@@ -10,6 +10,7 @@
 	<script type="text/javascript" src="scripts/lib/Base64.js" ></script>
 	<script type="text/javascript" src="scripts/lib/facebox.js" ></script>
 	<script type="text/javascript" src="/scripts/lib/shotenjin.js" ></script>
+	<script type="text/javascript" src="scripts/provinces.js" ></script>
 	<script type="text/javascript" src="scripts/utili.js" ></script>
 	<script type="text/javascript" src="scripts/s8api.js" ></script>
 	<script type="text/javascript" src="scripts/sinaApi.js" ></script>
@@ -22,7 +23,7 @@
 
 		var WH = getWidthAndHeight();
 		var wh_css = 'body{width:'+ WH[0] +'px;font-family:"'+ getFont() +'";font-size:'+ getFontSize() +'px;}'
-				   + '.warp{width:' + WH[0] + 'px;}.list_warp{height:' + (WH[1]-40) + 'px;}'
+				   + '.warp{width:' + WH[0] + 'px;}.list_warp, .list_p{height:' + (WH[1]-40) + 'px;}'
 				   + '#facebox img{max-width:'+ (WH[0]-50) +'px;}';
 		$("#styleCustom").html(wh_css);
 	</script>
@@ -48,6 +49,8 @@
 		<li class="tab-mentions" href="#mentions_timeline">@我<span class="unreadCount"></span></li>
 		<li class="tab-comments_timeline" href="#comments_timeline_timeline">评论<span class="unreadCount"></span></li>
 		<li class="tab-direct_messages" href="#direct_messages_timeline">私信<span class="unreadCount"></span></li>
+		<!-- <li class="tab-followers" href="#followers_timeline">粉丝<span class="unreadCount"></span></li> -->
+		<li class="tab-user_timeline" href="#user_timeline_timeline">微博<span class="unreadCount"></span></li>
 		<span id="loading"><img src="images/loader.gif" /></span>
 	  </ul>
 	  <div id='friends_timeline_timeline' class="list_p">
@@ -72,6 +75,18 @@
 		<div class="list_warp">
 			<ul class="list"></ul>
 			<a href="javascript:void(0);" id="direct_messagesReadMore" class="readMore" onclick="readMore('direct_messages');">更多</a>
+		</div>
+	  </div>
+	  <div id="followers_timeline" class="list_p" style="display:none;">
+		<div class="list_warp">
+			<ul class="list"></ul>
+			<a href="javascript:void(0);" id="followersReadMore" class="readMore" onclick="readMore('followers');">更多</a>
+		</div>
+	  </div>
+	  <div id="user_timeline_timeline" class="list_p" style="display:none;">
+		<div class="list_warp">
+			<ul class="list"></ul>
+			<a href="javascript:void(0);" id="user_timelineReadMore" class="readMore" onclick="readMore('user_timeline');">更多</a>
 		</div>
 	  </div>
 	  
@@ -137,14 +152,14 @@
 		<textarea id="tp_time_line">
 			<li class="tweetItem showCounts_#{tweet.id} <?js if (!tweet.readed) { ?>unread-item<?js } ?> <?js if (tweet.myTweet) { ?>myTweet<?js } ?> " id="tweet#{tweet.id}" did="#{tweet.id}">
 				<div class="usericon">
-					<a target="_blank" href="http://t.sina.com.cn/#{user.domain||user.id}" title="#{user.description}">
+					<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}');" rhref="http://t.sina.com.cn/#{user.domain||user.id}" title="#{user.description}">
 						<img src="#{user.profile_image_url.replace('24x24', '48x48')}">
 					</a>
 				</div>
 				<div class="mainContent">
 					<span class="arrow_r"></span>
 					<div class="userName">
-						<a target="_blank" href="http://t.sina.com.cn/#{user.domain||user.id}" title="#{getUserCountsInfo(user)}">
+						<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}');" rhref="http://t.sina.com.cn/#{user.domain||user.id}" title="#{getUserCountsInfo(user)}">
 							#{user.screen_name}<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
 						</a>
 						<span class="edit">
@@ -167,11 +182,35 @@
 						<div class="msg">
 							<div class="tweetItem retweeted showCounts_#{tweet.retweeted_status.id}" id="tweet#{tweet.retweeted_status.id}">
 								<div class="userName"><?js if(tType=='comments_timeline'){ ?>评<?js }else{ ?>转<?js } ?>
-									<a target="_blank" 
-										href="http://t.sina.com.cn/#{tweet.retweeted_status.user.domain||tweet.retweeted_status.user.id}" 
-										title="#{getUserCountsInfo(tweet.retweeted_status.user)}">
-										@#{tweet.retweeted_status.user.screen_name}<?js if(tweet.retweeted_status.user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
-									</a> 的微博: 
+									<span class="showtip">
+										<a target="_blank" 
+											href="javascript:getUserTimeline('#{tweet.retweeted_status.user.screen_name}');" 
+											rhref="http://t.sina.com.cn/#{tweet.retweeted_status.user.domain||tweet.retweeted_status.user.id}" >
+											@#{tweet.retweeted_status.user.screen_name}<?js if(tweet.retweeted_status.user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
+										</a>
+										<div class="tipbox">
+											<div>
+												<div class="user_head"><img src="#{tweet.retweeted_status.user.profile_image_url}" /></div>
+												<div class="user_info">
+													<p><a href="javascript:getUserTimeline('#{tweet.retweeted_status.user.screen_name}');" 
+														rhref="http://t.sina.com.cn/#{tweet.retweeted_status.user.domain||tweet.retweeted_status.user.id}">#{tweet.retweeted_status.user.screen_name}
+														<?js if(tweet.retweeted_status.user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
+													</a></p>
+													<p>
+														<img class="small_icon sicon_gender_#{tweet.retweeted_status.user.gender}" src="/images/transparent.gif" 
+															title="<?js if(tweet.retweeted_status.user.gender == 'm'){ ?>男<?js }else if(tweet.retweeted_status.user.gender == 'f'){ ?>女<?js }else{ ?>性别未知<?js } ?>" />
+														 #{provinces[tweet.retweeted_status.user.province].name}, #{provinces[tweet.retweeted_status.user.province]["citys"][tweet.retweeted_status.user.city]}</p>
+													<p>关注: <span>#{tweet.retweeted_status.user.friends_count}</span>个　
+														粉丝: <span>#{tweet.retweeted_status.user.followers_count}</span>个</p>
+													<p>微博: <span>#{tweet.retweeted_status.user.statuses_count}</span>条</p>
+												</div>
+											</div>
+											<?js if(tweet.retweeted_status.user.description){ ?>
+											<div class="des">简介：#{tweet.retweeted_status.user.description}</div>
+											<?js } ?>
+										</div>
+									</span>
+									的微博: 
 									<span class="edit">
 										#{ btn.rtRepostBtn + btn.rtRepostCounts + btn.rtCommentBtn + btn.rtCommentCounts}
 									</span>
@@ -183,8 +222,9 @@
 									<img class="imgicon pic" src="#{tweet.retweeted_status.thumbnail_pic}" /></a>
 								</div>
 								<?js } ?>
+								<div class="msgInfo">#{new Date(tweet.retweeted_status.created_at).format("yyyy-MM-dd hh:mm:ss")}</div>
 								<div class="comments">
-									<a href="javascript:void(0);" onclick="showComments(this, #{tweet.retweeted_status.id});">隐藏评论</a>
+									<p style="text-align:right;"><a href="javascript:void(0);" onclick="showComments(this, #{tweet.retweeted_status.id});">隐藏评论</a></p>
 									<ul class="comment_list"></ul>
 									<div class="comment_paging" page="1">
 										<a class="pre_page" href="javascript:void(0);" onclick="commentPage(this,#{tweet.retweeted_status.id}, true);" style="display:none;">《上一页</a>
@@ -198,7 +238,7 @@
 						</div>
 					</div>
 					<div class="comments">
-						<a href="javascript:void(0);" onclick="showComments(this, #{tweet.id});">隐藏评论</a>
+						<p style="text-align:right;"><a href="javascript:void(0);" onclick="showComments(this, #{tweet.id});">隐藏评论</a></p>
 						<ul class="comment_list"></ul>
 						<div class="comment_paging" page="1">
 							<a class="pre_page" href="javascript:void(0);" onclick="commentPage(this,#{tweet.id}, true);" style="display:none;">《上一页</a>
@@ -214,9 +254,31 @@
 				</div>
 			</li>
 		</textarea>
+		<textarea id="tp_user_info">
+			<div class="userinfo_detail">
+				<div class="user_head"><img src="#{user.profile_image_url}" /></div>
+				<div class="user_info">
+					<div class="userName"><a href="http://t.sina.com.cn/#{user.domain||user.id}">#{user.screen_name}<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
+					</a>　
+					<a class="follow" href="javascript:"><span class="plus">+</span>加关注</a>
+					</div>
+					<p>
+						<img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 
+							title="<?js if(user.gender == 'm'){ ?>男<?js }else if(user.gender == 'f'){ ?>女<?js }else{ ?>性别未知<?js } ?>" />
+						 #{provinces[user.province].name}, #{provinces[user.province]["citys"][user.city]}</p>
+					<p>关注: <span>#{user.friends_count}</span>个　 
+						粉丝: <span>#{user.followers_count}</span>个　 
+						微博: <span>#{user.statuses_count}</span>条</p>
+				</div>
+				<?js if(user.description){ ?>
+				<div class="des">简介：#{user.description}</div>
+				<?js } ?>
+			</div>
+		</textarea>
 	</div>
 	<script type="text/javascript">
 		var TEMPLATE = $("#tp_time_line").val();
+		var TEMPLATE_USER_INFO = $("#tp_user_info").val();
 	</script>
 	<!-- 模板选择 End -->
 

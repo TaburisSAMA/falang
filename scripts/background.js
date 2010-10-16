@@ -30,7 +30,8 @@ function setMaxMsgId(t, id){
 
 //获取最新的(未看的)微博
 // @t : 获取timeline的类型
-function checkTimeline(t){
+// @p : 要附加的请求参数,类型为{}
+function checkTimeline(t, p){
     //var t = 'friends_timeline';
     if(isDoChecking(t, 'checking')){ return; }
     var c_user = getUser(CURRENT_USER_KEY);
@@ -40,33 +41,23 @@ function checkTimeline(t){
     //window.checking[t] = true;
     setDoChecking(t, 'checking', true);
     showLoading();
-    var params = {count:100}
+    var params = {count:100};
     var last_id = getLastMsgId(t);
     if(last_id){
         params['since_id'] = last_id;
     }
-    var m = ''
+    if(p){
+        for(var key in p){
+            params[key] = p[key];
+        }
+    }
+    var m = '';
     switch(t){
-        case 'friends_timeline':
+        case 'friends_timeline': //示例，如有特殊才需特别定义
             m = 'friends_timeline';
             break;
-        case 'mentions':
-            m = 'mentions';
-            break;
-        case 'comments_timeline':
-            m = 'comments_timeline';
-            break;
-        case 'comments_by_me':
-            m = 'comments_by_me';
-            break;
-        case 'direct_messages':
-            m = 'direct_messages';
-            break;
-        case 'favorites':
-            m = 'favorites';
-            break;
         default:
-            //
+            m = t;
     }
     sinaApi[m](params, function(sinaMsgs, textStatus){
         var isFirstTime = false;
@@ -85,6 +76,9 @@ function checkTimeline(t){
         }
         var popupView = getPopupView();
 
+        if(sinaMsgs.users){
+            sinaMsgs = sinaMsgs.users;
+        }
         if(sinaMsgs && sinaMsgs.length > 0){
             
             _last_id = sinaMsgs[0].id;
@@ -139,8 +133,8 @@ function checkTimeline(t){
 
 //分页获取以前的微博
 // @t : 获取timeline的类型
-function getTimelinePage(t){
-    //var t = 'friends_timeline';
+// @p : 要附加的请求参数,类型为{}
+function getTimelinePage(t, p){
     if(isDoChecking(t, 'paging')){ return; }
     var c_user = getUser(CURRENT_USER_KEY);
     if(!c_user){
@@ -156,28 +150,18 @@ function getTimelinePage(t){
     if(max_id){
         params['max_id'] = max_id;
     }
+    if(p}{
+        for(var key in p){
+            params[key] = p[key];
+        }
+    }
     var m = ''
     switch(t){
-        case 'friends_timeline':
+        case 'friends_timeline': //示例，如有特殊才需特别定义
             m = 'friends_timeline';
             break;
-        case 'mentions':
-            m = 'mentions';
-            break;
-        case 'comments_timeline':
-            m = 'comments_timeline';
-            break;
-        case 'comments_by_me':
-            m = 'comments_by_me';
-            break;
-        case 'direct_messages':
-            m = 'direct_messages';
-            break;
-        case 'favorites':
-            m = 'favorites';
-            break;
         default:
-            //
+            m = t;
     }
     sinaApi[m](params, function(sinaMsgs, textStatus){
         if(sinaMsgs && sinaMsgs.length > 0){

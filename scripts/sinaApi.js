@@ -2,7 +2,7 @@
 
 */
 
-var SOURCE = "3097082413"; //encodeURIComponent('');
+var SOURCE = "2721776383"; //"3097082413";(旧FaWave) //encodeURIComponent('');
 
 var result_format = '.json';
 
@@ -18,6 +18,7 @@ var apiUrl = {
         comments_timeline:      api_domain_sina + '/statuses/comments_timeline' + result_format,
         user_timeline:          api_domain_sina + '/statuses/user_timeline' + result_format,
         mentions:               api_domain_sina + '/statuses/mentions' + result_format,
+        followers:              api_domain_sina + '/statuses/followers' + result_format,
         favorite:               api_domain_sina + '/favorite' + result_format,
         favorites_create:       api_domain_sina + '/favorites/create' + result_format,
         favorites_destroy:      api_domain_sina + '/favorites/destroy/{id}' + result_format,
@@ -30,9 +31,10 @@ var apiUrl = {
         comments:               api_domain_sina + '/statuses/comments' + result_format,
         destroy:                api_domain_sina + '/statuses/destroy' + result_format,
         destroy_msg:            api_domain_sina + '/direct_messages/destroy/{id}' + result_format,
-        direct_messages:        api_domain_sina + '/direct_messages' + result_format, //0 表示悄悄话，1 表示戳一下，2 表示升级通知，3 表示代发通知，4 表示系统消息。100表示不分类，都查询。
+        direct_messages:        api_domain_sina + '/direct_messages' + result_format, 
         new_message:            api_domain_sina + '/direct_messages/new' + result_format,
         verify_credentials:     api_domain_sina + '/account/verify_credentials' + result_format,
+        user_show:              api_domain_sina + '/users/show' + result_format,
 
         detailUrl:        domain_sina + '/jump?aid=detail&twId=',
         searchUrl:        domain_sina + '/search/'
@@ -70,6 +72,16 @@ var sinaApi = {
         _sendRequest(params, callbackFn);
 	},
 
+    user_timeline: function(data, callbackFn){
+		if(!callbackFn) return;
+        var params = {
+            url: apiUrl.sina.user_timeline,
+            type: 'get',
+            data: (data||{})
+        };
+        _sendRequest(params, callbackFn);
+	},
+
     comments_timeline: function(data, callbackFn){
 		if(!callbackFn) return;
         var params = {
@@ -84,6 +96,16 @@ var sinaApi = {
 		if(!callbackFn) return;
         var params = {
             url: apiUrl.sina.mentions,
+            type: 'get',
+            data: (data||{})
+        };
+        _sendRequest(params, callbackFn);
+	},
+
+    followers: function(data, callbackFn){
+		if(!callbackFn) return;
+        var params = {
+            url: apiUrl.sina.followers,
             type: 'get',
             data: (data||{})
         };
@@ -124,6 +146,16 @@ var sinaApi = {
         if(!callbackFn) return;
         var params = {
             url: apiUrl.sina.counts,
+            type: 'get',
+            data: (data||{})
+        };
+        _sendRequest(params, callbackFn);
+    },
+
+    user_show: function(data, callbackFn){
+        if(!callbackFn) return;
+        var params = {
+            url: apiUrl.sina.user_show,
             type: 'get',
             data: (data||{})
         };

@@ -1,25 +1,52 @@
 
-#fa_wave_msg_wrap{
+body #fa_wave_msg_wrap{
    position:fixed;
    z-index: 100000;
    top:0;
    right:0;
    font-size:12px;
 }
-#fa_wave_msg_wrap .close_fawave_remind{
+body #fa_wave_msg_wrap .close_fawave_remind{
 	display: block;
 	background: #E7F9FF;
 	border: 1px solid #A8E4FA;
 	color:green;
 	text-align: center;
 }
-#fa_wave_msg_wrap .msgRemind{
-   width: 320px;
+body #fa_wave_msg_wrap .msgRemind{
+   width: 350px;
    margin: 2px;
-   padding: .5em;
    background: #F8F8F8;
-   border: 5px solid #fcc7c7;/*gainsboro;*/
    color: #2B4A78;/*#a00;*/
+   line-height: 18px;
+	margin:5px 0;
+	color:#222;
+	position:relative;
+	background:#fff;
+	padding:8px 8px 6px;
+	word-wrap:break-word;
+	border-width:1px;
+	border-style:solid;
+	border-color:#ddd #ddd #eee #ddd;
+	-webkit-border-radius:6px;
+	-webkit-box-shadow:0 1px 1px #bbb;
 }
 
-#fa_wave_msg_wrap .msgRemind .username{color:#a00;font-weight: bold;}
+body #fa_wave_msg_wrap .msgRemind .usericon{
+	float: left;
+	margin: 2px 0px 0px 2px;
+}
+
+body #fa_wave_msg_wrap .msgRemind .maincontent {
+	margin:0 2px 0 60px;
+}
+
+body #fa_wave_msg_wrap .msgRemind .maincontent .retweeted{border-left:5px solid #487858;border-top:dashed 1px #ddd;margin:0px 0px 5px 8px;padding:3px 0 0 2px;}
+
+body #fa_wave_msg_wrap .msgRemind .maincontent .pic{
+	padding: 3px;
+	margin:2px;
+	-webkit-box-shadow: #AAA 0px 0px 5px;
+}
+
+body #fa_wave_msg_wrap .msgRemind .username{color:green;font-weight: bold;}

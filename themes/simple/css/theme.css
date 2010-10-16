@@ -26,3 +26,5 @@ div.msgInfo {padding-top:3px;}
 .list .comments .replyComment{float:right;color:green;}
 .list .comments .comment_paging a{color:green;}
 .list .comments .comment_paging .next_page{float:right;}
+
+.showtip:hover .tipbox{display:none;}
