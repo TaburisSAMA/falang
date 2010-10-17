@@ -44,12 +44,12 @@
 	</div>
 	
 	<div class="warp">
-	  <ul class="tabs">
+	  <ul id="tl_tabs" class="tabs">
 		<li class="tab-friends_timeline active" href="#friends_timeline_timeline">我跟随的人<span class="unreadCount"></span></li>
 		<li class="tab-mentions" href="#mentions_timeline">@我<span class="unreadCount"></span></li>
 		<li class="tab-comments_timeline" href="#comments_timeline_timeline">评论<span class="unreadCount"></span></li>
 		<li class="tab-direct_messages" href="#direct_messages_timeline">私信<span class="unreadCount"></span></li>
-		<!-- <li class="tab-followers" href="#followers_timeline">粉丝<span class="unreadCount"></span></li> -->
+		<li class="tab-followers" href="#followers_timeline">粉丝<span class="unreadCount"></span></li>
 		<li class="tab-user_timeline" href="#user_timeline_timeline">微博<span class="unreadCount"></span></li>
 		<span id="loading"><img src="images/loader.gif" /></span>
 	  </ul>
@@ -79,8 +79,11 @@
 	  </div>
 	  <div id="followers_timeline" class="list_p" style="display:none;">
 		<div class="list_warp">
+			<div id="fans_tab" class="tab2"><p>
+				<span class="tab_friends" onclick="getFansList('friends')" t="friends">我关注的</span>
+				<span class="active tab_followers"  onclick="getFansList('followers')" t="followers">我的粉丝</span>
+			</p></div>
 			<ul class="list"></ul>
-			<!-- <a href="javascript:void(0);" id="followersReadMore" class="readMore" onclick="readMore('followers');">更多</a> -->
 		</div>
 	  </div>
 	  <div id="user_timeline_timeline" class="list_p" style="display:none;">
@@ -275,10 +278,37 @@
 				<?js } ?>
 			</div>
 		</textarea>
+		<textarea id="tp_fans">
+			<div class="fans">
+				<div class="user_head"><img src="#{user.profile_image_url}" /></div>
+				<div class="user_info">
+					<div class="userName"><a  href="javascript:getUserTimeline('#{user.screen_name}');" 
+					rhref="http://t.sina.com.cn/#{user.domain||user.id}">#{user.screen_name}<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
+					</a>　
+					<?js if(tType =='friends'){ ?>
+					<a class="follow" href="javascript:" onclick="f_destroy(#{user.id}, this)">取消关注</a>
+					<?js }else{ ?>
+					<a class="follow" href="javascript:" onclick="f_create(#{user.id}, this)"><span class="plus">+</span>加关注</a>
+					<?js } ?>
+					</div>
+					<p>
+						<img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 
+							title="<?js if(user.gender == 'm'){ ?>男<?js }else if(user.gender == 'f'){ ?>女<?js }else{ ?>性别未知<?js } ?>" />
+						 #{provinces[user.province].name}, #{provinces[user.province]["citys"][user.city]}</p>
+					<p>关注: <span>#{user.friends_count}</span>个　 
+						粉丝: <span>#{user.followers_count}</span>个　 
+						微博: <span>#{user.statuses_count}</span>条</p>
+				</div>
+				<?js if(user.description){ ?>
+				<div class="des">简介：#{user.description}</div>
+				<?js } ?>
+			</div>
+		</textarea>
 	</div>
 	<script type="text/javascript">
 		var TEMPLATE = $("#tp_time_line").val();
 		var TEMPLATE_USER_INFO = $("#tp_user_info").val();
+		var TEMPLATE_FANS = $("#tp_fans").val();
 	</script>
 	<!-- 模板选择 End -->
 

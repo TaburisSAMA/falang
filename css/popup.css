@@ -15,6 +15,32 @@ li { line-height:16px;}
 .tabs li.tab-r { /*width:118px; border-right:0; text-align:right;*/ padding-right:10px;} 
 .tabs li.tab-r a { color:#F06; font-weight:bold; font-family:Georgia;}
 
+.tab2{
+	background-color: #FAFAFA;
+	margin: 5px 0;
+	padding: 5px 0;
+}
+.tab2 p span{
+	background-color: #EFEFEF;
+	border: 1px solid #CCCCCC;
+	cursor: pointer;
+	margin-right: 6px;
+	padding: 3px 6px;
+	border-bottom: none;
+	color:#888;
+}
+.tab2 p span.active{
+	background-color: #FAFAFA;
+	position: relative;
+	bottom: -1px;
+	color:#000;
+}
+.tab2 p{
+	border-bottom: 1px solid #CCCCCC;
+	font-weight: bold;
+	padding: 0 10px 2px;
+}
+
 .btn{
 	background:-webkit-gradient(linear,0 0,0 100%,from(#0C7823),to(#219A44));
     color:#fff;
@@ -173,24 +199,27 @@ li { line-height:16px;}
 	-webkit-border-radius:3px;
 	-webkit-box-shadow:0 0 9px #000;
 }
-.tipbox .user_head, .userinfo_detail .user_head{
+.tipbox .user_head, .userinfo_detail .user_head, .fans .user_head{
 	float:left;
 	border:solid 1px #ccc;
 	padding:2px;
 	/*margin-right: 8px;*/
 }
-.tipbox .user_info, .userinfo_detail .user_info{padding-left: 62px; min-height:55px;}
+.tipbox .user_info, 
+.userinfo_detail .user_info, 
+.fans .user_info{padding-left: 62px; min-height:55px;}
+
 .tipbox .des, .userinfo_detail .des{color:#888;}
 
 /* userinfo_detail */
-.userinfo_detail{
+.userinfo_detail, .fans{
 	margin:6px 3px;
 	padding:6px;
 	-webkit-border-radius:3px;
 	-webkit-box-shadow:0 0 9px #000;
 }
-.userinfo_detail p{margin:3px 0;}
-.userinfo_detail .follow{
+.userinfo_detail p, .fans p{margin:3px 0;}
+.userinfo_detail .follow, .fans .follow{
 	float:right;
 	background: white;
 	border: 1px solid #408CD9;
@@ -198,10 +227,15 @@ li { line-height:16px;}
 	padding: 1px 2px;
 	text-decoration:none;
 }
-.userinfo_detail .follow:hover{
+.userinfo_detail .follow:hover, .fans .follow:hover{
 	background: #7BB0E5;
 	border: 1px solid #408CD9;
 	color: white;
 }
 .userinfo_detail .plus{}
-.userinfo_detail .des{margin-top: 8px;}
+.userinfo_detail .des, .fans .des{margin-top: 8px;}
+
+.fans{
+	margin:6px 3px 9px;
+	-webkit-box-shadow:0 0 9px #888;
+}

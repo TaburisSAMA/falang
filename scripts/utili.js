@@ -39,7 +39,7 @@ var WIDTH_AND_HEIGHT_KEY = 'idi_WIDTH_AND_HEIGHT_KEY'; //宽高
 var DEFAULT_WIDTH_AND_HEIGHT = [480, 520]; //默认宽高
 
 //['friends_timeline','mentions','comments_timeline','comments_by_me','direct_messages','favorites']
-var T_LIST = ['friends_timeline','mentions','comments_timeline','direct_messages', 'followers']; //timeline的分类列表
+var T_LIST = ['friends_timeline','mentions','comments_timeline','direct_messages']; //timeline的分类列表
 
 
 function showMsg(msg){

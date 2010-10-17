@@ -74,7 +74,7 @@ function init(){
 
 function initTabs(){
     window.currentTab = '#friends_timeline_timeline';
-    $('.tabs li').click(function() {
+    $('#tl_tabs li').click(function() {
         var t = $(this);
         //不进行任何操作							 
         if(t.hasClass('tab-none')) {
@@ -94,6 +94,9 @@ function initTabs(){
         window.currentTab = t.attr('href');
         if(c_t =='user_timeline'){ //用户自己的微薄，清空内容。防止查看别人的微薄的时候内容混合
             $("#user_timeline_timeline ul.list").html('');
+        }else if(c_t =='followers'){
+            getFansList('followers');
+            return;
         }
         if(!c_ul.find('ul.list').html()){
             getSinaTimeline(c_t);
@@ -296,7 +299,7 @@ function initChangeUserList(){
             c_user.screen_name = c_user.screen_name || c_user.userName;
             c_user.user_list = li.join('');
             c_user.domain = c_user.domain || c_user.id;
-            $('.tabs').append(formatText(t_changeUser, c_user));
+            $('#tl_tabs').append(formatText(t_changeUser, c_user));
             $("#changeUser .userName").click(function(){
                 $("#changeUser").find('div').toggle();
             });
@@ -310,7 +313,7 @@ function initChangeUserList(){
         }else if(li){
             c_user.screen_name = c_user.screen_name || c_user.userName;
             c_user.user_list = li.join('');
-            $('.tabs').append(formatText(t_changeUser, c_user));
+            $('#tl_tabs').append(formatText(t_changeUser, c_user));
         }
 
     }
@@ -421,6 +424,55 @@ function resetScrollTop(t){
 };
 //====>>>>>>>>>>>>>>>>>>>>>>
 
+/*
+* 粉丝列表
+*/
+var NEXT_CURSOR = {};
+var FANS_HTML_CACHE = {};
+//获取用户的粉丝列表
+function getFansList(t, cursor){
+    var list = $("#followers_timeline .list");
+    var old_t = $("#fans_tab .active").attr('t');
+    FANS_HTML_CACHE[old_t] = list.html();
+    if(!cursor){ //点击tab的时候，而不是分页获取
+        if(!$("#fans_tab .tab_" + t).hasClass('active')){
+            $("#fans_tab span").removeClass('active');
+            $("#fans_tab .tab_" + t).addClass('active');
+        }
+        if(FANS_HTML_CACHE[t]){ //如果已经获取过，直接显示。
+            list.html(FANS_HTML_CACHE[t]);
+            return;
+        }else{
+            list.html('');
+        }
+    }
+    cursor = cursor || -1;
+    var c_user = getUser(CURRENT_USER_KEY);
+    if(!c_user){
+        return;
+    }
+    showLoading();
+    hideReadMore(t);
+    var params = {user_id:c_user.id, cursor:cursor};
+    sinaApi[t](params, function(users, textStatus, statuCode){
+        if(textStatus != 'error' && users && !users.error){
+            NEXT_CURSOR[t] = users.next_cursor;
+            users = users.users;
+            var html = '';
+            for(i in users){
+                html += bildMsgLi(users[i], t); //TODO: 待优化
+            }
+            list.append(html);
+            if(users.length >=20){
+                showReadMore(t);
+            }else{
+                hideReadMore(t);
+            }
+        }
+    });
+};
+// <<<<<<<<<<<<<<<<====
+
 //查看用户的微薄
 function getUserTimeline(screen_name){
     var c_user = getUser(CURRENT_USER_KEY);
@@ -433,7 +485,7 @@ function getUserTimeline(screen_name){
     var m = 'user_timeline';
     sinaApi[m](params, function(sinaMsgs, textStatus){
         if(sinaMsgs && sinaMsgs.length > 0){
-            var t = $(".tabs .tab-user_timeline");
+            var t = $("#tl_tabs .tab-user_timeline");
             //添加当前激活的状态
             t.siblings().removeClass('active').end()
                     .addClass('active');
@@ -631,7 +683,11 @@ function scrollPaging(){
     var list_warp = $(c_t + ' .list_warp');
     h = h - list_warp.height();
     if(list_warp.scrollTop() >= h){
-        readMore(tl);
+        if(tl == 'followers'){ //粉丝列表特殊处理
+            readMoreFans();
+        }else{
+            readMore(tl);
+        }
     }
 };
 
@@ -639,6 +695,12 @@ function initScrollPaging(){
     $(".list_warp").scroll(function(){
         scrollPaging();
     });
+};
+
+function readMoreFans(){
+    var t = $("#fans_tab .active").attr('t');
+    var cursor = NEXT_CURSOR[t];
+    getFansList(t, cursor);
 };
 
 function readMore(t){

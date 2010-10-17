@@ -30,7 +30,7 @@ function setMaxMsgId(t, id){
 
 var friendships = {
     create: function(user_id, callback){ //更随某人
-        params = {user_id:user_id};
+        var params = {user_id:user_id};
         sinaApi.friendships_create(params, function(user_info, textStatus, statuCode){
             if(textStatus != 'error' && user_info.id){
                 showMsg('跟随 "' + user_info.screen_name + '" 成功');
@@ -40,7 +40,8 @@ var friendships = {
             hideLoading();
         });
     },
-    destroy: function(user_id){ //取消更随某人
+    destroy: function(user_id, callback){ //取消更随某人
+        var params = {user_id:user_id};
         sinaApi.friendships_destroy(params, function(user_info, textStatus, statuCode){
             if(textStatus != 'error' && user_info.id){
                 showMsg('你已经取消跟随 "' + user_info.screen_name + '"');
@@ -51,6 +52,7 @@ var friendships = {
         });
     },
     show: function(user_id){ //查看与某人的更随关系
+        var params = {user_id:user_id};
         sinaApi.friendships_show(params, function(sinaMsgs, textStatus){});
     }
 }; 
@@ -162,6 +164,7 @@ function checkTimeline(t, p){
 // @t : 获取timeline的类型
 // @p : 要附加的请求参数,类型为{}
 function getTimelinePage(t, p){
+    if(t == 'followers'){ return; } //忽略粉丝列表
     if(isDoChecking(t, 'paging')){ return; }
     var c_user = getUser(CURRENT_USER_KEY);
     if(!c_user){

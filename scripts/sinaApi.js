@@ -19,6 +19,7 @@ var apiUrl = {
         user_timeline:          api_domain_sina + '/statuses/user_timeline' + result_format,
         mentions:               api_domain_sina + '/statuses/mentions' + result_format,
         followers:              api_domain_sina + '/statuses/followers' + result_format,
+        friends:                api_domain_sina + '/statuses/friends' + result_format,
         favorite:               api_domain_sina + '/favorite' + result_format,
         favorites_create:       api_domain_sina + '/favorites/create' + result_format,
         favorites_destroy:      api_domain_sina + '/favorites/destroy/{id}' + result_format,
@@ -108,6 +109,16 @@ var sinaApi = {
 		if(!callbackFn) return;
         var params = {
             url: apiUrl.sina.followers,
+            type: 'get',
+            data: (data||{})
+        };
+        _sendRequest(params, callbackFn);
+	},
+
+    friends: function(data, callbackFn){
+		if(!callbackFn) return;
+        var params = {
+            url: apiUrl.sina.friends,
             type: 'get',
             data: (data||{})
         };

@@ -27,6 +27,9 @@ function bildMsgLi(sinaMsg, t){
     try{
         var c_user = getUser();
         var user = sinaMsg.user || sinaMsg.sender;
+        if(t == 'friends' || t == 'followers'){ //粉丝列表
+            user = sinaMsg;
+        }
         if(c_user.id == user.id){
             sinaMsg.myTweet = true;
         }
@@ -50,7 +53,7 @@ function bildMsgLi(sinaMsg, t){
         };
 
         var rt_status = sinaMsg.retweeted_status || sinaMsg.status;
-        if(rt_status){
+        if(rt_status && rt_status.user){
             crlBtn.rtRepostBtn = '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + rt_status.user.screen_name + '\',' + rt_status.id + ');" title="转发这条微博">转</a>';
             crlBtn.rtCommentBtn = '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + rt_status.user.screen_name + '\',' + rt_status.id + ');" title="点击添加评论">评</a>';
         }
@@ -134,9 +137,13 @@ function bildMsgLi(sinaMsg, t){
                         tweet: sinaMsg,
                         btn: crlBtn
                        };
-        var r = Shotenjin.render(TEMPLATE, context);
+        var tp = TEMPLATE;
+        if(t == 'friends' || t == 'followers'){
+            tp = TEMPLATE_FANS;
+        }
+        var r = Shotenjin.render(tp, context);
     }catch(err){
-        console.log(err);
+        console.log(JSON.stringify(err));
         return '';
     }
     sinaMsg.readed = true;
@@ -152,7 +159,19 @@ function buildUserInfo(user){
                    };
     var r = Shotenjin.render(TEMPLATE_USER_INFO, context);
     return r;
-}
+};
+
+//生成粉丝信息
+function buildFansLi(user, t){
+    var context = {
+                    t: t,
+                    provinces: provinces,
+                    getUserCountsInfo: getUserCountsInfo,
+                    user: user
+                   };
+    var r = Shotenjin.render(TEMPLATE_FANS, context);
+    return r;
+};
 
 /**
  * 生成评论列表
@@ -184,6 +203,7 @@ function getUserCountsInfo(user){
  * 处理内容
  */
 var processMsg = function (str) {
+    if(!str){ return ''; }
     //str = ubbCode(str);
     //str = str.replace(/(http:\/\/[\w|\.|\/|\-|\=|\+|\?|\%|#]+)/g, '<a target="_blank" href="$1" title="$1">$1</a>');
     var re = new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&\-/#=;:!\\+]+)\\s*(?:\\](.+)\\[/url\\]|)', 'ig');
