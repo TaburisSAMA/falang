@@ -34,7 +34,9 @@ var apiUrl = {
         direct_messages:        api_domain_sina + '/direct_messages' + result_format, 
         new_message:            api_domain_sina + '/direct_messages/new' + result_format,
         verify_credentials:     api_domain_sina + '/account/verify_credentials' + result_format,
-        user_show:              api_domain_sina + '/users/show' + result_format,
+        friendships_create:     api_domain_sina + '/friendships/create' + result_format,
+        friendships_destroy:    api_domain_sina + '/friendships/destroy' + result_format,
+        friendships_show:       api_domain_sina + '/friendships/show' + result_format,
 
         detailUrl:        domain_sina + '/jump?aid=detail&twId=',
         searchUrl:        domain_sina + '/search/'
@@ -253,6 +255,36 @@ var sinaApi = {
         var params = {
             url: apiUrl.sina.comment_destroy.replace('{id}', data.id),
             type: 'post',
+            data: (data||{})
+        };
+        _sendRequest(params, callbackFn);
+    },
+
+    friendships_create: function(data, callbackFn){
+        if(!callbackFn) return;
+        var params = {
+            url: apiUrl.sina.friendships_create,
+            type: 'post',
+            data: (data||{})
+        };
+        _sendRequest(params, callbackFn);
+    },
+
+    friendships_destroy: function(data, callbackFn){
+        if(!callbackFn) return;
+        var params = {
+            url: apiUrl.sina.friendships_destroy,
+            type: 'post',
+            data: (data||{})
+        };
+        _sendRequest(params, callbackFn);
+    },
+
+    friendships_show: function(data, callbackFn){
+        if(!callbackFn) return;
+        var params = {
+            url: apiUrl.sina.friendships_show,
+            type: 'get',
             data: (data||{})
         };
         _sendRequest(params, callbackFn);

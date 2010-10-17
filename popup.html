@@ -56,37 +56,37 @@
 	  <div id='friends_timeline_timeline' class="list_p">
 		<div class="list_warp">
 			<ul class="list"></ul>
-			<a href="javascript:void(0);" id="friends_timelineReadMore" class="readMore" onclick="readMore('friends_timeline');">更多</a>
+			<!-- <a href="javascript:void(0);" id="friends_timelineReadMore" class="readMore" onclick="readMore('friends_timeline');">更多</a> -->
 		</div>
 	  </div>
 	  <div id="mentions_timeline" class="list_p" style="display:none;">
 		<div class="list_warp">
 			<ul class="list"></ul>
-			<a href="javascript:void(0);" id="mentionsReadMore" class="readMore" onclick="readMore('mentions');">更多</a>
+			<!-- <a href="javascript:void(0);" id="mentionsReadMore" class="readMore" onclick="readMore('mentions');">更多</a> -->
 		</div>
 	  </div>
 	  <div id="comments_timeline_timeline" class="list_p" style="display:none;">
 		<div class="list_warp">
 			<ul class="list"></ul>
-			<a href="javascript:void(0);" id="comments_timelineReadMore" class="readMore" onclick="readMore('comments_timeline');">更多</a>
+			<!-- <a href="javascript:void(0);" id="comments_timelineReadMore" class="readMore" onclick="readMore('comments_timeline');">更多</a> -->
 		</div>
 	  </div>
 	  <div id="direct_messages_timeline" class="list_p" style="display:none;">
 		<div class="list_warp">
 			<ul class="list"></ul>
-			<a href="javascript:void(0);" id="direct_messagesReadMore" class="readMore" onclick="readMore('direct_messages');">更多</a>
+			<!-- <a href="javascript:void(0);" id="direct_messagesReadMore" class="readMore" onclick="readMore('direct_messages');">更多</a> -->
 		</div>
 	  </div>
 	  <div id="followers_timeline" class="list_p" style="display:none;">
 		<div class="list_warp">
 			<ul class="list"></ul>
-			<a href="javascript:void(0);" id="followersReadMore" class="readMore" onclick="readMore('followers');">更多</a>
+			<!-- <a href="javascript:void(0);" id="followersReadMore" class="readMore" onclick="readMore('followers');">更多</a> -->
 		</div>
 	  </div>
 	  <div id="user_timeline_timeline" class="list_p" style="display:none;">
 		<div class="list_warp">
 			<ul class="list"></ul>
-			<a href="javascript:void(0);" id="user_timelineReadMore" class="readMore" onclick="readMore('user_timeline');">更多</a>
+			<!-- <a href="javascript:void(0);" id="user_timelineReadMore" class="readMore" onclick="readMore('user_timeline');">更多</a> -->
 		</div>
 	  </div>
 	  
@@ -260,7 +260,7 @@
 				<div class="user_info">
 					<div class="userName"><a href="http://t.sina.com.cn/#{user.domain||user.id}">#{user.screen_name}<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
 					</a>　
-					<a class="follow" href="javascript:"><span class="plus">+</span>加关注</a>
+					<a class="follow" href="javascript:" onclick="f_create(#{user.id}, this)"><span class="plus">+</span>加关注</a>
 					</div>
 					<p>
 						<img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 

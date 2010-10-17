@@ -20,13 +20,40 @@ function getMaxMsgId(t){
     var c_user = getUser(CURRENT_USER_KEY);
     var _key = c_user.userName + t + '_max_msg_id';
     return MAX_MSG_ID[_key];
-}
+};
 
 function setMaxMsgId(t, id){
     var c_user = getUser(CURRENT_USER_KEY);
     var _key = c_user.userName + t + '_max_msg_id';
     MAX_MSG_ID[_key] = Number(id)-1;
-}
+};
+
+var friendships = {
+    create: function(user_id, callback){ //更随某人
+        params = {user_id:user_id};
+        sinaApi.friendships_create(params, function(user_info, textStatus, statuCode){
+            if(textStatus != 'error' && user_info.id){
+                showMsg('跟随 "' + user_info.screen_name + '" 成功');
+                if(callback){ callback(user_info, textStatus, statuCode); }
+                return;
+            }
+            hideLoading();
+        });
+    },
+    destroy: function(user_id){ //取消更随某人
+        sinaApi.friendships_destroy(params, function(user_info, textStatus, statuCode){
+            if(textStatus != 'error' && user_info.id){
+                showMsg('你已经取消跟随 "' + user_info.screen_name + '"');
+                if(callback){ callback(user_info, textStatus, statuCode); }
+                return;
+            }
+            hideLoading();
+        });
+    },
+    show: function(user_id){ //查看与某人的更随关系
+        sinaApi.friendships_show(params, function(sinaMsgs, textStatus){});
+    }
+}; 
 
 //获取最新的(未看的)微博
 // @t : 获取timeline的类型
@@ -150,7 +177,7 @@ function getTimelinePage(t, p){
     if(max_id){
         params['max_id'] = max_id;
     }
-    if(p}{
+    if(p){
         for(var key in p){
             params[key] = p[key];
         }
@@ -229,6 +256,7 @@ function setDoChecking(t, c_t, v){
     window[c_t][t+'_time'] = new Date().getTime();
 }
 
+//在页面显示提示信息
 //@userId: 插件当前登录的用户ID
 function showNewMsg(msgs, t, userId){
     if(isShowInPage(t)){

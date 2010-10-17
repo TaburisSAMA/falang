@@ -2,7 +2,7 @@
 var t_changeUser = '<table id="changeUser" class="tab-none" cellspacing="0" ><tr><td>'
             + '<span class="userName" title="点击切换用户">{{screen_name}}</span>'
             + '<div style="display:none;"><ul>{{user_list}}</lu></div></td>'
-            + '<td><a target="_blank" href="http://t.sina.com.cn/{{domain}}" title="点击打开我的主页"><img style="width:24px;height:24px;" class="userImg" src="{{profile_image_url}}" /></a></td></tr></table>';
+            + '<td><a target="_blank" class="user_home" href="http://t.sina.com.cn/{{domain}}" title="点击打开我的主页"><img style="width:24px;height:24px;" class="userImg" src="{{profile_image_url}}" /></a></td></tr></table>';
 
 var fawave = {};
 //var PAGE_SIZE = 20;
@@ -14,7 +14,9 @@ function setTimelineOffset(t, offset){
     var n = getTimelineOffset(t);
     timeline_offset[t] = n + offset;
 }
-
+function resetTimelineOffset(t){
+    timeline_offset[t] = PAGE_SIZE;
+}
 //var friendsTimeline_offset = replys_offset = messages_offset = PAGE_SIZE;
 
 function initOnLoad(){
@@ -64,6 +66,8 @@ function init(){
     initIamDoing();
 
     //callCheckNewMsg();
+
+    initScrollPaging();
 
     $(window).unload(function(){ initOnUnload(); }); 
 };
@@ -291,6 +295,7 @@ function initChangeUserList(){
         if(li && li.length>1){
             c_user.screen_name = c_user.screen_name || c_user.userName;
             c_user.user_list = li.join('');
+            c_user.domain = c_user.domain || c_user.id;
             $('.tabs').append(formatText(t_changeUser, c_user));
             $("#changeUser .userName").click(function(){
                 $("#changeUser").find('div').toggle();
@@ -300,6 +305,7 @@ function initChangeUserList(){
                 changeUser(li.text());
                 li.siblings().removeClass('current').end()
                 .addClass('current');
+                $("#changeUser").find('div').toggle();
             });
         }else if(li){
             c_user.screen_name = c_user.screen_name || c_user.userName;
@@ -309,6 +315,36 @@ function initChangeUserList(){
 
     }
 };
+
+function changeUser(userName){
+    friendsTimeline_offset = replys_offset = messages_offset = PAGE_SIZE;//复位分页
+    var userList = localStorage.getObject(USER_LIST_KEY);
+    var to_user = null;
+    for(i in userList){
+        var user = userList[i];
+        if(user.userName.toLowerCase() == userName.toLowerCase()){
+            to_user = user;
+        }
+    }
+    if(to_user){
+        for(i in T_LIST){
+            $("#" + T_LIST[i] + '_timeline .readMore').hide();
+            $("#" + T_LIST[i] + '_timeline .list').html('');
+        }
+        $("#changeUser .userName").html(to_user.screen_name || to_user.userName);
+        $("#changeUser .userImg").attr('src', to_user.profile_image_url || '');
+        $("#changeUser .user_home").attr('href', "http://t.sina.com.cn/" + (to_user.domain || to_user.id));
+        setUser(to_user);
+        for(i in T_LIST){
+            getSinaTimeline(T_LIST[i]);
+        }
+        //getSinaFriendsTimeline();
+        //getSinaReplies();
+        //getSinaMessages();
+        var b_view = getBackgroundView();
+        b_view.onChangeUser();
+    }
+}; // <<<<<<<<<<<<<========
 
 function addUnreadCountToTabs(){
     var ur = 0;
@@ -343,6 +379,30 @@ function initMsgHover(){
 
 //====>>>>>>>>>>>>>>>>>>>>>>
 
+// 用户关系：跟随、取消跟随
+function f_create(user_id, ele){
+    if(ele){ $(ele).hide(); }
+    showLoading();
+    var b_view = getBackgroundView();
+    b_view.friendships.create(user_id, function(user_info, textStatus, statuCode){
+        if(textStatus == 'error' || !user_info.id){
+            if(ele){ $(ele).show(); }
+        }
+    });
+};
+
+function f_destroy(user_id, ele){
+    if(ele){ $(ele).hide(); }
+    showLoading();
+    var b_view = getBackgroundView();
+    b_view.friendships.destroy(user_id, function(user_info, textStatus, statuCode){
+        if(textStatus == 'error' || !user_info.id){
+            if(ele){ $(ele).show(); }
+        }
+    });
+};
+//====>>>>>>>>>>>>>>>>>>>>>>
+
 //滚动条位置
 var SCROLL_TOP_CACHE = {};
 //@t : timeline类型
@@ -368,7 +428,7 @@ function getUserTimeline(screen_name){
         return;
     }
     showLoading();
-    var params = {count:60, screen_name:screen_name};
+    var params = {count:40, screen_name:screen_name};
     
     var m = 'user_timeline';
     sinaApi[m](params, function(sinaMsgs, textStatus){
@@ -390,7 +450,7 @@ function getUserTimeline(screen_name){
 
             addTimelineMsgs(sinaMsgs, m);
 
-            $("#user_timelineReadMore").hide();
+            hideReadMore('user_timeline');
 
             var user = sinaMsgs[0].user || sinaMsgs[0].sender;
             var userinfo_html = buildUserInfo(user);
@@ -544,17 +604,46 @@ function commentPage(ele, tweetId, is_pre){
 //<<<<<<<<<<<======
 
 //======>>>>>>> 更多(分页) <<<<<<<
+var CAN_SCROLL_PAGING = {};
+//有分页
 function showReadMore(t){
-    $("#" + t + "ReadMore").css({display:"block"});
+    //$("#" + t + "ReadMore").css({display:"block"});
+    CAN_SCROLL_PAGING[t] = true;
+};
+//正在获取分页或者没有分页内容了
+function hideReadMore(t){
+    //$("#" + t + "ReadMore").hide();
+    CAN_SCROLL_PAGING[t] = false;
+};
+//是否可以分页
+function isCanReadMore(t){
+    //$("#" + t + "ReadMore").hide();
+    return CAN_SCROLL_PAGING[t] || false;
 };
 
-function hideReadMore(t){
-    $("#" + t + "ReadMore").hide();
-}
+function scrollPaging(){
+    var c_t = window.currentTab;
+    var tl = c_t.replace('#','').replace(/_timeline$/i,'');
+    if(!isCanReadMore(tl)){
+        return;
+    }
+    var h = $(c_t + ' .list').height();
+    var list_warp = $(c_t + ' .list_warp');
+    h = h - list_warp.height();
+    if(list_warp.scrollTop() >= h){
+        readMore(tl);
+    }
+};
+
+function initScrollPaging(){
+    $(".list_warp").scroll(function(){
+        scrollPaging();
+    });
+};
 
 function readMore(t){
-    var moreEle = $("#" + t + "ReadMore");
     hideReadMore(t);
+    var moreEle = $("#" + t + "ReadMore");
     showLoading();
     var _b_view = getBackgroundView();
     var _key = getUser().userName + t + '_tweets';
@@ -592,6 +681,7 @@ function addTimelineMsgs(msgs, t){
     
     var li = $('.tab-' + t);
     if(!li.hasClass('active')){
+        //清空，让下次点tab的时候重新取
         $("#" + t + "_timeline ul.list").html('');
         var c_user = getUser(CURRENT_USER_KEY), _msg_user = null, _unreadCount = 0;
         for(i in msgs){
@@ -607,6 +697,7 @@ function addTimelineMsgs(msgs, t){
         }
         return false;
     }else{
+        setTimelineOffset(t, msgs.length);
         var html = '';
         var ids = [];
         var _unreadCount = 0;
@@ -649,35 +740,6 @@ function addPageMsgs(msgs, t){
     hideLoading();
 };
 //<<<<<<<<<<<<<<<<====
-
-function changeUser(userName){
-    friendsTimeline_offset = replys_offset = messages_offset = PAGE_SIZE;//复位分页
-    var userList = localStorage.getObject(USER_LIST_KEY);
-    var to_user = null;
-    for(i in userList){
-        var user = userList[i];
-        if(user.userName.toLowerCase() == userName.toLowerCase()){
-            to_user = user;
-        }
-    }
-    if(to_user){
-        for(i in T_LIST){
-            $("#" + T_LIST[i] + '_timeline .readMore').hide();
-            $("#" + T_LIST[i] + '_timeline .list').html('');
-        }
-        $("#changeUser .userName").html(to_user.screen_name || to_user.userName);
-        $("#changeUser .userImg").attr('src', to_user.profile_image_url || '');
-        setUser(to_user);
-        for(i in T_LIST){
-            getSinaTimeline(T_LIST[i]);
-        }
-        //getSinaFriendsTimeline();
-        //getSinaReplies();
-        //getSinaMessages();
-        var b_view = getBackgroundView();
-        b_view.onChangeUser();
-    }
-}
 
 function sendSinaMsg(msg, isReply){
     var btn, txt, data;
@@ -1012,7 +1074,7 @@ function delDirectMsg(ele, screen_name, tweetId){//删除私信
         }
     });
 };
-function addFavorites(ele, screen_name, tweetId){//删除私信
+function addFavorites(ele, screen_name, tweetId){//添加收藏
     if(!tweetId){return;}
     showLoading();
     var _a = $(ele);
@@ -1044,7 +1106,7 @@ function addFavorites(ele, screen_name, tweetId){//删除私信
         }
     });
 };
-function delFavorites(ele, screen_name, tweetId){//删除私信
+function delFavorites(ele, screen_name, tweetId){//删除收藏
     if(!tweetId){return;}
     showLoading();
     var _a = $(ele);
