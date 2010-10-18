@@ -54,6 +54,8 @@ li { line-height:16px;}
 	background:-webkit-gradient(linear,0 0,0 100%,from(#219A44),to(#0C7823));
 }
 
+.list li{position:relative;}
+
 #txtContent{resize: none;}
 #diguReplies { display:none;}
 
@@ -193,7 +195,7 @@ li { line-height:16px;}
 	color:#000;
 	position:absolute;
 	z-index:9999;
-	margin:-3px 0 0 -8px;
+	margin:-3px 0 0;
 	padding:6px;
 	background:#fff;
 	-webkit-border-radius:3px;
@@ -205,10 +207,12 @@ li { line-height:16px;}
 	padding:2px;
 	/*margin-right: 8px;*/
 }
+.tipbox .user_info img{border:none;}
 .tipbox .user_info, 
 .userinfo_detail .user_info, 
-.fans .user_info{padding-left: 62px; min-height:55px;}
-
+.fans .user_info{
+	padding-left: 62px; min-height:55px;
+}
 .tipbox .des, .userinfo_detail .des{color:#888;}
 
 /* userinfo_detail */

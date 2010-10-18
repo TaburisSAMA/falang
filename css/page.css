@@ -15,6 +15,7 @@ body #fa_wave_msg_wrap .close_fawave_remind{
 }
 body #fa_wave_msg_wrap .msgRemind{
    width: 350px;
+   min-height:50px;
    margin: 2px;
    background: #F8F8F8;
    color: #2B4A78;/*#a00;*/

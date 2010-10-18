@@ -155,9 +155,32 @@
 		<textarea id="tp_time_line">
 			<li class="tweetItem showCounts_#{tweet.id} <?js if (!tweet.readed) { ?>unread-item<?js } ?> <?js if (tweet.myTweet) { ?>myTweet<?js } ?> " id="tweet#{tweet.id}" did="#{tweet.id}">
 				<div class="usericon">
-					<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}');" rhref="http://t.sina.com.cn/#{user.domain||user.id}" title="#{user.description}">
-						<img src="#{user.profile_image_url.replace('24x24', '48x48')}">
-					</a>
+				    <span class="showtip">
+						<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}');" rhref="http://t.sina.com.cn/#{user.domain||user.id}" title="#{user.description}">
+							<img src="#{user.profile_image_url.replace('24x24', '48x48')}">
+						</a>
+						<div class="tipbox">
+							<div>
+								<div class="user_head"><img src="#{user.profile_image_url}" /></div>
+								<div class="user_info">
+									<p><a href="javascript:getUserTimeline('#{user.screen_name}');" 
+										rhref="http://t.sina.com.cn/#{user.domain||user.id}">#{user.screen_name}
+										<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
+									</a></p>
+									<p>
+										<img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 
+											title="<?js if(user.gender == 'm'){ ?>男<?js }else if(user.gender == 'f'){ ?>女<?js }else{ ?>性别未知<?js } ?>" />
+										 #{provinces[user.province].name}, #{provinces[user.province]["citys"][user.city]}</p>
+									<p>关注: <span>#{user.friends_count}</span>个　
+										粉丝: <span>#{user.followers_count}</span>个</p>
+									<p>微博: <span>#{user.statuses_count}</span>条</p>
+								</div>
+							</div>
+							<?js if(user.description){ ?>
+							<div class="des">简介：#{user.description}</div>
+							<?js } ?>
+						</div>
+				    </span>
 				</div>
 				<div class="mainContent">
 					<span class="arrow_r"></span>
@@ -272,6 +295,9 @@
 					<p>关注: <span>#{user.friends_count}</span>个　 
 						粉丝: <span>#{user.followers_count}</span>个　 
 						微博: <span>#{user.statuses_count}</span>条</p>
+					<?js if(user.url){ ?>
+					<p>博客：<a href="#{user.url}">#{user.url}</a></p>
+					<?js } ?>
 				</div>
 				<?js if(user.description){ ?>
 				<div class="des">简介：#{user.description}</div>
@@ -298,6 +324,9 @@
 					<p>关注: <span>#{user.friends_count}</span>个　 
 						粉丝: <span>#{user.followers_count}</span>个　 
 						微博: <span>#{user.statuses_count}</span>条</p>
+					<?js if(user.url){ ?>
+					<p>博客：#{user.url}</p>
+					<?js } ?>
 				</div>
 				<?js if(user.description){ ?>
 				<div class="des">简介：#{user.description}</div>

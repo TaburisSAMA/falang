@@ -1,6 +1,6 @@
-div.usericon {float:left; padding:2px 0 0 2px;}
+div.usericon {float:left; padding:2px 0 0;}
 div.usericon img {border: solid 1px #A0A0A0}
-div.mainContent {margin:0 2px 0 60px;} 
+div.mainContent {margin:0 0 0 60px;} 
 div.userName {font-weight:bold;} 
 div.userName a {color:green;}
 .msgInfo {color:#888;}
@@ -11,7 +11,7 @@ div.msgInfo {padding-top:3px;}
 .list li div.retweeted .commentCounts a{color:green;font-weight:normal;}
 .list_p{margin:0;padding:0;}
 .list_warp { margin:0; height: 470px; overflow:auto;} 
-.list li {border-bottom:1px solid #ddd; padding:5px 0 5px 0;overflow:hidden;}
+.list li {border-bottom:1px solid #ddd; padding:5px 0; margin: 0 2px; /*overflow:hidden;*/}
 .list li .msg a, .comments a{color:#F77004;}
 .unread-item{background-color: #FFFFDF;}
 .list li.activeTweet{background-color: #FFFFEF;color:black;}
@@ -26,5 +26,3 @@ div.msgInfo {padding-top:3px;}
 .list .comments .replyComment{float:right;color:green;}
 .list .comments .comment_paging a{color:green;}
 .list .comments .comment_paging .next_page{float:right;}
-
-.showtip:hover .tipbox{display:none;}

@@ -1,5 +1,5 @@
 div.usericon {
-	float:left; margin:2px 0 0 2px;
+	float:left; margin:2px 0 0;
 }
 .myTweet div.usericon{float:right;}
 div.usericon:hover{background:none;-webkit-box-shadow:0 0 5px #aaa;}
@@ -21,7 +21,7 @@ div.usericon img {
 }
 div.mainContent {
 	line-height: 18px;
-	margin:0 2px 0 60px;
+	margin:0 0 0 60px;
 	color:#222;
 	position:relative;
 	background:#fff;
@@ -57,7 +57,7 @@ div.msgInfo {padding-top:3px;}
 .list li div.retweeted .edit a{color:green;font-weight:bold;}
 .list li div.retweeted .commentCounts a{color:green;font-weight:normal;}
 .list_p{ background:#fff; margin:0;padding:0;}
-.list li { padding:5px 0 5px 0; /*overflow:hidden;*/}
+.list li { padding:5px 0; margin: 0 2px; /*overflow:hidden;*/}
 .list li .msg a, .comments a{color:#F77004;}
 .list li .msg a:hover, .comments a:hover{color:#fff;background:#369;text-decoration:none;}
 .unread-item{}
@@ -74,3 +74,5 @@ div.msgInfo {padding-top:3px;}
 .list .comments .replyComment{float:right;color:green;}
 .list .comments .comment_paging a{color:green;}
 .list .comments .comment_paging .next_page{float:right;}
+
+.myTweet .showtip:hover .tipbox{display:none;}
