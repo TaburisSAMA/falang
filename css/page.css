@@ -14,6 +14,7 @@ body #fa_wave_msg_wrap .close_fawave_remind{
 	text-align: center;
 }
 body #fa_wave_msg_wrap .msgRemind{
+   text-align:left;
    width: 350px;
    min-height:50px;
    margin: 2px;
