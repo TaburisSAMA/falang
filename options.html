@@ -21,10 +21,10 @@
 		<a target="_blank" href="http://t.sina.com.cn/falang" title="跟随发微"><img src="icons/icon64.png" /></a>
 	</div>
 	<h3>用户账号设置</h3>
-	<div class="info">用户、密码为<b style="color:red;">明文</b>保存在本地。在公共电脑上使用时请慎重。对于OAuth还不熟悉，找时间再改吧。</div>
+	<div class="info">用户、密码保存在本地。在公共电脑上使用时请慎重。</div>
 	<table>
 		<tr>
-			<td><select id="account-list" size="6" style="width:120px;"></select></td>
+			<td><select id="account-list" size="6" style="width:220px;"></select></td>
 			<td>
 				<input type="button" id="refresh-account" value="更新用户信息" /><br/>
 				<input type="button" id="show-new-account" value="添加新用户" /><br/>
@@ -61,9 +61,11 @@
 				<label>获取信息间隔时间：</label>
 				<span>
 					<select id="selRefreshTime">
+						<option value="0.5">每30秒</option>
+						<option value="0.75">每45秒</option>
 						<option value="1">每1分钟</option>
-						<option value="2">每2分钟</option>
-						<option value="3" selected="true">每3分钟</option>
+						<option value="2" selected="true">每2分钟</option>
+						<option value="3">每3分钟</option>
 						<option value="5">每5分钟</option>
 						<option value="10">每10分钟</option>
 						<option value="20">每20分钟</option>

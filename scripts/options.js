@@ -240,7 +240,10 @@ function saveAll(){
     var t = $("#selRefreshTime").val(); //刷新频率
     if(t){
         localStorage.setObject(REFRESH_TIME_KEY, t);
-
+        var b_view = getBackgroundView();
+        if(b_view){
+            b_view.refreshInterval();
+        }
     }
     var num = $("#selLocalStorageNum").val();
     if(num){
@@ -377,5 +380,6 @@ function cleanLocalStorageData(){
         b_view.MAX_MSG_ID = {};
         b_view.checking={};
         b_view.paging={};
+        b_view.refreshInterval();
     }
 }

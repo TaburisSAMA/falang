@@ -2,7 +2,8 @@
 
 */
 
-var SOURCE = "2721776383"; //"3097082413";(旧FaWave) //encodeURIComponent('');
+var SOURCE = "3097082413"; //encodeURIComponent('');
+var SOURCE2 = "2721776383";
 
 var result_format = '.json';
 
@@ -70,6 +71,7 @@ var sinaApi = {
         var params = {
             url: apiUrl.sina.friends_timeline,
             type: 'get',
+            source: SOURCE2,
             data: (data||{})
         };
         _sendRequest(params, callbackFn);
@@ -90,6 +92,7 @@ var sinaApi = {
         var params = {
             url: apiUrl.sina.comments_timeline,
             type: 'get',
+            source: SOURCE2,
             data: (data||{})
         };
         _sendRequest(params, callbackFn);
@@ -100,6 +103,7 @@ var sinaApi = {
         var params = {
             url: apiUrl.sina.mentions,
             type: 'get',
+            source: SOURCE2,
             data: (data||{})
         };
         _sendRequest(params, callbackFn);
@@ -180,6 +184,7 @@ var sinaApi = {
         var params = {
             url: apiUrl.sina.direct_messages,
             type: 'get',
+            source: SOURCE2,
             data: (data||{})
         };
         _sendRequest(params, callbackFn);
@@ -321,7 +326,11 @@ function _sendRequest(params, callbackFn){
         callbackFn({}, 'error', '400');
         return;
     }
-    params.data['source'] = SOURCE;
+    if(params.source){
+        params.data['source'] = params.source;
+    }else{
+        params.data['source'] = SOURCE;
+    }
     //params.data['count'] = 100;
     if(params.data.status){
         params.data.status = encodeURIComponent(params.data.status);
