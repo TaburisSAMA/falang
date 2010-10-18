@@ -207,7 +207,7 @@ li { line-height:16px;}
 	padding:2px;
 	/*margin-right: 8px;*/
 }
-.tipbox .user_info img{border:none;}
+.tipbox .user_info img{border:none; -webkit-box-shadow: none;}
 .tipbox .user_info, 
 .userinfo_detail .user_info, 
 .fans .user_info{
