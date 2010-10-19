@@ -932,7 +932,7 @@ function callCheckNewMsg(){
 }
 
 function showMsgInput(){
-    var h = WH[1] - 40 - 79;
+    var h = WH[1] - 40 - 87;
     $(".list_warp").css('height', h);
     $("#doing").removeClass("doing").appendTo('#doingWarp');
     $("#txtContent").attr('rows', 5).removeClass('padDoing');
