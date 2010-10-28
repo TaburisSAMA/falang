@@ -984,8 +984,8 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
     $('#replyUserName').val(userName);
     $('#ye_dialog_title').html('转发@' + userName + ' 的信息');
 
-    $('#chk_sendOneMore').attr("checked", false).val(tweetId);
-    $('#txt_sendOneMore').text('同时给 @' + userName + ' 评论');
+    $('#chk_sendOneMore').attr("checked", false).val(tweetId).show();
+    $('#txt_sendOneMore').text('同时给 @' + userName + ' 评论').show();
     if(rtUserName && reTweetId){
         $('#chk_sendOneMore2').attr("checked", false).val(reTweetId).show();
         $('#txt_sendOneMore2').text('同时给 @' + rtUserName + ' 评论').show();
@@ -1024,8 +1024,8 @@ function doComment(ele, userName, tweetId, replyUserName, cid){//评论 cid:回�
     $('#ye_dialog_window').show();
     var _txt = replyUserName ? ('回复 @'+replyUserName+':') : '';
 
-    $('#chk_sendOneMore').val(tweetId);
-    $('#txt_sendOneMore').text('同时发一条微博');
+    $('#chk_sendOneMore').attr("checked", false).val(tweetId).show();
+    $('#txt_sendOneMore').text('同时发一条微博').show();
     $('#chk_sendOneMore2').val('').hide();
     $('#txt_sendOneMore2').text('').hide();
 
