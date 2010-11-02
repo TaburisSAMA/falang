@@ -115,7 +115,7 @@ function sendSinaMsg(){
     builder += crlf; 
 
     /* Append form data. */
-    builder += msg;
+    builder += encodeURIComponent(msg);
     builder += crlf;
 
     /* Write boundary. */

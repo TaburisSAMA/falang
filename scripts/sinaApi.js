@@ -29,6 +29,7 @@ var apiUrl = {
         upload:                 api_domain_sina + '/statuses/upload' + result_format,
         repost:                 api_domain_sina + '/statuses/repost' + result_format,
         comment:                api_domain_sina + '/statuses/comment' + result_format,
+        reply:                  api_domain_sina + '/statuses/reply' + result_format,
         comment_destroy:        api_domain_sina + '/statuses/comment_destroy/{id}' + result_format,
         comments:               api_domain_sina + '/statuses/comments' + result_format,
         destroy:                api_domain_sina + '/statuses/destroy' + result_format,
@@ -250,6 +251,16 @@ var sinaApi = {
         if(!callbackFn) return;
         var params = {
             url: apiUrl.sina.comment,
+            type: 'post',
+            data: (data||{})
+        };
+        _sendRequest(params, callbackFn);
+    },
+
+    reply: function(data, callbackFn){
+        if(!callbackFn) return;
+        var params = {
+            url: apiUrl.sina.reply,
             type: 'post',
             data: (data||{})
         };

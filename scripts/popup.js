@@ -904,7 +904,9 @@ function sendComment(msg, commentTweetId, notSendMord){
     
     btn.attr('disabled','true');
     txt.attr('disabled','true');
-    sinaApi.comment(data, function(sinaMsg, textStatus){
+    var m = 'comment';
+    if(cid){ m = 'reply';} //如果是回复别人的微博
+    sinaApi[m](data, function(sinaMsg, textStatus){
         if(sinaMsg.id){
             hideReplyInput();
             txt.val('');
