@@ -83,6 +83,9 @@ function init(){
     var asuwc = getAutoShortUrlWordCount();
     $("#autoShortUrlCount").val(asuwc);
 
+    //初始化是否同步未读提示
+    $("#unread_sync_to_page").attr("checked", getIsSyncUnread());
+
     initSetBadgeText();
     initShowInPage();
     initTheme();
@@ -263,6 +266,8 @@ function saveAll(){
     }else{
         localStorage.setObject(AUTO_SHORT_URL_WORD_COUNT, 15);
     }
+
+    setIsSyncUnread($("#unread_sync_to_page").attr("checked") ? 1 : 0);
 
     saveSetBadgeText();
     saveSetShowInPage();

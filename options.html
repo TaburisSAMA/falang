@@ -47,7 +47,7 @@
 			<input type="hidden" id="edit-account-name" />
 		</li>
 		<li>
-			<label for="account-pwd">密码：</label>
+			<label for="account-pwd">密　码：</label>
 			<input type="password" id="account-pwd" />
 		</li>
 		<li>
@@ -57,12 +57,12 @@
 	<ul>
 </div>
 <div>
-<div>
+<div class="other">
 	<h3>其他设置</h3>
 	<ul>
 		<li>
 			<p>
-				<label>获取信息间隔时间：</label>
+				<label class="title">获取信息间隔时间：</label>
 				<span>
 					<select id="selRefreshTime">
 						<option value="0.5">每30秒</option>
@@ -79,7 +79,7 @@
 			</p>
 		</li>
 		<li>
-			<label>是否自动缩短URL：</label>
+			<label class="title">是否自动缩短URL：</label>
 			<span>
 				<input type="checkbox" name="autoShortUrl" value="1" checked="checked" id="autoShortUrl"><label for="autoShortUrl">自动缩短</label>, 
 				<label for="autoShortUrlCount">URL超过多少个字符自动缩短:</label><input type="text" id="autoShortUrlCount" value="15" />
@@ -87,7 +87,7 @@
 			</span>
 		</li>
 		<li>
-			<p id="set_badge_wrap">未读提示：
+			<p id="set_badge_wrap"><label class="title">未读提示：</label>
 				<input type="checkbox" id="set_badge_friends_timeline" value="1" /><label for="set_badge_friends_timeline">最新微博</label>
 				<input type="checkbox" id="set_badge_mentions" value="1" /><label for="set_badge_mentions">@我的</label>
 				<input type="checkbox" id="set_badge_comments_timeline" value="1" /><label for="set_badge_comments_timeline">评论</label>
@@ -95,7 +95,13 @@
 			</p>
 		</li>
 		<li>
-			<p id="set_show_in_page_wrap">新消息在页面提示：
+			<label class="title">同步设置：</label>
+			<span>
+				<input type="checkbox" id="unread_sync_to_page" value="1" /><label for="unread_sync_to_page">同时将新浪微博页面的未读提示置零</label>
+			</span>
+		</li>
+		<li>
+			<p id="set_show_in_page_wrap"><label class="title">新消息在页面提示：</label>
 				<input type="checkbox" id="set_show_in_page_friends_timeline" value="1" /><label for="set_show_in_page_friends_timeline">最新微博</label>
 				<input type="checkbox" id="set_show_in_page_mentions" value="1" /><label for="set_show_in_page_mentions">@我的</label>
 				<input type="checkbox" id="set_show_in_page_comments_timeline" value="1" /><label for="set_show_in_page_comments_timeline">评论</label>
@@ -104,7 +110,7 @@
 		</li>
 		<li>
 			<p>
-				<label>字体设置：</label>
+				<label class="title">字体设置：</label>
 				<span>
 					<select id="selFont">
 						<option value="微软雅黑">微软雅黑</option>
@@ -125,7 +131,7 @@
 		</li>
 		<li>
 			<p>
-				<label>高宽设置：</label>
+				<label class="title">高宽设置：</label>
 				<span>
 					<label for="set_main_height">高度:</label>
 					<input type="text" id="set_main_height" value="520" />
@@ -134,7 +140,7 @@
 				</span>
 			</li>
 			<li>
-				<label>主题选择：</label>
+				<label class="title">主题选择：</label>
 				<span>
 					<select id="selTheme">
 						<option value="default">默认</option>

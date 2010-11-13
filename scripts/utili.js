@@ -28,6 +28,7 @@ var AUTO_SHORT_URL_WORD_COUNT = 'idi_SHORT_URL_WORD_COUNT'; //URL长度超过多
 
 var SET_BADGE_TEXT = 'idi_SET_BADGE_TEXT'; //设置未读信息提示
 var IS_SHOW_IN_PAGE = 'idi_IS_SHOW_IN_PAGE_'; //新消息是否在页面提示
+var IS_SYNC_TO_PAGE_KEY = 'idi_IS_SYNC_TO_PAGE_KEY'; //已读消息是否和新浪微博页面同步
 
 var THEME_KEY = 'idi_THEME_KEY'; //主题样式的KEY
 var THEME_LIST = {'default':'default', simple:'simple'}; //主题列表
@@ -140,6 +141,9 @@ function setUnreadTimelineCount(count, t, setBadgeText){
 
 function removeUnreadTimelineCount(t){
     localStorage.setObject(getUser().userName + t + UNREAD_TIMELINE_COUNT_KEY, 0);
+    if(getIsSyncUnread()){ //如果同步未读数
+        syncUnreadCountToSinaPage(t);
+    }
     var total = 0;
     for(i in T_LIST){
         if(T_LIST[i]==t){
@@ -154,6 +158,31 @@ function removeUnreadTimelineCount(t){
         chrome.browserAction.setBadgeText({text: total});
     }else{
         chrome.browserAction.setBadgeText({text: ''});
+    }
+    chrome.browserAction.setTitle({title:getTooltip()});
+};
+
+//将新浪微博页面的未读信息数清零
+function syncUnreadCountToSinaPage(t){
+    var tl_type = false;
+    switch(t){
+        case 'comments_timeline':
+            tl_type = 1;
+            break;
+        case 'mentions':
+            tl_type = 2;
+            break;
+        case 'direct_messages':
+            tl_type = 3;
+            break;
+        case 'followers':
+            tl_type = 4;
+            break;
+    }
+    if(tl_type){
+        sinaApi.reset_count({'type':tl_type}, function(users, textStatus, statuCode){
+            //TODO: reset success
+        });
     }
 };
 
@@ -253,6 +282,17 @@ function getFontSize(){
 
 function setFontSize(fontSize){
     localStorage.setObject(FONT_SIZE_KEY, fontSize);
+};
+//<<--
+
+//-- 未读提示同步 --
+function getIsSyncUnread(){
+    var t = localStorage.getObject(IS_SYNC_TO_PAGE_KEY);
+    return t || 0;
+};
+
+function setIsSyncUnread(is_sync){
+    localStorage.setObject(IS_SYNC_TO_PAGE_KEY, is_sync);
 };
 //<<--
 

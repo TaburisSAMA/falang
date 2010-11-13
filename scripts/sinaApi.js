@@ -40,6 +40,7 @@ var apiUrl = {
         friendships_create:     api_domain_sina + '/friendships/create' + result_format,
         friendships_destroy:    api_domain_sina + '/friendships/destroy' + result_format,
         friendships_show:       api_domain_sina + '/friendships/show' + result_format,
+        reset_count:            api_domain_sina + '/statuses/reset_count' + result_format,
 
         detailUrl:        domain_sina + '/jump?aid=detail&twId=',
         searchUrl:        domain_sina + '/search/'
@@ -312,6 +313,16 @@ var sinaApi = {
         var params = {
             url: apiUrl.sina.friendships_show,
             type: 'get',
+            data: (data||{})
+        };
+        _sendRequest(params, callbackFn);
+    },
+
+    reset_count: function(data, callbackFn){
+        if(!callbackFn) return;
+        var params = {
+            url: apiUrl.sina.reset_count,
+            type: 'post',
             data: (data||{})
         };
         _sendRequest(params, callbackFn);
