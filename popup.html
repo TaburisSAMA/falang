@@ -197,7 +197,7 @@
 							#{processMsg(tweet.text)}
 							<?js if(tweet.thumbnail_pic){ ?>
 							<div>
-								<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.bmiddle_pic}" >
+								<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.bmiddle_pic}" original="#{tweet.original_pic}" >
 									<img class="imgicon pic" src="#{tweet.thumbnail_pic}" />
 								</a>
 							</div>
@@ -244,7 +244,7 @@
 								#{processMsg(tweet.retweeted_status.text)}
 								<?js if(tweet.retweeted_status.thumbnail_pic){ ?>
 								<div>
-									<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.retweeted_status.bmiddle_pic}" >
+									<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.retweeted_status.bmiddle_pic}" original="#{tweet.retweeted_status.original_pic}" >
 									<img class="imgicon pic" src="#{tweet.retweeted_status.thumbnail_pic}" /></a>
 								</div>
 								<?js } ?>

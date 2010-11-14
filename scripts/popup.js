@@ -1205,7 +1205,7 @@ function delFavorites(ele, screen_name, tweetId){//删除收藏
 //<<<<<<<<<<<<<=====
 
 function showFacebox(ele){
-    jQuery.facebox({ image: $(ele).attr('bmiddle') })
+    jQuery.facebox({ image: $(ele).attr('bmiddle'), original: $(ele).attr('original') })
 }
 
 //====>>>>

@@ -63,9 +63,10 @@
 (function($) {
   $.facebox = function(data, klass) {
     $.facebox.loading()
-
+    
+    data.original = data.original || '';
     if (data.ajax) fillFaceboxFromAjax(data.ajax)
-    else if (data.image) fillFaceboxFromImage(data.image)
+    else if (data.image) fillFaceboxFromImage(data.image, null, data.original)
     else if (data.div) fillFaceboxFromHref(data.div)
     else if ($.isFunction(data)) data.call($)
     else $.facebox.reveal(data, klass)
@@ -265,11 +266,12 @@
     }
   }
 
-  function fillFaceboxFromImage(href, klass) {
+  function fillFaceboxFromImage(href, klass, original) {
+    if(!original){ original='javascript:'; }
     var image = new Image()
     image.onload = function() {
       showOverlay();
-      $.facebox.reveal('<div class="image"><a target="_blank" href="' + image.src.replace('/bmiddle/','/orignal/') +'">查看原图</a><br/><img src="' + image.src + '" class="cur_min" onclick="$(document).trigger(\'close.facebox\')" /></div>', klass)
+      $.facebox.reveal('<div class="image"><a target="_blank" href="' + original +'">查看原图</a><br/><img src="' + image.src + '" class="cur_min" onclick="$(document).trigger(\'close.facebox\')" /></div>', klass)
     }
     image.src = href
   }
