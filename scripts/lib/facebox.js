@@ -1,3 +1,4 @@
+
 /*
  * Facebox (for jQuery)
  * version: 1.2 (05/05/2008)
@@ -271,7 +272,10 @@
     var image = new Image()
     image.onload = function() {
       showOverlay();
-      $.facebox.reveal('<div class="image"><a target="_blank" href="' + original +'">查看原图</a><br/><img src="' + image.src + '" class="cur_min" onclick="$(document).trigger(\'close.facebox\')" /></div>', klass)
+      $.facebox.reveal('<div style="text-align: center;"><a target="_blank" href="' + original +'">查看原图</a></div><div class="image"><span class="rotate_btn">'
+          + '<a href="javascript:" onclick="$(\'#facebox_see_img\').rotateLeft(90);"><img src="/images/rotate_l.png"></a>'
+          + '<a href="javascript:" onclick="$(\'#facebox_see_img\').rotateRight(90);" style="margin-left:10px;"><img src="/images/rotate_r.png"></a></span>'
+          + '<img id="facebox_see_img" src="' + image.src + '" class="cur_min" onclick="$(document).trigger(\'close.facebox\')" /></div>', klass)
     }
     image.src = href
   }

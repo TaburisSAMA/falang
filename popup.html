@@ -8,6 +8,7 @@
 	<script type="text/javascript" > window.theViewName = 'popup'; </script>
 	<script type="text/javascript" src="scripts/lib/jquery-1.4.js" ></script>
 	<script type="text/javascript" src="scripts/lib/Base64.js" ></script>
+	<script type="text/javascript" src="scripts/lib/jquery.rotate.1-1.js" ></script>
 	<script type="text/javascript" src="scripts/lib/facebox.js" ></script>
 	<script type="text/javascript" src="/scripts/lib/shotenjin.js" ></script>
 	<script type="text/javascript" src="scripts/provinces.js" ></script>
@@ -24,7 +25,7 @@
 		var WH = getWidthAndHeight();
 		var wh_css = 'body{width:'+ WH[0] +'px;font-family:"'+ getFont() +'";font-size:'+ getFontSize() +'px;}'
 				   + '.warp{width:' + WH[0] + 'px;}.list_warp{height:' + (WH[1]-40) + 'px;}'
-				   + '#facebox img{max-width:'+ (WH[0]-50) +'px;}';
+				   + '#facebox img, #facebox canvas{max-width:'+ (WH[0]-50) +'px;}';
 		$("#styleCustom").html(wh_css);
 	</script>
  </head>
@@ -156,7 +157,7 @@
 			<li class="tweetItem showCounts_#{tweet.id} <?js if (!tweet.readed) { ?>unread-item<?js } ?> <?js if (tweet.myTweet) { ?>myTweet<?js } ?> " id="tweet#{tweet.id}" did="#{tweet.id}">
 				<div class="usericon">
 				    <span class="showtip">
-						<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}');" rhref="http://t.sina.com.cn/#{user.domain||user.id}" title="#{user.description}">
+						<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}');" rhref="http://t.sina.com.cn/#{user.domain||user.id}">
 							<img src="#{user.profile_image_url.replace('24x24', '48x48')}">
 						</a>
 						<div class="tipbox">

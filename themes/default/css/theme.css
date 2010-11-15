@@ -75,4 +75,5 @@ div.msgInfo {padding-top:3px;}
 .list .comments .comment_paging a{color:green;}
 .list .comments .comment_paging .next_page{float:right;}
 
+.myTweet .usericon .showtip .tipbox{display:none;}
 .myTweet .usericon .showtip:hover .tipbox{display:none;}

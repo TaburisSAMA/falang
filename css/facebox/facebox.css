@@ -94,3 +94,7 @@
   position: absolute;
   height: expression(document.body.scrollHeight > document.body.offsetHeight ? document.body.scrollHeight : document.body.offsetHeight + 'px');
 }
+
+
+#facebox .image .rotate_btn{position: absolute; top: 42px; left: 20px; display:none;}
+#facebox .image:hover .rotate_btn{display:block;}

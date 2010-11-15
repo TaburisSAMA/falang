@@ -189,11 +189,16 @@ div.mainContent{word-wrap: break-word;}
 .sicon_gender_n{background-position: 0px -48px;}
 
 /*toltip*/
-.showtip:hover .tipbox{display:block;}
+.showtip:hover .tipbox{
+	-webkit-transition: opacity 0.8s ease;
+	opacity: 0.95;
+	visibility:visible;
+}
 
 .tipbox{
-	display:none;
 	font-size:12px;
+	opacity: 0;
+	visibility:hidden;
 	color:#000;
 	position:absolute;
 	z-index:9999;

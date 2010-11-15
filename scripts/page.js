@@ -5,6 +5,17 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
         if(msg_wrap.length < 1){
             msg_wrap = $('<div id="fa_wave_msg_wrap"><a href="javascript:void(0)" class="close_fawave_remind">关闭</a><div class="fa_wave_list"></div></div>').appendTo('body');
             msg_wrap.find('.close_fawave_remind').click(function(){ close_fawave_remind(); });
+            msg_wrap.hover(function(){
+                $("#fa_wave_msg_wrap .fa_wave_list > div").stop(true).css('opacity', '1.0');
+            }, function(){
+                $("#fa_wave_msg_wrap .fa_wave_list > div")
+                      .fadeOut('slow', function() {
+                          $(this).remove();
+                          if(!$("#fa_wave_msg_wrap .fa_wave_list").html()){
+                              $("#fa_wave_msg_wrap").hide();
+                          }
+                      });
+            });
         }
         var msg_list_wrap = msg_wrap.find('.fa_wave_list');
         var len = request.msgs.length>5 ? 5 : request.msgs.length;
@@ -27,6 +38,9 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
                     });
                 if(showCount >= 5){break;}
             }
+        }
+        if(!msg_list_wrap.html()){
+            msg_wrap.hide();
         }
     }
 });
@@ -58,12 +72,6 @@ function builFawaveTip(msg){
             + '  </div>'
             + '</div>';
     return tp;
-
-
-    //var tp = '<div class="msgRemind"><span class="username">'
-    //       + user.screen_name + ': </span><span class="msg">'
-    //        + msg.text + '</span></div>';
-    //return tp;
 };
 
 function close_fawave_remind(){
