@@ -2,6 +2,8 @@
 var LOCAL_STORAGE_NUM_KEY = 'idi_local_storage_num';
 
 $(function(){
+    initTab();
+
     showAccountList();
 
     init();
@@ -57,20 +59,23 @@ $(function(){
 
 function showAccountList(){
     var userList = localStorage.getObject(USER_LIST_KEY);
+    var userCount = 0;
     if(userList){
         var op = '';
         var user = ''
         for(i in userList){
+            userCount++;
             user = userList[i];
             op = op + '<option value="' + user.userName + '">' + user.userName + '</option>';
         }
         $("#account-list").html(op);
     }
+    if(userCount <= 0){
+        $("#tab_user_set").click();
+    }
 }
 
 function init(){
-    initTab();
-
     var t = localStorage.getObject(REFRESH_TIME_KEY);
     if(t){
         $("#selRefreshTime").val(t);
@@ -102,6 +107,11 @@ function initTab(){
         var new_t = $(this).parents();
 		new_t.addClass("selected");
         $(new_t.attr('target_id')).show();
+        if(new_t.attr('hide_save_btn')){
+            $("#save-all").hide();
+        }else{
+            $("#save-all").show();
+        }
 		return false;
 	});
 }

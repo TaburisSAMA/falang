@@ -14,6 +14,8 @@ h3{
 
 label.title{color:#AB5603; font-weight:bold;}
 
+.logo{padding-bottom:5px;}
+.logo h1{display:inline;color:green;}
 .other{font-size:13px;}
 
 #themePreview{
@@ -46,7 +48,7 @@ label.title{color:#AB5603; font-weight:bold;}
 /* tab */
 ul#navigation {
 	height: 36px;
-	padding: 5px 20px 0 20px;
+	padding: 10px 20px 0 20px;
 	margin: 0 auto;
 	position: relative;
 	overflow: hidden;

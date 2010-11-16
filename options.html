@@ -13,60 +13,65 @@
 </head>
 
 <body>
-<a href="http://t.sina.com.cn/falang" target="_blank" style="position:absolute;right:0;top:0;">
+<a href="http://t.sina.com.cn/falang" target="_blank" style="position:absolute;right:0;top:0;z-index: 5;">
 	<img src="images/follow-me.png" border="0" title="跟随发微" />
 </a>
 <div>
 	<div class="logo">
-		<a target="_blank" href="http://t.sina.com.cn/falang" title="跟随发微"><img src="icons/icon64.png" style="vertical-align: middle;" /></a>
-		<span style="margin-left:30px;color:green;font-size:18px; font-weight:bold;">
+		<h1>FaWave - 发微</h1>
+		
+		<span style="margin-right: 150px;color:green;font-size:18px; font-weight:bold;float:right;">
 			应用推荐： <a href="http://timgs.sinaapp.com/" target="_blank">微博图墙</a>
 			<a href="http://caimi.sinaapp.com/" target="_blank">微博猜谜</a>
 		</span>
 	</div>
-	<h3>用户账号设置</h3>
-	<div class="info">用户、密码保存在本地。在公共电脑上使用时请慎重。</div>
-	<table>
-		<tr>
-			<td><select id="account-list" size="6" style="width:220px;"></select></td>
-			<td>
-				<input type="button" id="refresh-account" value="更新用户信息" /><br/>
-				<input type="button" id="show-new-account" value="添加新用户" /><br/>
-				<input type="button" id="show-edit-account" value="编辑用户" disabled="true" /><br/>
-				<input type="button" id="del-account" value="删除用户" disabled="true" />
-			</td>
-		</tr>
-	</table>
-
-	<div id="new-account" style="display:none;">
-	<ul>
-		<li>新浪微博的API，由于cookie信息会干扰Basic Authentcation的认证，而我至今未找到解决办法，所以在添加或者编辑用户信息的时候，为了确保你可以正确设置你的账号信息，请你先<b><a href="http://t.sina.com.cn/logout.php?backurl=/" target="_blank">退出新浪微博</a></b></li>
-		<li>
-			<label for="account-name">用户名：</label>
-			<input type="text" id="account-name" />
-			<input type="hidden" id="edit-account-name" />
-		</li>
-		<li>
-			<label for="account-pwd">密　码：</label>
-			<input type="password" id="account-pwd" />
-		</li>
-		<li>
-			<input type="button" id="save-account" value="添加" />   
-			<input type="button" id="cancel-save-account" value="取消" />
-		</li>
-	<ul>
-</div>
 <div>
 <div class="other">
-	<h3>其他设置</h3>
 	<ul id="navigation"> 
 		<li class="selected" target_id="#common_set"><a href="javascript:">基本设置</a></li> 
 		<li class="" target_id="#appearance_set"><a href="javascript:">外观设置</a></li> 
-		<li class="" target_id="#about_me"><a href="javascript:">关于与感谢</a></li> 
+		<li class="" target_id="#user_set" hide_save_btn="1"><a id="tab_user_set" href="javascript:">帐号设置</a></li> 
+		<li class="" target_id="#about_me" hide_save_btn="1"><a href="javascript:">关于与感谢</a></li> 
 		<!-- <li class=""><a href="javascript:">Sponsors</a></li> 
 		<li class=""><a href="javascript:">Register</a></li> -->
 		<li class="shadow"></li> 
 	</ul>
+	<!-- 用户设置 START -->
+	<div id="user_set" style="display:none;">
+		<br/><br/>
+		<div class="info">用户、密码保存在本地。在公共电脑上使用时请慎重。</div>
+		<table>
+			<tr>
+				<td><select id="account-list" size="6" style="width:220px;"></select></td>
+				<td>
+					<input type="button" id="refresh-account" value="更新用户信息" /><br/>
+					<input type="button" id="show-new-account" value="添加新用户" /><br/>
+					<input type="button" id="show-edit-account" value="编辑用户" disabled="true" /><br/>
+					<input type="button" id="del-account" value="删除用户" disabled="true" />
+				</td>
+			</tr>
+		</table>
+
+		<div id="new-account" style="display:none;">
+			<ul>
+				<li>新浪微博的API，由于cookie信息会干扰Basic Authentcation的认证，而我至今未找到解决办法，所以在添加或者编辑用户信息的时候，为了确保你可以正确设置你的账号信息，请你先<b><a href="http://t.sina.com.cn/logout.php?backurl=/" target="_blank">退出新浪微博</a></b></li>
+				<li>
+					<label for="account-name">用户名：</label>
+					<input type="text" id="account-name" />
+					<input type="hidden" id="edit-account-name" />
+				</li>
+				<li>
+					<label for="account-pwd">密　码：</label>
+					<input type="password" id="account-pwd" />
+				</li>
+				<li>
+					<input type="button" id="save-account" value="添加" />   
+					<input type="button" id="cancel-save-account" value="取消" />
+				</li>
+			<ul>
+		</div>
+	</div>
+	<!-- 用户设置END -->
 	<ul id="common_set">
 		<li>
 			<p>
@@ -175,10 +180,10 @@
 			</p>
 		</li>
 	</ul>
-	<div id="about_me" style="color:green;display:none;">
+	<div id="about_me" style="display:none;">
 		<br/><br/>
-		作者：<a target="_blank" href="http://t.sina.com.cn/qleelulu" >@QLeelulu</a>，有什么建议和问题可以直接@我或者私信我
-		<div><a target="_blank" href="http://t.sina.com.cn/qleelulu" ><img style="padding:3px;border:solid 1px #ccc;" src="http://tp4.sinaimg.cn/1644902943/50/1279883084/1" /></a></div>
+		<b>作者：</b><a target="_blank" href="http://t.sina.com.cn/qleelulu" >@QLeelulu</a>，有什么建议和问题可以直接@我或者私信我
+		<!-- <div><a target="_blank" href="http://t.sina.com.cn/qleelulu" ><img style="padding:3px;border:solid 1px #ccc;" src="http://tp4.sinaimg.cn/1644902943/50/1279883084/1" /></a></div> -->
 		<br /><br />
 		<b>感谢以下朋友的贡献：</b>
 		<ul>
