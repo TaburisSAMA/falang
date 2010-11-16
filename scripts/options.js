@@ -98,7 +98,10 @@ function init(){
     initTheme();
     initWidthAndHeight();
     initFont();
+
+    initJtip();
 };
+//初始化Tab标签
 function initTab(){
     $("ul#navigation li a").click(function() {
         var old_t = $("ul#navigation li.selected").attr('target_id');
@@ -114,6 +117,19 @@ function initTab(){
         }
 		return false;
 	});
+};
+// jTip
+function initJtip(){
+    $(".jTip").hover(function(){
+        var _t = $(this);
+        var offset = _t.offset();
+        $("#JT_close_left").html(_t.attr('jTitle')||'　');
+        $("#JT_copy").html(_t.find('.c').html());
+        //_t.after($("#JT").css({top:offset.top-5, left:offset.left + 25}));
+        $("#JT").css({top:offset.top-5, left:offset.left + 25}).css({visibility:'visible', opacity:'0.98'})
+    }, function(){
+        $("#JT").css({opacity:0, visibility:'hidden'});
+    });
 }
 //初始化设置未读提示信息
 function initSetBadgeText(){

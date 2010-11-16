@@ -20,7 +20,7 @@ function resetTimelineOffset(t){
 //var friendsTimeline_offset = replys_offset = messages_offset = PAGE_SIZE;
 
 function initOnLoad(){
-    setTimeout(init, 100);
+    setTimeout(init, 100); //为了打开的时候不会感觉太卡
 };
 
 function init(){

@@ -105,12 +105,18 @@
 				<input type="checkbox" id="set_badge_mentions" value="1" /><label for="set_badge_mentions">@我的</label>
 				<input type="checkbox" id="set_badge_comments_timeline" value="1" /><label for="set_badge_comments_timeline">评论</label>
 				<input type="checkbox" id="set_badge_direct_messages" value="1" /><label for="set_badge_direct_messages">私信</label>
+				<span class="jTip" jTitle="FaWave(发微)的按钮上未读信息数的提示:　">?
+					<span class="c"><img src="/images/setting/unread.gif" /></span>
+				</span>
 			</p>
 		</li>
 		<li>
 			<label class="title">　　　　同步设置：</label>
 			<span>
 				<input type="checkbox" id="unread_sync_to_page" value="1" /><label for="unread_sync_to_page">同时将新浪微博页面的未读提示置零</label>
+			</span>
+			<span class="jTip" jTitle="未读信息提示同步:　">?
+				<span class="c">如果已经通过FaWave(发微)看过的信息，<br/>则同时将新浪微博的页面提示数置零<br/><br/><img src="/images/setting/page_unread_tip.png" /></span>
 			</span>
 		</li>
 		<li>
@@ -119,6 +125,9 @@
 				<input type="checkbox" id="set_show_in_page_mentions" value="1" /><label for="set_show_in_page_mentions">@我的</label>
 				<input type="checkbox" id="set_show_in_page_comments_timeline" value="1" /><label for="set_show_in_page_comments_timeline">评论</label>
 				<input type="checkbox" id="set_show_in_page_direct_messages" value="1" /><label for="set_show_in_page_direct_messages">私信</label>
+				<span class="jTip" jTitle="在你正在看的网页上提示新信息，5秒钟后自动隐藏:　">?
+					<span class="c"><img src="/images/setting/show_in_page.png" /></span>
+				</span>
 			</p>
 		</li>
 		<li>
@@ -138,7 +147,7 @@
 	</ul>
 	<ul id="appearance_set" style="display:none;">
 		<li>
-			<p>
+			<div>
 				<label class="title">字体设置：</label>
 				<span>
 					<select id="selFont">
@@ -156,7 +165,7 @@
 						<option value="14">14px</option>
 					</select>
 				</span>
-			</p>
+			</div>
 		</li>
 		<li>
 			<p>
@@ -195,5 +204,11 @@
 <input type="button" id="save-all" value="保存所有" style="width:100px;height:40px;margin-left:20px;" />
 
 <div id="msgInfoWarp"></div>
+
+<div id="JT" style="visibility:hidden;">
+	<div id="JT_arrow_left"></div>
+	<div id="JT_close_left"></div>
+	<div id="JT_copy"></div>
+</div>
 </body>
 </html>
