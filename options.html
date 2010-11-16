@@ -59,7 +59,15 @@
 <div>
 <div class="other">
 	<h3>其他设置</h3>
-	<ul>
+	<ul id="navigation"> 
+		<li class="selected" target_id="#common_set"><a href="javascript:">基本设置</a></li> 
+		<li class="" target_id="#appearance_set"><a href="javascript:">外观设置</a></li> 
+		<li class="" target_id="#about_me"><a href="javascript:">关于与感谢</a></li> 
+		<!-- <li class=""><a href="javascript:">Sponsors</a></li> 
+		<li class=""><a href="javascript:">Register</a></li> -->
+		<li class="shadow"></li> 
+	</ul>
+	<ul id="common_set">
 		<li>
 			<p>
 				<label class="title">获取信息间隔时间：</label>
@@ -87,7 +95,7 @@
 			</span>
 		</li>
 		<li>
-			<p id="set_badge_wrap"><label class="title">未读提示：</label>
+			<p id="set_badge_wrap"><label class="title">　　　　未读提示：</label>
 				<input type="checkbox" id="set_badge_friends_timeline" value="1" /><label for="set_badge_friends_timeline">最新微博</label>
 				<input type="checkbox" id="set_badge_mentions" value="1" /><label for="set_badge_mentions">@我的</label>
 				<input type="checkbox" id="set_badge_comments_timeline" value="1" /><label for="set_badge_comments_timeline">评论</label>
@@ -95,7 +103,7 @@
 			</p>
 		</li>
 		<li>
-			<label class="title">同步设置：</label>
+			<label class="title">　　　　同步设置：</label>
 			<span>
 				<input type="checkbox" id="unread_sync_to_page" value="1" /><label for="unread_sync_to_page">同时将新浪微博页面的未读提示置零</label>
 			</span>
@@ -108,6 +116,22 @@
 				<input type="checkbox" id="set_show_in_page_direct_messages" value="1" /><label for="set_show_in_page_direct_messages">私信</label>
 			</p>
 		</li>
+		<li>
+			<p>
+				<!--<label>本地缓存信息数：</label>
+				<span>
+					<select id="selLocalStorageNum">
+						<option value="50">50</option>
+						<option value="100">100</option>
+						<option value="200" selected="true">200</option>
+						<option value="300">300</option>
+					</select>
+				</span>-->
+				<div><input type="button" id="cleanLocalStorage" value="清空本地缓存数据" /></div>
+			</p>
+		</li>
+	</ul>
+	<ul id="appearance_set" style="display:none;">
 		<li>
 			<p>
 				<label class="title">字体设置：</label>
@@ -150,33 +174,21 @@
 				<div><img id="themePreview" src="/themes/default/theme.gif" onclick="jQuery.facebox({image:this.src});return false;" /></div>
 			</p>
 		</li>
-		<li>
-			<p>
-				<!--<label>本地缓存信息数：</label>
-				<span>
-					<select id="selLocalStorageNum">
-						<option value="50">50</option>
-						<option value="100">100</option>
-						<option value="200" selected="true">200</option>
-						<option value="300">300</option>
-					</select>
-				</span>-->
-				<div><input type="button" id="cleanLocalStorage" value="清空本地缓存数据" /></div>
-			</p>
-		</li>
 	</ul>
+	<div id="about_me" style="color:green;display:none;">
+		<br/><br/>
+		作者：<a target="_blank" href="http://t.sina.com.cn/qleelulu" >@QLeelulu</a>，有什么建议和问题可以直接@我或者私信我
+		<div><a target="_blank" href="http://t.sina.com.cn/qleelulu" ><img style="padding:3px;border:solid 1px #ccc;" src="http://tp4.sinaimg.cn/1644902943/50/1279883084/1" /></a></div>
+		<br /><br />
+		<b>感谢以下朋友的贡献：</b>
+		<ul>
+			<li><a target="_blank" href="http://t.sina.com.cn/pat1982">@鸽子</a>: 帮忙做了右上角到围脖跟随我的图片</li>
+		</ul>
+	</div>
 </div>
 <br>
-<input type="button" id="save-all" value="保存" style="width:100px;height:40px;margin-left:20px;" />
-<br/><br/>
-<div style="color:green;">
-	注：有什么建议可以直接找我<a target="_blank" href="http://t.sina.com.cn/qleelulu" >@QLeelulu</a>
-	<br />
-	<b>感谢以下朋友的贡献：</b>
-	<ul>
-		<li><a target="_blank" href="http://t.sina.com.cn/pat1982">@鸽子</a>: 帮忙做了右上角到围脖跟随我的图片</li>
-	</ul>
-</div>
+<input type="button" id="save-all" value="保存所有" style="width:100px;height:40px;margin-left:20px;" />
+
 <div id="msgInfoWarp"></div>
 </body>
 </html>

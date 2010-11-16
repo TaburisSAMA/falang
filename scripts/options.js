@@ -69,6 +69,8 @@ function showAccountList(){
 }
 
 function init(){
+    initTab();
+
     var t = localStorage.getObject(REFRESH_TIME_KEY);
     if(t){
         $("#selRefreshTime").val(t);
@@ -92,6 +94,17 @@ function init(){
     initWidthAndHeight();
     initFont();
 };
+function initTab(){
+    $("ul#navigation li a").click(function() {
+        var old_t = $("ul#navigation li.selected").attr('target_id');
+        $(old_t).hide();
+		$("ul#navigation li").removeClass("selected");
+        var new_t = $(this).parents();
+		new_t.addClass("selected");
+        $(new_t.attr('target_id')).show();
+		return false;
+	});
+}
 //初始化设置未读提示信息
 function initSetBadgeText(){
     for(i in T_LIST){
