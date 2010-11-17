@@ -48,7 +48,7 @@ function showMsg(msg){
     if(popupView){
         popupView._showMsg(msg);
     }
-}
+};
 function _showMsg(msg){
     $('<div class="messageInfo">' + msg + '</div>')
     .appendTo('#msgInfoWarp')
@@ -423,6 +423,13 @@ function formatText(msg, values, filter) {
     });	
 };
 
+// HTML 编码
+function HTMLEnCode(str){
+    var _div = document.createElement('div');
+    var _text = document.createTextNode(str);
+    _div.appendChild(_text);
+    return _div.innerHTML;
+};
 
 ///UBB内容转换
 function ubbCode(str)	{

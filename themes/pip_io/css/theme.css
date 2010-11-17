@@ -118,6 +118,6 @@ div.msgInfo {padding-top:3px;}
 
 .list li.unread-item .li_wrap{border-left: 1px solid green;}
 
-.list .activeTweet .retweeted, .list .activeTweet .mainContent{color:#475366;}
-.list .activeTweet .li_wrap{-webkit-transition: background 0.2s linear; background: -webkit-gradient(linear,left bottom,left top,color-stop(.4, #fff),color-stop(2, #E6EFFF));}
-.list .activeTweet div.retweeted{background: -webkit-gradient(linear,left bottom,left top,color-stop(.1, #E6EFFF),color-stop(0.5, #fff));}
+.list .activeTweet .retweeted, .list .activeTweet .mainContent{color:#222;/*#475366;*/}
+.list .activeTweet .li_wrap{-webkit-transition: background 0.2s linear; background: -webkit-gradient(linear,left bottom,left top,from(#fff), to(#E6EFFF), color-stop(0.5, #fff));}
+.list .activeTweet div.retweeted{/*background: -webkit-gradient(linear,right bottom,right top, from(#E6EFFF), to(#fff), color-stop(0.3, #fff));*/}

@@ -215,6 +215,8 @@ function getUserCountsInfo(user){
  */
 var processMsg = function (str) {
     if(!str){ return ''; }
+    str = HTMLEnCode(str); //先编码HTML
+
     //str = ubbCode(str);
     //str = str.replace(/(http:\/\/[\w|\.|\/|\-|\=|\+|\?|\%|#]+)/g, '<a target="_blank" href="$1" title="$1">$1</a>');
     var re = new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&\-/#=;:!\\+]+)\\s*(?:\\](.+)\\[/url\\]|)', 'ig');
