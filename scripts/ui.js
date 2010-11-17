@@ -196,7 +196,7 @@ function buildComment(comment){
             + processMsg('@'
                         + comment.user.screen_name
                         + (comment.user.verified ? '<img title="新浪认证" src="/images/verified.gif" />':'')
-                        + ': ' + comment.text) 
+                        + ': ' + HTMLEnCode(comment.text), true) 
             + '<span class="msgInfo">(' + new Date(comment.created_at).format("yyyy-MM-dd hh:mm:ss") + ')</span>'
             + commentBtn
             + '</li>';
@@ -214,9 +214,11 @@ function getUserCountsInfo(user){
 /**
  * 处理内容
  */
-var processMsg = function (str) {
+var processMsg = function (str, notEncode) {
     if(!str){ return ''; }
-    str = HTMLEnCode(str); //先编码HTML
+    if(!notEncode){
+        str = HTMLEnCode(str);
+    }
 
     //str = ubbCode(str);
     //str = str.replace(/(http:\/\/[\w|\.|\/|\-|\=|\+|\?|\%|#]+)/g, '<a target="_blank" href="$1" title="$1">$1</a>');

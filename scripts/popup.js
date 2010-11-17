@@ -544,6 +544,11 @@ function getSinaTimeline(t){
         }
         _ul.append(html);
         if(ids.length>0){
+            if(ids.length > 100){
+                var ids2 = ids.slice(0, 99);
+                ids = ids.slice(99, ids.length);
+                showCounts(t, ids2.join(','));
+            }
             showCounts(t, ids.join(','));
         }
         if(tweetsAll.length >= (PAGE_SIZE/2)){
@@ -734,6 +739,11 @@ function readMore(t){
         showReadMore(t);
         hideLoading();
         if(ids.length>0){
+            if(ids.length > 100){
+                var ids2 = ids.slice(0, 99);
+                ids = ids.slice(99, ids.length);
+                showCounts(t, ids2.join(','));
+            }
             showCounts(t, ids.join(','));
         }
     }
@@ -778,6 +788,11 @@ function addTimelineMsgs(msgs, t){
         var _ul = $("#" + t + "_timeline ul.list");
         _ul.prepend(html);
         if(ids.length>0){
+            if(ids.length > 100){
+                var ids2 = ids.slice(0, 99);
+                ids = ids.slice(99, ids.length);
+                showCounts(t, ids2.join(','));
+            }
             showCounts(t, ids.join(','));
         }
     }
@@ -800,6 +815,11 @@ function addPageMsgs(msgs, t){
     var _ul = $("#" + t + "_timeline ul.list");
     _ul.append(html);
     if(ids.length>0){
+        if(ids.length > 100){
+            var ids2 = ids.slice(0, 99);
+            ids = ids.slice(99, ids.length);
+            showCounts(t, ids2.join(','));
+        }
         showCounts(t, ids.join(','));
     }
     hideLoading();
