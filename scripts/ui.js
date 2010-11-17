@@ -1,3 +1,4 @@
+// @author qleelulu@gmail.com
 
 //var emotionalDict={
 //    "微笑": "01", "我晕": "02", "口水": "03", "开心": "04", "鄙视": "05", 
@@ -49,13 +50,17 @@ function bildMsgLi(sinaMsg, t){
                 addFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>',
                 delFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="delFavorites(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');" title="点击取消收藏"><img width="11px" src="/images/favorites.gif"/></a>',
                 rtRepostBtn: '',
-                rtCommentBtn: ''
+                rtCommentBtn: '',
+                rtReplyBtn: '',
+                rtAddFavoritesMsgBtn: ''
         };
 
         var rt_status = sinaMsg.retweeted_status || sinaMsg.status;
         if(rt_status && rt_status.user){
             crlBtn.rtRepostBtn = '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + rt_status.user.screen_name + '\',' + rt_status.id + ');" title="转发这条微博">转</a>';
             crlBtn.rtCommentBtn = '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + rt_status.user.screen_name + '\',' + rt_status.id + ');" title="点击添加评论">评</a>';
+            crlBtn.rtReplyBtn = '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + rt_status.user.screen_name + '\',' + rt_status.id + ');" title="进行@回复">@</a>';
+            crlBtn.rtAddFavoritesMsgBtn = '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'' + rt_status.user.screen_name + '\',' + rt_status.id + ');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>';
         }
 
         switch(t){
@@ -140,6 +145,12 @@ function bildMsgLi(sinaMsg, t){
         var tp = TEMPLATE;
         if(t == 'friends' || t == 'followers'){
             tp = TEMPLATE_FANS;
+        }
+        var theme = getTheme();
+        if(theme=='pip_io'){
+            tp = tp.replace('<!-- {{retweeted_status_out}} -->', TEMPLATE_RT);
+        }else{
+            tp = tp.replace('<!-- {{retweeted_status_in}} -->', TEMPLATE_RT);
         }
         var r = Shotenjin.render(tp, context);
     }catch(err){

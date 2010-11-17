@@ -1,0 +1,123 @@
+.tabs{background-color:#fff; padding-left:2px; position:relative; margin-top:1px;}
+.tabs li{
+	border-top-right-radius:5px;
+	border-top-left-radius:5px;
+	margin: 0 2px 0 0;
+	background-color: #2B477D;
+	border: solid 1px #415F9D;
+	color:#fff;
+	position: relative;
+	z-index: 1;
+}
+.tabs li.shadow{
+	display:block;
+	width: 100%;
+	height: 2px;
+	position: absolute;
+	bottom: -3px;
+	left: 0;
+	border: none;
+	background: none;
+	z-index: 2;
+	-webkit-box-shadow: #111 0 -2px 3px;
+	box-shadow: #111 0 -2px 6px;
+}
+.tabs li.active{
+	border-bottom-color:#CDD2E0; color:#2B477D; z-index:3;
+	background: -webkit-gradient(linear,left bottom,left top,from(#fff),to(#CDD2E0), color-stop(0.5,#fff));
+}
+
+#submitwarp {border-bottom: 1px solid #fff;}
+.unreadcount{color:yellow;}
+
+div.usericon {
+	float:left; margin:2px 0 0 5px;
+}
+div.usericon:hover{background:none;-webkit-box-shadow:0 0 5px #aaa;}
+div.usericon img {
+	-webkit-border-radius:4px;
+	-webkit-box-shadow:0 0 3px #aaa;
+}
+.arrow_r{
+	position:absolute;
+	margin:1px 0 0 -15px;
+	width:7px;
+	height:13px;
+	background:url(../images/arrow_r.png) no-repeat;
+}
+div.mainContent {
+	line-height: 18px;
+	margin:0 0 0 60px;
+	color:#475366;
+	position:relative;
+	padding:0 5px;
+	word-wrap:break-word;
+}
+.pic{
+	padding: 3px;
+	margin:2px;
+	-webkit-box-shadow: #AAA 0px 0px 5px;
+	background:#fff;
+}
+div.userName {font-weight:bold;} 
+div.userName a {color:green;}
+.msgInfo {color:#888;}
+div.msgInfo {padding-top:3px;}
+.list li{
+	margin: 10px 5px;
+}
+.list li .li_wrap{
+	background:#fff;
+	padding: 6px 3px 3px;
+	border-width:1px;
+	border-style:solid;
+	border-color:#bbb #bbb #ddd #bbb;
+	-webkit-border-radius:5px;
+	border-bottom-right-radius:0;
+	-webkit-box-shadow:1px 2px 2px #888;
+}
+.list li div.retweeted{
+	background:#fff;
+	color:#475366;
+	padding: 6px 6px 3px;
+	margin-left: 20px;
+	margin-top: -1px;
+	border-width:1px;
+	border-style:solid;
+	border-color:#eee #bbb #ddd #bbb;
+	-webkit-box-shadow:1px 2px 2px #888;
+	border-bottom-right-radius:5px;
+	border-bottom-left-radius:5px;
+}
+.list li div.retweeted .userName{color:green;font-weight:normal;}
+.list li div.retweeted .edit a{color:green;font-weight:bold;}
+.list li div.retweeted .commentCounts a{color:green;font-weight:normal;}
+.list_p{ margin:0;padding:0; background: -webkit-gradient(linear,left bottom,left top,from(#CDD2E0),to(#fff), color-stop(0.7,#fff));}
+.list li .msg a, .comments a{color:#F77004;}
+.list li .msg a:hover, .comments a:hover{color:#fff;background:#369;text-decoration:none;}
+.list li .edit{display:none; float:right;}
+.list li .edit a{padding:0 0 0 5px;}
+.list li .edit a:hover{background:none;text-decoration:underline;}
+.list li .commentCounts, .list li .repostCounts{color:#888;font-weight:normal;}
+.list li .commentCounts a{padding:0;font-weight:normal;}
+.readMore{display:none;text-align:center;background: #ccc; color:green; margin: 2px 0; padding:3px; border:solid 1px #ccc; font-size:14px;font-weight:bold;}
+.readMore:hover{text-decoration: none;}
+.list .comments{display:none;margin-top:3px;border-top:5px solid gainsboro;border-bottom:5px solid gainsboro;background: #F7FEFF;}
+.list .comments li{border-bottom: 1px dashed #EFAA00; padding:5px 2px;}
+.list .comments .replyComment{float:right;color:green;}
+.list .comments .comment_paging a{color:green;}
+.list .comments .comment_paging .next_page{float:right;}
+
+.fans{background:#fff;}
+
+.myTweet div.usericon{}
+.myTweet .arrow_r{}
+.myTweet div.mainContent{}
+.myTweet .usericon .showtip .tipbox{}
+.myTweet .usericon .showtip:hover .tipbox{}
+
+.list li.unread-item .li_wrap{border-left: 1px solid green;}
+
+.list .activeTweet .retweeted, .list .activeTweet .mainContent{color:#475366;}
+.list .activeTweet .li_wrap{-webkit-transition: background 0.2s linear; background: -webkit-gradient(linear,left bottom,left top,color-stop(.4, #fff),color-stop(2, #E6EFFF));}
+.list .activeTweet div.retweeted{background: -webkit-gradient(linear,left bottom,left top,color-stop(.1, #E6EFFF),color-stop(0.5, #fff));}

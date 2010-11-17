@@ -1,4 +1,5 @@
-﻿//Need jQuery
+﻿// @author qleelulu@gmail.com
+//Need jQuery
 //s8.hk's api see: http://code.google.com/p/s8hk-api/wiki/ApiDocumentation
 
 var s8_host = 'http://s8.hk';

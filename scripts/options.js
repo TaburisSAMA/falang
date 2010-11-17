@@ -1,3 +1,4 @@
+// @author qleelulu@gmail.com
 
 var LOCAL_STORAGE_NUM_KEY = 'idi_local_storage_num';
 
@@ -150,10 +151,10 @@ function initTheme(){
     var theme = getTheme();
     if(theme){
         $("#selTheme").val(theme);
-        $("#themePreview").attr("src", '/themes/'+ theme +'/theme.gif');
+        $("#themePreview").attr("src", '/themes/'+ theme +'/theme.png');
     }
     $("#selTheme").change(function(){
-        $("#themePreview").attr("src", '/themes/'+ $(this).val() +'/theme.gif');
+        $("#themePreview").attr("src", '/themes/'+ $(this).val() +'/theme.png');
     });
 };
 

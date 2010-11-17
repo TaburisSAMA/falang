@@ -1,4 +1,4 @@
-//alert('hi');
+// @author qleelulu@gmail.com
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     if(request.msgs && request.msgs.length>0){
         var msg_wrap = $("#fa_wave_msg_wrap");

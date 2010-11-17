@@ -1,7 +1,8 @@
+// @author qleelulu@gmail.com
 
 var t_changeUser = '<table id="changeUser" class="tab-none" cellspacing="0" ><tr><td>'
             + '<span class="userName" title="点击切换用户">{{screen_name}}</span>'
-            + '<div style="display:none;"><ul>{{user_list}}</lu></div></td>'
+            + '<div id="changeUserListWrap" style="display:none;"><ul>{{user_list}}</lu></div></td>'
             + '<td><a target="_blank" class="user_home" href="http://t.sina.com.cn/{{domain}}" title="点击打开我的主页"><img style="width:24px;height:24px;" class="userImg" src="{{profile_image_url}}" /></a></td></tr></table>';
 
 var fawave = {};
@@ -300,15 +301,19 @@ function initChangeUserList(){
             c_user.user_list = li.join('');
             c_user.domain = c_user.domain || c_user.id;
             $('#tl_tabs').append(formatText(t_changeUser, c_user));
+            var tl_offset = $('#changeUser').offset();
+            $("#changeUserListWrap").appendTo('body').css({top:tl_offset.top+25});
             $("#changeUser .userName").click(function(){
-                $("#changeUser").find('div').toggle();
+                $("#changeUserListWrap").toggle();
             });
-            $("#changeUser ul li[class!=current]").click(function(){
+            $("#changeUserListWrap ul li").click(function(){
                 var li = $(this);
-                changeUser(li.text());
-                li.siblings().removeClass('current').end()
-                .addClass('current');
-                $("#changeUser").find('div').toggle();
+                if(!li.hasClass('current')){
+                    changeUser(li.text());
+                    li.siblings().removeClass('current').end()
+                    .addClass('current');
+                }
+                $("#changeUserListWrap").toggle();
             });
         }else if(li){
             c_user.screen_name = c_user.screen_name || c_user.userName;
@@ -592,10 +597,8 @@ function showCounts(t, ids){
 //@notHide: 不要隐藏评论列表
 function showComments(ele,tweetId, page, notHide){
     if(tweetId){
-        var tweetItem = $(ele).closest('.tweetItem');
-        var tweetWrap = tweetItem.children('.mainContent');
-        tweetWrap = tweetWrap.length>0 ? tweetWrap : tweetItem;
-        var commentWrap = tweetWrap.children('.comments');
+        var comment_p = $(ele).closest('.commentWrap');
+        var commentWrap = comment_p.children('.comments');
         if(!notHide && commentWrap.css('display') != 'none'){
             commentWrap.hide();
             return;

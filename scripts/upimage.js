@@ -1,3 +1,5 @@
+// @author qleelulu@gmail.com
+
 function checkChrome(){
     if(!window.BlobBuilder){
         $("body").html($("#needUpdateChrome")[0].outerHTML);

@@ -11,6 +11,7 @@ li { line-height:16px;}
 .list_warp { margin:0; height: 470px; overflow:auto;} 
 .tabs { overflow:hidden; background:#f1f7fc;height:24px;}
 .tabs li {line-height:23px; height:23px; border:1px solid #ace; border-width:0 1px 1px 0; background:#f1f7fc; padding:0 5px; text-align:center; float:left; cursor:pointer;} 
+.tabs li.shadow{display:none;}
 .tabs li.active { background:#fff; border-bottom-color:#fff; font-weight:bold;} 
 .tabs li.tab-r { /*width:118px; border-right:0; text-align:right;*/ padding-right:10px;} 
 .tabs li.tab-r a { color:#F06; font-weight:bold; font-family:Georgia;}
@@ -56,6 +57,7 @@ li { line-height:16px;}
 
 .list li{position:relative;}
 div.mainContent{word-wrap: break-word;}
+.list li .msg .msgInfo a{color:#888;}
 
 #txtContent{resize: none;}
 #diguReplies { display:none;}
@@ -63,13 +65,30 @@ div.mainContent{word-wrap: break-word;}
 #changeUser{float:right; margin-right:20px; padding:0; font-size:12px;}
 #changeUser:hover{cursor:pointer;background-color:#fff;}
 #changeUser .userName{font-weight:bold;}
-#changeUser div{
-	right: 20px;
+#changeUserListWrap{
 	position:absolute;
+	right:0;
 	z-index: 10;
 }
-#changeUser li{ float:none; border:solid 1px #AACCEE;}
-#changeUser li.current{ list-style-type:disc;}
+#changeUserListWrap ul{
+	padding:6px 3px;
+	background:#fff;
+	-webkit-border-radius:3px;
+	-webkit-box-shadow:0 0 8px #aaa;
+}
+#changeUserListWrap li{
+	float:none;
+	display:block;
+	color:#333;
+	margin:2px 0;
+	padding: 3px 8px;
+	cursor: pointer;
+}
+#changeUserListWrap li.current, #changeUserListWrap li:hover{
+	background:-webkit-gradient(linear,0 0,0 100%,from(#a0a0a0),to(#888));
+	color:#fff;
+	-webkit-border-radius:3px;
+}
 
 #submitWarp{border-bottom:solid 1px #AACCEE;}
 #wordCount{float:right;font-size:13px;font-weight: bold;}

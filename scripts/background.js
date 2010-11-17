@@ -1,3 +1,4 @@
+// @author qleelulu@gmail.com
 
 var itv; //Interval
 var tweets = {};

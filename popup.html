@@ -52,6 +52,7 @@
 		<li class="tab-direct_messages" href="#direct_messages_timeline">私信<span class="unreadCount"></span></li>
 		<li class="tab-followers" href="#followers_timeline">粉丝<span class="unreadCount"></span></li>
 		<li class="tab-user_timeline" href="#user_timeline_timeline">微博<span class="unreadCount"></span></li>
+		<li class="shadow"></li>
 		<span id="loading"><img src="images/loader.gif" /></span>
 	  </ul>
 	  <div id='friends_timeline_timeline' class="list_p">
@@ -155,6 +156,7 @@
 	<div style="display:none;">
 		<textarea id="tp_time_line">
 			<li class="tweetItem showCounts_#{tweet.id} <?js if (!tweet.readed) { ?>unread-item<?js } ?> <?js if (tweet.myTweet) { ?>myTweet<?js } ?> " id="tweet#{tweet.id}" did="#{tweet.id}">
+			  <div class="li_wrap">
 				<div class="usericon">
 				    <span class="showtip">
 						<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}');" rhref="http://t.sina.com.cn/#{user.domain||user.id}">
@@ -183,7 +185,7 @@
 						</div>
 				    </span>
 				</div>
-				<div class="mainContent">
+				<div class="mainContent commentWrap">
 					<span class="arrow_r"></span>
 					<div class="userName">
 						<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}');" rhref="http://t.sina.com.cn/#{user.domain||user.id}" title="#{getUserCountsInfo(user)}">
@@ -203,11 +205,39 @@
 								</a>
 							</div>
 							<?js } ?>
+						</div>
 						<?js if(tweet.retweeted_status){ ?>
 						<!-- 转发 -->
+						<!-- {{retweeted_status_in}} -->
+						<!-- 转发 End -->
+						<?js } ?>
+					</div>
+					<div class="comments">
+						<p style="text-align:right;"><a href="javascript:void(0);" onclick="showComments(this, #{tweet.id});">隐藏评论</a></p>
+						<ul class="comment_list"></ul>
+						<div class="comment_paging" page="1">
+							<a class="pre_page" href="javascript:void(0);" onclick="commentPage(this,#{tweet.id}, true);" style="display:none;">《上一页</a>
+							<a class="next_page" href="javascript:void(0);" onclick="commentPage(this,#{tweet.id});" style="display:none;">下一页》</a>
 						</div>
+						<br />
+					</div>
+					<div class="msgInfo">#{new Date(tweet.created_at).format("yyyy-MM-dd hh:mm:ss")} 通过 #{tweet.source||'网站'}</div>
+				</div>
+			  </div> <!-- end .li_wrap -->
+				<?js if(tweet.retweeted_status){ ?>
+				<!-- 转发 -->
+				<!-- {{retweeted_status_out}} -->
+				<!-- 转发 End -->
+				<?js } ?>
+				<div class="msgObjJson" style="display:none;">
+					#{JSON.stringify(tweet)}
+				</div>
+			</li>
+		</textarea>
+		<textarea id="tp_time_line_rt">
+						<!-- 转发 -->
 						<div class="msg">
-							<div class="tweetItem retweeted showCounts_#{tweet.retweeted_status.id}" id="tweet#{tweet.retweeted_status.id}">
+							<div class="tweetItem retweeted commentWrap showCounts_#{tweet.retweeted_status.id}" id="tweet#{tweet.retweeted_status.id}">
 								<div class="userName"><?js if(tType=='comments_timeline'){ ?>评<?js }else{ ?>转<?js } ?>
 									<span class="showtip">
 										<a target="_blank" 
@@ -239,7 +269,7 @@
 									</span>
 									的微博: 
 									<span class="edit">
-										#{ btn.rtRepostBtn + btn.rtRepostCounts + btn.rtCommentBtn + btn.rtCommentCounts}
+										#{ btn.rtAddFavoritesMsgBtn + btn.rtReplyBtn + btn.rtRepostBtn + btn.rtRepostCounts + btn.rtCommentBtn + btn.rtCommentCounts}
 									</span>
 								</div>
 								#{processMsg(tweet.retweeted_status.text)}
@@ -249,7 +279,7 @@
 									<img class="imgicon pic" src="#{tweet.retweeted_status.thumbnail_pic}" /></a>
 								</div>
 								<?js } ?>
-								<div class="msgInfo">#{new Date(tweet.retweeted_status.created_at).format("yyyy-MM-dd hh:mm:ss")}</div>
+								<div class="msgInfo">#{new Date(tweet.retweeted_status.created_at).format("yyyy-MM-dd hh:mm:ss")}  通过 #{tweet.retweeted_status.source||'网站'}</div>
 								<div class="comments">
 									<p style="text-align:right;"><a href="javascript:void(0);" onclick="showComments(this, #{tweet.retweeted_status.id});">隐藏评论</a></p>
 									<ul class="comment_list"></ul>
@@ -260,26 +290,8 @@
 									<br />
 								</div>
 							</div>
-							<!-- 转发 End -->
-							<?js } ?>
 						</div>
-					</div>
-					<div class="comments">
-						<p style="text-align:right;"><a href="javascript:void(0);" onclick="showComments(this, #{tweet.id});">隐藏评论</a></p>
-						<ul class="comment_list"></ul>
-						<div class="comment_paging" page="1">
-							<a class="pre_page" href="javascript:void(0);" onclick="commentPage(this,#{tweet.id}, true);" style="display:none;">《上一页</a>
-							<a class="next_page" href="javascript:void(0);" onclick="commentPage(this,#{tweet.id});" style="display:none;">下一页》</a>
-						</div>
-						<br />
-					</div>
-					<div class="msgInfo">#{new Date(tweet.created_at).format("yyyy-MM-dd hh:mm:ss")} 通过 #{tweet.source||'网站'}</div>
-				</div>
-				
-				<div class="msgObjJson" style="display:none;">
-					#{JSON.stringify(tweet)}
-				</div>
-			</li>
+						<!-- 转发 End -->
 		</textarea>
 		<textarea id="tp_user_info">
 			<div class="userinfo_detail">
@@ -337,6 +349,7 @@
 	</div>
 	<script type="text/javascript">
 		var TEMPLATE = $("#tp_time_line").val();
+		var TEMPLATE_RT = $("#tp_time_line_rt").val();
 		var TEMPLATE_USER_INFO = $("#tp_user_info").val();
 		var TEMPLATE_FANS = $("#tp_fans").val();
 	</script>

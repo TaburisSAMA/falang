@@ -31,7 +31,7 @@ var IS_SHOW_IN_PAGE = 'idi_IS_SHOW_IN_PAGE_'; //新消息是否在页面提示
 var IS_SYNC_TO_PAGE_KEY = 'idi_IS_SYNC_TO_PAGE_KEY'; //已读消息是否和新浪微博页面同步
 
 var THEME_KEY = 'idi_THEME_KEY'; //主题样式的KEY
-var THEME_LIST = {'default':'default', simple:'simple'}; //主题列表
+var THEME_LIST = {'default':'default', 'simple':'simple', 'pip_io':'pip_io'}; //主题列表
 
 var FONT_KEY = 'idi_FONT_KEY'; //字体样式的KEY
 var FONT_SIZE_KEY = 'idi_FONT_SIZE_KEY'; //字体大小的KEY
