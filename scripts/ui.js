@@ -20,7 +20,8 @@ var emotionalDict={
     "猪头":"pig", "蜡烛":"candle", "伤心":"unheart", "风扇":"fan", "冰棍":"ice", "西瓜":"watermelon",
     "织":"zhi", "围观":"wg", "威武":"v5", "害羞":"shame", "睡觉":"sleep", "钱":"money", "偷笑":"touxiao",
     "奥特曼":"otm", "宅":"z", "酷":"cool", "微风":"wind", "话筒":"maiphone", "爱心专递":"axcd",
-    "馋嘴":"cz", "来":"come", "便便":"shi"
+    "馋嘴":"cz", "来":"come", "便便":"shi", "赞":"z2_org", "瞄":"miao_org", "囧":"j_org", "惊恐":"jingkong_org", 
+    "鼓掌":"gz_org", "手套":"shoutao_org", "挖鼻屎":"kbs_org"
 }
 
 function bildMsgLi(sinaMsg, t){

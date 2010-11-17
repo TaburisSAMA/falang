@@ -64,7 +64,7 @@ div.userName a {color:green;}
 .msgInfo {color:#888;}
 div.msgInfo {padding-top:3px;}
 .list li{
-	margin: 10px 5px;
+	margin: 10px 5px 10px 3px;
 }
 .list li .li_wrap{
 	background:#fff;
@@ -77,9 +77,10 @@ div.msgInfo {padding-top:3px;}
 	-webkit-box-shadow:1px 2px 2px #888;
 }
 .list li div.retweeted{
+	line-height: 18px;
 	background:#fff;
 	color:#475366;
-	padding: 6px 6px 3px;
+	padding: 6px 6px 3px 8px;
 	margin-left: 20px;
 	margin-top: -1px;
 	border-width:1px;
