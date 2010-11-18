@@ -97,37 +97,6 @@ var TSINA_FACES = {
 //"白羊座": "e0/byz_thumb.gif"
 };
 
-// 格式化内容，处理表情和url等
-function tsina_format_text(text) {
-	// 格式url
-	text = text.replace(/(ssh|ftp|http)s?:\/\/[\w\/\?\&\.=]+/g, function(url) {
-		return '<a target="_blank" href="'+ url +'">' + url + '</a>';
-	});
-	
-	// 转化标签 #xxx#
-	text = text.replace(/#(\S+?)#/g, function(match, tag) {
-		return '<a target="_blank" href="http://t.sina.com.cn/k/'+ encodeURI(tag) +'" title="到新浪微博搜索: ' + tag + '">' + match + '</a>';
-	});
-	
-	// 转化表情
-	text = text.replace(/\[(\S+?)\]/g, function(key, keyname) {
-		if(TSINA_FACES[keyname]) {
-			return "<img src=" + TSINA_FACE_URL_PRE + TSINA_FACES[keyname] + " title=" + key + " />";
-		} else {
-			return key;
-		}
-	});
-	
-	return text;
-}
-
-function tsina_get_screen_name_link(user, need_at) {
-	var name = need_at ? '@' + user.screen_name : user.screen_name;
-	return '<a href="' + user.t_url + '" target="_blank" title="关注：' 
-		+ user.friends_count + '个  粉丝：' + user.followers_count + '个  微博：' + user.statuses_count + '条">' + name + '</a>';
-}
-
-
 //第一行是新浪API提供的表情列表，不过貌似很不全
 var emotionalDict={
     "\u6c42\u9886\u517b":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/08/adopt.gif","\u522b\u7406\u6211":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/14/alone.gif","\u751f\u6c14":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/57/angry.gif","\u751f\u65e5\u5feb\u4e50":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/33/bday.gif","\u6293\u72c2":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/4d/crazy.gif","\u5927\u54ed":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/af/cry.gif","\u4efb\u4f60\u5904\u7f6e":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/b1/deal.gif","\u5403\u996d\u4e86":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/07/eat.gif","\u55ef\u55ef":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/d7/en.gif","\u5174\u594b":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/9c/excite.gif","\u6655":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/a4/dizzy.gif","\u8ddf\u6211\u8d70\u5427":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/6b/go.gif","\u771f\u4e56":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/d8/good.gif","\u6211\u6765\u4e86":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/74/here.gif","\u8fdf\u5230\u4e86":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/87/late.gif","\u7b11\u6b7b\u4eba\u4e86":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/6a/laugh.gif","\u65e9\u4e0a\u597d":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/c8/morning.gif","\u65b0\u7684\u4e00\u5929":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/e7/newday.gif","\u8def\u8fc7":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/72/pass.gif","\u60f3\u4e0d\u901a":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/64/puzzle.gif","\u627e\u70b9\u523a\u6fc0":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/fc/rest.gif","\u6211\u597d\u51c4\u51c9":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/d8/sad.gif","\u60ca\u559c":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/1b/surprise.gif","\u8c22\u8c22":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/6b/thx.gif","\u8d50\u4e2a\u5ab3\u5987\u5427":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/magic/38/wife.gif","\u6012":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/57/angry.gif","\u7bee\u7403":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/2c/bball_thumb.gif","\u793c\u82b1":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/3d/bingo_thumb.gif","\u5496\u5561":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/64/cafe_thumb.gif","\u86cb\u7cd5":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/6a/cake.gif","\u8721\u70db":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/cc/candle.gif","\u5149\u76d8":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/d0/cd_thumb.gif","\u5e72\u676f":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/bd/cheer.gif","\u9177":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/40/cool_thumb.gif","\u8870":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/af/cry.gif","\u9634\u5929":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/37/dark_thumb.gif","\u98ce\u6247":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/92/fan.gif","\u7403":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/93/fball_thumb.gif","\u82b1":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/6c/flower.gif","\u9c9c\u82b1":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/6c/flower_thumb.gif","\u8db3\u7403":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/c0/football.gif","\u54fc":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/19/hate.gif","\u5e3d\u5b50":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/25/hat_thumb.gif","\u5fc3":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/6d/heart.gif","\u5077\u7b11":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/7e/hei_thumb.gif","\u623f\u5b50":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/d1/house_thumb.gif","\u51b0\u68cd":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/3a/ice.gif","\u5531\u6b4c":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/79/ktv_thumb.gif","\u54c8\u54c8":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/6a/laugh.gif","\u7231\u4f60":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/7e/love.gif","\u94b1":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/90/money_thumb.gif","\u6708\u4eae":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/b9/moon.gif","\u7535\u5f71":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/77/movie_thumb.gif","\u97f3\u4e50":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/d0/music_thumb.gif","\u8bdd\u7b52":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/1b/m_thumb.gif","\u732a\u5934":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/58/pig.gif","\u4e0b\u96e8":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/50/rain.gif","\u7ea2\u724c":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/64/redcard.gif","\u6cea":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/d8/sad.gif","\u5bb3\u7f9e":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/05/shame_thumb.gif","\u54e8\u5b50":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/a0/shao.gif","\u95ea\u7535":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/e3/sh_thumb.gif","\u56f0":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/8b/sleepy.gif","\u7761\u89c9":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/7d/sleep_thumb.gif","\u5475\u5475":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/eb/smile.gif","\u96ea":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/00/snow_thumb.gif","\u661f":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/0b/star_thumb.gif","\u592a\u9633":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/e5/sun.gif","\u9633\u5149":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/1a/sunny_thumb.gif","\u6c57":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/13/sweat.gif","\u7535\u8bdd":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/9d/tel_thumb.gif","\u563b\u563b":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/c2/tooth.gif","\u7535\u89c6\u673a":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/b3/tv_thumb.gif","\u96e8\u4f1e":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/33/umb_thumb.gif","\u4f24\u5fc3":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/ea/unheart.gif","\u897f\u74dc":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/6b/watermelon.gif","\u5fae\u98ce":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/a5/wind_thumb.gif","\u9ec4\u724c":"http://timg.sjs.sinajs.cn/miniblog2style/images/common/face/ext/normal/a0/yellowcard.gif",
@@ -364,17 +333,22 @@ function replaceUrl(m, g1, g2){
     if(g1.indexOf('http') != 0){
         _url = 'http://' + g1;
     }
-    return '<a target="_blank" href="' + _url + '" title="' + g1 + '">' + (g2||g1) + '</a>';
+    return formatText('<a target="_blank" href="{{url}}" title="{{title}}">{{value}}</a>', {
+    	url: _url, title: g1, value: g2||g1
+    });
 };
 
 function replaceEmotional(m, g1){
+	var tpl = '<img title="{{title}}" src="{{src}}" />';
     if(g1 && emotionalDict[g1]){
         var src = emotionalDict[g1];
         if(src.indexOf('http') != 0){
             src = '/images/faces/' + src + '.gif';
         }
-        return '<img title="' + m + '" src="' + src + '" />';
-    }else{
-        return tsina_format_text(m);
+        return formatText(tpl, {title: m, src: src});
     }
+    if(g1 && TSINA_FACES[g1]) {
+    	return formatText(tpl, {title: m, src: TSINA_FACE_URL_PRE + TSINA_FACES[g1]});
+	}
+    return m;
 };
