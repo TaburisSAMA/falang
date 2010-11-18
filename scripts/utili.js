@@ -351,24 +351,32 @@ function getRefreshTime(){
 
 //====>>>>>>>>>>>>>>>>>>
 function getBackgroundView(){
-    //var popupUrl = chrome.extension.getURL('background.html');
-    var views = chrome.extension.getViews();
-    for (var i = 0; i < views.length; i++) {
-        var view = views[i];
-        if (view.theViewName && view.theViewName == 'background') {
-            return view;
+    var b = chrome.extension.getBackgroundPage();
+    if(b){
+        return b;
+    }else{
+        var views = chrome.extension.getViews();
+        for (var i = 0; i < views.length; i++) {
+            var view = views[i];
+            if (view.theViewName && view.theViewName == 'background') {
+                return view;
+            }
         }
     }
     return null;
 };
 
 function getPopupView(){
-    //var popupUrl = chrome.extension.getURL('popup.html');
-    var views = chrome.extension.getViews();
-    for (var i = 0; i < views.length; i++) {
-        var view = views[i];
-        if (view.theViewName && view.theViewName == 'popup') {
-            return view;
+    var p = chrome.experimental.extension.getPopupView();
+    if(p){
+        return p;
+    }else{
+        var views = chrome.extension.getViews();
+        for (var i = 0; i < views.length; i++) {
+            var view = views[i];
+            if (view.theViewName && view.theViewName == 'popup') {
+                return view;
+            }
         }
     }
     return null;
@@ -472,7 +480,23 @@ function ubbCode(str)	{
     return result;
 };
 
+var _u = {
+    //向页面写内容
+    w: function(s){
+        return document.write(s);
+    },
+    //获取本地化语言
+    i18n: function(s, e){
+        var re = chrome.i18n.getMessage(s, e);
+        if(re){
+            return re;
+        }else{
+            return s;
+        }
+    }
+};
+
 //在Chrome上输出log信息，用于调试
 function log(msg){
     console.log(msg);
-}
+};

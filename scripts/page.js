@@ -54,7 +54,7 @@ function builFawaveTip(msg){
     }
     if(msg.retweeted_status){
         rtHtml =  '<div class="retweeted"><span class="username">' + msg.retweeted_status.user.screen_name + ': </span>'
-                + msg.retweeted_status.text;
+                + processMsg(msg.retweeted_status.text);
         if(msg.retweeted_status.thumbnail_pic){
             rtHtml += '<div> <img class="imgicon pic" src="' + msg.retweeted_status.thumbnail_pic + '" /> </div>';
         }
@@ -67,7 +67,7 @@ function builFawaveTip(msg){
             + '  <div class="maincontent">'
             + '    <div class="msg">'
             + '       <span class="username">' + user.screen_name + ': </span>'
-            +         msg.text + picHtml 
+            +         processMsg(msg.text) + picHtml 
             + '    </div>'
             +      rtHtml
             + '  </div>'
@@ -88,7 +88,7 @@ var processMsg = function (str, notEncode) {
     if(!notEncode){
         str = HTMLEnCode(str);
     }
-
+    var domain_sina = 'http://t.sina.com.cn';
     var re = new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&\-/#=;:!\\+]+)(?:\\](.+)\\[/url\\]|)', 'ig');
     str = str.replace(re, replaceUrl);
     str = str.replace(/^@([\w\-\u4e00-\u9fa5|\_]+)/g, ' <a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ domain_sina +'/n/$1" title="左键查看微薄，右键打开主页">@$1</a>');
@@ -97,6 +97,14 @@ var processMsg = function (str, notEncode) {
     
     //str = str.replace(/\[([\u4e00-\u9fff,\uff1f]{1,4})\]/g, replaceEmotional);
     
+    return str;
+};
+
+// HTML 编码
+function HTMLEnCode(str){
+    if(!str){ return ''; }
+    str = str.replace(/</ig, '&lt;');
+    str = str.replace(/>/ig, '&gt;');
     return str;
 };
 

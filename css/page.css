@@ -6,6 +6,21 @@ body #fa_wave_msg_wrap{
    right:0;
    font-size:12px;
 }
+body #fa_wave_msg_wrap *{
+  font-family: "微软雅黑", "雅黑", "Arial", "sans-serif";
+  font-size: 12px;
+  outline:none;
+  margin:0;
+  padding:0;
+}
+
+body #fa_wave_msg_wrap a:link,
+body #fa_wave_msg_wrap a:active,
+body #fa_wave_msg_wrap a:visited{
+  text-decoration:none;
+  cursor:pointer;
+  color:green;
+}
 body #fa_wave_msg_wrap .close_fawave_remind{
 	display: block;
 	background: #E7F9FF;
