@@ -89,7 +89,11 @@ var TSINA_FACES = {
 "照相机": "33/camera_thumb.gif",
 "白云": "ff/y3_thumb.gif",
 "礼物": "c4/liwu_thumb.gif",
-"v5": "c5/v5_org.gif"
+"v5": "c5/v5_org.gif",
+"书呆子": "61/sdz_org.gif"
+// 星座
+//"天蝎座": "09/txz_thumb.gif", "天秤座": "c1/tpz_thumb.gif", "双子座": "d4/szz_thumb.gif", "双鱼座": "7f/syz_thumb.gif", "射手座": "5d/ssz_thumb.gif", "水瓶座": "00/spz_thumb.gif", "摩羯座": "da/mjz_thumb.gif", "狮子座": "23/leo_thumb.gif", "巨蟹座": "a3/jxz_thumb.gif", "金牛座": "8d/jnz_thumb.gif", "处女座": "09/cnz_thumb.gif", 
+//"白羊座": "e0/byz_thumb.gif"
 };
 
 // 格式化内容，处理表情和url等
