@@ -63,15 +63,15 @@
  */
 (function($) {
   $.facebox = function(data, klass) {
-    $.facebox.loading()
+    $.facebox.loading();
     
     data.original = data.original || '';
-    if (data.ajax) fillFaceboxFromAjax(data.ajax)
-    else if (data.image) fillFaceboxFromImage(data.image, null, data.original)
-    else if (data.div) fillFaceboxFromHref(data.div)
-    else if ($.isFunction(data)) data.call($)
-    else $.facebox.reveal(data, klass)
-  }
+    if (data.ajax) fillFaceboxFromAjax(data.ajax);
+    else if (data.image) fillFaceboxFromImage(data.image, null, data.original);
+    else if (data.div) fillFaceboxFromHref(data.div);
+    else if ($.isFunction(data)) data.call($);
+    else $.facebox.reveal(data, klass);
+  };
 
   /*
    * Public, $.facebox methods
@@ -115,66 +115,66 @@
     },
 
     loading: function() {
-      init()
-      if ($('#facebox .loading').length == 1) return true
+      init();
+      if ($('#facebox .loading').length == 1) return true;
       //showOverlay() //修改为图片显示再block
 
-      $('#facebox .content').empty()
+      $('#facebox .content').empty();
       $('#facebox .body').children().hide().end().
         append('<div class="loading"><img src="'+$.facebox.settings.loadingImage+'"/> \
                     <br/> \
                     <a href="javascript:" onclick="$(document).trigger(\'close.facebox\');return false;"><img src="/css/facebox/closelabel.gif" title="close" /></a> \
-                </div>')
+                </div>');
 
       $('#facebox').css({
         top:	getPageScroll()[1] + (getPageHeight() / 10),
         left:	385.5
-      }).show()
+      }).show();
 
       $(document).bind('keydown.facebox', function(e) {
-        if (e.keyCode == 27) $.facebox.close()
-        return true
-      })
-      $(document).trigger('loading.facebox')
+        if (e.keyCode == 27) $.facebox.close();
+        return true;
+      });
+      $(document).trigger('loading.facebox');
     },
 
     reveal: function(data, klass) {
-      $(document).trigger('beforeReveal.facebox')
-      if (klass) $('#facebox .content').addClass(klass)
-      $('#facebox .content').append(data)
-      $('#facebox .loading').remove()
-      $('#facebox .body').children().fadeIn('normal')
-      $('#facebox').css('left', $(window).width() / 2 - ($('#facebox table').width() / 2))
-      $(document).trigger('reveal.facebox').trigger('afterReveal.facebox')
+      $(document).trigger('beforeReveal.facebox');
+      if (klass) $('#facebox .content').addClass(klass);
+      $('#facebox .content').append(data);
+      $('#facebox .loading').remove();
+      $('#facebox .body').children().fadeIn('normal');
+      $('#facebox').css('left', $(window).width() / 2 - ($('#facebox table').width() / 2));
+      $(document).trigger('reveal.facebox').trigger('afterReveal.facebox');
     },
 
     close: function() {
-      $(document).trigger('close.facebox')
-      return false
+      $(document).trigger('close.facebox');
+      return false;
     }
-  })
+  });
 
   /*
    * Public, $.fn methods
    */
 
   $.fn.facebox = function(settings) {
-    init(settings)
+    init(settings);
 
     function clickHandler() {
-      $.facebox.loading(true)
+      $.facebox.loading(true);
 
       // support for rel="facebox.inline_popup" syntax, to add a class
       // also supports deprecated "facebox[.inline_popup]" syntax
-      var klass = this.rel.match(/facebox\[?\.(\w+)\]?/)
-      if (klass) klass = klass[1]
+      var klass = this.rel.match(/facebox\[?\.(\w+)\]?/);
+      if (klass) klass = klass[1];
 
-      fillFaceboxFromHref(this.href, klass)
-      return false
+      fillFaceboxFromHref(this.href, klass);
+      return false;
     }
 
-    return this.click(clickHandler)
-  }
+    return this.click(clickHandler);
+  };
 
   /*
    * Private methods

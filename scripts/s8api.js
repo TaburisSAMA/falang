@@ -15,7 +15,7 @@ var shorten_default = { //缩短URL API的默认参数
     source: SOURCE,
     format: 'json',
     heart: ''
-}
+};
 
 s8Api.shorten = function(params, success_fn, error_fn){
     var opts = $.extend(shorten_default, params);
@@ -50,8 +50,8 @@ s8Api.multshorten = function(params){
 //=================
 var expand_default = { //还原URL API的默认参数
     shortUrl: '',
-    format: 'json',
-}
+    format: 'json'
+};
 
 s8Api.expand = function(params){
     var opts = $.extend(expand_default, params);

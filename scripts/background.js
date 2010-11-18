@@ -186,7 +186,7 @@ function getTimelinePage(t, p){
             params[key] = p[key];
         }
     }
-    var m = ''
+    var m = '';
     switch(t){
         case 'friends_timeline': //示例，如有特殊才需特别定义
             m = 'friends_timeline';

@@ -235,7 +235,7 @@ var processMsg = function (str, notEncode) {
     //str = str.replace(/([^\w]|^)#([\w\u4e00-\u9fa5|\_\~]+)/g, ' <a target="_blank" href="'+ domain_sina +'/k/$2" title="Search #$2">#$2</a>');
     //str = str.replace(/\[:(\d{2})\]|\{([\u4e00-\u9fa5,\uff1f]{2,})\}/g, replaceEmotional); //嘀咕的表情
     
-    str = str.replace(/\[([\u4e00-\u9fff,\uff1f]{1,4})\]/g, replaceEmotional);
+    str = str.replace(/\[([\u4e00-\u9fff,\uff1f,\w]{1,4})\]/g, replaceEmotional);
     //str = str.replace(/([^\w])@([\w\-\u4e00-\u9fa5|\_]+)/g, '$1<a target="_blank" href="'+ domain_sina +'/n/$2" title="$2\'s Homepage">@$2</a>');
     
     return str;
@@ -257,6 +257,6 @@ function replaceEmotional(m, g1){
         }
         return '<img title="' + m + '" src="' + src + '" />';
     }else{
-        return m;
+        return tsina_format_text(m);
     }
-}
+};

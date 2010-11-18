@@ -1241,6 +1241,32 @@ fawave.face = {
     show: function($this, target_id){
         var f = $("#face_box");
         if(f.css('display')=='none' || $("#face_box_target_id").val()!=target_id){
+        	// 初始化表情
+        	var $face_icons = $('#face_icons');
+        	if(!$face_icons.attr('init_icons')) {
+        		var exists = {};
+        		$('#face_icons li a').each(function() {
+        			exists[$(this).attr('title')] = true;
+        		});
+        		var tpl = '<li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[{name}]" title="{name}"><img src="{url}" alt="{name}"></a></li>';
+    			for(var name in TSINA_FACES) {
+        			if(exists[name]) continue;
+        			$face_icons.append($.format(tpl, {'name': name, 'url': TSINA_FACE_URL_PRE + TSINA_FACES[name]}));
+        			exists[name] = true;
+        		}
+        		for(var name in emotionalDict) {
+        			if(exists[name]) continue;
+        			var src = emotionalDict[name];
+			        if(src.indexOf('http') != 0){
+			            src = '/images/faces/' + src + '.gif';
+			        } else {
+			        	continue;
+			        }
+        			$face_icons.append($.format(tpl, {'name': name, 'url': src}));
+        			exists[name] = true;
+        		}
+        		$face_icons.attr('init_icons', true);
+        	}
             $("#face_box_target_id").val(target_id);
             var offset = $($this).offset();
             f.css({"top":offset.top+20, "left":offset.left-25}).show();
