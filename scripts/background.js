@@ -209,7 +209,7 @@ function getTimelinePage(t, p){
             }
             sinaMsgs = sinaMsgs.slice(0, PAGE_SIZE);
             for(i in sinaMsgs){
-                sinaMsgs[i].readed = true
+                sinaMsgs[i].readed = true;
             }
             tweets[_key] = tweets[_key].concat(sinaMsgs);
             _max_id = sinaMsgs[sinaMsgs.length-1].id;
