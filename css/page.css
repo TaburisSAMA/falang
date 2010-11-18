@@ -19,8 +19,15 @@ body #fa_wave_msg_wrap a:active,
 body #fa_wave_msg_wrap a:visited{
   text-decoration:none;
   cursor:pointer;
-  color:green;
+  color:#F77004;
 }
+body #fa_wave_msg_wrap a:hover{
+  text-decoration:none;
+  cursor:pointer;
+  color:#fff;
+  background:#06C;
+}
+
 body #fa_wave_msg_wrap .close_fawave_remind{
 	display: block;
 	background: #E7F9FF;

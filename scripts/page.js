@@ -10,7 +10,8 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
                 $("#fa_wave_msg_wrap .fa_wave_list > div").stop(true).css('opacity', '1.0');
             }, function(){
                 $("#fa_wave_msg_wrap .fa_wave_list > div")
-                      .fadeOut('slow', function() {
+                    .animate({opacity: 1.0}, 800)      
+                    .fadeOut('slow', function() {
                           $(this).remove();
                           if(!$("#fa_wave_msg_wrap .fa_wave_list").html()){
                               $("#fa_wave_msg_wrap").hide();
@@ -50,13 +51,13 @@ function builFawaveTip(msg){
     var user = msg.user || msg.sender;
     var picHtml = '', rtHtml = '';
     if(msg.thumbnail_pic){
-        picHtml = '<div> <img class="imgicon pic" src="' + msg.thumbnail_pic + '" /> </div>';
+        picHtml = '<div><a target="_blank" href="'+msg.original_pic+'"> <img class="imgicon pic" src="' + msg.thumbnail_pic + '" /></a> </div>';
     }
     if(msg.retweeted_status){
         rtHtml =  '<div class="retweeted"><span class="username">' + msg.retweeted_status.user.screen_name + ': </span>'
                 + processMsg(msg.retweeted_status.text);
         if(msg.retweeted_status.thumbnail_pic){
-            rtHtml += '<div> <img class="imgicon pic" src="' + msg.retweeted_status.thumbnail_pic + '" /> </div>';
+            rtHtml += '<div><a target="_blank" href="'+msg.retweeted_status.original_pic+'"> <img class="imgicon pic" src="' + msg.retweeted_status.thumbnail_pic + '" /> </a> </div>';
         }
         rtHtml += '</div>';
     }
