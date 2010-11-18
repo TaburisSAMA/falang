@@ -500,3 +500,8 @@ var _u = {
 function log(msg){
     console.log(msg);
 };
+
+// 微博字数
+String.prototype.len = function(){
+	return this.replace(/[^\x00-\xff]/g,"qq").length / 2;
+};

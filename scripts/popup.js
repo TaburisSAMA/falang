@@ -223,15 +223,13 @@ function sendMsgByActionType(c){//c:要发送的内容
 //统计字数
 function countInputText() {
     var c = $("#txtContent").val();
-    var len = tsina_word_count(c); //c.length || 0;
-    len = 140 - len;
+    var len = 140 - c.len();
     $("#wordCount").html(len);
 }
 
 function countReplyText(){
     var c = $("#replyTextarea").val();
-    var len = tsina_word_count(c) // c.length || 0;
-    len = 140 - len;
+    var len = 140 - c.len();
     if(len > 0){
         len = '(你还可以输入' + len + '字)';
     }else{
@@ -1248,10 +1246,10 @@ fawave.face = {
         		$('#face_icons li a').each(function() {
         			exists[$(this).attr('title')] = true;
         		});
-        		var tpl = '<li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[{name}]" title="{name}"><img src="{url}" alt="{name}"></a></li>';
+        		var tpl = '<li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[{{name}}]" title="{{name}}"><img src="{{url}}" alt="{{name}}"></a></li>';
     			for(var name in TSINA_FACES) {
         			if(exists[name]) continue;
-        			$face_icons.append($.format(tpl, {'name': name, 'url': TSINA_FACE_URL_PRE + TSINA_FACES[name]}));
+        			$face_icons.append(formatText(tpl, {'name': name, 'url': TSINA_FACE_URL_PRE + TSINA_FACES[name]}));
         			exists[name] = true;
         		}
         		for(var name in emotionalDict) {
@@ -1262,7 +1260,7 @@ fawave.face = {
 			        } else {
 			        	continue;
 			        }
-        			$face_icons.append($.format(tpl, {'name': name, 'url': src}));
+        			$face_icons.append(formatText(tpl, {'name': name, 'url': src}));
         			exists[name] = true;
         		}
         		$face_icons.attr('init_icons', true);
