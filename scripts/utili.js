@@ -446,8 +446,6 @@ function HTMLEnCode(str){
     if(!str){ return ''; }
     str = str.replace(/</ig, '&lt;');
     str = str.replace(/>/ig, '&gt;');
-    str = str.replace(/ /ig, '&nbsp;');
-    str = str.replace(/\n/ig, '&nbsp;');
     return str;
 };
 

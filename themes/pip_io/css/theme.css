@@ -39,11 +39,6 @@ div.usericon img {
 	-webkit-box-shadow:0 0 3px #aaa;
 }
 .arrow_r{
-	position:absolute;
-	margin:1px 0 0 -15px;
-	width:7px;
-	height:13px;
-	background:url(../images/arrow_r.png) no-repeat;
 }
 div.mainContent {
 	line-height: 18px;

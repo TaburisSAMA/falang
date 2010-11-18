@@ -22,8 +22,10 @@ var emotionalDict={
     "奥特曼":"otm", "宅":"z", "酷":"cool", "微风":"wind", "话筒":"maiphone", "爱心专递":"axcd",
     "馋嘴":"cz", "来":"come", "便便":"shi", "赞":"z2_org", "瞄":"miao_org", "囧":"j_org", "惊恐":"jingkong_org", 
     "鼓掌":"gz_org", "手套":"shoutao_org", "挖鼻屎":"kbs_org", "good":"http://timg.sjs.sinajs.cn/t3/style/images/common/face/ext/normal/d8/good_thumb.gif",
-    "弱":"http://timg.sjs.sinajs.cn/t3/style/images/common/face/ext/normal/d8/sad_org.gif"
-}
+    "弱":"http://timg.sjs.sinajs.cn/t3/style/images/common/face/ext/normal/d8/sad_org.gif",
+    "嘘":"http://timg.sjs.sinajs.cn/t3/style/images/common/face/ext/normal/a6/x_thumb.gif",
+    "花心":"http://timg.sjs.sinajs.cn/t3/style/images/common/face/ext/normal/64/hs_org.gif"
+};
 
 function bildMsgLi(sinaMsg, t){
     if(!sinaMsg){ return ''; }
@@ -223,7 +225,7 @@ var processMsg = function (str, notEncode) {
 
     //str = ubbCode(str);
     //str = str.replace(/(http:\/\/[\w|\.|\/|\-|\=|\+|\?|\%|#]+)/g, '<a target="_blank" href="$1" title="$1">$1</a>');
-    var re = new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&\-/#=;:!\\+]+)\\s*(?:\\](.+)\\[/url\\]|)', 'ig');
+    var re = new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&\-/#=;:!\\+]+)(?:\\](.+)\\[/url\\]|)', 'ig');
     str = str.replace(re, replaceUrl);
     //str = str.replace(/^@([\w\-\u4e00-\u9fa5|\_]+)/g, ' <a target="_blank" href="'+ domain_sina +'/n/$1" title="$1\'s Homepage">@$1</a>');
     str = str.replace(/^@([\w\-\u4e00-\u9fa5|\_]+)/g, ' <a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ domain_sina +'/n/$1" title="左键查看微薄，右键打开主页">@$1</a>');
@@ -240,8 +242,12 @@ var processMsg = function (str, notEncode) {
 };
 
 function replaceUrl(m, g1, g2){
-    return '<a target="_blank" href="' + g1 + '" title="' + g1 + '">' + (g2||g1) + '</a>';
-}
+    var _url = g1;
+    if(g1.indexOf('http') != 0){
+        _url = 'http://' + g1;
+    }
+    return '<a target="_blank" href="' + _url + '" title="' + g1 + '">' + (g2||g1) + '</a>';
+};
 
 function replaceEmotional(m, g1){
     if(g1 && emotionalDict[g1]){

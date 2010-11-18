@@ -1,4 +1,5 @@
 // @author qleelulu@gmail.com
+
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     if(request.msgs && request.msgs.length>0){
         var msg_wrap = $("#fa_wave_msg_wrap");
@@ -77,6 +78,33 @@ function builFawaveTip(msg){
 function close_fawave_remind(){
     $("#fa_wave_msg_wrap .fa_wave_list").html('');
     $("#fa_wave_msg_wrap").hide();
+};
+
+/**
+ * 处理内容
+ */
+var processMsg = function (str, notEncode) {
+    if(!str){ return ''; }
+    if(!notEncode){
+        str = HTMLEnCode(str);
+    }
+
+    var re = new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&\-/#=;:!\\+]+)(?:\\](.+)\\[/url\\]|)', 'ig');
+    str = str.replace(re, replaceUrl);
+    str = str.replace(/^@([\w\-\u4e00-\u9fa5|\_]+)/g, ' <a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ domain_sina +'/n/$1" title="左键查看微薄，右键打开主页">@$1</a>');
+    str = str.replace(/([^\w#])@([\w\-\u4e00-\u9fa5|\_]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ domain_sina +'/n/$2" title="左键查看微薄，右键打开主页">@$2</a>');
+    str = str.replace(/#([^#]+)#/g, '<a target="_blank" href="'+ domain_sina +'/k/$1" title="Search #$1">#$1#</a>');
+    
+    //str = str.replace(/\[([\u4e00-\u9fff,\uff1f]{1,4})\]/g, replaceEmotional);
+    
+    return str;
+};
+
+function replaceUrl(m, g1, g2){
+    if(g1.indexOf('http') != 0){
+        g1 = 'http://' + g1;
+    }
+    return '<a target="_blank" href="' + g1 + '" title="' + g1 + '">' + (g2||g1) + '</a>';
 };
 
 /*
