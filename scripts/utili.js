@@ -440,17 +440,13 @@ Storage.prototype.getObject = function(key) {
 function formatText(msg, values, filter) {
     var pattern = /\{\{([\w\s\.\(\)"',-]+)?\}\}/g;
     return msg.replace(pattern, function(match, key) {
-        return jQuery.isFunction(filter) ? filter((values[key] || eval('(values.' +key+')')), key) : (values[key] || eval('(values.' +key+')')); //values[key];
+    	var value = values[key] || eval('(values.' +key+')');
+        return jQuery.isFunction(filter) ? filter(value, key) : value;
     });	
 };
 
 // HTML 编码
 function HTMLEnCode(str){
-    /*
-    var _div = document.createElement('div');
-    var _text = document.createTextNode(str);
-    _div.appendChild(_text);
-    return _div.innerHTML; */
     if(!str){ return ''; }
     str = str.replace(/</ig, '&lt;');
     str = str.replace(/>/ig, '&gt;');
@@ -503,5 +499,5 @@ function log(msg){
 
 // 微博字数
 String.prototype.len = function(){
-	return this.replace(/[^\x00-\xff]/g,"qq").length / 2;
+	return this.replace(/[^\x00-\xff]/g, "qq").length / 2;
 };
