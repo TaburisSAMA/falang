@@ -1,51 +1,59 @@
 // @author qleelulu@gmail.com
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-    if(request.msgs && request.msgs.length>0){
-        var msg_wrap = $("#fa_wave_msg_wrap");
-        if(msg_wrap.length < 1){
-            msg_wrap = $('<div id="fa_wave_msg_wrap"><a href="javascript:void(0)" class="close_fawave_remind">关闭</a><div class="fa_wave_list"></div></div>').appendTo('body');
-            msg_wrap.find('.close_fawave_remind').click(function(){ close_fawave_remind(); });
-            msg_wrap.hover(function(){
-                $("#fa_wave_msg_wrap .fa_wave_list > div").stop(true).css('opacity', '1.0');
-            }, function(){
-                $("#fa_wave_msg_wrap .fa_wave_list > div")
-                    .animate({opacity: 1.0}, 800)      
-                    .fadeOut('slow', function() {
-                          $(this).remove();
-                          if(!$("#fa_wave_msg_wrap .fa_wave_list").html()){
-                              $("#fa_wave_msg_wrap").hide();
-                          }
-                      });
-            });
-        }
-        var msg_list_wrap = msg_wrap.find('.fa_wave_list');
-        var len = request.msgs.length>5 ? 5 : request.msgs.length;
-        var showCount = 0;//已经提示的信息数
-        var _msg_user = null;
-        for(var i=0; i<request.msgs.length; i++){
-            _msg_user = request.msgs[i].user || request.msgs[i].sender;
-            if(_msg_user.id != request.userId){
-                showCount += 1;
-                if(showCount == 1){msg_wrap.show();}//有可显示的信息，就显示
-                $(builFawaveTip(request.msgs[i]))
-                    .appendTo(msg_list_wrap)
-                    .fadeIn('slow')
-                    .animate({opacity: 1.0}, 8000)
-                    .fadeOut('slow', function() {
-                      $(this).remove();
-                      if(!msg_list_wrap.html()){
-                          msg_wrap.hide();
-                      }
-                    });
-                if(showCount >= 5){break;}
-            }
-        }
-        if(!msg_list_wrap.html()){
-            msg_wrap.hide();
-        }
+    if(request.method){
+        methodManager[request.method](request, sender, sendResponse);
     }
 });
+
+var methodManager = {
+    showNewMsgInPage: function(request, sender, sendResponse){
+        if(request.msgs && request.msgs.length>0){
+            var msg_wrap = $("#fa_wave_msg_wrap");
+            if(msg_wrap.length < 1){
+                msg_wrap = $('<div id="fa_wave_msg_wrap"><a href="javascript:void(0)" class="close_fawave_remind">关闭</a><div class="fa_wave_list"></div></div>').appendTo('body');
+                msg_wrap.find('.close_fawave_remind').click(function(){ close_fawave_remind(); });
+                msg_wrap.hover(function(){
+                    $("#fa_wave_msg_wrap .fa_wave_list > div").stop(true).css('opacity', '1.0');
+                }, function(){
+                    $("#fa_wave_msg_wrap .fa_wave_list > div")
+                        .animate({opacity: 1.0}, 800)      
+                        .fadeOut('slow', function() {
+                              $(this).remove();
+                              if(!$("#fa_wave_msg_wrap .fa_wave_list").html()){
+                                  $("#fa_wave_msg_wrap").hide();
+                              }
+                          });
+                });
+            }
+            var msg_list_wrap = msg_wrap.find('.fa_wave_list');
+            var len = request.msgs.length>5 ? 5 : request.msgs.length;
+            var showCount = 0;//已经提示的信息数
+            var _msg_user = null;
+            for(var i=0; i<request.msgs.length; i++){
+                _msg_user = request.msgs[i].user || request.msgs[i].sender;
+                if(_msg_user.id != request.userId){
+                    showCount += 1;
+                    if(showCount == 1){msg_wrap.show();}//有可显示的信息，就显示
+                    $(builFawaveTip(request.msgs[i]))
+                        .appendTo(msg_list_wrap)
+                        .fadeIn('slow')
+                        .animate({opacity: 1.0}, 8000)
+                        .fadeOut('slow', function() {
+                          $(this).remove();
+                          if(!msg_list_wrap.html()){
+                              msg_wrap.hide();
+                          }
+                        });
+                    if(showCount >= 5){break;}
+                }
+            }
+            if(!msg_list_wrap.html()){
+                msg_wrap.hide();
+            }
+        }
+    }
+};
 
 function builFawaveTip(msg){
     var user = msg.user || msg.sender;
@@ -143,3 +151,96 @@ function replaceUrl(m, g1, g2){
 	</div>
 </li>
 */
+
+
+/**
+ * 格式化字符串 from tbra
+ * eg:
+ * 	formatText('{0}天有{1}个小时', [1, 24]) 
+ *  or
+ *  formatText('{{day}}天有{{hour}}个小时', {day:1, hour:24}}
+ * @param {Object} msg
+ * @param {Object} values
+ */
+function fawaveFormatText(msg, values, filter) {
+    var pattern = /\{\{([\w\s\.\(\)"',-]+)?\}\}/g;
+    return msg.replace(pattern, function(match, key) {
+        return jQuery.isFunction(filter) ? filter((values[key] || eval('(values.' +key+')')), key) : (values[key] || eval('(values.' +key+')')); //values[key];
+    });	
+};
+
+/* 快速发微博 */
+var QUICK_SEND_TEMPLATE = ' \
+    <div id="fawaveSendMsgWrap" style="display:none;"> \
+        <div class="fawave-model-container">\
+            <div class="modal-title" id="modalTitle">快速发送微博--FaWave(发微)</div> \
+            <div class="close"><a href="javascript:" class="fawavemodal-close">x</a></div> \
+            <div class="modal-data"> \
+                <div>\
+                    <input type="checkbox" id="fawave-share-page-chk" /><label for="fawave-share-page-chk">分享当前网页</label>\
+                    <textarea id="fawaveTxtContentInp" style="width:100%;" rows="5" class="padDoing" ></textarea>\
+                </div>\
+                <div id="submitWarp">\
+                    <button id="btnSend" class="btn-positive" onclick="">\
+                        <img src="/images/tick.png" alt="">发微\
+                    </button>\
+                    <button class="btn-negative">\
+                        <img src="/images/cross.png" alt="">取消\
+                    </button>\
+                    <span>(按 ESC 键取消)</span>\
+                    <span class="fawave-wordCount">140</span>\
+                </div>\
+            </div> \
+        </div>\
+    </div>';
+
+QUICK_SEND_TEMPLATE = QUICK_SEND_TEMPLATE.replace('/images/tick.png', chrome.extension.getURL("/images/tick.png"))
+                                         .replace('/images/cross.png', chrome.extension.getURL("/images/cross.png"));
+
+
+//由于chrome.extension.sendRequest是异步请求，所以先写个默认的
+var fawaveLookingTemplate = '我正在看: {{title}} {{url}} ';
+
+function fawaveToggleLooking(ele){
+    var loc_url = window.location.href;
+    var result = '';
+    if(loc_url){
+        var title = document.title;
+        result = fawaveFormatText(fawaveLookingTemplate, {title:(title||''), url:loc_url});
+        //showMsgInput();
+        //countInputText();
+    }
+    if($(ele).attr('checked')){
+        $("#fawaveTxtContentInp").val(result);
+    }else{
+        $("#fawaveTxtContentInp").val($("#fawaveTxtContentInp").val().replace(result, ''));
+    }
+};
+
+var HOT_KEY = [];
+
+$(function(){
+    //异步获取模板先
+    chrome.extension.sendRequest({method:'getLookingTemplate'}, function(response){
+        fawaveLookingTemplate = response.lookingTemplate;
+    });
+
+    $('body').append(QUICK_SEND_TEMPLATE);
+
+    $("#fawaveSendMsgWrap .fawavemodal-close, #fawaveSendMsgWrap .btn-negative").click(function(){
+        $("#fawaveSendMsgWrap").hide();
+    });
+
+    var chkLooking = document.getElementById("fawave-share-page-chk");
+    if(chkLooking){
+        chkLooking.addEventListener("click", function() {
+            fawaveToggleLooking(this);
+        }, false);
+    }
+    document.onkeydown = function(e){
+        //console.log(e.keyCode);
+        if(e.keyCode == 16){
+            //$("#fawaveSendMsgWrap").show();
+        }
+    };
+});

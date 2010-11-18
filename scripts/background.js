@@ -265,7 +265,7 @@ function setDoChecking(t, c_t, v){
 function showNewMsg(msgs, t, userId){
     if(isShowInPage(t)){
         chrome.tabs.getSelected(null, function(tab) {
-            chrome.tabs.sendRequest(tab.id, {msgs: msgs, t:t, userId:userId}, function handler(response) {
+            chrome.tabs.sendRequest(tab.id, {method:'showNewMsgInPage', msgs: msgs, t:t, userId:userId}, function handler(response) {
             });
         });
     }
@@ -308,9 +308,22 @@ itv = setInterval(checkNewMsg, getRefreshTime());
 
 
 
+chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+    // sender.tab ? sender.tab.url
+    if(request.method){
+        r_method_manager[request.method](request, sender, sendResponse);
+    }
+});
 
-
-
+r_method_manager = {
+    test: function(request, sender, sendResponse){
+        sendResponse({farewell: "goodbye"});
+    },
+    getLookingTemplate: function(request, sender, sendResponse){
+        var _l_tp = getLookingTemplate();
+        sendResponse({lookingTemplate: _l_tp});
+    }
+};
 
 
 

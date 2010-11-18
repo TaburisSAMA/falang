@@ -44,6 +44,7 @@ label.title{color:#AB5603; font-weight:bold;}
 	right:20px;
 	position:fixed;
 	top:0;
+	z-index:10;
 }
 
 /* tab */
