@@ -255,23 +255,18 @@ function initIamDoing(){
                 if(isAutoShortUrl() && loc_url.replace(/^https?:\/\//i, '').length > getAutoShortUrlWordCount()){
                     s8Api.shorten({longUrl: loc_url}, function(data){
                         if(data && data.shortUrl){
-                            $("#txtContent").val('我正在看: ' + (title||'') + ' ' + data.shortUrl + ' ');
-                            //$("#txtContent").val('我正在看 [url=' + data.shortUrl + ' ]' + (title||data.shortUrl) + '[/url]');
-                        }else{
-                            $("#txtContent").val('我正在看: ' + (title||'') + ' ' + loc_url + ' ');
-                            //$("#txtContent").val('我正在看 [url=' + loc_url + ' ]' + (title||loc_url) + '[/url]');
+                            loc_url = data.shortUrl;
                         }
+                        $("#txtContent").val( formatText(getLookingTemplate(), {title:(title||''), url:loc_url}) );
                         showMsgInput();
                         countInputText();
                     },function(xhr, textStatus, errorThrown){
-                        $("#txtContent").val('我正在看: ' + (title||'') + ' ' + loc_url + ' ');
-                        //$("#txtContent").val('我正在看 [url=' + loc_url + ' ]' + (title||loc_url) + '[/url]');
+                        $("#txtContent").val( formatText(getLookingTemplate(), {title:(title||''), url:loc_url}) );
                         showMsgInput();
                         countInputText();
                     });
                 }else{
-                    $("#txtContent").val('我正在看: ' + (title||'') + ' ' + loc_url + ' ');
-                    //$("#txtContent").val('我正在看 [url=' + loc_url + ' ]' + (title||loc_url) + '[/url]');
+                    $("#txtContent").val( formatText(getLookingTemplate(), {title:(title||''), url:loc_url}) );
                     showMsgInput();
                     countInputText();
                 }
@@ -1020,7 +1015,7 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
     }
 
     $('#ye_dialog_window').show();
-    var d = $(ele).parent().parent().parent().parent().find('.msgObjJson').text();
+    var d = $(ele).closest('li').find('.msgObjJson').text();
     try{
         d = JSON.parse(d);
     }
@@ -1028,7 +1023,7 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
         d = null;
     }
     var v = '';
-    if(d && d.retweeted_status){
+    if(reTweetId && d && d.retweeted_status){
         v = '//@' + userName + ':' + d.text;
     }else{
         v = '转发微博.';

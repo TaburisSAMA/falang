@@ -94,6 +94,8 @@ function init(){
     //初始化是否同步未读提示
     $("#unread_sync_to_page").attr("checked", getIsSyncUnread());
 
+    $("#tp_looking").val(getLookingTemplate()); //我正在看模板
+
     initSetBadgeText();
     initShowInPage();
     initTheme();
@@ -126,8 +128,8 @@ function initJtip(){
         var offset = _t.offset();
         $("#JT_close_left").html(_t.attr('jTitle')||'　');
         $("#JT_copy").html(_t.find('.c').html());
-        //_t.after($("#JT").css({top:offset.top-5, left:offset.left + 25}));
-        $("#JT").css({top:offset.top-5, left:offset.left + 25}).css({visibility:'visible', opacity:'0.98'})
+        var jWidth = _t.attr('jWidth') || '';
+        $("#JT").css({top:offset.top-5, left:offset.left + 25, width:jWidth}).css({visibility:'visible', opacity:'0.98'})
     }, function(){
         $("#JT").css({opacity:0, visibility:'hidden'});
     });
@@ -308,6 +310,8 @@ function saveAll(){
     }
 
     setIsSyncUnread($("#unread_sync_to_page").attr("checked") ? 1 : 0);
+
+    setLookingTemplate($("#tp_looking").val()); //我正在看模板
 
     saveSetBadgeText();
     saveSetShowInPage();

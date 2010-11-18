@@ -11,6 +11,7 @@ h3{
 	margin:0 8px 1em 0;
 	padding:2px;
 }
+p{margin: 0;}
 
 label.title{color:#AB5603; font-weight:bold;}
 
@@ -112,6 +113,9 @@ ul#navigation li.selected{
 	border: solid 1px #ccc;
 }
 
+.set_wrap{padding: 20px 10px; min-height:200px;}
+.set_wrap li{margin:5px 0;}
+
 /* ---------->>> jtip <<<---------------------------------------------------------------*/
 #JT_arrow_left{
 	background-image: url(../images/arrow_left.gif);
@@ -146,6 +150,8 @@ ul#navigation li.selected{
 #JT_copy{
 	padding:10px 10px 10px 10px;
 	color:#333333;
+	font-size:12px;
+	line-height:18px;
 }
 .JT_loader{
 	background-image: url(../images/loader.gif);
@@ -171,7 +177,7 @@ ul#navigation li.selected{
 	font-weight:bold;
 }
 #JT_copy p{
-margin:3px 0;
+	margin:3px 0;
 }
 #JT_copy img{
 	padding: 1px;

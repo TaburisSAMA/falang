@@ -31,13 +31,14 @@
 		<li class="selected" target_id="#common_set"><a href="javascript:">基本设置</a></li> 
 		<li class="" target_id="#appearance_set"><a href="javascript:">外观设置</a></li> 
 		<li class="" target_id="#user_set" hide_save_btn="1"><a id="tab_user_set" href="javascript:">帐号设置</a></li> 
+		<li class="" target_id="#advanced_set" ><a href="javascript:">高级设置</a></li> 
 		<li class="" target_id="#about_me" hide_save_btn="1"><a href="javascript:">关于与感谢</a></li> 
 		<!-- <li class=""><a href="javascript:">Sponsors</a></li> 
 		<li class=""><a href="javascript:">Register</a></li> -->
 		<li class="shadow"></li> 
 	</ul>
 	<!-- 用户设置 START -->
-	<div id="user_set" style="display:none;">
+	<div id="user_set" class="set_wrap" style="display:none;">
 		<br/><br/>
 		<div class="info">用户、密码保存在本地。在公共电脑上使用时请慎重。</div>
 		<table>
@@ -72,7 +73,8 @@
 		</div>
 	</div>
 	<!-- 用户设置END -->
-	<ul id="common_set">
+	<!-- 基本设置 -->
+	<ul id="common_set" class="set_wrap">
 		<li>
 			<p>
 				<label class="title">获取信息间隔时间：</label>
@@ -145,7 +147,8 @@
 			</p>
 		</li>
 	</ul>
-	<ul id="appearance_set" style="display:none;">
+	<!-- 外观设置 -->
+	<ul id="appearance_set" class="set_wrap" style="display:none;">
 		<li>
 			<div>
 				<label class="title">字体设置：</label>
@@ -190,10 +193,27 @@
 			</p>
 		</li>
 	</ul>
-	<div id="about_me" style="display:none;">
+	<!-- 关于与感谢 -->
+	<ul id="advanced_set" class="set_wrap" style="display:none;">
+		<li><label class="title">我正在看模板: </label>
+			<input type="text" id="tp_looking" value="我正在看: {{title}} {{url}} " style="width:200px;" />
+			<span class="jTip" jTitle="可用参数与说明:　" jWidth="320">?
+				<span class="c">当你使用“我正在看”的功能的时候，会根据该模板生成最终内容。<br/>
+					模板参数必须由"{{}}"包裹起来，可用的参数有：<br/>
+					<p><b>{{url}}</b>: 你当前正在浏览的网页的url</p>
+					<p><b>{{title}}</b>: 你当前正在浏览的网页的标题</p>
+					<img src="/images/setting/looking.png" /></span>
+			</span>
+		</li>
+	</ul>
+	<!-- 关于与感谢 -->
+	<div id="about_me" class="set_wrap" style="display:none;">
 		<br/><br/>
+		
 		<b>作者：</b><a target="_blank" href="http://t.sina.com.cn/qleelulu" >@QLeelulu</a>，有什么建议和问题可以直接@我或者私信我
 		<!-- <div><a target="_blank" href="http://t.sina.com.cn/qleelulu" ><img style="padding:3px;border:solid 1px #ccc;" src="http://tp4.sinaimg.cn/1644902943/50/1279883084/1" /></a></div> -->
+		<br/><br/>
+		<b>官方微博：</b><a target="_blank" href="http://t.sina.com.cn/falang" >@FaWave</a>
 		<br /><br />
 		<b>感谢以下朋友的贡献：</b>
 		<ul>

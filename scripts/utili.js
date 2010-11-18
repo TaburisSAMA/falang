@@ -39,6 +39,8 @@ var FONT_SIZE_KEY = 'idi_FONT_SIZE_KEY'; //字体大小的KEY
 var WIDTH_AND_HEIGHT_KEY = 'idi_WIDTH_AND_HEIGHT_KEY'; //宽高
 var DEFAULT_WIDTH_AND_HEIGHT = [480, 520]; //默认宽高
 
+var TP_LOOKING_KEY = 'idi_TP_LOOKING_KEY'; //我正在看的模板key
+
 //['friends_timeline','mentions','comments_timeline','comments_by_me','direct_messages','favorites']
 var T_LIST = ['friends_timeline','mentions','comments_timeline','direct_messages']; //timeline的分类列表
 
@@ -265,6 +267,17 @@ function setTheme(theme){
 };
 //<<--
 
+//-- 我正在看模板 --
+function getLookingTemplate(){
+    var t = localStorage.getObject(TP_LOOKING_KEY);
+    return t || '我正在看: {{title}} {{url}} ';
+};
+
+function setLookingTemplate(tp){
+    localStorage.setObject(TP_LOOKING_KEY, tp);
+};
+//<<--
+
 //-- 字体 --
 function getFont(){
     var t = localStorage.getObject(FONT_KEY);
@@ -425,10 +438,17 @@ function formatText(msg, values, filter) {
 
 // HTML 编码
 function HTMLEnCode(str){
+    /*
     var _div = document.createElement('div');
     var _text = document.createTextNode(str);
     _div.appendChild(_text);
-    return _div.innerHTML;
+    return _div.innerHTML; */
+    if(!str){ return ''; }
+    str = str.replace(/</ig, '&lt;');
+    str = str.replace(/>/ig, '&gt;');
+    str = str.replace(/ /ig, '&nbsp;');
+    str = str.replace(/\n/ig, '&nbsp;');
+    return str;
 };
 
 ///UBB内容转换
