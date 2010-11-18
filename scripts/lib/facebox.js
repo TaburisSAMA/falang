@@ -66,11 +66,11 @@
     $.facebox.loading();
     
     data.original = data.original || '';
-    if (data.ajax) fillFaceboxFromAjax(data.ajax);
-    else if (data.image) fillFaceboxFromImage(data.image, null, data.original);
-    else if (data.div) fillFaceboxFromHref(data.div);
-    else if ($.isFunction(data)) data.call($);
-    else $.facebox.reveal(data, klass);
+    if (data.ajax){ fillFaceboxFromAjax(data.ajax); }
+    else if (data.image){ fillFaceboxFromImage(data.image, null, data.original); }
+    else if (data.div){ fillFaceboxFromHref(data.div); }
+    else if ($.isFunction(data)){ data.call($); }
+    else{ $.facebox.reveal(data, klass); }
   };
 
   /*
