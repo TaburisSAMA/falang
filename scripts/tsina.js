@@ -125,3 +125,18 @@ function tsina_get_screen_name_link(user, need_at) {
 	return '<a href="' + user.t_url + '" target="_blank" title="关注：' 
 		+ user.friends_count + '个  粉丝：' + user.followers_count + '个  微博：' + user.statuses_count + '条">' + name + '</a>';
 }
+
+// 计算字符数，英文字符算半个
+function tsina_word_count(text) {
+	var count = 0;
+	if(!text) return count;
+	var ascii_rex = /[\w\s\.,\?'""!@#\$%\^&\*\(\)-_=\+;:<>\/\\\|\}\{\[\]`~]/;
+	for(var c in text) {
+		if(ascii_rex.test(text[c])) {
+			count += 0.5;
+		} else {
+			count += 1;
+		}
+	}
+	return count;
+}

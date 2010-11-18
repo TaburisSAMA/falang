@@ -221,18 +221,18 @@ function sendMsgByActionType(c){//c:要发送的内容
 }
 
 //统计字数
-function countInputText(){
+function countInputText() {
     var c = $("#txtContent").val();
-    var len = c.length || 0;
+    var len = tsina_word_count(c); //c.length || 0;
     len = 140 - len;
     $("#wordCount").html(len);
 }
 
 function countReplyText(){
     var c = $("#replyTextarea").val();
-    var len = c.length || 0;
+    var len = tsina_word_count(c) // c.length || 0;
     len = 140 - len;
-    if(len>0){
+    if(len > 0){
         len = '(你还可以输入' + len + '字)';
     }else{
         len = '(<em style="color:red;">已超出' + (-len) + '字</em>)';
