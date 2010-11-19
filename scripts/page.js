@@ -232,12 +232,14 @@ function fawaveInitTemplate(){
             .end().find('img').attr('src', CURRENT_USER.profile_image_url);
     }
     $("#fawaveSendMsgWrap .fawavemodal-close").click(function(){
+        showFawaveAlertMsg('');
         $("#fawaveSendMsgWrap").hide();
     });
 
     $("#fawaveSendMsgWrap .btn-negative").click(function(){
         $("#fawaveTxtContentInp").val('');
         $("#fawave-share-page-chk").attr("checked", false);
+        showFawaveAlertMsg('');
         $("#fawaveSendMsgWrap").hide();
     });
 
