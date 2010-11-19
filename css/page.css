@@ -1,17 +1,21 @@
 
 body #fa_wave_msg_wrap{
    position:fixed;
-   z-index: 100000;
+   z-index: 110000;
    top:0;
    right:0;
    font-size:12px;
+   padding:0;
+   margin:0;
 }
-body #fa_wave_msg_wrap *{
+body #fa_wave_msg_wrap *, body #fawaveSendMsgWrap *{
   font-family: "微软雅黑", "雅黑", "Arial", "sans-serif";
   font-size: 12px;
   outline:none;
   margin:0;
   padding:0;
+  font-weight:normal;
+  float:none;
 }
 body #fa_wave_msg_wrap a:link,
 body #fa_wave_msg_wrap a:active,
@@ -71,13 +75,13 @@ body #fa_wave_msg_wrap .msgRemind .username{color:green;font-weight: bold;}
 /* Overlay */
 body #fawave-page-overlay {background-color:#000; height: 976px; left:0px; opacity:0.5; position:fixed; top:0px; width:100%; z-index:100001;}
 /* Container */
-body #fawaveSendMsgWrap {margin: 0px auto; position:relative; width:500px; z-index:100002;}
-body #fawaveSendMsgWrap .fawave-model-container {position:fixed; width:500px; top:0px; background-color:#F6F6F6; color:#000; font: 16px/24px "Lucida Grande",Arial,sans-serif; padding-bottom:4px; -webkit-border-bottom-left-radius:6px; -webkit-border-bottom-right-radius:6px; border-radius:0 0 6px 6px; -webkit-box-shadow:0 0 64px #000;}
+body #fawaveSendMsgWrap {margin: 0px auto; position:relative; width:420px; z-index:100002; }
+body #fawaveSendMsgWrap .fawave-model-container {position:fixed; text-align:left; width:420px; top:0px; background-color:#F6F6F6; color:#000; font: 16px/24px "Lucida Grande",Arial,sans-serif; padding-bottom:4px; -webkit-border-bottom-left-radius:6px; -webkit-border-bottom-right-radius:6px; border-radius:0 0 6px 6px; -webkit-box-shadow:0 0 64px #000;}
 body #fawaveSendMsgWrap .fawave-model-container a {color:#369;}
-body #fawaveSendMsgWrap .fawave-model-container .modal-title {color:#000; background-color:#ddd; border-bottom:1px solid #ccc; font-weight:bold; padding:6px 8px; text-shadow:0 1px 0 #f4f4f4;}
+body #fawaveSendMsgWrap .fawave-model-container .modal-title {font-size:14px; color:#000; background-color:#ddd; border-bottom:1px solid #ccc; font-weight:bold; padding:3px 8px; text-shadow:0 1px 0 #f4f4f4;}
 body #fawaveSendMsgWrap .fawave-model-container .close {position:absolute; right:0; top:0;}
 body #fawaveSendMsgWrap .fawave-model-container .close a {display:block; color:#777; font-weight:bold; padding:6px 12px 0; text-decoration:none; text-shadow:0 1px 0 #f4f4f4;}
-body #fawaveSendMsgWrap .fawave-model-container .close a:hover {color:#000;}
+body #fawaveSendMsgWrap .fawave-model-container .close a:hover {color:#000; background:#ddd;}
 body #fawaveSendMsgWrap .fawave-model-container .modal-data {font-size:12px; padding:6px 12px;}
 body #fawaveSendMsgWrap .fawave-model-container h2 {margin:10px 0 6px;}
 body #fawaveSendMsgWrap .fawave-model-container p {margin-bottom:10px;}
@@ -92,3 +96,5 @@ body #fawaveSendMsgWrap .fawave-model-container .btn-positive,
 body #fawaveSendMsgWrap .fawave-model-container .btn-positive img,
 	body #fawaveSendMsgWrap .fawave-model-container .btn-negative img{vertical-align: top; border:none; padding:0; margin:0;}
 body #fawaveSendMsgWrap .fawave-model-container .fawave-wordCount{float:right;}
+body #fawaveSendMsgWrap .fawave-model-container .fawave-wordCount{float:right;}
+body #fawaveSendMsgWrap .fawave-model-container .fawaveSubmitWarp{margin-top:8px;}

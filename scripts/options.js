@@ -1,5 +1,7 @@
 // @author qleelulu@gmail.com
 
+var KEYCODE_MAP = {8:"BackSpace", 9:"Tab", 12:"Clear", 13:"Enter", 16:"Shift", 17:"Ctrl", 18:"Alt", 19:"Pause", 20:"Caps Lock", 27:"Escape", 32:"Space", 33:"Prior", 34:"Next", 35:"End", 36:"Home", 37:"Left", 38:"Up", 39:"Right", 40:"Down", 41:"Select", 42:"Print", 43:"Execute", 45:"Insert", 46:"Delete", 47:"Help", 48:"0", 49:"1", 50:"2", 51:"3", 52:"4", 53:"5", 54:"6", 55:"7", 56:"8", 57:"9", 65:"A", 66:"B", 67:"C", 68:"D", 69:"E", 70:"F", 71:"G", 72:"H", 73:"I", 74:"J", 75:"K", 76:"L", 77:"M", 78:"N", 79:"O", 80:"P", 81:"Q", 82:"R", 83:"S", 84:"T", 85:"U", 86:"V", 87:"W", 88:"X", 89:"Y", 90:"Z", 96:"KP_0", 97:"KP_1", 98:"KP_2", 99:"KP_3", 100:"KP_4", 101:"KP_5", 102:"KP_6", 103:"KP_7", 104:"KP_8", 105:"KP_9", 106:"KP_Multiply", 107:"KP_Add", 108:"KP_Separator", 109:"KP_Subtract", 110:"KP_Decimal", 111:"KP_Divide", 112:"F1", 113:"F2", 114:"F3", 115:"F4", 116:"F5", 117:"F6", 118:"F7", 119:"F8", 120:"F9", 121:"F10", 122:"F11", 123:"F12", 124:"F13", 125:"F14", 126:"F15", 127:"F16", 128:"F17", 129:"F18", 130:"F19", 131:"F20", 132:"F21", 133:"F22", 134:"F23", 135:"F24", 136:"Num_Lock", 137:"Scroll_Lock", 187:"acute", 188:"comma", 189:"minus", 190:"period", 192:"numbersign", 210:"plusminus", 211:"211", 212:"copyright", 213:"guillemotleft", 214:"masculine", 215:"AE", 216:"cent", 217:"questiondown", 218:"onequarter", 220:"less", 221:"plus", 227:"multiply", 228:"Acircumflex", 229:"Ecircumflex", 230:"Icircumflex", 231:"Ocircumflex", 232:"Ucircumflex", 233:"Ntilde", 234:"Yacute", 235:"Ooblique", 236:"Aring", 237:"Ccedilla", 238:"THORN", 239:"ETH", 240:"diaeresis", 241:"Agrave", 242:"Egrave", 243:"Igrave", 244:"Ograve", 245:"Ugrave", 246:"Adiaeresis", 247:"Ediaeresis", 248:"Idiaeresis", 249:"Odiaeresis", 250:"Udiaeresis", 251:"ssharp", 252:"asciicircum", 253:"sterling", 254:"Mode_switch"};
+
 var LOCAL_STORAGE_NUM_KEY = 'idi_local_storage_num';
 
 $(function(){
@@ -101,6 +103,7 @@ function init(){
     initTheme();
     initWidthAndHeight();
     initFont();
+    initQuickSendHotKey();
 
     initJtip();
 };
@@ -178,6 +181,57 @@ function initWidthAndHeight(){
     var wh = getWidthAndHeight();
     $("#set_main_width").val(wh[0]);
     $("#set_main_height").val(wh[1]);
+};
+
+//初始化快速发送热键
+var TEMP_SET_KEYS = [];
+function initQuickSendHotKey(){
+    var keys = getQuickSendHotKey();
+    keys = keys.split(',');
+    var key_maps = '';
+    for(i in keys){
+        var _i = keys[i];
+        if(KEYCODE_MAP[_i]){
+            _i = KEYCODE_MAP[_i];
+        }
+        if(key_maps){ key_maps += ' + '; }
+        key_maps += _i;
+    }
+    $("#set_quick_send_key_inp").val(key_maps);
+    $("#set_quick_send_key").val(keys);
+    $("#set_quick_send_key_inp").focus(function(){
+        $(this).bind('keydown', function(e){
+            //如果是同一个键,则无视
+            if(TEMP_SET_KEYS.length && e.keyCode == TEMP_SET_KEYS[TEMP_SET_KEYS.length-1]){
+                return false;
+            }
+            var _t = $(this);
+            if(!TEMP_SET_KEYS.length){ _t.val(''); }
+            TEMP_SET_KEYS.push(e.keyCode);
+            var key_name = e.keyCode;
+            if(KEYCODE_MAP[e.keyCode]){
+                key_name = KEYCODE_MAP[e.keyCode];
+            }
+            if(_t.val()){
+                _t.val(_t.val() + ' + ');
+            }
+            _t.val(_t.val() + key_name);
+            return false;
+        });
+        $(this).bind('keyup', function(e){
+            if(TEMP_SET_KEYS.length){
+                $("#set_quick_send_key").val(TEMP_SET_KEYS.toString());
+            }
+            TEMP_SET_KEYS = [];
+        });
+    }).blur(function(){
+        $(this).unbind('keydown');
+        $(this).unbind('keyup');
+        if(TEMP_SET_KEYS.length){
+            $("#set_quick_send_key").val(TEMP_SET_KEYS.toString());
+        }
+        TEMP_SET_KEYS = [];
+    });
 };
 
 function saveAccount(){
@@ -312,6 +366,8 @@ function saveAll(){
     setIsSyncUnread($("#unread_sync_to_page").attr("checked") ? 1 : 0);
 
     setLookingTemplate($("#tp_looking").val()); //我正在看模板
+
+    setQuickSendHotKey($("#set_quick_send_key").val()); //快速发送微博快捷键
 
     saveSetBadgeText();
     saveSetShowInPage();

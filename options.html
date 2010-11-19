@@ -42,7 +42,10 @@
 			<tr>
 				<td><select id="account-list" size="6" style="width:220px;"></select></td>
 				<td>
-					<input type="button" id="refresh-account" value="更新用户信息" /><br/>
+					<input type="button" id="refresh-account" value="更新用户信息" />
+					<span class="jTip" jTitle="为什么要更新？　" jWidth="320">?<span class="c">为了快速启动，用户信息会缓存在本地，如果你修改了用户头像或者其他用户信息，
+							需要手动更新一下。
+						</span></span><br/>
 					<input type="button" id="show-new-account" value="添加新用户" /><br/>
 					<input type="button" id="show-edit-account" value="编辑用户" disabled="true" /><br/>
 					<input type="button" id="del-account" value="删除用户" disabled="true" />
@@ -126,6 +129,16 @@
 				<input type="checkbox" id="set_show_in_page_direct_messages" value="1" /><label for="set_show_in_page_direct_messages">私信</label>
 				<span class="jTip" jTitle="在你正在看的网页上提示新信息，5秒钟后自动隐藏:　">?
 					<span class="c"><img src="/images/setting/show_in_page.png" /></span>
+				</span>
+			</p>
+		</li>
+		<li>
+			<p>
+				<label class="title">快速发微博快捷键：</label>
+				<input type="hidden" id="set_quick_send_key" value="" />
+				<input type="text" id="set_quick_send_key_inp" value="" />
+				<span>
+					
 				</span>
 			</p>
 		</li>

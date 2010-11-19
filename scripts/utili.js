@@ -40,6 +40,7 @@ var WIDTH_AND_HEIGHT_KEY = 'idi_WIDTH_AND_HEIGHT_KEY'; //宽高
 var DEFAULT_WIDTH_AND_HEIGHT = [480, 520]; //默认宽高
 
 var TP_LOOKING_KEY = 'idi_TP_LOOKING_KEY'; //我正在看的模板key
+var QUICK_SEND_HOT_KEY_KEY = 'idi_QUICK_SEND_HOT_KEY_KEY'; //快速发送热键key
 
 //['friends_timeline','mentions','comments_timeline','comments_by_me','direct_messages','favorites']
 var T_LIST = ['friends_timeline','mentions','comments_timeline','direct_messages']; //timeline的分类列表
@@ -275,6 +276,18 @@ function getLookingTemplate(){
 
 function setLookingTemplate(tp){
     localStorage.setObject(TP_LOOKING_KEY, tp);
+};
+//<<--
+
+//-- 快捷发送热键 --
+//保存的格式为： 33,34,35 用逗号分隔的keycode
+function getQuickSendHotKey(){
+    var keys = localStorage.getObject(QUICK_SEND_HOT_KEY_KEY);
+    return keys || '16,70'; //默认 Shift + F
+};
+
+function setQuickSendHotKey(keys){
+    localStorage.setObject(QUICK_SEND_HOT_KEY_KEY, keys);
 };
 //<<--
 

@@ -1,5 +1,6 @@
 // @author qleelulu@gmail.com
 
+/* 在页面上显示新信息 */
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     if(request.method){
         methodManager[request.method](request, sender, sendResponse);
@@ -168,26 +169,28 @@ function fawaveFormatText(msg, values, filter) {
         return jQuery.isFunction(filter) ? filter((values[key] || eval('(values.' +key+')')), key) : (values[key] || eval('(values.' +key+')')); //values[key];
     });	
 };
+/* 在页面上显示新信息 end */
+
 
 /* 快速发微博 */
 var QUICK_SEND_TEMPLATE = ' \
     <div id="fawaveSendMsgWrap" style="display:none;"> \
         <div class="fawave-model-container">\
-            <div class="modal-title" id="modalTitle">快速发送微博--FaWave(发微)</div> \
+            <div class="modal-title" id="modalTitle"><img class="fawaveUserIco" src="" />快速发送微博--FaWave(发微)</div> \
             <div class="close"><a href="javascript:" class="fawavemodal-close">x</a></div> \
             <div class="modal-data"> \
                 <div>\
                     <input type="checkbox" id="fawave-share-page-chk" /><label for="fawave-share-page-chk">分享当前网页</label>\
-                    <textarea id="fawaveTxtContentInp" style="width:100%;" rows="5" class="padDoing" ></textarea>\
+                    <textarea id="fawaveTxtContentInp" style="width:100%;" rows="4" class="padDoing" ></textarea>\
                 </div>\
-                <div id="submitWarp">\
-                    <button id="btnSend" class="btn-positive" onclick="">\
+                <div class="fawaveSubmitWarp">\
+                    <button id="btnFawaveQuickSend" class="btn-positive" onclick="">\
                         <img src="/images/tick.png" alt="">发微\
                     </button>\
                     <button class="btn-negative">\
                         <img src="/images/cross.png" alt="">取消\
                     </button>\
-                    <span>(按 ESC 键取消)</span>\
+                    <span class="fawaveQuickSendTip"></span>\
                     <span class="fawave-wordCount">140</span>\
                 </div>\
             </div> \
@@ -197,37 +200,23 @@ var QUICK_SEND_TEMPLATE = ' \
 QUICK_SEND_TEMPLATE = QUICK_SEND_TEMPLATE.replace('/images/tick.png', chrome.extension.getURL("/images/tick.png"))
                                          .replace('/images/cross.png', chrome.extension.getURL("/images/cross.png"));
 
+var QUICK_SEND_HOT_KEYS = '', QUICK_SEND_HOT_KEYS_COUNT = 0, PRESSED_KEY = [], CURRENT_USER = '';
 
-//由于chrome.extension.sendRequest是异步请求，所以先写个默认的
-var fawaveLookingTemplate = '我正在看: {{title}} {{url}} ';
-
-function fawaveToggleLooking(ele){
-    var loc_url = window.location.href;
-    var result = '';
-    if(loc_url){
-        var title = document.title;
-        result = fawaveFormatText(fawaveLookingTemplate, {title:(title||''), url:loc_url});
-        //showMsgInput();
-        //countInputText();
-    }
-    if($(ele).attr('checked')){
-        $("#fawaveTxtContentInp").val(result);
-    }else{
-        $("#fawaveTxtContentInp").val($("#fawaveTxtContentInp").val().replace(result, ''));
-    }
-};
-
-var HOT_KEY = [];
-
-$(function(){
-    //异步获取模板先
-    chrome.extension.sendRequest({method:'getLookingTemplate'}, function(response){
-        fawaveLookingTemplate = response.lookingTemplate;
-    });
+function fawaveInitTemplate(){
+    if($("#fawaveSendMsgWrap").length){ return; }
 
     $('body').append(QUICK_SEND_TEMPLATE);
 
-    $("#fawaveSendMsgWrap .fawavemodal-close, #fawaveSendMsgWrap .btn-negative").click(function(){
+    if(CURRENT_USER){
+        $("#fawaveSendMsgWrap .fawaveUserIco").attr('src', CURRENT_USER.profile_image_url);
+    }
+    $("#fawaveSendMsgWrap .fawavemodal-close").click(function(){
+        $("#fawaveSendMsgWrap").hide();
+    });
+
+    $("#fawaveSendMsgWrap .btn-negative").click(function(){
+        $("#fawaveTxtContentInp").val('');
+        $("#fawave-share-page-chk").attr("checked", false);
         $("#fawaveSendMsgWrap").hide();
     });
 
@@ -237,10 +226,82 @@ $(function(){
             fawaveToggleLooking(this);
         }, false);
     }
-    document.onkeydown = function(e){
-        //console.log(e.keyCode);
-        if(e.keyCode == 16){
-            //$("#fawaveSendMsgWrap").show();
+
+    var btnSend = document.getElementById("btnFawaveQuickSend");
+    if(btnSend){
+        btnSend.addEventListener("click", function() {
+            sendFawaveMsg();
+        }, false);
+    }
+}
+
+function fawaveToggleLooking(ele){
+    chrome.extension.sendRequest({method:'getLookingTemplate'}, function(response){
+        var fawaveLookingTemplate = response.lookingTemplate;
+        var loc_url = window.location.href;
+        var title = document.title;
+        result = fawaveFormatText(fawaveLookingTemplate, {title:(title||''), url:loc_url});
+        //countInputText();
+        if($(ele).attr('checked')){
+            $("#fawaveTxtContentInp").val(result);
+        }else{
+            $("#fawaveTxtContentInp").val($("#fawaveTxtContentInp").val().replace(result, ''));
         }
-    };
+    });
+};
+
+function sendFawaveMsg(){
+    var msg = $("#fawaveTxtContentInp").val();
+    if(!msg){
+        $("#fawaveSendMsgWrap .fawaveQuickSendTip").html('请输入内容');
+        return;
+    }
+    $("#fawaveSendMsgWrap input, #fawaveSendMsgWrap button, #fawaveSendMsgWrap textarea").attr('disabled', true);
+    chrome.extension.sendRequest({method:'publicQuickSendMsg', sendMsg:msg}, function(response){
+        $("#fawaveSendMsgWrap input, #fawaveSendMsgWrap button, #fawaveSendMsgWrap textarea").removeAttr('disabled');
+        var msg = response.msg;
+        if(msg && msg.id){
+            $("#fawaveSendMsgWrap .btn-negative").click();
+        }else if(msg.error){
+            $("#fawaveSendMsgWrap .fawaveQuickSendTip").html('error: ' + sinaMsg.error);
+        }
+    });
+};
+
+$(function(){
+    
+    chrome.extension.sendRequest({method:'getQuickSendInitInfos'}, function(response){
+        QUICK_SEND_HOT_KEYS = response.hotkeys;
+        QUICK_SEND_HOT_KEYS_COUNT = QUICK_SEND_HOT_KEYS.split(',').length;
+
+        CURRENT_USER = response.c_user;
+    });
+
+    document.addEventListener("keydown", function(e) {
+        if(!QUICK_SEND_HOT_KEYS){ return; }
+
+        PRESSED_KEY.push(e.keyCode);
+        if(PRESSED_KEY.length > QUICK_SEND_HOT_KEYS_COUNT){
+            PRESSED_KEY.shift();
+        }
+        if(PRESSED_KEY.toString() == QUICK_SEND_HOT_KEYS ){
+            fawaveInitTemplate();
+            var fsw = $("#fawaveSendMsgWrap");
+            if(fsw.css('display')=='none'){
+                //更新用户头像，避免用错帐号发送信息
+                chrome.extension.sendRequest({method:'getQuickSendInitInfos'}, function(response){
+                    if(CURRENT_USER.profile_image_url != response.c_user.profile_image_url){
+                        CURRENT_USER = response.c_user;
+                        if(CURRENT_USER){
+                            $("#fawaveSendMsgWrap .fawaveUserIco").attr('src', CURRENT_USER.profile_image_url);
+                        }
+                    }
+                });
+                fsw.show();
+            }else{
+                fsw.hide();
+            }
+        }
+    }, false);
 });
+/* 快速发微博 end */

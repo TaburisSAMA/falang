@@ -322,6 +322,19 @@ r_method_manager = {
     getLookingTemplate: function(request, sender, sendResponse){
         var _l_tp = getLookingTemplate();
         sendResponse({lookingTemplate: _l_tp});
+    },
+    getQuickSendInitInfos: function(request, sender, sendResponse){
+        var hotkeys = getQuickSendHotKey();
+        var c_user = getUser(CURRENT_USER_KEY);
+        sendResponse({hotkeys: hotkeys, c_user:c_user});
+    },
+    publicQuickSendMsg: function(request, sender, sendResponse){
+        var msg = request.sendMsg;
+        var data = {};
+        data['status'] = msg;
+        sinaApi.update(data, function(sinaMsg, textStatus){
+            sendResponse({msg:sinaMsg, textStatus:textStatus});
+        });
     }
 };
 
