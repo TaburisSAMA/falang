@@ -411,9 +411,10 @@ function _sendRequest(params, callbackFn){
             if(!r){
                 textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';
                 errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
-                showMsg('error: ' + textStatus + errorThrown + 'statuCode: ' + status);
+                r = {error:'error: ' + textStatus + errorThrown + 'statuCode: ' + status};
+                showMsg(r.error);
             }
-            callbackFn({}, 'error', status); //不管什么状态，都返回 error
+            callbackFn(r||{}, 'error', status); //不管什么状态，都返回 error
             hideLoading();
         }
     });

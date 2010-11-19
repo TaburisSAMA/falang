@@ -184,8 +184,9 @@ var QUICK_SEND_TEMPLATE = ' \
                     <span class="fawave-wordCount">140</span>\
                     <textarea id="fawaveTxtContentInp" style="width:100%;" rows="5" ></textarea>\
                 </div>\
+                <div class="fawaveInfoMsg"></div>\
                 <div class="fawaveSubmitWarp">\
-                    <button id="btnFawaveQuickSend" class="btn-positive" onclick="">\
+                    <button id="btnFawaveQuickSend" class="btn-positive" title="Ctrl + 回车 发送">\
                         <img src="/images/tick.png" alt="">发微\
                     </button>\
                     <button class="btn-negative">\
@@ -215,6 +216,10 @@ function fawaveCountInputText(){
     $("#fawaveSendMsgWrap .fawave-wordCount").html(140 - $("#fawaveTxtContentInp").val().len());
 };
 
+function showFawaveAlertMsg(msg){
+    $("#fawaveSendMsgWrap .fawaveInfoMsg").html(msg);
+};
+
 function fawaveInitTemplate(){
     if($("#fawaveSendMsgWrap").length){ return; }
 
@@ -238,6 +243,17 @@ function fawaveInitTemplate(){
 
     $("#fawaveTxtContentInp").bind('keyup', function(){
         fawaveCountInputText();
+    });
+
+    $("#fawaveTxtContentInp").keydown(function(event){
+        if(event.ctrlKey && event.keyCode==13){
+            if(c){
+                sendFawaveMsg();
+            }else{
+                showFawaveAlertMsg('请输入要发送的内容');
+            }
+            return false;
+        }
     });
 
     var chkLooking = document.getElementById("fawave-share-page-chk");
@@ -272,9 +288,9 @@ function fawaveToggleLooking(ele){
 };
 
 function sendFawaveMsg(){
-    var msg = $("#fawaveTxtContentInp").val();
+    var msg = $.trim($("#fawaveTxtContentInp").val());
     if(!msg){
-        $("#fawaveSendMsgWrap .fawaveQuickSendTip").html('请输入内容');
+        showFawaveAlertMsg('请输入内容');
         return;
     }
     $("#fawaveSendMsgWrap input, #fawaveSendMsgWrap button, #fawaveSendMsgWrap textarea").attr('disabled', true);
@@ -283,8 +299,10 @@ function sendFawaveMsg(){
         var msg = response.msg;
         if(msg && msg.id){
             $("#fawaveSendMsgWrap .btn-negative").click();
-        }else if(msg.error){
-            $("#fawaveSendMsgWrap .fawaveQuickSendTip").html('error: ' + sinaMsg.error);
+        }else if(msg && msg.error){
+            showFawaveAlertMsg('error: ' + msg.error);
+        }else{
+            showFawaveAlertMsg('发送出错');
         }
     });
 };
@@ -327,6 +345,7 @@ $(function(){
                 $("#fawaveTxtContentInp").focus();
                 if(sText){ $("#fawaveTxtContentInp").val(sText); }
             }else{
+                showFawaveAlertMsg('');
                 fsw.hide();
             }
         }
