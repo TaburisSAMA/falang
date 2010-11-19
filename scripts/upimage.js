@@ -264,7 +264,7 @@ function sendSinaMsg(){
 };
 
 var FILECHECK = {maxFileSize: 1024000,
-                 fileTypes: '__image/gif__image/jpeg__image/jpg__image/png__',
+                 fileTypes: '__image/gif__image/jpeg__image/jpg__image/png__'
                 };
 function checkFile(file){
     var check = true;
