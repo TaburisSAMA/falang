@@ -98,3 +98,6 @@ body #fawaveSendMsgWrap .fawave-model-container .btn-positive img,
 body #fawaveSendMsgWrap .fawave-model-container .fawave-wordCount{float:right;}
 body #fawaveSendMsgWrap .fawave-model-container .fawave-wordCount{float:right;}
 body #fawaveSendMsgWrap .fawave-model-container .fawaveSubmitWarp{margin-top:8px;}
+body #fawaveSendMsgWrap .fawave-model-container .fawaveUserInfo{bottom:2px; position:absolute; right:10px;}
+body #fawaveSendMsgWrap .fawave-model-container .fawaveUserInfo img{width:35px; height:35px; background:#fff; padding:2px; border:solid 1px #ccc; vertical-align:bottom;}
+body #fawaveSendMsgWrap .fawave-model-container .fawaveUserInfo span{color:green; font-weight:bold;}

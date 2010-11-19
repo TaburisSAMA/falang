@@ -176,11 +176,12 @@ function fawaveFormatText(msg, values, filter) {
 var QUICK_SEND_TEMPLATE = ' \
     <div id="fawaveSendMsgWrap" style="display:none;"> \
         <div class="fawave-model-container">\
-            <div class="modal-title" id="modalTitle"><img class="fawaveUserIco" src="" />快速发送微博--FaWave(发微)</div> \
+            <div class="modal-title" id="modalTitle">快速发送微博--FaWave(发微)</div> \
             <div class="close"><a href="javascript:" class="fawavemodal-close">x</a></div> \
             <div class="modal-data"> \
                 <div>\
                     <input type="checkbox" id="fawave-share-page-chk" /><label for="fawave-share-page-chk">分享当前网页</label>\
+                    <span class="fawave-wordCount">140</span>\
                     <textarea id="fawaveTxtContentInp" style="width:100%;" rows="4" class="padDoing" ></textarea>\
                 </div>\
                 <div class="fawaveSubmitWarp">\
@@ -191,8 +192,11 @@ var QUICK_SEND_TEMPLATE = ' \
                         <img src="/images/cross.png" alt="">取消\
                     </button>\
                     <span class="fawaveQuickSendTip"></span>\
-                    <span class="fawave-wordCount">140</span>\
                 </div>\
+                <span class="fawaveUserInfo">\
+                    <span></span>\
+                    <a target="_blank"><img src="" /><a>\
+                </span>\
             </div> \
         </div>\
     </div>';
@@ -208,7 +212,10 @@ function fawaveInitTemplate(){
     $('body').append(QUICK_SEND_TEMPLATE);
 
     if(CURRENT_USER){
-        $("#fawaveSendMsgWrap .fawaveUserIco").attr('src', CURRENT_USER.profile_image_url);
+        var f_u_info = $("#fawaveSendMsgWrap .fawaveUserInfo");
+        f_u_info.find('span').html(CURRENT_USER.screen_name)
+            .end().find('a').attr('href', 'http://t.sina.com.cn/' + CURRENT_USER.domain||CURRENT_USER.id)
+            .end().find('img').attr('src', CURRENT_USER.profile_image_url);
     }
     $("#fawaveSendMsgWrap .fawavemodal-close").click(function(){
         $("#fawaveSendMsgWrap").hide();
@@ -293,7 +300,10 @@ $(function(){
                     if(CURRENT_USER.profile_image_url != response.c_user.profile_image_url){
                         CURRENT_USER = response.c_user;
                         if(CURRENT_USER){
-                            $("#fawaveSendMsgWrap .fawaveUserIco").attr('src', CURRENT_USER.profile_image_url);
+                            var f_u_info = $("#fawaveSendMsgWrap .fawaveUserInfo");
+                            f_u_info.find('span').html(CURRENT_USER.screen_name)
+                                .end().find('a').attr('href', 'http://t.sina.com.cn/' + CURRENT_USER.domain||CURRENT_USER.id)
+                                .end().find('img').attr('src', CURRENT_USER.profile_image_url);
                         }
                     }
                 });
