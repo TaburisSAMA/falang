@@ -283,7 +283,7 @@ function setLookingTemplate(tp){
 //保存的格式为： 33,34,35 用逗号分隔的keycode
 function getQuickSendHotKey(){
     var keys = localStorage.getObject(QUICK_SEND_HOT_KEY_KEY);
-    return keys || '16,70'; //默认 Shift + F
+    return keys || '113'; //默认 F2
 };
 
 function setQuickSendHotKey(keys){
@@ -517,5 +517,5 @@ function log(msg){
 
 // 微博字数
 String.prototype.len = function(){
-	return this.replace(/[^\x00-\xff]/g, "qq").length / 2;
+	return Math.round(this.replace(/[^\x00-\xff]/g, "qq").length / 2);
 };

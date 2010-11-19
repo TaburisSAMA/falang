@@ -176,13 +176,13 @@ function fawaveFormatText(msg, values, filter) {
 var QUICK_SEND_TEMPLATE = ' \
     <div id="fawaveSendMsgWrap" style="display:none;"> \
         <div class="fawave-model-container">\
-            <div class="modal-title" id="modalTitle">快速发送微博--FaWave(发微)</div> \
+            <div class="modal-title" id="modalTitle">快捷发送微博--FaWave(发微)</div> \
             <div class="close"><a href="javascript:" class="fawavemodal-close">x</a></div> \
             <div class="modal-data"> \
                 <div>\
                     <input type="checkbox" id="fawave-share-page-chk" /><label for="fawave-share-page-chk">分享当前网页</label>\
                     <span class="fawave-wordCount">140</span>\
-                    <textarea id="fawaveTxtContentInp" style="width:100%;" rows="4" class="padDoing" ></textarea>\
+                    <textarea id="fawaveTxtContentInp" style="width:100%;" rows="5" ></textarea>\
                 </div>\
                 <div class="fawaveSubmitWarp">\
                     <button id="btnFawaveQuickSend" class="btn-positive" onclick="">\
@@ -206,6 +206,15 @@ QUICK_SEND_TEMPLATE = QUICK_SEND_TEMPLATE.replace('/images/tick.png', chrome.ext
 
 var QUICK_SEND_HOT_KEYS = '', QUICK_SEND_HOT_KEYS_COUNT = 0, PRESSED_KEY = [], CURRENT_USER = '';
 
+// 微博字数
+String.prototype.len = function(){
+	return Math.round(this.replace(/[^\x00-\xff]/g, "qq").length / 2);
+};
+
+function fawaveCountInputText(){
+    $("#fawaveSendMsgWrap .fawave-wordCount").html(140 - $("#fawaveTxtContentInp").val().len());
+};
+
 function fawaveInitTemplate(){
     if($("#fawaveSendMsgWrap").length){ return; }
 
@@ -225,6 +234,10 @@ function fawaveInitTemplate(){
         $("#fawaveTxtContentInp").val('');
         $("#fawave-share-page-chk").attr("checked", false);
         $("#fawaveSendMsgWrap").hide();
+    });
+
+    $("#fawaveTxtContentInp").bind('keyup', function(){
+        fawaveCountInputText();
     });
 
     var chkLooking = document.getElementById("fawave-share-page-chk");
@@ -254,6 +267,7 @@ function fawaveToggleLooking(ele){
         }else{
             $("#fawaveTxtContentInp").val($("#fawaveTxtContentInp").val().replace(result, ''));
         }
+        fawaveCountInputText();
     });
 };
 
@@ -308,6 +322,10 @@ $(function(){
                     }
                 });
                 fsw.show();
+                //注意下面三句的顺序，不能乱
+                var sText = window.getSelection().toString();
+                $("#fawaveTxtContentInp").focus();
+                if(sText){ $("#fawaveTxtContentInp").val(sText); }
             }else{
                 fsw.hide();
             }

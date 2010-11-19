@@ -9,7 +9,7 @@ body #fa_wave_msg_wrap{
    margin:0;
 }
 body #fa_wave_msg_wrap *, body #fawaveSendMsgWrap *{
-  font-family: "微软雅黑", "雅黑", "Arial", "sans-serif";
+  /*font-family: "微软雅黑", "雅黑", "Arial", "sans-serif";*/
   font-size: 12px;
   outline:none;
   margin:0;

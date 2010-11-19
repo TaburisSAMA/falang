@@ -30,6 +30,8 @@ label.title{color:#AB5603; font-weight:bold;}
 #facebox img{max-width:none;}
 #facebox .image a{display:none;}
 
+#set_quick_send_key_tip{display:none; color:#610000;}
+
 .messageInfo{
    width: 320px;
    margin: 2px 0;
@@ -183,6 +185,15 @@ ul#navigation li.selected{
 #JT_copy img{
 	padding: 1px;
 	border: 1px solid #CCCCCC;
+}
+#JT_copy .note{
+	background: rgba(0, 0, 0, 0.796094);
+	border-bottom-left-radius: 3px 3px;
+	border-bottom-right-radius: 3px 3px;
+	border-top-left-radius: 3px 3px;
+	border-top-right-radius: 3px 3px;
+	color: #9C3;
+	padding: 2px 3px;
 }
 .jTip{
 	cursor:help;

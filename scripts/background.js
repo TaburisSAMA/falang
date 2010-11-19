@@ -333,6 +333,9 @@ r_method_manager = {
         var data = {};
         data['status'] = msg;
         sinaApi.update(data, function(sinaMsg, textStatus){
+            if(sinaMsg.id){
+                setTimeout(checkNewMsg, 1000);
+            }
             sendResponse({msg:sinaMsg, textStatus:textStatus});
         });
     }

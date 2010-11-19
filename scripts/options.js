@@ -200,6 +200,7 @@ function initQuickSendHotKey(){
     $("#set_quick_send_key_inp").val(key_maps);
     $("#set_quick_send_key").val(keys);
     $("#set_quick_send_key_inp").focus(function(){
+        $("#set_quick_send_key_tip").show();
         $(this).bind('keydown', function(e){
             //如果是同一个键,则无视
             if(TEMP_SET_KEYS.length && e.keyCode == TEMP_SET_KEYS[TEMP_SET_KEYS.length-1]){
@@ -231,6 +232,7 @@ function initQuickSendHotKey(){
             $("#set_quick_send_key").val(TEMP_SET_KEYS.toString());
         }
         TEMP_SET_KEYS = [];
+        $("#set_quick_send_key_tip").hide();
     });
 };
 
