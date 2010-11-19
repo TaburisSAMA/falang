@@ -445,6 +445,11 @@ function formatText(msg, values, filter) {
     });	
 };
 
+// 让所有字符串拥有模板格式化
+String.prototype.format = function(data) {
+	return formatText(this, data);
+};
+
 // HTML 编码
 function HTMLEnCode(str){
     if(!str){ return ''; }

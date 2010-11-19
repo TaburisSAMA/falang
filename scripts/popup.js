@@ -1249,7 +1249,7 @@ fawave.face = {
         		var tpl = '<li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[{{name}}]" title="{{name}}"><img src="{{url}}" alt="{{name}}"></a></li>';
     			for(var name in TSINA_FACES) {
         			if(exists[name]) continue;
-        			$face_icons.append(formatText(tpl, {'name': name, 'url': TSINA_FACE_URL_PRE + TSINA_FACES[name]}));
+        			$face_icons.append(tpl.format({'name': name, 'url': TSINA_FACE_URL_PRE + TSINA_FACES[name]}));
         			exists[name] = true;
         		}
         		for(var name in emotionalDict) {
@@ -1260,7 +1260,7 @@ fawave.face = {
 			        } else {
 			        	continue;
 			        }
-        			$face_icons.append(formatText(tpl, {'name': name, 'url': src}));
+        			$face_icons.append(tpl.format({'name': name, 'url': src}));
         			exists[name] = true;
         		}
         		$face_icons.attr('init_icons', true);

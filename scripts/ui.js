@@ -333,7 +333,7 @@ function replaceUrl(m, g1, g2){
     if(g1.indexOf('http') != 0){
         _url = 'http://' + g1;
     }
-    return formatText('<a target="_blank" href="{{url}}" title="{{title}}">{{value}}</a>', {
+    return '<a target="_blank" href="{{url}}" title="{{title}}">{{value}}</a>'.format({
     	url: _url, title: g1, value: g2||g1
     });
 };
@@ -345,10 +345,10 @@ function replaceEmotional(m, g1){
         if(src.indexOf('http') != 0){
             src = '/images/faces/' + src + '.gif';
         }
-        return formatText(tpl, {title: m, src: src});
+        return tpl.format({title: m, src: src});
     }
     if(g1 && TSINA_FACES[g1]) {
-    	return formatText(tpl, {title: m, src: TSINA_FACE_URL_PRE + TSINA_FACES[g1]});
+    	return tpl.format({title: m, src: TSINA_FACE_URL_PRE + TSINA_FACES[g1]});
 	}
     return m;
 };
