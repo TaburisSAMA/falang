@@ -1,5 +1,8 @@
 
-var TSohuAPI = $.extend({}, sinaApi, {
+// 搜狐api
+var TSohuAPI = $.extend({}, sinaApi);
+
+$.extend(TSohuAPI, {
 	// 覆盖不同的参数
 	config: $.extend(sinaApi.config, {
 		host: 'http://api.t.sohu.com',
