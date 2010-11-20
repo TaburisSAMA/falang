@@ -7,7 +7,7 @@ a:hover { text-decoration:underline;}
 .green{color:green;}
 ul { list-style:none;} 
 li { line-height:16px;} 
-.warp { width:480px; /*border:1px solid #ace; padding-bottom:10px;*/} 
+.warp { width:480px; position:relative; /*border:1px solid #ace; padding-bottom:10px;*/} 
 .list_warp { margin:0; height: 470px; overflow:auto;} 
 .tabs { overflow:hidden; background:#f1f7fc;height:24px;}
 .tabs li {line-height:23px; height:23px; border:1px solid #ace; border-width:0 1px 1px 0; background:#f1f7fc; padding:0 5px; text-align:center; float:left; cursor:pointer;} 
@@ -268,4 +268,64 @@ div.mainContent{word-wrap: break-word;}
 .fans{
 	margin:6px 3px 9px;
 	-webkit-box-shadow:0 0 9px #888;
+}
+
+/* Dock */
+#accountListDock{position: absolute; bottom:0; width:100%;}
+#accountListDock ul {
+    text-align: center;
+	width:100%;
+}
+#accountListDock li {
+    display: inline;
+	margin:0 3px;
+	position:relative;
+}
+#accountListDock li a:hover, a:focus {
+    z-index: 200;
+}
+#accountListDock li a img {
+	margin-bottom: -3px;
+    border: solid 1px #ccc;
+	padding:2px;
+	background: #fff;
+	height:40px;
+	width:40px;
+	opacity:0.5;
+    -webkit-transition: all .2s;
+    -webkit-transform-origin: bottom;
+}
+#accountListDock li.current a img{opacity:1; width:45px;height:45px; background: #9C3; border-color: green;}
+#accountListDock li:hover a img, a:focus img {
+    /*-webkit-transform: scale(1.6);*/
+	-webkit-transition: width height background opacity border-color 1s ease;
+	width:50px;
+	height:50px;
+	background: #F77004;
+	border-color:green;
+	opacity: 1;
+}
+#accountListDock li .blogType{
+	opacity:0.5;
+	right: 0px;
+	bottom:-2px;
+	position: absolute;
+}
+#accountListDock li:hover .blogType{
+	-webkit-transition: opacity 1s ease;
+	opacity: 1;
+}
+#accountListDock li.current .blogType{ opacity: 1;}
+#accountListDock li .username{
+	display:none;
+	left: 0px;
+	margin-top: -22px;
+	position: absolute;
+	color: #9C3;
+	background: rgba(0, 0, 0, 0.792969);
+	padding: 2px 3px;
+	-webkit-border-radius:2px;
+}
+#accountListDock li:hover .username{
+	display:inline;
 }

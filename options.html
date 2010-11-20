@@ -37,6 +37,7 @@
 	<!-- 用户设置 START -->
 	<div id="user_set" class="set_wrap" style="display:none;">
 		<br/><br/>
+		<div class="alert" id="needRefresh" style="display:none;">你看到这个是因为你的账户信息需要刷新FaWave才能继续使用，请点击“更新用户信息”进行刷新用户信息。</div>
 		<div class="info">用户、密码保存在本地。在公共电脑上使用时请慎重。</div>
 		<table>
 			<tr>
@@ -57,9 +58,15 @@
 			<ul>
 				<li>新浪微博的API，由于cookie信息会干扰Basic Authentcation的认证，而我至今未找到解决办法，所以在添加或者编辑用户信息的时候，为了确保你可以正确设置你的账号信息，请你先<b><a href="http://t.sina.com.cn/logout.php?backurl=/" target="_blank">退出新浪微博</a></b></li>
 				<li>
+					<label for="account-blogType">微　博：</label>
+					<select id="account-blogType">
+						<option value="tsina">新浪微博</option>
+					</select>
+				</li>
+				<li>
 					<label for="account-name">用户名：</label>
 					<input type="text" id="account-name" />
-					<input type="hidden" id="edit-account-name" />
+					<input type="hidden" id="edit-account-key" />
 				</li>
 				<li>
 					<label for="account-pwd">密　码：</label>

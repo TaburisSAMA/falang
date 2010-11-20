@@ -91,7 +91,7 @@ function getUser(){
 //        return window.c_user;
 //    }else{
         var c_user = localStorage.getObject(CURRENT_USER_KEY);
-        if(c_user && c_user.userName){
+        if(c_user && c_user.uniqueKey){
             //window.c_user = c_user;
         }else{
             var userList = localStorage.getObject(USER_LIST_KEY);
@@ -113,6 +113,14 @@ function getUser(){
 function setUser(user){
     localStorage.setObject(CURRENT_USER_KEY, user);
     window.c_user = user;
+};
+//获取所有用户列表
+function getUserList(){
+    return localStorage.getObject(USER_LIST_KEY);
+};
+//保存用户列表
+function saveUserList(userlist){
+    localStorage.setObject(USER_LIST_KEY, userlist);
 };
 
 function getUnreadTimelineCount(t){

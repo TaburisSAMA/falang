@@ -25,8 +25,12 @@ function initOnLoad(){
 };
 
 function init(){
-    if(!getUser()){
+    var c_user = getUser();
+    if(!c_user){
         chrome.tabs.create({url: 'options.html'});
+        return;
+    }else if(!c_user.uniqueKey){
+        chrome.tabs.create({url: 'options.html#no_uniqueKey'});
         return;
     }
     //$('a').attr('target', '_blank');
@@ -277,9 +281,9 @@ function initIamDoing(){
 
 //多用户切换
 function initChangeUserList(){
-    var c_user = getUser(CURRENT_USER_KEY);
+    var c_user = getUser();
     if(c_user){
-        var userList = localStorage.getObject(USER_LIST_KEY);
+        var userList = getUserList();
         var li = [];
         for(i in userList){
             user = userList[i];
@@ -314,12 +318,32 @@ function initChangeUserList(){
             $('#tl_tabs').append(formatText(t_changeUser, c_user));
         }
 
+        //底部Dock
+        var u_tp = '<li class="{{current}}">\
+                        <span class="username">{{screen_name}}</span>\
+                        <a href="javascript:"><img src="{{profile_image_url}}" /></a>\
+                        <img src="/images/blogs/{{blogType}}_16.png" class="blogType" />\
+                    </li>';
+        var li = [];
+        for(i in userList){
+            user = userList[i];
+            if(user.userName == c_user.userName){
+                user.current = 'current';
+            }else{
+                user.current = '';
+            }
+            li.push(u_tp.format(user));
+        }
+        $("#accountListDock").html('<ul>' + li.join('') + '</ul>');
+
+
+
     }
 };
 
 function changeUser(userName){
     friendsTimeline_offset = replys_offset = messages_offset = PAGE_SIZE;//复位分页
-    var userList = localStorage.getObject(USER_LIST_KEY);
+    var userList = getUserList();
     var to_user = null;
     for(i in userList){
         var user = userList[i];
@@ -445,7 +469,7 @@ function getFansList(t, cursor){
         }
     }
     cursor = cursor || -1;
-    var c_user = getUser(CURRENT_USER_KEY);
+    var c_user = getUser();
     if(!c_user){
         return;
     }
@@ -473,7 +497,7 @@ function getFansList(t, cursor){
 
 //查看用户的微薄
 function getUserTimeline(screen_name){
-    var c_user = getUser(CURRENT_USER_KEY);
+    var c_user = getUser();
     if(!c_user){
         return;
     }
@@ -518,7 +542,7 @@ function getUserTimeline(screen_name){
 function getSinaTimeline(t){
     showLoading();
     var _ul = $("#" + t + "_timeline ul.list");
-    var c_user = getUser(CURRENT_USER_KEY);
+    var c_user = getUser();
     var b_view = getBackgroundView();
     var _key = c_user.userName + t + '_tweets';
     if(b_view && b_view.tweets[_key] != undefined && b_view.tweets[_key].length>0){
@@ -751,7 +775,7 @@ function addTimelineMsgs(msgs, t){
     if(!li.hasClass('active')){
         //清空，让下次点tab的时候重新取
         $("#" + t + "_timeline ul.list").html('');
-        var c_user = getUser(CURRENT_USER_KEY), _msg_user = null, _unreadCount = 0;
+        var c_user = getUser(), _msg_user = null, _unreadCount = 0;
         for(i in msgs){
             _msg_user = msgs[i].user || msgs[i].sender;
             if(_msg_user.id != c_user.id){
@@ -1086,7 +1110,7 @@ function doDelTweet(tweetId, ele){//删除自己的微博
         if(textStatus != 'error' && data && !data.error){
             $(ele).closest('li').remove();
             var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
-            var c_user = getUser(CURRENT_USER_KEY);
+            var c_user = getUser();
             var cacheKey = c_user.userName + t + '_tweets';
             var b_view = getBackgroundView();
             if(b_view && b_view.tweets[cacheKey]){
@@ -1111,7 +1135,7 @@ function doDelComment(ele, screen_name, tweetId){//删除评论
         if(textStatus != 'error' && data && !data.error){
             $(ele).closest('li').remove();
             var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
-            var c_user = getUser(CURRENT_USER_KEY);
+            var c_user = getUser();
             var cacheKey = c_user.userName + t + '_tweets';
             var b_view = getBackgroundView();
             if(b_view && b_view.tweets[cacheKey]){
@@ -1136,7 +1160,7 @@ function delDirectMsg(ele, screen_name, tweetId){//删除私信
         if(textStatus != 'error' && data && !data.error){
             $(ele).closest('li').remove();
             var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
-            var c_user = getUser(CURRENT_USER_KEY);
+            var c_user = getUser();
             var cacheKey = c_user.userName + t + '_tweets';
             var b_view = getBackgroundView();
             if(b_view && b_view.tweets[cacheKey]){
@@ -1167,7 +1191,7 @@ function addFavorites(ele, screen_name, tweetId){//添加收藏
                             .replace('点击收藏','点击取消收藏'));
             _a.remove();
             var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
-            var c_user = getUser(CURRENT_USER_KEY);
+            var c_user = getUser();
             var cacheKey = c_user.userName + t + '_tweets';
             var b_view = getBackgroundView();
             if(b_view && b_view.tweets[cacheKey]){
@@ -1199,7 +1223,7 @@ function delFavorites(ele, screen_name, tweetId){//删除收藏
                             .replace('点击取消收藏','点击收藏'));
             _a.remove();
             var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
-            var c_user = getUser(CURRENT_USER_KEY);
+            var c_user = getUser();
             var cacheKey = c_user.userName + t + '_tweets';
             var b_view = getBackgroundView();
             if(b_view && b_view.tweets[cacheKey]){
