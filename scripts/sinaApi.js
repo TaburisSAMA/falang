@@ -2,56 +2,53 @@
 * @author qleelulu@gmail.com
 */
 
-var SOURCE = "3538199806"; //encodeURIComponent('');
-var SOURCE2 = "2721776383";
-
 var result_format = '.json';
 
 var domain_sina = 'http://t.sina.com.cn';
 
 var api_domain_sina = 'http://api.t.sina.com.cn';
 
-//各微博的API接口地址
-var apiUrl = {    
-    sina : {
-        public_timeline:        api_domain_sina + '/statuses/public_timeline' + result_format,
-        friends_timeline:       api_domain_sina + '/statuses/friends_timeline' + result_format,
-        comments_timeline:      api_domain_sina + '/statuses/comments_timeline' + result_format,
-        user_timeline:          api_domain_sina + '/statuses/user_timeline' + result_format,
-        mentions:               api_domain_sina + '/statuses/mentions' + result_format,
-        followers:              api_domain_sina + '/statuses/followers' + result_format,
-        friends:                api_domain_sina + '/statuses/friends' + result_format,
-        favorite:               api_domain_sina + '/favorite' + result_format,
-        favorites_create:       api_domain_sina + '/favorites/create' + result_format,
-        favorites_destroy:      api_domain_sina + '/favorites/destroy/{id}' + result_format,
-        counts:                 api_domain_sina + '/statuses/counts' + result_format,
-        update:                 api_domain_sina + '/statuses/update' + result_format,
-        upload:                 api_domain_sina + '/statuses/upload' + result_format,
-        repost:                 api_domain_sina + '/statuses/repost' + result_format,
-        comment:                api_domain_sina + '/statuses/comment' + result_format,
-        reply:                  api_domain_sina + '/statuses/reply' + result_format,
-        comment_destroy:        api_domain_sina + '/statuses/comment_destroy/{id}' + result_format,
-        comments:               api_domain_sina + '/statuses/comments' + result_format,
-        destroy:                api_domain_sina + '/statuses/destroy' + result_format,
-        destroy_msg:            api_domain_sina + '/direct_messages/destroy/{id}' + result_format,
-        direct_messages:        api_domain_sina + '/direct_messages' + result_format, 
-        new_message:            api_domain_sina + '/direct_messages/new' + result_format,
-        verify_credentials:     api_domain_sina + '/account/verify_credentials' + result_format,
-        friendships_create:     api_domain_sina + '/friendships/create' + result_format,
-        friendships_destroy:    api_domain_sina + '/friendships/destroy' + result_format,
-        friendships_show:       api_domain_sina + '/friendships/show' + result_format,
-        reset_count:            api_domain_sina + '/statuses/reset_count' + result_format,
+var sinaApi = {
+	config: {
+		host: 'http://api.t.sina.com.cn',
+		result_format: '.json',
+		source: '3538199806',
+        source2: '2721776383', // other key
+        
+		// api
+        public_timeline:      '/statuses/public_timeline',
+        friends_timeline:     '/statuses/friends_timeline',
+        comments_timeline: 	  '/statuses/comments_timeline',
+        user_timeline: 	      '/statuses/user_timeline',
+        mentions:             '/statuses/mentions',
+        followers:            '/statuses/followers',
+        friends:              '/statuses/friends',
+        favorites:            '/favorites',
+        favorites_create:     '/favorites/create',
+        favorites_destroy:    '/favorites/destroy/{{id}}',
+        counts:               '/statuses/counts',
+        update:               '/statuses/update',
+        upload:               '/statuses/upload',
+        repost:               '/statuses/repost',
+        comment:              '/statuses/comment',
+        reply:                '/statuses/reply',
+        comment_destroy:      '/statuses/comment_destroy/{{id}}',
+        comments:             '/statuses/comments',
+        destroy:              '/statuses/destroy/{{id}}',
+        destroy_msg:          '/direct_messages/destroy/{{id}}',
+        direct_messages:      '/direct_messages', 
+        new_message:          '/direct_messages/new',
+        verify_credentials:   '/account/verify_credentials',
+        friendships_create:   '/friendships/create',
+        friendships_destroy:  '/friendships/destroy',
+        friendships_show:     '/friendships/show',
+        reset_count:          '/statuses/reset_count',
+        user_show:            '/users/show/{{id}}',
 
         detailUrl:        domain_sina + '/jump?aid=detail&twId=',
         searchUrl:        domain_sina + '/search/'
     },
     
-    twitter : {
-    
-    }
-};
-
-var sinaApi = {
     /*
         callbackFn(data, textStatus, errorCode): 
             成功和错误都会调用的方法。
@@ -60,146 +57,160 @@ var sinaApi = {
     verify_credentials: function(user, callbackFn, data){
         if(!user || !callbackFn) return;
         var params = {
-            url: apiUrl.sina.verify_credentials + '?isAllInfo=true',
+            url: this.config.verify_credentials,
             type: 'get',
             user: user,
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
 	},
 	
+	// since_id, max_id, count, page 
 	friends_timeline: function(data, callbackFn){
 		if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.friends_timeline,
+            url: this.config.friends_timeline,
             type: 'get',
-            source: SOURCE2,
-            data: (data||{})
+            source: this.config.source2,
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
 	},
-
+	
+	// id, user_id, screen_name, since_id, max_id, count, page 
     user_timeline: function(data, callbackFn){
 		if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.user_timeline,
+            url: this.config.user_timeline,
             type: 'get',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
 	},
-
+	
+	// id, count, page
     comments_timeline: function(data, callbackFn){
 		if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.comments_timeline,
+            url: this.config.comments_timeline,
             type: 'get',
-            source: SOURCE2,
-            data: (data||{})
+            source: this.config.source2,
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
 	},
 
+	// since_id, max_id, count, page 
     mentions: function(data, callbackFn){
 		if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.mentions,
+            url: this.config.mentions,
             type: 'get',
-            source: SOURCE2,
-            data: (data||{})
+            source: this.config.source2,
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
 	},
 
+	// id, user_id, screen_name, cursor, count
     followers: function(data, callbackFn){
 		if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.followers,
+            url: this.config.followers,
             type: 'get',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
 	},
 
+	// id, user_id, screen_name, cursor, count
     friends: function(data, callbackFn){
 		if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.friends,
+            url: this.config.friends,
             type: 'get',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
 	},
 
-    favorite: function(data, callbackFn){
+	// page
+    favorites: function(data, callbackFn){
 		if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.favorite,
+            url: this.config.favorites,
             type: 'get',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
 	},
 
+	// id
     favorites_create: function(data, callbackFn){
 		if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.favorites_create,
+            url: this.config.favorites_create,
             type: 'post',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
 	},
 
+	// id
     favorites_destroy: function(data, callbackFn){
 		if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.favorites_destroy.replace('{id}', data.id),
+            url: this.config.favorites_destroy,
             type: 'post',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
 	},
 
+	// ids
     counts: function(data, callbackFn){
         if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.counts,
+            url: this.config.counts,
             type: 'get',
-            data: (data||{})
+            source: this.config.source2,
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
     },
 
+    // id
     user_show: function(data, callbackFn){
         if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.user_show,
+            url: this.config.user_show,
             type: 'get',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
     },
 
+    // since_id, max_id, count, page 
     direct_messages: function(data, callbackFn){
 		if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.direct_messages,
+            url: this.config.direct_messages,
             type: 'get',
-            source: SOURCE2,
-            data: (data||{})
+            source: this.config.source2,
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
 	},
 
+	// id
     destroy_msg: function(data, callbackFn){
 		if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.destroy_msg.replace('{id}',data.id),
+            url: this.config.destroy_msg,
             type: 'post',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
 	},
 
     /*data的参数列表：
@@ -211,213 +222,221 @@ var sinaApi = {
     new_message: function(data, callbackFn){//悄悄话
 		if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.new_message,
+            url: this.config.new_message,
             type: 'post',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
 	},
     
     update: function(data, callbackFn){
         if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.update,
+            url: this.config.update,
             type: 'post',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
     },
     
     upload: function(data, callbackFn){
         if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.upload,
+            url: this.config.upload,
             type: 'post',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
     },
 
     repost: function(data, callbackFn){
         if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.repost,
+            url: this.config.repost,
             type: 'post',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
     },
 
     comment: function(data, callbackFn){
         if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.comment,
+            url: this.config.comment,
             type: 'post',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
     },
 
     reply: function(data, callbackFn){
         if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.reply,
+            url: this.config.reply,
             type: 'post',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
     },
 
     comments: function(data, callbackFn){
         if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.comments,
+            url: this.config.comments,
             type: 'get',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
     },
 
+    // id
     comment_destroy: function(data, callbackFn){
         if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.comment_destroy.replace('{id}', data.id),
+            url: this.config.comment_destroy,
             type: 'post',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
     },
 
     friendships_create: function(data, callbackFn){
         if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.friendships_create,
+            url: this.config.friendships_create,
             type: 'post',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
     },
 
+    // id
     friendships_destroy: function(data, callbackFn){
         if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.friendships_destroy,
+            url: this.config.friendships_destroy,
             type: 'post',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
     },
 
     friendships_show: function(data, callbackFn){
         if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.friendships_show,
+            url: this.config.friendships_show,
             type: 'get',
             data: (data||{})
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
     },
 
+    // type
     reset_count: function(data, callbackFn){
         if(!callbackFn) return;
         var params = {
-            url: apiUrl.sina.reset_count,
+            url: this.config.reset_count,
             type: 'post',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn);
     },
 
+    // id
     destroy: function(data, callbackFn){
-        if(!data || !data.id){return;}
-        if(!callbackFn){ return; }
+        if(!data || !data.id || !callbackFn){return;}
         var params = {
-            url: apiUrl.sina.destroy.replace(result_format, '/' + data.id + result_format),
+            url: this.config.destroy,
             type: 'POST',
-            data: (data||{})
+            data: data
         };
-        _sendRequest(params, callbackFn);
-    }
-};
-
-function _sendRequest(params, callbackFn){
-    if(!callbackFn) return;
-    var user = params.user || localStorage.getObject(CURRENT_USER_KEY);
-    if(!user){
-        showMsg('用户未指定');
-        callbackFn({}, 'error', '400');
-        return;
-    }
-    if(params.source){
-        params.data['source'] = params.source;
-    }else{
-        params.data['source'] = SOURCE;
-    }
-    //params.data['count'] = 100;
-    if(params.data.status){
-        params.data.status = encodeURIComponent(params.data.status);
-    }
-    if(params.data.comment){
-        params.data.comment = encodeURIComponent(params.data.comment);
-    }
-    $.ajax({
-        url: params.url,
-        username: user.userName,
-        password: user.password,
-        cache: false,
-        timeout: 60*1000, //一分钟超时
-        type : params.type,
-        data: params.data,
-        dataType: 'text',
-        beforeSend: function(req) {
-            req.setRequestHeader('Authorization', make_base_auth_header(user.userName, user.password));
-        },
-        success: function (data, textStatus) {
-            try{
-                data = JSON.parse(data);
-            }
-            catch(err){
-                //data = null;
-                data = {error:'服务器返回结果错误，本地解析错误。', error_code:500};
-                textStatus = 'error';
-            }
-            var error_code = null;
-            if(data){
-                if(data.error || data.error_code){
-                    showMsg('error: ' + data.error + ', error_code: ' + data.error_code);
-                    error_code = data.error_code || error_code;
-                }
-            }else{error_code = 400;}
-            callbackFn(data, textStatus, error_code);
-            hideLoading();
-        },
-        error: function (xhr, textStatus, errorThrown) {
-            var r = null, status = 'unknow';
-            if(xhr){
-                if(xhr.status){
-                    status = xhr.status;
-                }
-                if(xhr.responseText){
-                    var r = xhr.responseText
-                    try{
-                        r = JSON.parse(r);
-                    }
-                    catch(err){
-                        r = null;
-                    }
-                    if(r){showMsg('error_code:' + r.error_code + ', error:' + r.error);}
-                }
-            }
-            if(!r){
-                textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';
-                errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
-                r = {error:'error: ' + textStatus + errorThrown + 'statuCode: ' + status};
-                showMsg(r.error);
-            }
-            callbackFn(r||{}, 'error', status); //不管什么状态，都返回 error
-            hideLoading();
+        this._sendRequest(params, callbackFn);
+    },
+    
+    _sendRequest: function(params, callbackFn) {
+    	var args = {type: 'get'};
+    	
+    	$.extend(args, params);
+    	args.data = args.data || {};
+    	args.data.source = args.data.source || this.config.source;
+    	if(!args.url) {
+    		showMsg('url未指定');
+            callbackFn({}, 'error', '400');
+            return;
+    	}
+    	args.url = this.config.host + args.url.format(args.data) + this.config.result_format;
+    	if(!callbackFn) return;
+        var user = args.user || localStorage.getObject(CURRENT_USER_KEY);
+        if(!user){
+            showMsg('用户未指定');
+            callbackFn({}, 'error', '400');
+            return;
         }
-    });
+        if(args.data.status){
+        	args.data.status = encodeURIComponent(args.data.status);
+        }
+        if(args.data.comment){
+        	args.data.comment = encodeURIComponent(args.data.comment);
+        }
+
+        $.ajax({
+            url: args.url,
+            username: user.userName,
+            password: user.password,
+            cache: false,
+            timeout: 60*1000, //一分钟超时
+            type : args.type,
+            data: args.data,
+            dataType: 'text',
+            beforeSend: function(req) {
+                req.setRequestHeader('Authorization', make_base_auth_header(user.userName, user.password));
+            },
+            success: function (data, textStatus) {
+                try{
+                    data = JSON.parse(data);
+                }
+                catch(err){
+                    data = {error:'服务器返回结果错误，本地解析错误。', error_code:500};
+                    textStatus = 'error';
+                }
+                var error_code = null;
+                if(data){
+                    if(data.error || data.error_code){
+                        showMsg('error: ' + data.error + ', error_code: ' + data.error_code);
+                        error_code = data.error_code || error_code;
+                    }
+                }else{error_code = 400;}
+                callbackFn(data, textStatus, error_code);
+                hideLoading();
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                var r = null, status = 'unknow';
+                if(xhr){
+                    if(xhr.status){
+                        status = xhr.status;
+                    }
+                    if(xhr.responseText){
+                        var r = xhr.responseText
+                        try{
+                            r = JSON.parse(r);
+                        }
+                        catch(err){
+                            r = null;
+                        }
+                        if(r){showMsg('error_code:' + r.error_code + ', error:' + r.error);}
+                    }
+                }
+                if(!r){
+                    textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';
+                    errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
+                    r = {error:'error: ' + textStatus + errorThrown + 'statuCode: ' + status};
+                    showMsg(r.error);
+                }
+                callbackFn(r||{}, 'error', status); //不管什么状态，都返回 error
+                hideLoading();
+            }
+        });
+    }
 };
 
 
@@ -429,6 +448,7 @@ function make_base_auth_header(user, password) {
   var hash = Base64.encode(tok);
   return "Basic " + hash;
 };
+
 // 生成HTTP Basic Authentication的url："http://userName:password@domain.com"
 function make_base_auth_url(domain, user, password) {
   return "http://" + user + ":" + password + "@" + domain;
