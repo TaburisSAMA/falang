@@ -453,3 +453,15 @@ function make_base_auth_header(user, password) {
 function make_base_auth_url(domain, user, password) {
   return "http://" + user + ":" + password + "@" + domain;
 };
+
+// 搜狐微博api
+var TSohuAPI = $.extend({}, sinaApi);
+
+$.extend(TSohuAPI, {
+	// 覆盖不同的参数
+	config: $.extend(sinaApi.config, {
+		host: 'http://api.t.sohu.com',
+		source: 'WbbRPziVG6', // 搜狐不是按key来限制的
+	    source2: 'WbbRPziVG6'
+	})
+});
