@@ -329,3 +329,11 @@ div.mainContent{word-wrap: break-word;}
 #accountListDock li:hover .username{
 	display:inline;
 }
+#accountListDock li .unr{
+	background: red;
+	font-size: 11px;
+	margin-top: -2px;
+	position: absolute;
+	right: 0px;
+	color:#fff;
+}

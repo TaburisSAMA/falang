@@ -122,24 +122,44 @@ function getUserList(){
 function saveUserList(userlist){
     localStorage.setObject(USER_LIST_KEY, userlist);
 };
+//根据uniqueKey获取用户
+function getUserByUniqueKey(uniqueKey){
+    if(!uniqueKey){return null;}
+    var userList = getUserList();
+    for(i in userList){
+        if(uniqueKey == userList[i].uniqueKey){
+            return userList[i];
+        }
+    }
+    return null;
+}
 
-function getUnreadTimelineCount(t){
-    var count = localStorage.getObject(getUser().userName + t + UNREAD_TIMELINE_COUNT_KEY);
+//获取用户的未读信息数
+function getUnreadTimelineCount(t, user_uniqueKey){
+    if(!user_uniqueKey){
+        user_uniqueKey = getUser().uniqueKey;
+    }
+    //key 大概如： tsina#11234598_friends_timeline_UNREAD_TIMELINE_COUNT_KEY
+    var count = localStorage.getObject(user_uniqueKey + t + UNREAD_TIMELINE_COUNT_KEY);
     if(!count){
         count = 0;
     }
     return count;
 };
 
-function setUnreadTimelineCount(count, t, setBadgeText){
-    setBadgeText = isSetBadgeText(t);
-    count += getUnreadTimelineCount(t);
-    localStorage.setObject(getUser().userName + t + UNREAD_TIMELINE_COUNT_KEY, count);
+//@t: timeline的类型
+function setUnreadTimelineCount(count, t, user_uniqueKey){
+    if(!user_uniqueKey){
+        user_uniqueKey = getUser().uniqueKey;
+    }
+    var setBadgeText = isSetBadgeText(t, user_uniqueKey);
+    count += getUnreadTimelineCount(t, user_uniqueKey);
+    localStorage.setObject(user_uniqueKey + t + UNREAD_TIMELINE_COUNT_KEY, count);
     if(setBadgeText){
         var total = 0;
         for(i in T_LIST){
             if(isSetBadgeText(T_LIST[i])){
-                total += getUnreadTimelineCount(T_LIST[i]);
+                total += getUnreadTimelineCount(T_LIST[i], user_uniqueKey);
             }
         }
         if(total > 0){
@@ -150,18 +170,21 @@ function setUnreadTimelineCount(count, t, setBadgeText){
     chrome.browserAction.setTitle({title:getTooltip()});
 };
 
-function removeUnreadTimelineCount(t){
-    localStorage.setObject(getUser().userName + t + UNREAD_TIMELINE_COUNT_KEY, 0);
-    if(getIsSyncUnread()){ //如果同步未读数
-        syncUnreadCountToSinaPage(t);
+function removeUnreadTimelineCount(t, user_uniqueKey){
+    if(!user_uniqueKey){
+        user_uniqueKey = getUser().uniqueKey;
+    }
+    localStorage.setObject(user_uniqueKey + t + UNREAD_TIMELINE_COUNT_KEY, 0);
+    if(getIsSyncUnread(user_uniqueKey)){ //如果同步未读数
+        syncUnreadCountToSinaPage(t, user_uniqueKey);
     }
     var total = 0;
     for(i in T_LIST){
         if(T_LIST[i]==t){
             continue;
         }
-        if(isSetBadgeText(T_LIST[i])){
-            total += getUnreadTimelineCount(T_LIST[i]);
+        if(isSetBadgeText(T_LIST[i]), user_uniqueKey){
+            total += getUnreadTimelineCount(T_LIST[i], user_uniqueKey);
         }
     }
     if(total > 0){
@@ -174,7 +197,10 @@ function removeUnreadTimelineCount(t){
 };
 
 //将新浪微博页面的未读信息数清零
-function syncUnreadCountToSinaPage(t){
+function syncUnreadCountToSinaPage(t, user_uniqueKey){
+    if(!user_uniqueKey){
+        user_uniqueKey = getUser().uniqueKey;
+    }
     var tl_type = false;
     switch(t){
         case 'comments_timeline':
@@ -197,6 +223,7 @@ function syncUnreadCountToSinaPage(t){
     }
 };
 
+//获取在插件icon上显示的tooltip内容
 function getTooltip(){
     var c_user = getUser();
     var u = '';
@@ -212,12 +239,18 @@ function getTooltip(){
 };
 
 //===>>>>>>>>>>>>>>>>>>>>>>>
-function setLastMsgId(id, t){
-    localStorage.setObject(getUser().userName + t + LAST_MSG_ID, id);
+function setLastMsgId(id, t, user_uniqueKey){
+    if(!user_uniqueKey){
+        user_uniqueKey = getUser().uniqueKey;
+    }
+    localStorage.setObject(user_uniqueKey + t + LAST_MSG_ID, id);
 }
 
-function getLastMsgId(t){
-    return localStorage.getObject(getUser().userName + t + LAST_MSG_ID);
+function getLastMsgId(t, user_uniqueKey){
+    if(!user_uniqueKey){
+        user_uniqueKey = getUser().uniqueKey;
+    }
+    return localStorage.getObject(user_uniqueKey + t + LAST_MSG_ID);
 }
 
 //<<<<<<<<<<<<<<<<=========
@@ -388,16 +421,11 @@ function getBackgroundView(){
 };
 
 function getPopupView(){
-    var p = chrome.experimental.extension.getPopupView();
-    if(p){
-        return p;
-    }else{
-        var views = chrome.extension.getViews();
-        for (var i = 0; i < views.length; i++) {
-            var view = views[i];
-            if (view.theViewName && view.theViewName == 'popup') {
-                return view;
-            }
+    var views = chrome.extension.getViews();
+    for (var i = 0; i < views.length; i++) {
+        var view = views[i];
+        if (view.theViewName && view.theViewName == 'popup') {
+            return view;
         }
     }
     return null;

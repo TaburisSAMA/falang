@@ -247,7 +247,7 @@ function initQuickSendHotKey(){
 //保存用户账号
 //如果其他微博类型的字段名与新浪的不同，则与新浪的为准，修改后再保存
 // 保存的账号信息有以下附加属性：
-//   - uniqueKey: 唯一标识账号的键， blogType#user_id , user_id为返回的用户信息的用户id
+//   - uniqueKey: 唯一标识账号的键， blogType_userId , userId为返回的用户信息的用户id. 用下划线分隔是因为下划线可以用在css class里面
 //   - authType: 认证类型：oauth, baseauth,
 //   - userName: baseAuth认证的用户名
 //   - password: baseAuth认证的密码
@@ -282,7 +282,7 @@ function saveAccount(){
                 data.userName = user.userName;//兼容预览版
                 data.password = user.password;
                 data.blogType = blogType;
-                data.uniqueKey = blogType + '#' + data.id;
+                data.uniqueKey = blogType + '_' + data.id;
                 data.screen_name = data.screen_name || data.name;
                 userList[data.uniqueKey] = data;
                 saveUserList(userList);
@@ -483,7 +483,7 @@ function refreshAccountWarp(userList, r_user, stat){
             data.userName = user.userName;//兼容预览版
             data.password = user.password;
             data.blogType = user.blogType || 'tsina'; //兼容单微博版
-            data.uniqueKey = data.blogType + '#' + data.id;
+            data.uniqueKey = data.blogType + '_' + data.id;
             userList[data.uniqueKey] = data;
             stat.successCount++;
             _showMsg('成功刷新“' + user.screen_name + '”的信息，');
@@ -493,7 +493,7 @@ function refreshAccountWarp(userList, r_user, stat){
             var c_user = getUser();
             if(c_user){
                 if(!c_user.uniqueKey){ //兼容单微博版本
-                    c_user.uniqueKey = (c_user.blogType||'tsina') + '#' + c_user.id;
+                    c_user.uniqueKey = (c_user.blogType||'tsina') + '_' + c_user.id;
                 }
                 c_user = userList[c_user.uniqueKey.toLowerCase()];
                 setUser(c_user);

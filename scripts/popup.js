@@ -287,14 +287,14 @@ function initChangeUserList(){
         var li = [];
         for(i in userList){
             user = userList[i];
-            if(user.userName != c_user.userName){
-                li.push('<li class="tab-none">' + user.userName + '</li>');
+            if(user.uniqueKey != c_user.uniqueKey){
+                li.push('<li class="tab-none">' + user.screen_name + '</li>');
             }else{
-                li.push('<li class="tab-none current">' + user.userName + '</li>');
+                li.push('<li class="tab-none current">' + user.screen_name + '</li>');
             }
         }
         if(li && li.length>1){
-            c_user.screen_name = c_user.screen_name || c_user.userName;
+            c_user.screen_name = c_user.screen_name;
             c_user.user_list = li.join('');
             c_user.domain = c_user.domain || c_user.id;
             $('#tl_tabs').append(formatText(t_changeUser, c_user));
@@ -313,21 +313,21 @@ function initChangeUserList(){
                 $("#changeUserListWrap").toggle();
             });
         }else if(li){
-            c_user.screen_name = c_user.screen_name || c_user.userName;
             c_user.user_list = li.join('');
             $('#tl_tabs').append(formatText(t_changeUser, c_user));
         }
 
         //底部Dock
-        var u_tp = '<li class="{{current}}">\
+        var u_tp = '<li class="{{uniqueKey}} {{current}}">\
                         <span class="username">{{screen_name}}</span>\
                         <a href="javascript:"><img src="{{profile_image_url}}" /></a>\
                         <img src="/images/blogs/{{blogType}}_16.png" class="blogType" />\
+                        <span class="unr"></span>\
                     </li>';
         var li = [];
         for(i in userList){
             user = userList[i];
-            if(user.userName == c_user.userName){
+            if(user.uniqueKey == c_user.uniqueKey){
                 user.current = 'current';
             }else{
                 user.current = '';
@@ -341,13 +341,13 @@ function initChangeUserList(){
     }
 };
 
-function changeUser(userName){
+function changeUser(uniqueKey){
     friendsTimeline_offset = replys_offset = messages_offset = PAGE_SIZE;//复位分页
     var userList = getUserList();
     var to_user = null;
     for(i in userList){
         var user = userList[i];
-        if(user.userName.toLowerCase() == userName.toLowerCase()){
+        if(user.uniqueKey.toLowerCase() == uniqueKey.toLowerCase()){
             to_user = user;
         }
     }
@@ -356,7 +356,7 @@ function changeUser(userName){
             $("#" + T_LIST[i] + '_timeline .readMore').hide();
             $("#" + T_LIST[i] + '_timeline .list').html('');
         }
-        $("#changeUser .userName").html(to_user.screen_name || to_user.userName);
+        $("#changeUser .userName").html(to_user.screen_name);
         $("#changeUser .userImg").attr('src', to_user.profile_image_url || '');
         $("#changeUser .user_home").attr('href', "http://t.sina.com.cn/" + (to_user.domain || to_user.id));
         setUser(to_user);
@@ -374,17 +374,31 @@ function changeUser(userName){
 function addUnreadCountToTabs(){
     var ur = 0;
     var tab = '';
-    for(i in T_LIST){
-        ur = getUnreadTimelineCount(T_LIST[i]);
-        if(ur>0){
-            tab = $(".tab-" + T_LIST[i]);
-            if(tab.length == 1 && !tab.hasClass('active')){
-                tab.find('.unreadCount').html('(' + ur + ')');
+    var userList = getUserList();
+    var c_user = getUser();
+    for(j in userList){
+        var user = userList[j];
+        var user_unread = 0;
+        for(i in T_LIST){
+            ur = getUnreadTimelineCount(T_LIST[i], user.uniqueKey);
+            if(ur>0 && c_user.uniqueKey == user.uniqueKey){ //当前用户，则设置timeline tab上的提示
+                tab = $(".tab-" + T_LIST[i]);
+                if(tab.length == 1 && !tab.hasClass('active')){
+                    tab.find('.unreadCount').html('(' + ur + ')');
+                    user_unread += ur;
+                }else{
+                    removeUnreadTimelineCount(T_LIST[i], user.uniqueKey);
+                }
             }else{
-                removeUnreadTimelineCount(T_LIST[i]);
+                user_unread += ur;
             }
+            ur = 0;
         }
-        ur = 0;
+        if(user_unread > 0){
+            $("#accountListDock ." + user.uniqueKey + " .unr").html(user_unread).show();
+        }else{
+            $("#accountListDock ." + user.uniqueKey + " .unr").html('').hide();
+        }
     }
 }
 
@@ -544,7 +558,7 @@ function getSinaTimeline(t){
     var _ul = $("#" + t + "_timeline ul.list");
     var c_user = getUser();
     var b_view = getBackgroundView();
-    var _key = c_user.userName + t + '_tweets';
+    var _key = c_user.uniqueKey + t + '_tweets';
     if(b_view && b_view.tweets[_key] != undefined && b_view.tweets[_key].length>0){
         var tweetsAll = b_view.tweets[_key];
         var tweets = tweetsAll.slice(0, PAGE_SIZE);
@@ -733,10 +747,11 @@ function readMore(t){
     var moreEle = $("#" + t + "ReadMore");
     showLoading();
     var _b_view = getBackgroundView();
-    var _key = getUser().userName + t + '_tweets';
+    var c_user = getUser();
+    var _key = c_user.uniqueKey + t + '_tweets';
     var cache = _b_view.tweets[_key];
     if(getTimelineOffset(t) >= cache.length){
-        _b_view.getTimelinePage(t);
+        _b_view.getTimelinePage(user_uniqueKey, t);
     }else{
         var tweets = cache.slice(getTimelineOffset(t), getTimelineOffset(t) + PAGE_SIZE);
         var _html = '';
@@ -769,13 +784,22 @@ function readMore(t){
 
 //====>>>>>>>>>>>>>>>>>>
 /*如果当前tab是激活的，就返回true，否则返回false(即为未读)*/
-function addTimelineMsgs(msgs, t){
-    
+function addTimelineMsgs(msgs, t, user_uniqueKey){
+    var c_user = getUser();
+    if(!user_uniqueKey){
+        user_uniqueKey = c_user.uniqueKey;
+    }
+    if(c_user.uniqueKey != user_uniqueKey){
+        var unread_count = getUnreadTimelineCount(t, user_uniqueKey) + msgs.length;
+        $("#accountListDock ." + user_uniqueKey + " .unr").html(unread_count).show();
+        return;
+    }
+
     var li = $('.tab-' + t);
     if(!li.hasClass('active')){
         //清空，让下次点tab的时候重新取
         $("#" + t + "_timeline ul.list").html('');
-        var c_user = getUser(), _msg_user = null, _unreadCount = 0;
+        var _msg_user = null, _unreadCount = 0;
         for(i in msgs){
             _msg_user = msgs[i].user || msgs[i].sender;
             if(_msg_user.id != c_user.id){
@@ -1111,7 +1135,7 @@ function doDelTweet(tweetId, ele){//删除自己的微博
             $(ele).closest('li').remove();
             var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
             var c_user = getUser();
-            var cacheKey = c_user.userName + t + '_tweets';
+            var cacheKey = c_user.uniqueKey + t + '_tweets';
             var b_view = getBackgroundView();
             if(b_view && b_view.tweets[cacheKey]){
                 var cache = b_view.tweets[cacheKey];
@@ -1136,7 +1160,7 @@ function doDelComment(ele, screen_name, tweetId){//删除评论
             $(ele).closest('li').remove();
             var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
             var c_user = getUser();
-            var cacheKey = c_user.userName + t + '_tweets';
+            var cacheKey = c_user.uniqueKey + t + '_tweets';
             var b_view = getBackgroundView();
             if(b_view && b_view.tweets[cacheKey]){
                 var cache = b_view.tweets[cacheKey];
@@ -1161,7 +1185,7 @@ function delDirectMsg(ele, screen_name, tweetId){//删除私信
             $(ele).closest('li').remove();
             var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
             var c_user = getUser();
-            var cacheKey = c_user.userName + t + '_tweets';
+            var cacheKey = c_user.uniqueKey + t + '_tweets';
             var b_view = getBackgroundView();
             if(b_view && b_view.tweets[cacheKey]){
                 var cache = b_view.tweets[cacheKey];
@@ -1192,7 +1216,7 @@ function addFavorites(ele, screen_name, tweetId){//添加收藏
             _a.remove();
             var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
             var c_user = getUser();
-            var cacheKey = c_user.userName + t + '_tweets';
+            var cacheKey = c_user.uniqueKey + t + '_tweets';
             var b_view = getBackgroundView();
             if(b_view && b_view.tweets[cacheKey]){
                 var cache = b_view.tweets[cacheKey];
@@ -1224,7 +1248,7 @@ function delFavorites(ele, screen_name, tweetId){//删除收藏
             _a.remove();
             var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
             var c_user = getUser();
-            var cacheKey = c_user.userName + t + '_tweets';
+            var cacheKey = c_user.uniqueKey + t + '_tweets';
             var b_view = getBackgroundView();
             if(b_view && b_view.tweets[cacheKey]){
                 var cache = b_view.tweets[cacheKey];
