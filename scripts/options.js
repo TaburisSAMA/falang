@@ -66,14 +66,15 @@ function showAccountList(){
     var needRefresh = false;
     if(userList){
         var op = '';
-        var user = ''
-        for(i in userList){
+        var tpl = '<option value="{{uniqueKey}}">({{blogTypeName}}){{screen_name}}</option>';
+        for(var i in userList){
             userCount++;
-            user = userList[i];
+            var user = userList[i];
             if(!user.uniqueKey){ //兼容单微博版本
                 needRefresh = true;
-            }else{
-                op = op + '<option value="' + user.uniqueKey + '">' + user.screen_name + '</option>';
+            } else {
+            	user.blogTypeName = T_NAMES[user.blogType];
+            	op += tpl.format(user);
             }
         }
         $("#account-list").html(op);
@@ -84,6 +85,14 @@ function showAccountList(){
     if(needRefresh){
         $("#needRefresh").show();
     }
+    
+    // 显示微博选项
+    var blogtype_options = '';
+    for(var k in T_NAMES) {
+    	blogtype_options += '<option value="{{value}}">{{name}}</option>'.format({name: T_NAMES[k], value: k});
+    }
+    $('#account-blogType').html(blogtype_options);
+    
 }
 
 function init(){
@@ -253,7 +262,7 @@ function initQuickSendHotKey(){
 //   - password: baseAuth认证的密码
 //   - oauth_token_key: oauth认证获取到的的key
 //   - oauth_token_secret: oAuth认证获取到的secret
-//   - blogType: 微博类型：tsina, t163, tsohu, twitter
+//   - blogType: 微博类型：tsina, t163, tsohu, twitter, digu
 function saveAccount(){
     var userName = $.trim($("#account-name").val());
     var pwd = $.trim($("#account-pwd").val());
@@ -264,8 +273,8 @@ function saveAccount(){
         if(!userList){
             userList = {};
         }
-        var user = {userName:userName, password:pwd};
-        sinaApi.verify_credentials(user,function(data, textStatus, errorCode){
+        var user = {blogType: blogType, userName:userName, password:pwd};
+        apiDispatch(user).verify_credentials(user,function(data, textStatus, errorCode){
             if(errorCode || textStatus=='error'){
                 if(errorCode==400||errorCode==401||errorCode==403){
                     _showMsg('用户名或者密码不正确，请修改');
@@ -291,19 +300,7 @@ function saveAccount(){
                     setUser(data);
                 }
                 var btnVal = $("#save-account").val();
-                if(btnVal == '添加'){
-                    var op = '<option value="' + data.uniqueKey + '">' + data.screen_name + '</option>';
-                    $("#account-list").append(op);
-                }else if(btnVal == '保存'){
-                    var temp_uniqueKey = $("#edit-account-key").val();
-                    var ots = $("#account-list option");
-                    for(i in ots){
-                        if($(ots[i]).val() == temp_uniqueKey){
-                            $(ots[i]).val(data.uniqueKey).text(data.screen_name);
-                            break;
-                        }
-                    }
-                }
+                showAccountList();
                     
                 $("#new-account").hide();
                 $("#account-name").val('');
@@ -328,6 +325,7 @@ function showEditAccount(uniqueKey){
         var user = userList[uniqueKey];
         if(user){
             $("#new-account").show();
+            $("#account-blogType").val(user.blogType);
             $("#account-name").val(user.userName);
             $("#account-pwd").val(user.password);
             $("#save-account").val('保存');
@@ -469,7 +467,7 @@ function refreshAccountInfo(){
 
 function refreshAccountWarp(userList, r_user, stat){
     var user = r_user;
-    sinaApi.verify_credentials(user,function(data, textStatus, errorCode){
+    apiDispatch(user).verify_credentials(user,function(data, textStatus, errorCode){
         if(errorCode){
             if(errorCode==400){
                 _showMsg('刷新“' + user.screen_name + '”的信息失败，原因：用户名或者密码不正确，请修改。');

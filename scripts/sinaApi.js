@@ -383,7 +383,7 @@ var sinaApi = {
             url: args.url,
             username: user.userName,
             password: user.password,
-            cache: false,
+//            cache: false, // chrome不会出现ie本地cache的问题, 若url参数带有_=xxxxx，digu无法获取完整的用户信息
             timeout: 60*1000, //一分钟超时
             type : args.type,
             data: args.data,
@@ -465,3 +465,47 @@ $.extend(TSohuAPI, {
 	    source2: 'WbbRPziVG6'
 	})
 });
+
+//嘀咕api
+var DiguAPI = $.extend({}, sinaApi);
+
+$.extend(DiguAPI, {
+	// 覆盖不同的参数
+	config: $.extend({}, sinaApi.config, {
+		host: 'http://api.minicloud.com.cn',
+		source: 'fawave', 
+	    source2: 'fawave',
+	    
+	    verify_credentials:   '/account/verify'
+	}),
+	
+	verify_credentials: function(user, callbackFn, data){
+		data = data || {};
+		data.isAllInfo = true;
+	    if(!user || !callbackFn) return;
+	    var params = {
+	        url: this.config.verify_credentials,
+	        type: 'get',
+	        user: user,
+	        data: data
+	    };
+	    this._sendRequest(params, callbackFn);
+	}
+});
+
+var T_API = {
+	'tsina': sinaApi,
+	'tsohu': TSohuAPI,
+	'digu': DiguAPI
+};
+
+var T_NAMES = {
+	'tsina': '新浪微博',
+	'tsohu': '搜狐微博',
+	'digu': '嘀咕'
+};
+
+// 自动判断当前用户所使用的api, 根据user.blogType判断
+function apiDispatch(user) {
+	return T_API[user.blogType || 'tsina'];
+};
