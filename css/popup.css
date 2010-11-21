@@ -277,7 +277,7 @@ div.mainContent{word-wrap: break-word;}
 	width:100%;
 }
 #accountListDock li {
-    display: inline;
+    display: inline-block;
 	margin:0 3px;
 	position:relative;
 }
@@ -307,7 +307,7 @@ div.mainContent{word-wrap: break-word;}
 }
 #accountListDock li .blogType{
 	opacity:0.5;
-	right: 0px;
+	right: -2px;
 	bottom:-2px;
 	position: absolute;
 }
@@ -334,8 +334,8 @@ div.mainContent{word-wrap: break-word;}
 	background: red;
 	font-size: 11px;
 	padding:0 2px;
-	margin-top: -2px;
 	position: absolute;
-	right: 0px;
+	right: -2px;
+	top:-2px;
 	color:#fff;
 }
