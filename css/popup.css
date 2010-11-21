@@ -318,6 +318,7 @@ div.mainContent{word-wrap: break-word;}
 #accountListDock li.current .blogType{ opacity: 1;}
 #accountListDock li .username{
 	display:none;
+	white-space:nowrap;
 	left: 0px;
 	margin-top: -22px;
 	position: absolute;

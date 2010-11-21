@@ -429,15 +429,6 @@ var sinaApi = {
             success: function (data, textStatus) {
                 try{
                     data = JSON.parse(data);
-                    if(data) {
-                    	if($.isArray(data)) {
-                        	for(var i in data) {
-                        		$this.format_result(data[i], play_load);
-                        	}
-                        } else {
-                        	$this.format_result(data, play_load);
-                        }
-                    }
                 }
                 catch(err){
                     data = {error:'服务器返回结果错误，本地解析错误。' + err, error_code:500};
@@ -448,6 +439,15 @@ var sinaApi = {
                     if(data.error || data.error_code){
                         showMsg('error: ' + data.error + ', error_code: ' + data.error_code);
                         error_code = data.error_code || error_code;
+                    }else{
+                        //成功再去格式化结果
+                        if($.isArray(data)) { 
+                        	for(var i in data) {
+                        		$this.format_result(data[i], play_load);
+                        	}
+                        } else {
+                        	$this.format_result(data, play_load);
+                        }
                     }
                 }else{error_code = 400;}
                 callbackFn(data, textStatus, error_code);
