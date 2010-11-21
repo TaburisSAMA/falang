@@ -274,7 +274,7 @@ function saveAccount(){
             userList = {};
         }
         var user = {blogType: blogType, userName:userName, password:pwd};
-        apiDispatch(user).verify_credentials(user,function(data, textStatus, errorCode){
+        tapi.verify_credentials(user,function(data, textStatus, errorCode){
             if(errorCode || textStatus=='error'){
                 if(errorCode==400||errorCode==401||errorCode==403){
                     _showMsg('用户名或者密码不正确，请修改');
@@ -467,7 +467,7 @@ function refreshAccountInfo(){
 
 function refreshAccountWarp(userList, r_user, stat){
     var user = r_user;
-    apiDispatch(user).verify_credentials(user,function(data, textStatus, errorCode){
+    tapi.verify_credentials(user,function(data, textStatus, errorCode){
         if(errorCode){
             if(errorCode==400){
                 _showMsg('刷新“' + user.screen_name + '”的信息失败，原因：用户名或者密码不正确，请修改。');

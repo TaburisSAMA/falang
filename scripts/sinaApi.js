@@ -493,7 +493,7 @@ $.extend(DiguAPI, {
 	}
 });
 
-var T_API = {
+var T_APIS = {
 	'tsina': sinaApi,
 	'tsohu': TSohuAPI,
 	'digu': DiguAPI
@@ -505,7 +505,136 @@ var T_NAMES = {
 	'digu': '嘀咕'
 };
 
-// 自动判断当前用户所使用的api, 根据user.blogType判断
-function apiDispatch(user) {
-	return T_API[user.blogType || 'tsina'];
+
+// 封装兼容所有微博的api，自动判断微博类型
+var tapi = {
+	// 自动判断当前用户所使用的api, 根据user.blogType判断
+	api_dispatch: function(data) {
+		return T_APIS[data.user ? data.user.blogType : data.blogType];
+	},
+	
+	verify_credentials: function(user, callbackFn, data){
+	    return this.api_dispatch(user).verify_credentials(user, callbackFn, data);
+	},
+
+	// since_id, max_id, count, page 
+	friends_timeline: function(data, callbackFn){
+		return this.api_dispatch(data).friends_timeline(data, callbackFn);
+	},
+	
+	// id, user_id, screen_name, since_id, max_id, count, page 
+	user_timeline: function(data, callbackFn){
+		return this.api_dispatch(data).user_timeline(data, callbackFn);
+	},
+	
+	// id, count, page
+	comments_timeline: function(data, callbackFn){
+		return this.api_dispatch(data).comments_timeline(data, callbackFn);
+	},
+	
+	// since_id, max_id, count, page 
+	mentions: function(data, callbackFn){
+		return this.api_dispatch(data).mentions(data, callbackFn);
+	},
+	
+	// id, user_id, screen_name, cursor, count
+	followers: function(data, callbackFn){
+		return this.api_dispatch(data).followers(data, callbackFn);
+	},
+	
+	// id, user_id, screen_name, cursor, count
+	friends: function(data, callbackFn){
+		return this.api_dispatch(data).friends(data, callbackFn);
+	},
+	
+	// page
+	favorites: function(data, callbackFn){
+		return this.api_dispatch(data).favorites(data, callbackFn);
+	},
+	
+	// id
+	favorites_create: function(data, callbackFn){
+		return this.api_dispatch(data).favorites_create(data, callbackFn);
+	},
+	
+	// id
+	favorites_destroy: function(data, callbackFn){
+		return this.api_dispatch(data).favorites_destroy(data, callbackFn);
+	},
+	
+	// ids
+	counts: function(data, callbackFn){
+		return this.api_dispatch(data).counts(data, callbackFn);
+	},
+	
+	// id
+	user_show: function(data, callbackFn){
+		return this.api_dispatch(data).user_show(data, callbackFn);
+	},
+	
+	// since_id, max_id, count, page 
+	direct_messages: function(data, callbackFn){
+		return this.api_dispatch(data).direct_messages(data, callbackFn);
+	},
+	
+	// id
+	destroy_msg: function(data, callbackFn){
+		return this.api_dispatch(data).destroy_msg(data, callbackFn);
+	},
+	
+	new_message: function(data, callbackFn){
+		return this.api_dispatch(data).new_message(data, callbackFn);
+	},
+	
+	update: function(data, callbackFn){
+		return this.api_dispatch(data).update(data, callbackFn);
+	},
+	
+	upload: function(data, callbackFn){
+		return this.api_dispatch(data).upload(data, callbackFn);
+	},
+	
+	repost: function(data, callbackFn){
+		return this.api_dispatch(data).repost(data, callbackFn);
+	},
+	
+	comment: function(data, callbackFn){
+		return this.api_dispatch(data).comment(data, callbackFn);
+	},
+	
+	reply: function(data, callbackFn){
+		return this.api_dispatch(data).reply(data, callbackFn);
+	},
+	
+	comments: function(data, callbackFn){
+		return this.api_dispatch(data).comments(data, callbackFn);
+	},
+	
+	// id
+	comment_destroy: function(data, callbackFn){
+		return this.api_dispatch(data).comment_destroy(data, callbackFn);
+	},
+	
+	friendships_create: function(data, callbackFn){
+		return this.api_dispatch(data).friendships_create(data, callbackFn);
+	},
+	
+	// id
+	friendships_destroy: function(data, callbackFn){
+		return this.api_dispatch(data).friendships_destroy(data, callbackFn);
+	},
+	
+	friendships_show: function(data, callbackFn){
+		return this.api_dispatch(data).friendships_show(data, callbackFn);
+	},
+	
+	// type
+	reset_count: function(data, callbackFn){
+		return this.api_dispatch(data).reset_count(data, callbackFn);
+	},
+	
+	// id
+	destroy: function(data, callbackFn){
+		return this.api_dispatch(data).destroy(data, callbackFn);
+	}
 };
