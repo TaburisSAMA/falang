@@ -113,7 +113,12 @@ function initTabs(){
         removeUnreadTimelineCount(c_t);
         t.find(".unreadCount").html('');
         var c_user = getUser();
-        $("#accountListDock ." + c_user.uniqueKey + " .unr").html(getUserUnreadTimelineCount(c_user.uniqueKey)).show();
+        var userUnreaded = getUserUnreadTimelineCount(c_user.uniqueKey);
+        if(userUnreaded > 0){
+            $("#accountListDock ." + c_user.uniqueKey + " .unr").html(userUnreaded).show();
+        }else{
+            $("#accountListDock ." + c_user.uniqueKey + " .unr").html('').hide();
+        }
     });
 };
 

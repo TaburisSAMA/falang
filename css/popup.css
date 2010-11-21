@@ -291,13 +291,12 @@ div.mainContent{word-wrap: break-word;}
 	background: #fff;
 	height:30px;
 	width:30px;
-	opacity:0.5;
+	opacity:0.7;
     -webkit-transition: all .2s;
     -webkit-transform-origin: bottom;
 }
-#accountListDock li.current a img{opacity:1; width:45px;height:45px; background: #9C3; border-color: green;}
+#accountListDock li.current a img{opacity:1; width:40px;height:40px; background: #9C3; border-color: green;}
 #accountListDock li:hover a img, a:focus img {
-    /*-webkit-transform: scale(1.6);*/
 	-webkit-transition: width height background opacity border-color 1s ease;
 	width:50px;
 	height:50px;
@@ -332,8 +331,10 @@ div.mainContent{word-wrap: break-word;}
 }
 #accountListDock li .unr{
 	background: red;
+	border-radius:2px;
 	font-size: 11px;
-	padding:0 2px;
+	line-height: 12px;
+	padding:0 1px;
 	position: absolute;
 	right: -2px;
 	top:-2px;
