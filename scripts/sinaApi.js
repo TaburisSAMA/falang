@@ -394,7 +394,9 @@ var sinaApi = {
 		return data;
 	},
 	
-	format_result_item: function(data, play_load, url) {},
+	format_result_item: function(data, play_load, url) {
+		return data;
+	},
     
     _sendRequest: function(params, callbackFn) {
     	var args = {type: 'get', play_load: 'status'};
