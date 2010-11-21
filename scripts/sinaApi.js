@@ -366,7 +366,7 @@ var sinaApi = {
     	}
     	args.url = this.config.host + args.url.format(args.data) + this.config.result_format;
     	if(!callbackFn) return;
-        var user = args.user || localStorage.getObject(CURRENT_USER_KEY);
+        var user = args.user || args.data.user || localStorage.getObject(CURRENT_USER_KEY);
         if(!user){
             showMsg('用户未指定');
             callbackFn({}, 'error', '400');
