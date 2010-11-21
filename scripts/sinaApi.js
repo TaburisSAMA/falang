@@ -353,6 +353,11 @@ var sinaApi = {
         this._sendRequest(params, callbackFn);
     },
     
+    // 格式化数据格式，其他微博实现兼容新浪微博的数据格式
+    format_result: function(data) {
+    	return data;
+    },
+    
     _sendRequest: function(params, callbackFn) {
     	var args = {type: 'get'};
     	
@@ -367,6 +372,7 @@ var sinaApi = {
     	args.url = this.config.host + args.url.format(args.data) + this.config.result_format;
     	if(!callbackFn) return;
         var user = args.user || args.data.user || localStorage.getObject(CURRENT_USER_KEY);
+        if(args.data && args.data.user) delete args.data.user;
         if(!user){
             showMsg('用户未指定');
             callbackFn({}, 'error', '400');
@@ -378,7 +384,7 @@ var sinaApi = {
         if(args.data.comment){
         	args.data.comment = encodeURIComponent(args.data.comment);
         }
-
+        var $this = this;
         $.ajax({
             url: args.url,
             username: user.userName,
@@ -394,9 +400,10 @@ var sinaApi = {
             success: function (data, textStatus) {
                 try{
                     data = JSON.parse(data);
+                    data = $this.format_result(data);
                 }
                 catch(err){
-                    data = {error:'服务器返回结果错误，本地解析错误。', error_code:500};
+                    data = {error:'服务器返回结果错误，本地解析错误。' + err, error_code:500};
                     textStatus = 'error';
                 }
                 var error_code = null;
@@ -416,7 +423,7 @@ var sinaApi = {
                         status = xhr.status;
                     }
                     if(xhr.responseText){
-                        var r = xhr.responseText
+                        var r = xhr.responseText;
                         try{
                             r = JSON.parse(r);
                         }
@@ -476,7 +483,13 @@ $.extend(DiguAPI, {
 		source: 'fawave', 
 	    source2: 'fawave',
 	    
-	    verify_credentials:   '/account/verify'
+	    verify_credentials:   '/account/verify',
+	    
+	    mentions:             '/statuses/replies',
+	    
+	    destroy_msg:          '/messages/handle/destroy/{{id}}',
+        direct_messages:      '/messages/100', // message ：0 表示悄悄话，1 表示戳一下，2 表示升级通知，3 表示代发通知，4 表示系统消息。100表示不分类，都查询。其余参数跟
+        new_message:          '/messages/handle/new'
 	}),
 	
 	verify_credentials: function(user, callbackFn, data){

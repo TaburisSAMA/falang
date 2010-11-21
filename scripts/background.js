@@ -87,6 +87,7 @@ function checkTimeline(t, p, user_uniqueKey){
     if(last_id){
         params['since_id'] = last_id;
     }
+
     if(p){
         for(var key in p){
             params[key] = p[key];
@@ -100,7 +101,8 @@ function checkTimeline(t, p, user_uniqueKey){
         default:
             m = t;
     }
-    sinaApi[m](params, function(sinaMsgs, textStatus){
+
+    tapi[m](params, function(sinaMsgs, textStatus){
         var isFirstTime = false;
         var _last_id = '';
         var _max_id = '';
@@ -214,7 +216,7 @@ function getTimelinePage(user_uniqueKey, t, p){
         default:
             m = t;
     }
-    sinaApi[m](params, function(sinaMsgs, textStatus){
+    tapi[m](params, function(sinaMsgs, textStatus){
         if(sinaMsgs && sinaMsgs.length > 0){
             var _max_id = '';
             //TODO: 这里不确定会不会有闭包造成的c_user变量覆盖问题，待测试
