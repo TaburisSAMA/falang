@@ -60,6 +60,7 @@ var sinaApi = {
             url: this.config.verify_credentials,
             type: 'get',
             user: user,
+            play_load: 'user',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -72,6 +73,7 @@ var sinaApi = {
             url: this.config.friends_timeline,
             type: 'get',
             source: this.config.source2,
+            play_load: 'status',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -83,6 +85,7 @@ var sinaApi = {
         var params = {
             url: this.config.user_timeline,
             type: 'get',
+            play_load: 'status',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -95,6 +98,7 @@ var sinaApi = {
             url: this.config.comments_timeline,
             type: 'get',
             source: this.config.source2,
+            play_load: 'comment',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -107,6 +111,7 @@ var sinaApi = {
             url: this.config.mentions,
             type: 'get',
             source: this.config.source2,
+            play_load: 'status',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -118,6 +123,7 @@ var sinaApi = {
         var params = {
             url: this.config.followers,
             type: 'get',
+            play_load: 'user',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -129,6 +135,7 @@ var sinaApi = {
         var params = {
             url: this.config.friends,
             type: 'get',
+            play_load: 'user',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -140,6 +147,7 @@ var sinaApi = {
         var params = {
             url: this.config.favorites,
             type: 'get',
+            play_load: 'status',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -151,6 +159,7 @@ var sinaApi = {
         var params = {
             url: this.config.favorites_create,
             type: 'post',
+            play_load: 'status',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -162,6 +171,7 @@ var sinaApi = {
         var params = {
             url: this.config.favorites_destroy,
             type: 'post',
+            play_load: 'status',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -174,6 +184,7 @@ var sinaApi = {
             url: this.config.counts,
             type: 'get',
             source: this.config.source2,
+            play_load: 'count',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -185,6 +196,7 @@ var sinaApi = {
         var params = {
             url: this.config.user_show,
             type: 'get',
+            play_load: 'user',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -197,6 +209,7 @@ var sinaApi = {
             url: this.config.direct_messages,
             type: 'get',
             source: this.config.source2,
+            play_load: 'message',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -208,6 +221,7 @@ var sinaApi = {
         var params = {
             url: this.config.destroy_msg,
             type: 'post',
+            play_load: 'message',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -224,6 +238,7 @@ var sinaApi = {
         var params = {
             url: this.config.new_message,
             type: 'post',
+            play_load: 'message',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -234,6 +249,7 @@ var sinaApi = {
         var params = {
             url: this.config.update,
             type: 'post',
+            play_load: 'status',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -244,6 +260,7 @@ var sinaApi = {
         var params = {
             url: this.config.upload,
             type: 'post',
+            play_load: 'status',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -254,6 +271,7 @@ var sinaApi = {
         var params = {
             url: this.config.repost,
             type: 'post',
+            play_load: 'status',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -264,6 +282,7 @@ var sinaApi = {
         var params = {
             url: this.config.comment,
             type: 'post',
+            play_load: 'comment',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -274,6 +293,7 @@ var sinaApi = {
         var params = {
             url: this.config.reply,
             type: 'post',
+            play_load: 'comment',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -284,6 +304,7 @@ var sinaApi = {
         var params = {
             url: this.config.comments,
             type: 'get',
+            play_load: 'comment',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -295,6 +316,7 @@ var sinaApi = {
         var params = {
             url: this.config.comment_destroy,
             type: 'post',
+            play_load: 'comment',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -305,6 +327,7 @@ var sinaApi = {
         var params = {
             url: this.config.friendships_create,
             type: 'post',
+            play_load: 'user',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -316,6 +339,7 @@ var sinaApi = {
         var params = {
             url: this.config.friendships_destroy,
             type: 'post',
+            play_load: 'user',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -326,7 +350,8 @@ var sinaApi = {
         var params = {
             url: this.config.friendships_show,
             type: 'get',
-            data: (data||{})
+            play_load: 'user',
+            data: data
         };
         this._sendRequest(params, callbackFn);
     },
@@ -337,6 +362,7 @@ var sinaApi = {
         var params = {
             url: this.config.reset_count,
             type: 'post',
+            play_load: 'result',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -348,18 +374,20 @@ var sinaApi = {
         var params = {
             url: this.config.destroy,
             type: 'POST',
+            play_load: 'status',
             data: data
         };
         this._sendRequest(params, callbackFn);
     },
     
     // 格式化数据格式，其他微博实现兼容新浪微博的数据格式
-    format_result: function(data) {
+    // play_load: status, user, comment, message, count, result(reset_count)
+    format_result: function(data, play_load) {
     	return data;
     },
     
     _sendRequest: function(params, callbackFn) {
-    	var args = {type: 'get'};
+    	var args = {type: 'get', play_load: 'status'};
     	
     	$.extend(args, params);
     	args.data = args.data || {};
@@ -385,6 +413,8 @@ var sinaApi = {
         	args.data.comment = encodeURIComponent(args.data.comment);
         }
         var $this = this;
+        var play_load = args.play_load; // 返回的是什么类型的数据格式
+        delete args.play_load;
         $.ajax({
             url: args.url,
             username: user.userName,
@@ -400,7 +430,7 @@ var sinaApi = {
             success: function (data, textStatus) {
                 try{
                     data = JSON.parse(data);
-                    data = $this.format_result(data);
+                    data = $this.format_result(data, play_load);
                 }
                 catch(err){
                     data = {error:'服务器返回结果错误，本地解析错误。' + err, error_code:500};
