@@ -42,7 +42,6 @@ function init(){
         }
     }).live('mousedown', function(e){
         if(e.button == 2){ //右键点击
-            console.log(e.button);
             var url = $.trim($(this).attr('rhref'));
             if(url){
                 chrome.tabs.create({url:url, selected:false});
@@ -500,8 +499,8 @@ function getFansList(t, cursor){
     }
     showLoading();
     hideReadMore(t);
-    var params = {user_id:c_user.id, cursor:cursor};
-    sinaApi[t](params, function(users, textStatus, statuCode){
+    var params = {user_id:c_user.id, cursor:cursor, user:c_user};
+    tapi[t](params, function(users, textStatus, statuCode){
         if(textStatus != 'error' && users && !users.error){
             NEXT_CURSOR[t] = users.next_cursor;
             users = users.users;
@@ -527,10 +526,10 @@ function getUserTimeline(screen_name){
         return;
     }
     showLoading();
-    var params = {count:40, screen_name:screen_name};
+    var params = {count:40, screen_name:screen_name, user: c_user};
     
     var m = 'user_timeline';
-    sinaApi[m](params, function(sinaMsgs, textStatus){
+    tapi[m](params, function(sinaMsgs, textStatus){
         if(sinaMsgs && sinaMsgs.length > 0){
             var t = $("#tl_tabs .tab-user_timeline");
             //添加当前激活的状态
@@ -613,8 +612,12 @@ function showCounts(t, ids){
     if(['direct_messages'].indexOf(t) >= 0){return;}
 
     showLoading();
-    var data = {ids:ids}
-    sinaApi.counts(data, function(counts, textStatus){
+    var c_user = getUser();
+    if(!c_user){
+        return;
+    }
+    var data = {ids:ids, user:c_user};
+    tapi.counts(data, function(counts, textStatus){
         if(textStatus != 'error' && counts && !counts.error){
             if(counts.length && counts.length>0){
                 for(i in counts){

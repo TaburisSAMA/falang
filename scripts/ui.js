@@ -125,6 +125,7 @@ function bildMsgLi(sinaMsg, t){
         if(c_user.id == user.id){
             sinaMsg.myTweet = true;
         }
+     
         var crlBtn = {
                 delTweetBtn: '<a class="deltweet" href="javascript:void(0);" onclick="doDelTweet(' + sinaMsg.id + ', this);" title="点击删除微博">删</a>',
                 replyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');" title="进行@回复">@</a>',
@@ -185,7 +186,8 @@ function bildMsgLi(sinaMsg, t){
                 break;
             case 'comments_timeline':
                 crlBtn.repostBtn = crlBtn.repostCounts = crlBtn.commentCounts = crlBtn.delTweetBtn = crlBtn.delDirectMsgBtn = crlBtn.addFavoritesMsgBtn = crlBtn.delFavoritesMsgBtn = '';
-                crlBtn.commentBtn = '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + sinaMsg.status.user.screen_name + '\',' + sinaMsg.status.id + ',\'' + user.screen_name + '\', ' + sinaMsg.id + ');" title="点击回复评论">回复</a>';
+                crlBtn.commentBtn = '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + 
+                	sinaMsg.status.user.screen_name + '\',' + sinaMsg.status.id + ',\'' + user.screen_name + '\', ' + sinaMsg.id + ');" title="点击回复评论">回复</a>';
                 if(c_user.id == user.id){
                     crlBtn.new_msgBtn = '';
                 }else{

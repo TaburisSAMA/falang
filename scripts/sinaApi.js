@@ -383,7 +383,6 @@ var sinaApi = {
     // 格式化数据格式，其他微博实现兼容新浪微博的数据格式
     // play_load: status, user, comment, message, count, result(reset_count)
     format_result: function(data, play_load) {
-    	return data;
     },
     
     _sendRequest: function(params, callbackFn) {
@@ -421,7 +420,7 @@ var sinaApi = {
             password: user.password,
 //            cache: false, // chrome不会出现ie本地cache的问题, 若url参数带有_=xxxxx，digu无法获取完整的用户信息
             timeout: 60*1000, //一分钟超时
-            type : args.type,
+            type: args.type,
             data: args.data,
             dataType: 'text',
             beforeSend: function(req) {
@@ -430,7 +429,15 @@ var sinaApi = {
             success: function (data, textStatus) {
                 try{
                     data = JSON.parse(data);
-                    data = $this.format_result(data, play_load);
+                    if(data) {
+                    	if($.isArray(data)) {
+                        	for(var i in data) {
+                        		$this.format_result(data[i], play_load);
+                        	}
+                        } else {
+                        	$this.format_result(data, play_load);
+                        }
+                    }
                 }
                 catch(err){
                     data = {error:'服务器返回结果错误，本地解析错误。' + err, error_code:500};
@@ -500,7 +507,39 @@ $.extend(TSohuAPI, {
 		host: 'http://api.t.sohu.com',
 		source: 'WbbRPziVG6', // 搜狐不是按key来限制的
 	    source2: 'WbbRPziVG6'
-	})
+	}),
+
+	format_result: function(data, play_load) {
+		if(play_load == 'status' && data.id) {
+			data.thumbnail_pic = data.small_pic;
+			delete data.small_pic;
+			data.bmiddle_pic = data.middle_pic;
+			delete data.middle_pic;
+			if(data.in_reply_to_status_text) {
+				data.retweeted_status = {
+					id: data.in_reply_to_status_id,
+					text: data.in_reply_to_status_text,
+					has_image: data.in_reply_to_has_image,
+					user: {
+						id: data.in_reply_to_user_id,
+						screen_name: data.in_reply_to_screen_name
+					}
+				};
+				delete data.in_reply_to_has_image;
+				delete data.in_reply_to_status_text;
+			}
+		} else if(play_load == 'comment' && data.id) {
+			data.status = {
+				id: data.in_reply_to_status_id,
+				text: data.in_reply_to_status_text,
+				user: {
+					id: data.in_reply_to_user_id,
+					screen_name: data.in_reply_to_screen_name
+				}
+			};
+		}
+		return data;
+	}
 });
 
 //嘀咕api
@@ -530,9 +569,33 @@ $.extend(DiguAPI, {
 	        url: this.config.verify_credentials,
 	        type: 'get',
 	        user: user,
+	        play_load: 'user',
 	        data: data
 	    };
 	    this._sendRequest(params, callbackFn);
+	},
+	
+	format_result: function(data, play_load) {
+		if(play_load == 'status' && data.id) {
+			if(data.picPath && data.picPath.length > 0) {
+				// http://pic.digu.com:80/file/12/93/99/27/201011/d144f3f76aaebf5df71c0003ca0767e9_100x75.JPEG
+				data.thumbnail_pic = data.picPath[0];
+				data.bmiddle_pic = data.thumbnail_pic.replace('_100x75', '_640x480');
+				data.original_pic = data.thumbnail_pic.replace('_100x75', '');
+			}
+			delete data.picPath;
+			if(data.in_reply_to_status_id != '0' && data.in_reply_to_status_id != '') {
+				data.retweeted_status = {
+					id: data.in_reply_to_status_id,
+					user: {
+						id: data.in_reply_to_user_id,
+						screen_name: data.in_reply_to_screen_name,
+						name: data.in_reply_to_user_name
+					}
+				};
+			}
+		}
+		return data;
 	}
 });
 

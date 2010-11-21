@@ -173,7 +173,10 @@
 									<p>
 										<img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 
 											title="<?js if(user.gender == 'm'){ ?>男<?js }else if(user.gender == 'f'){ ?>女<?js }else{ ?>性别未知<?js } ?>" />
-										 #{provinces[user.province].name}, #{provinces[user.province]["citys"][user.city]}</p>
+										 <?js if(user.province){ ?>
+										 #{provinces[user.province].name}, #{provinces[user.province]["citys"][user.city]}
+										 <?js } ?>
+								    </p>
 									<p>关注: <span>#{user.friends_count}</span>个　
 										粉丝: <span>#{user.followers_count}</span>个</p>
 									<p>微博: <span>#{user.statuses_count}</span>条</p>
@@ -257,7 +260,10 @@
 													<p>
 														<img class="small_icon sicon_gender_#{tweet.retweeted_status.user.gender}" src="/images/transparent.gif" 
 															title="<?js if(tweet.retweeted_status.user.gender == 'm'){ ?>男<?js }else if(tweet.retweeted_status.user.gender == 'f'){ ?>女<?js }else{ ?>性别未知<?js } ?>" />
-														 #{provinces[tweet.retweeted_status.user.province].name}, #{provinces[tweet.retweeted_status.user.province]["citys"][tweet.retweeted_status.user.city]}</p>
+														 <?js if(tweet.retweeted_status.user.province){ ?>
+				                                         #{provinces[tweet.retweeted_status.user.province].name}, #{provinces[tweet.retweeted_status.user.province]["citys"][tweet.retweeted_status.user.city]}
+				                                         <?js } ?>
+				                                    </p>
 													<p>关注: <span>#{tweet.retweeted_status.user.friends_count}</span>个　
 														粉丝: <span>#{tweet.retweeted_status.user.followers_count}</span>个</p>
 													<p>微博: <span>#{tweet.retweeted_status.user.statuses_count}</span>条</p>
@@ -306,7 +312,10 @@
 					<p>
 						<img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 
 							title="<?js if(user.gender == 'm'){ ?>男<?js }else if(user.gender == 'f'){ ?>女<?js }else{ ?>性别未知<?js } ?>" />
-						 #{provinces[user.province].name}, #{provinces[user.province]["citys"][user.city]}</p>
+					      <?js if(user.province){ ?>
+	                      #{provinces[user.province].name}, #{provinces[user.province]["citys"][user.city]}
+	                      <?js } ?>
+	                </p>
 					<p>关注: <span>#{user.friends_count}</span>个　 
 						粉丝: <span>#{user.followers_count}</span>个　 
 						微博: <span>#{user.statuses_count}</span>条</p>
@@ -336,7 +345,10 @@
 					<p>
 						<img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 
 							title="<?js if(user.gender == 'm'){ ?>男<?js }else if(user.gender == 'f'){ ?>女<?js }else{ ?>性别未知<?js } ?>" />
-						 #{provinces[user.province].name}, #{provinces[user.province]["citys"][user.city]}</p>
+					<?js if(user.province){ ?>
+                          #{provinces[user.province].name}, #{provinces[user.province]["citys"][user.city]}
+                          <?js } ?>
+                    </p>
 					<p>关注: <span>#{user.friends_count}</span>个　 
 						粉丝: <span>#{user.followers_count}</span>个　 
 						微博: <span>#{user.statuses_count}</span>条</p>
