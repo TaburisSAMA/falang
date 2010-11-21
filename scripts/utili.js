@@ -43,7 +43,18 @@ var TP_LOOKING_KEY = 'idi_TP_LOOKING_KEY'; //我正在看的模板key
 var QUICK_SEND_HOT_KEY_KEY = 'idi_QUICK_SEND_HOT_KEY_KEY'; //快速发送热键key
 
 //['friends_timeline','mentions','comments_timeline','comments_by_me','direct_messages','favorites']
-var T_LIST = ['friends_timeline','mentions','comments_timeline','direct_messages']; //timeline的分类列表
+//timeline的分类列表
+var T_LIST = {'all': ['friends_timeline','mentions','comments_timeline','direct_messages'],
+              'tsina': ['friends_timeline','mentions','comments_timeline','direct_messages'],
+              'tsohu': ['friends_timeline','mentions','comments_timeline','direct_messages'],
+              'digu': ['friends_timeline','mentions', 'direct_messages']
+        }; 
+
+var T_NAMES = {
+	'tsina': '新浪微博',
+	'tsohu': '搜狐微博',
+	'digu': '嘀咕'
+};
 
 
 function showMsg(msg){
@@ -134,7 +145,23 @@ function getUserByUniqueKey(uniqueKey){
     return null;
 }
 
-//获取用户的未读信息数
+//获取用户的全部timeline的未读信息数
+function getUserUnreadTimelineCount(user_uniqueKey){
+    var user = getUserByUniqueKey(user_uniqueKey);
+    if(!user){ return 0; }
+    var total = 0;
+    for(i in T_LIST[user.blogType]){
+        //key 大概如： tsina#11234598_friends_timeline_UNREAD_TIMELINE_COUNT_KEY
+        var count = localStorage.getObject(user_uniqueKey + T_LIST[user.blogType][i] + UNREAD_TIMELINE_COUNT_KEY);
+        if(!count){
+            count = 0;
+        }
+        total += count;
+    }
+    return total;
+};
+
+//获取用户的某一timeline的未读信息数
 function getUnreadTimelineCount(t, user_uniqueKey){
     if(!user_uniqueKey){
         user_uniqueKey = getUser().uniqueKey;
@@ -157,9 +184,13 @@ function setUnreadTimelineCount(count, t, user_uniqueKey){
     localStorage.setObject(user_uniqueKey + t + UNREAD_TIMELINE_COUNT_KEY, count);
     if(setBadgeText){
         var total = 0;
-        for(i in T_LIST){
-            if(isSetBadgeText(T_LIST[i])){
-                total += getUnreadTimelineCount(T_LIST[i], user_uniqueKey);
+        var userList = getUserList();
+        for(j in userList){
+            var user = userList[j];
+            for(i in T_LIST[user.blogType]){
+                if(isSetBadgeText(T_LIST[user.blogType][i], user.uniqueKey)){
+                    total += getUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
+                }
             }
         }
         if(total > 0){
@@ -179,12 +210,16 @@ function removeUnreadTimelineCount(t, user_uniqueKey){
         syncUnreadCountToSinaPage(t, user_uniqueKey);
     }
     var total = 0;
-    for(i in T_LIST){
-        if(T_LIST[i]==t){
-            continue;
-        }
-        if(isSetBadgeText(T_LIST[i]), user_uniqueKey){
-            total += getUnreadTimelineCount(T_LIST[i], user_uniqueKey);
+    var userList = getUserList();
+    for(j in userList){
+        var user = userList[j];
+        for(i in T_LIST[user.blogType]){
+            if(T_LIST[user.blogType][i]==t){
+                continue;
+            }
+            if(isSetBadgeText(T_LIST[user.blogType][i], user.uniqueKey)){
+                total += getUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
+            }
         }
     }
     if(total > 0){
@@ -198,8 +233,15 @@ function removeUnreadTimelineCount(t, user_uniqueKey){
 
 //将新浪微博页面的未读信息数清零
 function syncUnreadCountToSinaPage(t, user_uniqueKey){
+    var c_user = null;
     if(!user_uniqueKey){
-        user_uniqueKey = getUser().uniqueKey;
+        c_user = getUser();
+        user_uniqueKey = c_user.uniqueKey;
+    }else{
+        c_user = getUserByUniqueKey(user_uniqueKey);
+    }
+    if(!c_user){
+        return;
     }
     var tl_type = false;
     switch(t){
@@ -217,7 +259,7 @@ function syncUnreadCountToSinaPage(t, user_uniqueKey){
             break;
     }
     if(tl_type){
-        sinaApi.reset_count({'type':tl_type}, function(users, textStatus, statuCode){
+        sinaApi.reset_count({'user':c_user, 'type':tl_type}, function(users, textStatus, statuCode){
             //TODO: reset success
         });
     }
@@ -225,16 +267,21 @@ function syncUnreadCountToSinaPage(t, user_uniqueKey){
 
 //获取在插件icon上显示的tooltip内容
 function getTooltip(){
-    var c_user = getUser();
-    var u = '';
-    if(c_user){
-        u = (c_user.screen_name||c_user.userName) + ' 的';
+    
+    var tip = '';
+    var userList = getUserList();
+    for(j in userList){
+        var user = userList[j];
+        if(tip){
+            tip += '\r\n';
+        }
+        tip = tip + '(' + T_NAMES[user.blogType] + ')' + user.screen_name + ': '
+            + '　新微博: ' + getUnreadTimelineCount('friends_timeline', user.uniqueKey) + ','
+            + '　新@我: ' + getUnreadTimelineCount('mentions', user.uniqueKey) + ','
+            + '　新评论: ' + getUnreadTimelineCount('comments_timeline', user.uniqueKey) + ','
+            + '　新私信: ' + getUnreadTimelineCount('direct_messages', user.uniqueKey);
     }
-    var tip = u + '发微(FaWave)\r\n'
-            + '新微博: ' + getUnreadTimelineCount('friends_timeline') + ',    '
-            + '新@我: ' + getUnreadTimelineCount('mentions') + '\r\n'
-            + '新评论: ' + getUnreadTimelineCount('comments_timeline') + ',    '
-            + '新私信: ' + getUnreadTimelineCount('direct_messages');
+    
     return tip;
 };
 

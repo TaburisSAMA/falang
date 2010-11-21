@@ -1,7 +1,7 @@
 // @author qleelulu@gmail.com
 
 var t_changeUser = '<table id="changeUser" class="tab-none" cellspacing="0" ><tr><td>'
-            + '<span class="userName" title="点击切换用户">{{screen_name}}</span>'
+            + '<span class="userName" title="">{{screen_name}}</span>'
             + '<div id="changeUserListWrap" style="display:none;"><ul>{{user_list}}</lu></div></td>'
             + '<td><a target="_blank" class="user_home" href="http://t.sina.com.cn/{{domain}}" title="点击打开我的主页"><img style="width:24px;height:24px;" class="userImg" src="{{profile_image_url}}" /></a></td></tr></table>';
 
@@ -113,6 +113,8 @@ function initTabs(){
         resetScrollTop(c_t); //复位到上次滚动条的位置
         removeUnreadTimelineCount(c_t);
         t.find(".unreadCount").html('');
+        var c_user = getUser();
+        $("#accountListDock ." + c_user.uniqueKey + " .unr").html(getUserUnreadTimelineCount(c_user.uniqueKey)).show();
     });
 };
 
@@ -284,6 +286,7 @@ function initChangeUserList(){
     var c_user = getUser();
     if(c_user){
         var userList = getUserList();
+        /*
         var li = [];
         for(i in userList){
             user = userList[i];
@@ -316,11 +319,13 @@ function initChangeUserList(){
             c_user.user_list = li.join('');
             $('#tl_tabs').append(formatText(t_changeUser, c_user));
         }
+        */
+        $('#tl_tabs').append(formatText(t_changeUser, c_user));
 
         //底部Dock
         var u_tp = '<li class="{{uniqueKey}} {{current}}">\
                         <span class="username">{{screen_name}}</span>\
-                        <a href="javascript:"><img src="{{profile_image_url}}" /></a>\
+                        <a href="javascript:" onclick="changeUser(\'{{uniqueKey}}\')"><img src="{{profile_image_url}}" /></a>\
                         <img src="/images/blogs/{{blogType}}_16.png" class="blogType" />\
                         <span class="unr"></span>\
                     </li>';
@@ -342,6 +347,10 @@ function initChangeUserList(){
 };
 
 function changeUser(uniqueKey){
+    var c_user = getUser();
+    if(c_user.uniqueKey == uniqueKey){
+        return;
+    }
     friendsTimeline_offset = replys_offset = messages_offset = PAGE_SIZE;//复位分页
     var userList = getUserList();
     var to_user = null;
@@ -349,25 +358,27 @@ function changeUser(uniqueKey){
         var user = userList[i];
         if(user.uniqueKey.toLowerCase() == uniqueKey.toLowerCase()){
             to_user = user;
+            break;
         }
     }
     if(to_user){
-        for(i in T_LIST){
-            $("#" + T_LIST[i] + '_timeline .readMore').hide();
-            $("#" + T_LIST[i] + '_timeline .list').html('');
+        for(i in T_LIST.all){
+            $("#" + T_LIST.all[i] + '_timeline .readMore').hide();
+            $("#" + T_LIST.all[i] + '_timeline .list').html('');
         }
+        $("#tl_tabs .unreadCount").html('');
         $("#changeUser .userName").html(to_user.screen_name);
         $("#changeUser .userImg").attr('src', to_user.profile_image_url || '');
         $("#changeUser .user_home").attr('href', "http://t.sina.com.cn/" + (to_user.domain || to_user.id));
+        $("#accountListDock").find('.current').removeClass('current')
+            .end().find('.'+to_user.uniqueKey).addClass('current');
         setUser(to_user);
-        for(i in T_LIST){
-            getSinaTimeline(T_LIST[i]);
-        }
-        //getSinaFriendsTimeline();
-        //getSinaReplies();
-        //getSinaMessages();
         var b_view = getBackgroundView();
         b_view.onChangeUser();
+        addUnreadCountToTabs();
+        for(i in T_LIST[to_user.blogType]){
+            getSinaTimeline(T_LIST[to_user.blogType][i], true);
+        }
     }
 }; // <<<<<<<<<<<<<========
 
@@ -379,15 +390,15 @@ function addUnreadCountToTabs(){
     for(j in userList){
         var user = userList[j];
         var user_unread = 0;
-        for(i in T_LIST){
-            ur = getUnreadTimelineCount(T_LIST[i], user.uniqueKey);
+        for(i in T_LIST[user.blogType]){
+            ur = getUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
             if(ur>0 && c_user.uniqueKey == user.uniqueKey){ //当前用户，则设置timeline tab上的提示
-                tab = $(".tab-" + T_LIST[i]);
+                tab = $(".tab-" + T_LIST[user.blogType][i]);
                 if(tab.length == 1 && !tab.hasClass('active')){
                     tab.find('.unreadCount').html('(' + ur + ')');
                     user_unread += ur;
                 }else{
-                    removeUnreadTimelineCount(T_LIST[i], user.uniqueKey);
+                    removeUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
                 }
             }else{
                 user_unread += ur;
@@ -553,7 +564,7 @@ function getUserTimeline(screen_name){
 
 //获取时间线微博列表
 //@t : 类型
-function getSinaTimeline(t){
+function getSinaTimeline(t, notCheckNew){
     showLoading();
     var _ul = $("#" + t + "_timeline ul.list");
     var c_user = getUser();
@@ -589,7 +600,7 @@ function getSinaTimeline(t){
         if(t=="user_timeline"){ //用户
             b_view.checkTimeline(t);
         }
-    }else{
+    }else if(!notCheckNew){
         b_view.checkTimeline(t);
     }
     //hideLoading();
@@ -751,7 +762,7 @@ function readMore(t){
     var _key = c_user.uniqueKey + t + '_tweets';
     var cache = _b_view.tweets[_key];
     if(getTimelineOffset(t) >= cache.length){
-        _b_view.getTimelinePage(user_uniqueKey, t);
+        _b_view.getTimelinePage(c_user.uniqueKey, t);
     }else{
         var tweets = cache.slice(getTimelineOffset(t), getTimelineOffset(t) + PAGE_SIZE);
         var _html = '';
@@ -790,15 +801,16 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
         user_uniqueKey = c_user.uniqueKey;
     }
     if(c_user.uniqueKey != user_uniqueKey){
-        var unread_count = getUnreadTimelineCount(t, user_uniqueKey) + msgs.length;
+        var unread_count = getUserUnreadTimelineCount(user_uniqueKey) + msgs.length;
         $("#accountListDock ." + user_uniqueKey + " .unr").html(unread_count).show();
-        return;
+        return false;
     }
 
     var li = $('.tab-' + t);
     if(!li.hasClass('active')){
         //清空，让下次点tab的时候重新取
         $("#" + t + "_timeline ul.list").html('');
+        
         var _msg_user = null, _unreadCount = 0;
         for(i in msgs){
             _msg_user = msgs[i].user || msgs[i].sender;
@@ -810,6 +822,7 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
         ur += _unreadCount;
         if(ur>0){
             li.find('.unreadCount').html('(' + ur + ')');
+            $("#accountListDock ." + user_uniqueKey + " .unr").html(_unreadCount + getUserUnreadTimelineCount(user_uniqueKey)).show();
         }
         return false;
     }else{

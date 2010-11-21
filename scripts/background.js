@@ -315,8 +315,9 @@ function checkNewMsg(){
         //checkTimeline('direct_messages');
         var userList = getUserList();
         for(j in userList){
-            for(i in T_LIST){
-                checkTimeline(T_LIST[i], null, userList[j].uniqueKey);
+            var user = userList[j];
+            for(i in T_LIST[user.blogType]){
+                checkTimeline(T_LIST[user.blogType][i], null, user.uniqueKey);
             }
         }
     }catch(err){
@@ -325,17 +326,17 @@ function checkNewMsg(){
 }
 
 function onChangeUser(){
-    clearInterval(itv);
+    //clearInterval(itv);
     window.c_user = null;
     var c_user = getUser();
     if(c_user){
-        //window.c_user = c_user;
+        window.c_user = c_user;
     }
-    for(i in T_LIST){
-        setUnreadTimelineCount(0, T_LIST[i]);
+    for(i in T_LIST[c_user.blogType]){
+        setUnreadTimelineCount(0, T_LIST[[c_user.blogType]][i]);
     }
-    checkNewMsg();
-    itv = setInterval(checkNewMsg, getRefreshTime());
+    //checkNewMsg();
+    //itv = setInterval(checkNewMsg, getRefreshTime());
 };
 
 function refreshInterval(){

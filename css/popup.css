@@ -289,8 +289,8 @@ div.mainContent{word-wrap: break-word;}
     border: solid 1px #ccc;
 	padding:2px;
 	background: #fff;
-	height:40px;
-	width:40px;
+	height:30px;
+	width:30px;
 	opacity:0.5;
     -webkit-transition: all .2s;
     -webkit-transform-origin: bottom;
@@ -332,6 +332,7 @@ div.mainContent{word-wrap: break-word;}
 #accountListDock li .unr{
 	background: red;
 	font-size: 11px;
+	padding:0 2px;
 	margin-top: -2px;
 	position: absolute;
 	right: 0px;

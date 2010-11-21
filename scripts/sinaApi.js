@@ -542,12 +542,6 @@ var T_APIS = {
 	'digu': DiguAPI
 };
 
-var T_NAMES = {
-	'tsina': '新浪微博',
-	'tsohu': '搜狐微博',
-	'digu': '嘀咕'
-};
-
 
 // 封装兼容所有微博的api，自动判断微博类型
 var tapi = {
