@@ -611,7 +611,12 @@ var T_APIS = {
 // 封装兼容所有微博的api，自动判断微博类型
 var tapi = {
 	// 自动判断当前用户所使用的api, 根据user.blogType判断
-	api_dispatch: function(data) {
+    // tapi.g('fridens_timeline')(data, function(){})
+	g: function(method_name){
+        return T_APIS[data.user ? data.user.blogType : data.blogType][method_name];
+    },
+    // 自动判断当前用户所使用的api, 根据user.blogType判断
+    api_dispatch: function(data) {
 		return T_APIS[data.user ? data.user.blogType : data.blogType];
 	},
 	
