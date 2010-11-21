@@ -382,8 +382,19 @@ var sinaApi = {
     
     // 格式化数据格式，其他微博实现兼容新浪微博的数据格式
     // play_load: status, user, comment, message, count, result(reset_count)
-    format_result: function(data, play_load) {
-    },
+    // args: request arguments
+    format_result: function(data, play_load, args) {
+		if($.isArray(data)) {
+	    	for(var i in data) {
+	    		data[i] = this.format_result_item(data[i], play_load, args);
+	    	}
+	    } else {
+	    	data = this.format_result_item(data, play_load, args);
+	    }
+		return data;
+	},
+	
+	format_result_item: function(data, play_load, url) {},
     
     _sendRequest: function(params, callbackFn) {
     	var args = {type: 'get', play_load: 'status'};
@@ -396,7 +407,7 @@ var sinaApi = {
             callbackFn({}, 'error', '400');
             return;
     	}
-    	args.url = this.config.host + args.url.format(args.data) + this.config.result_format;
+    	var url = this.config.host + args.url.format(args.data) + this.config.result_format;
     	if(!callbackFn) return;
         var user = args.user || args.data.user || localStorage.getObject(CURRENT_USER_KEY);
         if(args.data && args.data.user) delete args.data.user;
@@ -415,7 +426,7 @@ var sinaApi = {
         var play_load = args.play_load; // 返回的是什么类型的数据格式
         delete args.play_load;
         $.ajax({
-            url: args.url,
+            url: url,
             username: user.userName,
             password: user.password,
 //            cache: false, // chrome不会出现ie本地cache的问题, 若url参数带有_=xxxxx，digu无法获取完整的用户信息
@@ -436,18 +447,13 @@ var sinaApi = {
                 }
                 var error_code = null;
                 if(data){
-                    if(data.error || data.error_code){
-                        showMsg('error: ' + data.error + ', error_code: ' + data.error_code);
+                	// digu {"wrong":"no data"}
+                    if(data.error || data.error_code || data.wrong){
+                        showMsg('error: ' + (data.error || data.wrong) + ', error_code: ' + data.error_code);
                         error_code = data.error_code || error_code;
-                    }else{
+                    } else {
                         //成功再去格式化结果
-                        if($.isArray(data)) { 
-                        	for(var i in data) {
-                        		$this.format_result(data[i], play_load);
-                        	}
-                        } else {
-                        	$this.format_result(data, play_load);
-                        }
+                    	data = $this.format_result(data, play_load, args);
                     }
                 }else{error_code = 400;}
                 callbackFn(data, textStatus, error_code);
@@ -510,8 +516,8 @@ $.extend(TSohuAPI, {
 	    
 	    mentions: '/statuses/mentions_timeline'
 	}),
-
-	format_result: function(data, play_load) {
+	
+	format_result_item: function(data, play_load, args) {
 		if(play_load == 'status' && data.id) {
 			data.thumbnail_pic = data.small_pic;
 			delete data.small_pic;
@@ -563,6 +569,10 @@ $.extend(DiguAPI, {
         new_message:          '/messages/handle/new'
 	}),
 	
+	counts: function(data, callback) {
+	
+	},
+	
 	verify_credentials: function(user, callbackFn, data){
 		data = data || {};
 		data.isAllInfo = true;
@@ -577,13 +587,65 @@ $.extend(DiguAPI, {
 	    this._sendRequest(params, callbackFn);
 	},
 	
-	format_result: function(data, play_load) {
+	friends: function(data, callbackFn) {
+		this.followers_or_friends(this.config.friends, data, callbackFn);
+	},
+	
+	// id, user_id, screen_name, cursor, count
+    followers: function(data, callbackFn){
+		this.followers_or_friends(this.config.followers, data, callbackFn);
+	},
+	
+	followers_or_friends: function(url, data, callbackFn) {
+		// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
+		// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
+		data.page = data.cursor == -1 ? 1 : data.cursor;
+		delete data.cursor;
+		if(!data.page) {
+			data.page = 1;
+		}
+		//data.count = data.count || 20;
+		delete data.user_id;
+		if(!callbackFn) return;
+        var params = {
+            url: url,
+            type: 'get',
+            play_load: 'user',
+            data: data
+        };
+        this._sendRequest(params, callbackFn);
+	},
+	
+	format_result: function(data, play_load, args) {
+		if($.isArray(data)) {
+	    	for(var i in data) {
+	    		data[i] = this.format_result_item(data[i], play_load);
+	    	}
+	    } else {
+	    	data = this.format_result_item(data, play_load);
+	    }
+		// 若是follwers api，则需要封装成cursor接口
+		// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
+		// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
+		if(args.url == this.config.followers || args.url == this.config.friends) {
+			data = {users: data, next_cursor: args.data.page + 1, previous_cursor: args.data.page};
+			if(data.users.length == 0) {
+				data.next_cursor = 0;
+			}
+		}
+		return data;
+	},
+	
+	format_result_item: function(data, play_load, args) {
 		if(play_load == 'status' && data.id) {
 			if(data.picPath && data.picPath.length > 0) {
+				// http://img2.digu.com/100x75/u/1290361951998_9a36990561cf56f66c2333ee836d0441.jpg
 				// http://pic.digu.com:80/file/12/93/99/27/201011/d144f3f76aaebf5df71c0003ca0767e9_100x75.JPEG
 				data.thumbnail_pic = data.picPath[0];
-				data.bmiddle_pic = data.thumbnail_pic.replace('_100x75', '_640x480');
-				data.original_pic = data.thumbnail_pic.replace('_100x75', '');
+				data.bmiddle_pic = data.thumbnail_pic.replace(/([\/_])100x75/, function(m, $1) {
+					return $1 + '640x480';
+				});
+				data.original_pic = data.thumbnail_pic.replace(/[\/_]100x75/, '');
 			}
 			delete data.picPath;
 			if(data.in_reply_to_status_id != '0' && data.in_reply_to_status_id != '') {
@@ -599,6 +661,7 @@ $.extend(DiguAPI, {
 		}
 		return data;
 	}
+	
 });
 
 var T_APIS = {
