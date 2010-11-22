@@ -663,6 +663,7 @@ $.extend(DiguAPI, {
 	
 	format_result_item: function(data, play_load, args) {
 		if(play_load == 'status' && data.id) {
+			data.favorited = data.favorited == 'true';
 			if(data.picPath && data.picPath.length > 0) {
 				// http://img2.digu.com/100x75/u/1290361951998_9a36990561cf56f66c2333ee836d0441.jpg
 				// http://pic.digu.com:80/file/12/93/99/27/201011/d144f3f76aaebf5df71c0003ca0767e9_100x75.JPEG
