@@ -748,17 +748,19 @@ function scrollPaging(){
             readMore(tl);
         }
     }
-    checkShowGototop(list_warp); //返回顶部按钮
 };
 
 function initScrollPaging(){
     $(".list_warp").scroll(function(){
         scrollPaging();
+        checkShowGototop();
     });
 };
 
 //检查是否需要显示返回顶部按钮
-function checkShowGototop(list_warp){
+function checkShowGototop(){
+    var c_t = window.currentTab;
+    var list_warp = $(c_t + ' .list_warp');
     if(list_warp.scrollTop() > 200){
         $("#gototop").show();
     }else{
