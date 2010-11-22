@@ -663,8 +663,9 @@ function showComments(ele,tweetId, page, notHide){
         }
         showLoading();
         page = page || 1;
-        var data = {id:tweetId, page:page, count:COMMENT_PAGE_SIZE};
-        sinaApi.comments(data, function(comments, textStatus){
+        var user = localStorage.getObject(CURRENT_USER_KEY);
+        var data = {id:tweetId, page:page, count:COMMENT_PAGE_SIZE, user:user};
+        tapi.comments(data, function(comments, textStatus){
             if(textStatus != 'error' && comments && !comments.error){
                 if(comments.length && comments.length>0){
                     var _html = '';
@@ -906,7 +907,10 @@ function sendSinaMsg(msg, isReply){
     btn.attr('disabled','true');
     txt.attr('disabled','true');
     data['status'] = msg;
-    sinaApi.update(data, function(sinaMsg, textStatus){
+    
+    var user = localStorage.getObject(CURRENT_USER_KEY);
+    data['user'] = user;
+    tapi.update(data, function(sinaMsg, textStatus){
         if(sinaMsg.id){
             if(isReply){
                 hideReplyInput();
@@ -930,10 +934,11 @@ function sendWhisper(msg){
     txt = $("#replyTextarea");
     var toUserId = $('#whisperToUserId').val();
     data = {text: msg, id:toUserId};
-    
+    var user = localStorage.getObject(CURRENT_USER_KEY);
+    data['user'] = user;
     btn.attr('disabled','true');
     txt.attr('disabled','true');
-    sinaApi.new_message(data, function(sinaMsg, textStatus){
+    tapi.new_message(data, function(sinaMsg, textStatus){
         if(sinaMsg.id){
             hideReplyInput();
             txt.val('');
@@ -953,10 +958,11 @@ function sendRepost(msg, repostTweetId, notSendMord){
     txt = $("#replyTextarea");
     repostTweetId = repostTweetId || $('#repostTweetId').val();
     data = {status: msg, id:repostTweetId};
-    
+    var user = localStorage.getObject(CURRENT_USER_KEY);
+    data['user'] = user;
     btn.attr('disabled','true');
     txt.attr('disabled','true');
-    sinaApi.repost(data, function(sinaMsg, textStatus){
+    tapi.repost(data, function(sinaMsg, textStatus){
         if(sinaMsg.id){
             hideReplyInput();
             txt.val('');
@@ -986,12 +992,13 @@ function sendComment(msg, commentTweetId, notSendMord){
     cid = $('#commentCommentId').val();
     commentTweetId = commentTweetId || $('#commentTweetId').val();
     data = {comment: msg, id:commentTweetId, cid:cid};
-    
+    var user = localStorage.getObject(CURRENT_USER_KEY);
+    data['user'] = user;
     btn.attr('disabled','true');
     txt.attr('disabled','true');
     var m = 'comment';
     if(cid){ m = 'reply';} //如果是回复别人的微博
-    sinaApi[m](data, function(sinaMsg, textStatus){
+    tapi[m](data, function(sinaMsg, textStatus){
         if(sinaMsg.id){
             hideReplyInput();
             txt.val('');
@@ -1151,7 +1158,8 @@ function doRT(ele){//RT
 function doDelTweet(tweetId, ele){//删除自己的微博
     if(!tweetId){return;}
     showLoading();
-    sinaApi.destroy({id:tweetId}, function(data, textStatus){
+    var user = localStorage.getObject(CURRENT_USER_KEY);
+    tapi.destroy({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
             $(ele).closest('li').remove();
             var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
@@ -1176,7 +1184,8 @@ function doDelTweet(tweetId, ele){//删除自己的微博
 function doDelComment(ele, screen_name, tweetId){//删除评论
     if(!tweetId){return;}
     showLoading();
-    sinaApi.comment_destroy({id:tweetId}, function(data, textStatus){
+    var user = localStorage.getObject(CURRENT_USER_KEY);
+    tapi.comment_destroy({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
             $(ele).closest('li').remove();
             var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
@@ -1201,7 +1210,8 @@ function doDelComment(ele, screen_name, tweetId){//删除评论
 function delDirectMsg(ele, screen_name, tweetId){//删除私信
     if(!tweetId){return;}
     showLoading();
-    sinaApi.destroy_msg({id:tweetId}, function(data, textStatus){
+    var user = localStorage.getObject(CURRENT_USER_KEY);
+    tapi.destroy_msg({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
             $(ele).closest('li').remove();
             var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
@@ -1229,7 +1239,8 @@ function addFavorites(ele, screen_name, tweetId){//添加收藏
     var _a = $(ele);
     var _aHtml = _a[0].outerHTML;
     _a.hide();
-    sinaApi.favorites_create({id:tweetId}, function(data, textStatus){
+    var user = localStorage.getObject(CURRENT_USER_KEY);
+    tapi.favorites_create({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
             _a.after(_aHtml.replace('addFavorites','delFavorites')
                             .replace('favorites_2.gif','favorites.gif')
@@ -1261,7 +1272,8 @@ function delFavorites(ele, screen_name, tweetId){//删除收藏
     var _a = $(ele);
     var _aHtml = _a[0].outerHTML;
     _a.hide();
-    sinaApi.favorites_destroy({id:tweetId}, function(data, textStatus){
+    var user = localStorage.getObject(CURRENT_USER_KEY);
+    tapi.favorites_destroy({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
             _a.after(_aHtml.replace('delFavorites','addFavorites')
                             .replace('favorites.gif','favorites_2.gif')

@@ -297,7 +297,7 @@ var sinaApi = {
 		    builder += crlf;
 		    builder += crlf; 
 		     /* Append form data. */
-		    builder += encodeURIComponent(data[key]);
+		    builder += this.url_encode(data[key]);
 		    builder += crlf;
 		    
 		    /* Write boundary. */
@@ -309,7 +309,7 @@ var sinaApi = {
 	    /* Generate headers. [PIC] */            
 	    builder += 'Content-Disposition: form-data; name="' + pic.keyname + '"';
 	    if(pic.file.fileName) {
-	      builder += '; filename="' + encodeURIComponent(pic.file.fileName) + '"';
+	      builder += '; filename="' + this.url_encode(pic.file.fileName) + '"';
 	    }
 	    builder += crlf;
 	
@@ -544,6 +544,11 @@ var sinaApi = {
 		} 
 		return data;
 	},
+	
+	// urlencode，子类覆盖是否需要urlencode处理
+	url_encode: function(text) {
+		return encodeURIComponent(text);
+	},
     
     _sendRequest: function(params, callbackFn) {
     	var args = {type: 'get', play_load: 'status'};
@@ -566,10 +571,10 @@ var sinaApi = {
             return;
         }
         if(args.data.status){
-        	args.data.status = encodeURIComponent(args.data.status);
+        	args.data.status = this.url_encode(args.data.status);
         }
         if(args.data.comment){
-        	args.data.comment = encodeURIComponent(args.data.comment);
+        	args.data.comment = this.url_encode(args.data.comment);
         }
         var $this = this;
         var play_load = args.play_load; // 返回的是什么类型的数据格式
@@ -866,6 +871,11 @@ $.extend(ZuosaAPI, {
 	    source2: 'fawave',
 	    upload: '/statuses/update'
 	}),
+	
+	// 无需urlencode
+	url_encode: function(text) {
+		return text;
+	},
 	
 	counts: function(data, callback) {
 	
