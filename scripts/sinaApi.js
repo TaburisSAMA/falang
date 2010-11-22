@@ -395,14 +395,19 @@ var sinaApi = {
 	},
 	
 	format_result_item: function(data, play_load, args) {
-		if(play_load == 'user') {
+		if(play_load == 'user' && data && data.id) {
 			data.t_url = 'http://t.sina.com.cn/' + (data.domain || data.id);
 		} else if(play_load == 'status') {
 			this.format_result_item(data.user, 'user', args);
 			if(data.retweeted_status) {
 				this.format_result_item(data.retweeted_status.user, 'user', args);
 			}
-		}
+		} else if(play_load == 'message') {
+			this.format_result_item(data.sender, 'user', args);
+			this.format_result_item(data.recipient, 'user', args);
+		} else if(play_load == 'comment') {
+			this.format_result_item(data.user, 'user', args);
+		} 
 		return data;
 	},
     
@@ -556,8 +561,11 @@ $.extend(TSohuAPI, {
 					screen_name: data.in_reply_to_screen_name
 				}
 			};
-		} else if(play_load == 'user') {
+		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = 'http://t.sohu.com/u/' + (data.domain || data.id);
+		} else if(play_load == 'message') {
+			this.format_result_item(data.sender, 'user', args);
+			this.format_result_item(data.recipient, 'user', args);
 		}
 		return data;
 	}
@@ -674,7 +682,16 @@ $.extend(DiguAPI, {
 						name: data.in_reply_to_user_name
 					}
 				};
+				this.format_result_item(data.retweeted_status.user, 'user', args);
 			}
+			this.format_result_item(data.user, 'user', args)
+		} else if(play_load == 'user' && data && data.id) {
+			data.t_url = data.url || ('http://digu.com/' + (data.name || data.id));
+		} else if(play_load == 'comment') {
+			this.format_result_item(data.user, 'user', args)
+		} else if(play_load == 'message') {
+			this.format_result_item(data.sender, 'user', args);
+			this.format_result_item(data.recipient, 'user', args);
 		}
 		return data;
 	}
