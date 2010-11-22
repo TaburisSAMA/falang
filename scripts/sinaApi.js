@@ -449,8 +449,7 @@ var sinaApi = {
                 }
                 var error_code = null;
                 if(data){
-                	// digu {"wrong":"no data"}
-                    if(data.error || data.error_code || data.wrong){
+                    if(data.error || data.error_code){
                         showMsg('error: ' + (data.error || data.wrong) + ', error_code: ' + data.error_code);
                         error_code = data.error_code || error_code;
                     } else {
@@ -619,6 +618,10 @@ $.extend(DiguAPI, {
 	},
 	
 	format_result: function(data, play_load, args) {
+		// digu {"wrong":"no data"}
+		if(data.wrong == 'no data') {
+			data = [];
+		}
 		if($.isArray(data)) {
 	    	for(var i in data) {
 	    		data[i] = this.format_result_item(data[i], play_load);
