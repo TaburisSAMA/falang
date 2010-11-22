@@ -132,9 +132,10 @@ function checkTimeline(t, p, user_uniqueKey){
             tweets[_key] = sinaMsgs.concat(tweets[_key]);
             
             var _unreadCount = 0, _msg_user = null;
-            for(i in sinaMsgs){
+            for(var i in sinaMsgs){
                 _msg_user = sinaMsgs[i].user || sinaMsgs[i].sender;
-                if(_msg_user.id != c_user.id){
+                //if(!_msg_user) {console.dir(m); console.dir(c_user);console.dir(sinaMsgs);}
+                if(_msg_user && _msg_user.id != c_user.id){
                     _unreadCount += 1;
                 }
             }

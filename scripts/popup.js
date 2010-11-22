@@ -521,17 +521,18 @@ function getFansList(t, cursor){
         }
     });
 };
-// <<<<<<<<<<<<<<<<====
 
 //查看用户的微薄
-function getUserTimeline(screen_name){
+function getUserTimeline(screen_name, user_id){
     var c_user = getUser();
     if(!c_user){
         return;
     }
     showLoading();
     var params = {count:40, screen_name:screen_name, user: c_user};
-    
+    if(user_id) {
+    	params.id = user_id;
+    }
     var m = 'user_timeline';
     tapi[m](params, function(sinaMsgs, textStatus){
         if(sinaMsgs && sinaMsgs.length > 0){
@@ -817,9 +818,7 @@ function readMore(t){
         }
     }
 };
-//<<<<<<<<<<<======
 
-//====>>>>>>>>>>>>>>>>>>
 /*如果当前tab是激活的，就返回true，否则返回false(即为未读)*/
 function addTimelineMsgs(msgs, t, user_uniqueKey){
     var c_user = getUser();
@@ -838,9 +837,14 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
         $("#" + t + "_timeline ul.list").html('');
         
         var _msg_user = null, _unreadCount = 0;
-        for(i in msgs){
+        for(var i in msgs){
             _msg_user = msgs[i].user || msgs[i].sender;
-            if(_msg_user.id != c_user.id){
+//            if(!_msg_user || !c_user) {
+//            	console.dir(t);
+//            	console.dir(msgs[i]);
+//            	console.dir(msgs);
+//            }
+            if(_msg_user && c_user && _msg_user.id != c_user.id){
                 _unreadCount += 1;
             }
         }

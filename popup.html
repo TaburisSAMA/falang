@@ -150,14 +150,14 @@
 			  <div class="li_wrap">
 				<div class="usericon">
 				    <span class="showtip">
-						<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}');" rhref="#{user.t_url}">
+						<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" rhref="#{user.t_url}">
 							<img src="#{user.profile_image_url.replace('24x24', '48x48')}">
 						</a>
 						<div class="tipbox">
 							<div>
 								<div class="user_head"><img src="#{user.profile_image_url}" /></div>
 								<div class="user_info">
-									<p><a href="javascript:getUserTimeline('#{user.screen_name}');" 
+									<p><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" 
 										rhref="#{user.t_url}">#{user.screen_name}
 										<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
 									</a></p>
@@ -182,7 +182,7 @@
 				<div class="mainContent commentWrap">
 					<span class="arrow_r"></span>
 					<div class="userName">
-						<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}');" rhref="#{user.t_url}" title="#{getUserCountsInfo(user)}">
+						<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" rhref="#{user.t_url}" title="#{getUserCountsInfo(user)}">
 							#{user.screen_name}<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
 						</a>
 						<span class="edit">
@@ -236,7 +236,7 @@
 								<div class="userName"><?js if(tType=='comments_timeline'){ ?>评<?js }else{ ?>转<?js } ?>
 									<span class="showtip">
 										<a target="_blank" 
-											href="javascript:getUserTimeline('#{tweet.retweeted_status.user.screen_name}');" 
+											href="javascript:getUserTimeline('#{tweet.retweeted_status.user.screen_name}', '#{tweet.retweeted_status.user.id}');" 
 											rhref="#{tweet.retweeted_status.user.t_url}" >
 											@#{tweet.retweeted_status.user.screen_name}<?js if(tweet.retweeted_status.user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
 										</a>
@@ -244,7 +244,7 @@
 											<div>
 												<div class="user_head"><img src="#{tweet.retweeted_status.user.profile_image_url}" /></div>
 												<div class="user_info">
-													<p><a href="javascript:getUserTimeline('#{tweet.retweeted_status.user.screen_name}');" 
+													<p><a href="javascript:getUserTimeline('#{tweet.retweeted_status.user.screen_name}', '#{tweet.retweeted_status.user.id}');" 
 														rhref="#{tweet.retweeted_status.user.t_url}">#{tweet.retweeted_status.user.screen_name}
 														<?js if(tweet.retweeted_status.user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
 													</a></p>
@@ -324,7 +324,7 @@
 			<div class="fans">
 				<div class="user_head"><img src="#{user.profile_image_url}" /></div>
 				<div class="user_info">
-					<div class="userName"><a  href="javascript:getUserTimeline('#{user.screen_name}');" 
+					<div class="userName"><a  href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" 
 					rhref="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
 					</a>　
 					<?js if(tType =='friends'){ ?>

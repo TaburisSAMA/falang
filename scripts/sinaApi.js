@@ -677,7 +677,8 @@ $.extend(TSohuAPI, {
 	    friendships_create:   '/friendship/create/{{id}}',
         friendships_destroy:  '/friendship/destroy/{{id}}',
         counts: '/statuses/counts/{{ids}}',
-	    mentions: '/statuses/mentions_timeline'
+	    mentions: '/statuses/mentions_timeline',
+	    user_timeline: '/statuses/user_timeline/{{id}}'
 	}),
 	
 	// 不支持批量获取，暂时屏蔽
@@ -815,6 +816,14 @@ $.extend(DiguAPI, {
 			// id => userIdOrName
 			args.data.userIdOrName = args.data.id;
 			delete args.data.id;
+		} else if(args.url == this.config.user_timeline) {
+			if(args.data.id) {
+				args.data.userIdOrName = args.data.id;
+				delete args.data.id;
+			} else if(args.data.screen_name){
+				args.data.userIdOrName = args.data.screen_name;
+				delete args.data.screen_name;
+			}
 		}
     },
 	
