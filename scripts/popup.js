@@ -49,8 +49,6 @@ function init(){
         }
     });
 
-
-
     $('#ye_dialog_close').click(function(){ hideReplyInput(); });
 
     initTabs();
@@ -327,12 +325,12 @@ function initChangeUserList(){
         $('#tl_tabs').append(formatText(t_changeUser, c_user));
 
         //底部Dock
-        var u_tp = '<li class="{{uniqueKey}} {{current}}">\
-                        <span class="username">{{screen_name}}</span>\
-                        <a href="javascript:" onclick="changeUser(\'{{uniqueKey}}\')"><img src="{{profile_image_url}}" /></a>\
-                        <img src="/images/blogs/{{blogType}}_16.png" class="blogType" />\
-                        <span class="unr"></span>\
-                    </li>';
+        var u_tp = '<li class="{{uniqueKey}} {{current}}">' +
+                       '<span class="username">{{screen_name}}</span>' +
+                       '<a href="javascript:" onclick="changeUser(\'{{uniqueKey}}\')"><img src="{{profile_image_url}}" /></a>' +
+                       '<img src="/images/blogs/{{blogType}}_16.png" class="blogType" />' +
+                       '<span class="unr"></span>' +
+                   '</li>';
         var li = [];
         for(i in userList){
             user = userList[i];
@@ -356,6 +354,7 @@ function changeUser(uniqueKey){
         return;
     }
     friendsTimeline_offset = replys_offset = messages_offset = PAGE_SIZE;//复位分页
+    NEXT_CURSOR = {};
     var userList = getUserList();
     var to_user = null;
     for(i in userList){
@@ -384,7 +383,7 @@ function changeUser(uniqueKey){
             getSinaTimeline(T_LIST[to_user.blogType][i], true);
         }
     }
-}; // <<<<<<<<<<<<<========
+};
 
 function addUnreadCountToTabs(){
     var ur = 0;
@@ -507,7 +506,7 @@ function getFansList(t, cursor){
     var params = {user_id:c_user.id, cursor:cursor, user:c_user};
     tapi[t](params, function(users, textStatus, statuCode){
         if(textStatus != 'error' && users && !users.error){
-            NEXT_CURSOR[t] = users.next_cursor;
+        	NEXT_CURSOR[t] = users.next_cursor;
             users = users.users;
             var html = '';
             for(i in users){

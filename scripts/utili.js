@@ -44,11 +44,13 @@ var QUICK_SEND_HOT_KEY_KEY = 'idi_QUICK_SEND_HOT_KEY_KEY'; //快速发送热键k
 
 //['friends_timeline','mentions','comments_timeline','comments_by_me','direct_messages','favorites']
 //timeline的分类列表
-var T_LIST = {'all': ['friends_timeline','mentions','comments_timeline','direct_messages'],
-              'tsina': ['friends_timeline','mentions','comments_timeline','direct_messages'],
-              'tsohu': ['friends_timeline','mentions','comments_timeline','direct_messages'],
-              'digu': ['friends_timeline','mentions', 'direct_messages']
-        }; 
+var T_LIST = {
+	'all': ['friends_timeline','mentions','comments_timeline','direct_messages', 'friends', 'followers', 'user_timeline'],
+	'tsina': ['friends_timeline','mentions','comments_timeline','direct_messages', 'friends', 'followers', 'user_timeline'],
+	'tsohu': ['friends_timeline','mentions','comments_timeline','direct_messages', 'friends', 'followers', 'user_timeline'],
+	'digu': ['friends_timeline','mentions','comments_timeline', 'direct_messages', 'friends', 'followers', 'user_timeline'],
+	'zuosa': ['friends_timeline','mentions','comments_timeline', 'direct_messages', 'friends', 'followers', 'user_timeline']
+}; 
 
 var T_NAMES = {
 	'tsina': '新浪微博',
