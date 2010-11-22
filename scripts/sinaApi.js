@@ -903,12 +903,17 @@ $.extend(ZuosaAPI, {
 		host: 'http://api.zuosa.com',
 		source: 'fawave', 
 	    source2: 'fawave',
-	    upload: '/statuses/update'
+	    upload: '/statuses/update',
+	    repost: '/statuses/update',
+	    comment: '/statuses/update'
 	}),
 	
 	// 无需urlencode
 	url_encode: function(text) {
 		return text;
+	},
+	
+	comments_timeline: function(data, callback) {
 	},
 	
 	counts: function(data, callback) {
@@ -946,6 +951,20 @@ $.extend(ZuosaAPI, {
 			}
 			//data.count = data.count || 20;
 			delete args.data.user_id;
+		} else if(args.url == this.config.repost) {
+			// id => in_reply_to_status_id
+			if(args.data.id) {
+				args.data.in_reply_to_status_id = args.data.id;
+				delete args.data.id;
+			}
+			if(args.data.comment) {
+				args.data.status = args.data.comment;
+				delete args.data.comment;
+			}
+		} else if(args.url == this.config.new_message) {
+			// id => user
+			args.data.user = args.data.id;
+			delete args.data.id;
 		}
     },
 	
@@ -992,11 +1011,15 @@ $.extend(ZuosaAPI, {
 			this.format_result_item(data.user, 'user', args)
 		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = 'http://zuosa.com/' + (data.screen_name || data.name);
+			if(data.profile_image_url) {
+				data.profile_image_url = data.profile_image_url.replace('/normal/', '/middle/');
+			}
 		} 
 		else if(play_load == 'comment') {
-			this.format_result_item(data.user, 'user', args)
+			this.format_result_item(data.user, 'user', args);
 		} else if(play_load == 'message') {
 			this.format_result_item(data.sender, 'user', args);
+			data.sender.id = data.sender.screen_name;
 			this.format_result_item(data.recipient, 'user', args);
 		}
 		return data;
@@ -1013,11 +1036,7 @@ var T_APIS = {
 
 // 封装兼容所有微博的api，自动判断微博类型
 var tapi = {
-	// 自动判断当前用户所使用的api, 根据user.blogType判断
-    // tapi.g('fridens_timeline')(data, function(){})
-	g: function(data, method_name){
-        return T_APIS[(data.user ? data.user.blogType : data.blogType) || 'tsina'][method_name];
-    },
+
     // 自动判断当前用户所使用的api, 根据user.blogType判断
     api_dispatch: function(data) {
 		return T_APIS[(data.user ? data.user.blogType : data.blogType) || 'tsina'];
