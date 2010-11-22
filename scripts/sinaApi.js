@@ -244,8 +244,15 @@ var sinaApi = {
         this._sendRequest(params, callbackFn);
 	},
     
+	// 格式上传参数，方便子类覆盖做特殊处理
+    // 子类可以增加自己的参数
+    format_update_params: function(data) {
+    	
+    },
+    
     update: function(data, callbackFn){
         if(!callbackFn) return;
+        this.format_update_params(data);
         var params = {
             url: this.config.update,
             type: 'post',
@@ -736,7 +743,14 @@ $.extend(DiguAPI, {
 	    this._sendRequest(params, callbackFn);
 	},
 	
-	/* content[可选]：更新的Digu消息内容， 请确定必要时需要进行UrlEncode编码，另外，不超过140个中文或者英文字。暂不支持图片
+	/* content[可选]：更新的Digu消息内容， 请确定必要时需要进行UrlEncode编码，另外，不超过140个中文或者英文字。
+	 */
+	format_update_params: function(data) {
+    	data.content = data.status;
+    	delete data.status;
+    },
+	
+	/* content[可选]：更新的Digu消息内容， 请确定必要时需要进行UrlEncode编码，另外，不超过140个中文或者英文字。
 	 * imageX[可选]：发送图片。如果要发送图片，这个不能为空，并且，Form类型为multipart data。
 	 * 如 enctype="multipart data"，且，input的type为file类型。最多上传3张图片，每张图片大小不能超过1M。
 	 * 如果上传一张，这个X就是数字0，即input的名字是image0，如果上传两张，input的名字分别是image0 image1，以此类推，最多3张。
@@ -851,7 +865,54 @@ $.extend(ZuosaAPI, {
 		source: 'fawave', 
 	    source2: 'fawave',
 	    upload: '/statuses/update'
-	})
+	}),
+	
+	// {"authorized":True}，需要再调用 users/show获取用户信息
+	verify_credentials: function(user, callbackFn, data){
+		if(!user || !callbackFn) return;
+        var params = {
+            url: this.config.verify_credentials,
+            type: 'get',
+            user: user,
+            play_load: 'user',
+            data: data
+        };
+        var $this = this;
+        this._sendRequest(params, function(data, textStatus, error_code) {
+	    	if(!error_code && data.authorized) { // 继续获取用户信息
+	    		$this.user_show({user: user, id: user.userName}, callbackFn);
+	    	} else {
+	    		callbackFn(data, textStatus, error_code);
+	    	}
+	    });
+	}, 
+	
+	format_result_item: function(data, play_load, args) {
+		if(play_load == 'status' && data.id) {
+//			delete data.picPath;
+//			if(data.in_reply_to_status_id != '0' && data.in_reply_to_status_id != '') {
+//				data.retweeted_status = {
+//					id: data.in_reply_to_status_id,
+//					user: {
+//						id: data.in_reply_to_user_id,
+//						screen_name: data.in_reply_to_screen_name,
+//						name: data.in_reply_to_user_name
+//					}
+//				};
+//				this.format_result_item(data.retweeted_status.user, 'user', args);
+//			}
+			this.format_result_item(data.user, 'user', args)
+		} else if(play_load == 'user' && data && data.id) {
+			data.t_url = data.url || ('http://zuosa.com/' + (data.name || data.id));
+		} 
+		else if(play_load == 'comment') {
+			this.format_result_item(data.user, 'user', args)
+		} else if(play_load == 'message') {
+			this.format_result_item(data.sender, 'user', args);
+			this.format_result_item(data.recipient, 'user', args);
+		}
+		return data;
+	}
 });
 
 var T_APIS = {

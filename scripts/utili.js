@@ -53,7 +53,8 @@ var T_LIST = {'all': ['friends_timeline','mentions','comments_timeline','direct_
 var T_NAMES = {
 	'tsina': '新浪微博',
 	'tsohu': '搜狐微博',
-	'digu': '嘀咕'
+	'digu': '嘀咕',
+	'zuosa': '做啥'
 };
 
 
