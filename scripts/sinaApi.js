@@ -255,6 +255,12 @@ var sinaApi = {
         this._sendRequest(params, callbackFn);
     },
     
+    // 格式上传参数，方便子类覆盖做特殊处理
+    // 子类可以增加自己的参数
+    format_upload_params: function(user, data, pic) {
+    	
+    },
+    
     /* 上传图片
      * user: 当前用户
      * data: {source: xxx, status: xxx, ...}
@@ -264,10 +270,7 @@ var sinaApi = {
      * callback: finish callback function
      * */
     upload: function(user, data, pic, before_request, onprogress, callback) {
-    	console.dir(user);
-    	console.dir(data);
-    	console.dir(pic);
-    	console.dir(this);
+    	this.format_upload_params(user, data, pic);
     	pic.keyname = pic.keyname || 'pic';
     	data.source = data.source || this.config.source;
 	    var boundary = '----multipartformboundary' + (new Date).getTime();
@@ -711,7 +714,8 @@ $.extend(DiguAPI, {
 	    
 	    destroy_msg:          '/messages/handle/destroy/{{id}}',
         direct_messages:      '/messages/100', // message ：0 表示悄悄话，1 表示戳一下，2 表示升级通知，3 表示代发通知，4 表示系统消息。100表示不分类，都查询。其余参数跟
-        new_message:          '/messages/handle/new'
+        new_message:          '/messages/handle/new',
+        upload: 			  '/statuses/update'
 	}),
 	
 	counts: function(data, callback) {
@@ -731,6 +735,20 @@ $.extend(DiguAPI, {
 	    };
 	    this._sendRequest(params, callbackFn);
 	},
+	
+	/* content[可选]：更新的Digu消息内容， 请确定必要时需要进行UrlEncode编码，另外，不超过140个中文或者英文字。暂不支持图片
+	 * imageX[可选]：发送图片。如果要发送图片，这个不能为空，并且，Form类型为multipart data。
+	 * 如 enctype="multipart data"，且，input的type为file类型。最多上传3张图片，每张图片大小不能超过1M。
+	 * 如果上传一张，这个X就是数字0，即input的名字是image0，如果上传两张，input的名字分别是image0 image1，以此类推，最多3张。
+	 * 格式只支持".png"，".jpg"，".jpeg"，".gif"，".bmp"。
+	 * uploadImg[上传图片必须]： 隐含授权码的字段。如果用户想上传图片，需要需要传递此参数，参数值为：xiexiezhichi
+	 */
+    format_upload_params: function(user, data, pic) {
+    	data.uploadImg = 'xiexiezhichi';
+    	data.content = data.status;
+    	delete data.status;
+    	pic.keyname = 'image0';
+    },
 	
 	friends: function(data, callbackFn) {
 		this.followers_or_friends(this.config.friends, data, callbackFn);
