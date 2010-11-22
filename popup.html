@@ -159,7 +159,7 @@
 			  <div class="li_wrap">
 				<div class="usericon">
 				    <span class="showtip">
-						<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}');" rhref="http://t.sina.com.cn/#{user.domain||user.id}">
+						<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}');" rhref="#{user.t_url}">
 							<img src="#{user.profile_image_url.replace('24x24', '48x48')}">
 						</a>
 						<div class="tipbox">
@@ -167,7 +167,7 @@
 								<div class="user_head"><img src="#{user.profile_image_url}" /></div>
 								<div class="user_info">
 									<p><a href="javascript:getUserTimeline('#{user.screen_name}');" 
-										rhref="http://t.sina.com.cn/#{user.domain||user.id}">#{user.screen_name}
+										rhref="#{user.t_url}">#{user.screen_name}
 										<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
 									</a></p>
 									<p>
@@ -191,7 +191,7 @@
 				<div class="mainContent commentWrap">
 					<span class="arrow_r"></span>
 					<div class="userName">
-						<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}');" rhref="http://t.sina.com.cn/#{user.domain||user.id}" title="#{getUserCountsInfo(user)}">
+						<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}');" rhref="#{user.t_url}" title="#{getUserCountsInfo(user)}">
 							#{user.screen_name}<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
 						</a>
 						<span class="edit">
@@ -246,7 +246,7 @@
 									<span class="showtip">
 										<a target="_blank" 
 											href="javascript:getUserTimeline('#{tweet.retweeted_status.user.screen_name}');" 
-											rhref="http://t.sina.com.cn/#{tweet.retweeted_status.user.domain||tweet.retweeted_status.user.id}" >
+											rhref="#{tweet.retweeted_status.user.t_url}" >
 											@#{tweet.retweeted_status.user.screen_name}<?js if(tweet.retweeted_status.user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
 										</a>
 										<div class="tipbox">
@@ -254,7 +254,7 @@
 												<div class="user_head"><img src="#{tweet.retweeted_status.user.profile_image_url}" /></div>
 												<div class="user_info">
 													<p><a href="javascript:getUserTimeline('#{tweet.retweeted_status.user.screen_name}');" 
-														rhref="http://t.sina.com.cn/#{tweet.retweeted_status.user.domain||tweet.retweeted_status.user.id}">#{tweet.retweeted_status.user.screen_name}
+														rhref="#{tweet.retweeted_status.user.t_url}">#{tweet.retweeted_status.user.screen_name}
 														<?js if(tweet.retweeted_status.user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
 													</a></p>
 													<p>
@@ -305,7 +305,7 @@
 			<div class="userinfo_detail">
 				<div class="user_head"><img src="#{user.profile_image_url}" /></div>
 				<div class="user_info">
-					<div class="userName"><a href="http://t.sina.com.cn/#{user.domain||user.id}">#{user.screen_name}<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
+					<div class="userName"><a href="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
 					</a>　
 					<a class="follow" href="javascript:" onclick="f_create(#{user.id}, this)"><span class="plus">+</span>加关注</a>
 					</div>
@@ -334,7 +334,7 @@
 				<div class="user_head"><img src="#{user.profile_image_url}" /></div>
 				<div class="user_info">
 					<div class="userName"><a  href="javascript:getUserTimeline('#{user.screen_name}');" 
-					rhref="http://t.sina.com.cn/#{user.domain||user.id}">#{user.screen_name}<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
+					rhref="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
 					</a>　
 					<?js if(tType =='friends'){ ?>
 					<a class="follow" href="javascript:" onclick="f_destroy(#{user.id}, this)">取消关注</a>

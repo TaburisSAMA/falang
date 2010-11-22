@@ -394,7 +394,15 @@ var sinaApi = {
 		return data;
 	},
 	
-	format_result_item: function(data, play_load, url) {
+	format_result_item: function(data, play_load, args) {
+		if(play_load == 'user') {
+			data.t_url = 'http://t.sina.com.cn/' + (data.domain || data.id);
+		} else if(play_load == 'status') {
+			this.format_result_item(data.user, 'user', args);
+			if(data.retweeted_status) {
+				this.format_result_item(data.retweeted_status.user, 'user', args);
+			}
+		}
 		return data;
 	},
     
@@ -534,9 +542,11 @@ $.extend(TSohuAPI, {
 						screen_name: data.in_reply_to_screen_name
 					}
 				};
+				this.format_result_item(data.retweeted_status.user, 'user', args);
 				delete data.in_reply_to_has_image;
 				delete data.in_reply_to_status_text;
 			}
+			this.format_result_item(data.user, 'user', args);
 		} else if(play_load == 'comment' && data.id) {
 			data.status = {
 				id: data.in_reply_to_status_id,
@@ -546,6 +556,8 @@ $.extend(TSohuAPI, {
 					screen_name: data.in_reply_to_screen_name
 				}
 			};
+		} else if(play_load == 'user') {
+			data.t_url = 'http://t.sohu.com/u/' + (data.domain || data.id);
 		}
 		return data;
 	}
