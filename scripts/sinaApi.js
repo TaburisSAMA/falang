@@ -244,15 +244,8 @@ var sinaApi = {
         this._sendRequest(params, callbackFn);
 	},
     
-	// 格式上传参数，方便子类覆盖做特殊处理
-    // 子类可以增加自己的参数
-    format_update_params: function(data) {
-    	
-    },
-    
     update: function(data, callbackFn){
         if(!callbackFn) return;
-        this.format_update_params(data);
         var params = {
             url: this.config.update,
             type: 'post',
@@ -757,11 +750,16 @@ $.extend(DiguAPI, {
 	    destroy_msg:          '/messages/handle/destroy/{{id}}',
         direct_messages:      '/messages/100', // message ：0 表示悄悄话，1 表示戳一下，2 表示升级通知，3 表示代发通知，4 表示系统消息。100表示不分类，都查询。其余参数跟
         new_message:          '/messages/handle/new',
-        upload: 			  '/statuses/update'
+        upload: 			  '/statuses/update',
+        repost:               '/statuses/update',
+        comment:              '/statuses/update',
+        reply:                '/statuses/update'
 	}),
 	
 	counts: function(data, callback) {
+	},
 	
+	comments_timeline: function(data, callback) {
 	},
 	
 	verify_credentials: function(user, callbackFn, data){
@@ -780,9 +778,44 @@ $.extend(DiguAPI, {
 	
 	/* content[可选]：更新的Digu消息内容， 请确定必要时需要进行UrlEncode编码，另外，不超过140个中文或者英文字。
 	 */
-	format_update_params: function(data) {
-    	data.content = data.status;
-    	delete data.status;
+	before_sendRequest: function(args) {
+		if(args.url == this.config.update) { // repost, comment, reply
+			// id => reply_user_id[可选]：指明要回复的用户的id
+			// status => content
+			// comment => content
+			// id => digu_id
+			if(args.data.status) {
+				args.data.content = args.data.status;
+				delete args.data.status;
+			} else if(args.data.comment) {
+				args.data.content = args.data.comment;
+				delete args.data.comment;
+			}
+			if(args.data.id) {
+				args.data.digu_id = args.data.id;
+				delete args.data.id;
+			}
+		} else if(args.url == this.config.friends || args.url == this.config.followers) {
+			// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
+			// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
+			args.data.page = args.data.cursor == -1 ? 1 : args.data.cursor;
+			delete args.data.cursor;
+			if(!args.data.page) {
+				args.data.page = 1;
+			}
+			delete args.data.user_id;
+		} else if(args.url == this.config.new_message) {
+			// id => receiveUserId , text => content , message=0: 必须 0 表示悄悄话 1 表示戳一下
+			args.data.content = args.data.text;
+			args.data.receiveUserId = args.data.id;
+			args.data.message = 0;
+			delete args.data.text;
+			delete args.data.id;
+		} else if(args.url == this.config.friendships_create || args.url == this.config.friendships_destroy) {
+			// id => userIdOrName
+			args.data.userIdOrName = args.data.id;
+			delete args.data.id;
+		}
     },
 	
 	/* content[可选]：更新的Digu消息内容， 请确定必要时需要进行UrlEncode编码，另外，不超过140个中文或者英文字。
@@ -798,35 +831,6 @@ $.extend(DiguAPI, {
     	delete data.status;
     	pic.keyname = 'image0';
     },
-	
-	friends: function(data, callbackFn) {
-		this.followers_or_friends(this.config.friends, data, callbackFn);
-	},
-	
-	// id, user_id, screen_name, cursor, count
-    followers: function(data, callbackFn){
-		this.followers_or_friends(this.config.followers, data, callbackFn);
-	},
-	
-	followers_or_friends: function(url, data, callbackFn) {
-		// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
-		// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
-		data.page = data.cursor == -1 ? 1 : data.cursor;
-		delete data.cursor;
-		if(!data.page) {
-			data.page = 1;
-		}
-		//data.count = data.count || 20;
-		delete data.user_id;
-		if(!callbackFn) return;
-        var params = {
-            url: url,
-            type: 'get',
-            play_load: 'user',
-            data: data
-        };
-        this._sendRequest(params, callbackFn);
-	},
 	
 	format_result: function(data, play_load, args) {
 		// digu {"wrong":"no data"}
@@ -931,34 +935,19 @@ $.extend(ZuosaAPI, {
 	    });
 	},
 	
-	friends: function(data, callbackFn) {
-		this.followers_or_friends(this.config.friends, data, callbackFn);
-	},
-	
-	// id, user_id, screen_name, cursor, count
-    followers: function(data, callbackFn){
-		this.followers_or_friends(this.config.followers, data, callbackFn);
-	},
-	
-	followers_or_friends: function(url, data, callbackFn) {
-		// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
-		// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
-		data.page = data.cursor == -1 ? 1 : data.cursor;
-		delete data.cursor;
-		if(!data.page) {
-			data.page = 1;
+	before_sendRequest: function(args) {
+		if(args.url == this.config.friends || args.url == this.config.followers) {
+			// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
+			// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
+			args.data.page = args.data.cursor == -1 ? 1 : args.data.cursor;
+			delete args.data.cursor;
+			if(!args.data.page) {
+				args.data.page = 1;
+			}
+			//data.count = data.count || 20;
+			delete args.data.user_id;
 		}
-		//data.count = data.count || 20;
-		delete data.user_id;
-		if(!callbackFn) return;
-        var params = {
-            url: url,
-            type: 'get',
-            play_load: 'user',
-            data: data
-        };
-        this._sendRequest(params, callbackFn);
-	},
+    },
 	
 	format_result: function(data, play_load, args) {
 		if($.isArray(data)) {
