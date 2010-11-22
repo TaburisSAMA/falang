@@ -85,145 +85,160 @@ function sendSinaMsg(){
     }
 
     if(!check){ return; }
-
-    var boundary = '----multipartformboundary' + (new Date).getTime();
-    var dashdash = '--';
-    var crlf     = '\r\n';
-
-    /* Build RFC2388 string. */
-    var builder = '';
-
-    builder += dashdash;
-    builder += boundary;
-    builder += crlf;
-
-    /* Generate headers. [SOURCE KEY] */            
-    builder += 'Content-Disposition: form-data; name="source"';
-    builder += crlf;
-    builder += crlf; 
-
-    /* Append form data. */
-    builder += SOURCE;
-    builder += crlf;
-
-    /* Write boundary. */
-    builder += dashdash;
-    builder += boundary;
-    builder += crlf;
-
-    /* Generate headers. [STATUS] */            
-    builder += 'Content-Disposition: form-data; name="status"';
-    builder += crlf;
-    builder += crlf; 
-
-    /* Append form data. */
-    builder += encodeURIComponent(msg);
-    builder += crlf;
-
-    /* Write boundary. */
-    builder += dashdash;
-    builder += boundary;
-    builder += crlf;
-
-    /* Generate headers. [PIC] */            
-    builder += 'Content-Disposition: form-data; name="pic"';
-    if (file.fileName) {
-      builder += '; filename="' + file.fileName + '"';
-    }
-    builder += crlf;
-
-    builder += 'Content-Type: '+file.type;
-    builder += crlf;
-    builder += crlf; 
-
-    //var reader = new FileReader();
-    //reader.onload = r_loaded;
-    //reader.readAsBinaryString(file);
-    /* Append binary data.
-    builder += file.getAsBinary();
-    builder += crlf;*/ 
-
+	
+    var pic = {file: file};
+    var data = {status: msg};
     
-    var bb = new BlobBuilder(); //NOTE
-    bb.append(builder);
-    bb.append(file);
-    builder = crlf;
+//    var boundary = '----multipartformboundary' + (new Date).getTime();
+//    var dashdash = '--';
+//    var crlf     = '\r\n';
+//
+//    /* Build RFC2388 string. */
+//    var builder = '';
+//
+//    builder += dashdash;
+//    builder += boundary;
+//    builder += crlf;
+//
+//    /* Generate headers. [SOURCE KEY] */            
+//    builder += 'Content-Disposition: form-data; name="source"';
+//    builder += crlf;
+//    builder += crlf; 
+//
+//    /* Append form data. */
+//    builder += SOURCE;
+//    builder += crlf;
+//
+//    /* Write boundary. */
+//    builder += dashdash;
+//    builder += boundary;
+//    builder += crlf;
+//
+//    /* Generate headers. [STATUS] */            
+//    builder += 'Content-Disposition: form-data; name="status"';
+//    builder += crlf;
+//    builder += crlf; 
+//
+//    /* Append form data. */
+//    builder += encodeURIComponent(msg);
+//    builder += crlf;
+//
+//    /* Write boundary. */
+//    builder += dashdash;
+//    builder += boundary;
+//    builder += crlf;
+//
+//    /* Generate headers. [PIC] */            
+//    builder += 'Content-Disposition: form-data; name="pic"';
+//    if (file.fileName) {
+//      builder += '; filename="' + file.fileName + '"';
+//    }
+//    builder += crlf;
+//
+//    builder += 'Content-Type: '+file.type;
+//    builder += crlf;
+//    builder += crlf; 
+//
+//    //var reader = new FileReader();
+//    //reader.onload = r_loaded;
+//    //reader.readAsBinaryString(file);
+//    /* Append binary data.
+//    builder += file.getAsBinary();
+//    builder += crlf;*/ 
+//
+//    
+//    var bb = new BlobBuilder(); //NOTE
+//    bb.append(builder);
+//    bb.append(file);
+//    builder = crlf;
+//    
+//    /* Mark end of the request.*/ 
+//    builder += dashdash;
+//    builder += boundary;
+//    builder += dashdash;
+//    builder += crlf;
+//
+//    bb.append(builder);
     
-    /* Mark end of the request.*/ 
-    builder += dashdash;
-    builder += boundary;
-    builder += dashdash;
-    builder += crlf;
-
-    bb.append(builder);
-    
-    _showLoading();
-    disabledUpload();
-
-    $.ajax({
-        url: apiUrl.sina.upload,
-        username: user.userName,
-        password: user.password,
-        cache: false,
-        timeout: 5*60*1000, //5分钟超时
-        type : 'post',
-        data: bb.getBlob(),
-        dataType: 'text',
-        contentType: 'multipart/form-data; boundary=' + boundary,
-        processData: false,
-        beforeSend: function(req) {
-            req.setRequestHeader('Authorization', make_base_auth_header(user.userName, user.password));
-            if(req.upload){
-                req.upload.onprogress = function(ev){
-                    onprogress(ev);
-                };
-            }
-        },
-        success: function (data, textStatus) {
-            try{
-                data = JSON.parse(data);
-            }
-            catch(err){
-                //data = null;
-                data = {error:'服务器返回结果错误，本地解析错误。', error_code:500};
-                textStatus = 'error';
-            }
-            var error_code = null;
-            if(data){
-                if(data.error || data.error_code){
-                    _showMsg('error: ' + data.error + ', error_code: ' + data.error_code);
-                    error_code = data.error_code || error_code;
-                }
-            }else{error_code = 400;}
-            processUploadResult(data, textStatus, error_code);
+    tapi.upload(user, data, pic, 
+    	function() {
+    		_showLoading();
+    		disabledUpload();
+    	}, 
+    	function(ev) {
+    		onprogress(ev);
+    	}, 
+    	function(data, textStatus, error_code) {
+    		processUploadResult(data, textStatus, error_code);
             _hideLoading();
-        },
-        error: function (xhr, textStatus, errorThrown) {
-            var r = null, status = 'unknow';
-            if(xhr){
-                if(xhr.status){
-                    status = xhr.status;
-                }
-                if(xhr.responseText){
-                    var r = xhr.responseText
-                    try{
-                        r = JSON.parse(r);
-                    }
-                    catch(err){
-                        r = null;
-                    }
-                    if(r){_showMsg('error_code:' + r.error_code + ', error:' + r.error);}
-                }
-            }
-            if(!r){
-                textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';
-                errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
-                _showMsg('error: ' + textStatus + errorThrown + 'statuCode: ' + status);
-            }
-            processUploadResult({}, 'error', status); //不管什么状态，都返回 error
-            _hideLoading();
-        }
-    });
+    	}
+    );
+    
+
+//    $.ajax({
+//        url: apiUrl.sina.upload,
+//        username: user.userName,
+//        password: user.password,
+//        cache: false,
+//        timeout: 5*60*1000, //5分钟超时
+//        type : 'post',
+//        data: bb.getBlob(),
+//        dataType: 'text',
+//        contentType: 'multipart/form-data; boundary=' + boundary,
+//        processData: false,
+//        beforeSend: function(req) {
+//            req.setRequestHeader('Authorization', make_base_auth_header(user.userName, user.password));
+//            if(req.upload){
+//                req.upload.onprogress = function(ev){
+//                    onprogress(ev);
+//                };
+//            }
+//        },
+//        success: function (data, textStatus) {
+//            try{
+//                data = JSON.parse(data);
+//            }
+//            catch(err){
+//                //data = null;
+//                data = {error:'服务器返回结果错误，本地解析错误。', error_code:500};
+//                textStatus = 'error';
+//            }
+//            var error_code = null;
+//            if(data){
+//                if(data.error || data.error_code){
+//                    _showMsg('error: ' + data.error + ', error_code: ' + data.error_code);
+//                    error_code = data.error_code || error_code;
+//                }
+//            }else{error_code = 400;}
+//            processUploadResult(data, textStatus, error_code);
+//            _hideLoading();
+//        },
+//        error: function (xhr, textStatus, errorThrown) {
+//            var r = null, status = 'unknow';
+//            if(xhr){
+//                if(xhr.status){
+//                    status = xhr.status;
+//                }
+//                if(xhr.responseText){
+//                    var r = xhr.responseText;
+//                    try{
+//                        r = JSON.parse(r);
+//                    }
+//                    catch(err){
+//                        r = null;
+//                    }
+//                    if(r){_showMsg('error_code:' + r.error_code + ', error:' + r.error);}
+//                }
+//            }
+//            if(!r){
+//                textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';
+//                errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
+//                _showMsg('error: ' + textStatus + errorThrown + 'statuCode: ' + status);
+//            }
+//            processUploadResult({}, 'error', status); //不管什么状态，都返回 error
+//            _hideLoading();
+//        }
+//    });
 
     /*var xhr = new XMLHttpRequest();
     var upload = xhr.upload;

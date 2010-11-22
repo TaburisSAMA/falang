@@ -255,15 +255,139 @@ var sinaApi = {
         this._sendRequest(params, callbackFn);
     },
     
-    upload: function(data, callbackFn){
-        if(!callbackFn) return;
-        var params = {
-            url: this.config.upload,
-            type: 'post',
-            play_load: 'status',
-            data: data
-        };
-        this._sendRequest(params, callbackFn);
+    /* 上传图片
+     * user: 当前用户
+     * data: {source: xxx, status: xxx, ...}
+     * pic: {keyname: 'pic', file: fileobj}
+     * before_request: before_request function
+     * onprogress: on_progress_callback function
+     * callback: finish callback function
+     * */
+    upload: function(user, data, pic, before_request, onprogress, callback) {
+    	console.dir(user);
+    	console.dir(data);
+    	console.dir(pic);
+    	console.dir(this);
+    	pic.keyname = pic.keyname || 'pic';
+    	data.source = data.source || this.config.source;
+	    var boundary = '----multipartformboundary' + (new Date).getTime();
+	    var dashdash = '--';
+	    var crlf = '\r\n';
+	
+	    /* Build RFC2388 string. */
+	    var builder = '';
+	
+	    builder += dashdash;
+	    builder += boundary;
+	    builder += crlf;
+		
+	    for(var key in data) {
+	    	/* Generate headers. key */            
+		    builder += 'Content-Disposition: form-data; name="' + key + '"';
+		    builder += crlf;
+		    builder += crlf; 
+		     /* Append form data. */
+		    builder += encodeURIComponent(data[key]);
+		    builder += crlf;
+		    
+		    /* Write boundary. */
+		    builder += dashdash;
+		    builder += boundary;
+		    builder += crlf;
+	    }
+	    
+	    /* Generate headers. [PIC] */            
+	    builder += 'Content-Disposition: form-data; name="' + pic.keyname + '"';
+	    if(pic.file.fileName) {
+	      builder += '; filename="' + encodeURIComponent(pic.file.fileName) + '"';
+	    }
+	    builder += crlf;
+	
+	    builder += 'Content-Type: '+ pic.file.type;
+	    builder += crlf;
+	    builder += crlf; 
+	
+	    var bb = new BlobBuilder(); //NOTE
+	    bb.append(builder);
+	    bb.append(pic.file);
+	    builder = crlf;
+	    
+	    /* Mark end of the request.*/ 
+	    builder += dashdash;
+	    builder += boundary;
+	    builder += dashdash;
+	    builder += crlf;
+	
+	    bb.append(builder);
+	    
+	    if(before_request) {
+	    	before_request();
+	    }
+		var url = this.config.host + this.config.upload + this.config.result_format;
+	    $.ajax({
+	        url: url,
+	        username: user.userName,
+	        password: user.password,
+	        cache: false,
+	        timeout: 5*60*1000, //5分钟超时
+	        type : 'post',
+	        data: bb.getBlob(),
+	        dataType: 'text',
+	        contentType: 'multipart/form-data; boundary=' + boundary,
+	        processData: false,
+	        beforeSend: function(req) {
+	            req.setRequestHeader('Authorization', make_base_auth_header(user.userName, user.password));
+	            if(onprogress) {
+	            	if(req.upload){
+		                req.upload.onprogress = function(ev){
+		                    onprogress(ev);
+		                };
+		            }
+	            }
+	        },
+	        success: function (data, textStatus) {
+	            try{
+	                data = JSON.parse(data);
+	            }
+	            catch(err){
+	                //data = null;
+	                data = {error:'服务器返回结果错误，本地解析错误。', error_code:500};
+	                textStatus = 'error';
+	            }
+	            var error_code = null;
+	            if(data){
+	                if(data.error || data.error_code){
+	                    _showMsg('error: ' + data.error + ', error_code: ' + data.error_code);
+	                    error_code = data.error_code || error_code;
+	                }
+	            }else{error_code = 400;}
+	            callback(data, textStatus, error_code);
+	        },
+	        error: function (xhr, textStatus, errorThrown) {
+	            var r = null, status = 'unknow';
+	            if(xhr){
+	                if(xhr.status){
+	                    status = xhr.status;
+	                }
+	                if(xhr.responseText){
+	                    var r = xhr.responseText;
+	                    try{
+	                        r = JSON.parse(r);
+	                    }
+	                    catch(err){
+	                        r = null;
+	                    }
+	                    if(r){_showMsg('error_code:' + r.error_code + ', error:' + r.error);}
+	                }
+	            }
+	            if(!r){
+	                textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';
+	                errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
+	                _showMsg('error: ' + textStatus + errorThrown + 'statuCode: ' + status);
+	            }
+	            callback({}, 'error', status); //不管什么状态，都返回 error
+	        }
+	    });
     },
 
     repost: function(data, callbackFn){
@@ -699,10 +823,24 @@ $.extend(DiguAPI, {
 	
 });
 
+// 做啥api
+var ZuosaAPI = $.extend({}, sinaApi);
+
+$.extend(ZuosaAPI, {
+	// 覆盖不同的参数
+	config: $.extend({}, sinaApi.config, {
+		host: 'http://api.zuosa.com',
+		source: 'fawave', 
+	    source2: 'fawave',
+	    upload: '/statuses/update'
+	})
+});
+
 var T_APIS = {
 	'tsina': sinaApi,
 	'tsohu': TSohuAPI,
-	'digu': DiguAPI
+	'digu': DiguAPI,
+	'zuosa': ZuosaAPI
 };
 
 
@@ -710,7 +848,7 @@ var T_APIS = {
 var tapi = {
 	// 自动判断当前用户所使用的api, 根据user.blogType判断
     // tapi.g('fridens_timeline')(data, function(){})
-	g: function(method_name){
+	g: function(data, method_name){
         return T_APIS[(data.user ? data.user.blogType : data.blogType) || 'tsina'][method_name];
     },
     // 自动判断当前用户所使用的api, 根据user.blogType判断
@@ -795,8 +933,8 @@ var tapi = {
 		return this.api_dispatch(data).update(data, callbackFn);
 	},
 	
-	upload: function(data, callbackFn){
-		return this.api_dispatch(data).upload(data, callbackFn);
+	upload: function(user, data, pic, before_request, onprogress, callback){
+		return this.api_dispatch(user).upload(user, data, pic, before_request, onprogress, callback);
 	},
 	
 	repost: function(data, callbackFn){
