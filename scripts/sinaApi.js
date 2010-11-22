@@ -550,9 +550,12 @@ var sinaApi = {
 		return encodeURIComponent(text);
 	},
     
+	before_sendRequest: function(args) {
+		
+	},
+	
     _sendRequest: function(params, callbackFn) {
     	var args = {type: 'get', play_load: 'status'};
-    	
     	$.extend(args, params);
     	args.data = args.data || {};
     	args.data.source = args.data.source || this.config.source;
@@ -584,6 +587,8 @@ var sinaApi = {
         var $this = this;
         var play_load = args.play_load; // 返回的是什么类型的数据格式
         delete args.play_load;
+        // 请求前调用
+        this.before_sendRequest(args);
         $.ajax({
             url: url,
             username: user.userName,
@@ -685,6 +690,14 @@ $.extend(TSohuAPI, {
 	// 不支持批量获取，暂时屏蔽
 	counts: function(data, callback) {
 	
+	},
+	
+	before_sendRequest: function(args) {
+		if(args.url == this.config.new_message) {
+			// id => user
+			args.data.user = args.data.id;
+			delete args.data.id;
+		}
 	},
 	
 	format_result_item: function(data, play_load, args) {
