@@ -669,7 +669,7 @@ $.extend(TSohuAPI, {
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.t.sohu.com',
 		source: 'WbbRPziVG6', // 搜狐不是按key来限制的
-	    source2: 'WbbRPziVG6',
+	    source2: 'fawave',
 	    
 	    favorites_create: '/favourites/create/{{id}}',
 	    favorites_destroy: '/favourites/destroy/{{id}}',
