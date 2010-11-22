@@ -346,7 +346,8 @@
 						<img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 
 							title="<?js if(user.gender == 'm'){ ?>男<?js }else if(user.gender == 'f'){ ?>女<?js }else{ ?>性别未知<?js } ?>" />
 					<?js if(user.province){ ?>
-                          #{provinces[user.province].name}, #{provinces[user.province]["citys"][user.city]}
+                          #{provinces[user.province] ? provinces[user.province].name : user.province}, 
+                          #{provinces[user.province] ? provinces[user.province]["citys"][user.city] : user.city}
                           <?js } ?>
                     </p>
 					<p>关注: <span>#{user.friends_count}</span>个　 

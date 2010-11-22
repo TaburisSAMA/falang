@@ -867,6 +867,10 @@ $.extend(ZuosaAPI, {
 	    upload: '/statuses/update'
 	}),
 	
+	counts: function(data, callback) {
+	
+	},
+	
 	// {"authorized":True}，需要再调用 users/show获取用户信息
 	verify_credentials: function(user, callbackFn, data){
 		if(!user || !callbackFn) return;
@@ -885,25 +889,80 @@ $.extend(ZuosaAPI, {
 	    		callbackFn(data, textStatus, error_code);
 	    	}
 	    });
-	}, 
+	},
+	
+	friends: function(data, callbackFn) {
+		this.followers_or_friends(this.config.friends, data, callbackFn);
+	},
+	
+	// id, user_id, screen_name, cursor, count
+    followers: function(data, callbackFn){
+		this.followers_or_friends(this.config.followers, data, callbackFn);
+	},
+	
+	followers_or_friends: function(url, data, callbackFn) {
+		// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
+		// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
+		data.page = data.cursor == -1 ? 1 : data.cursor;
+		delete data.cursor;
+		if(!data.page) {
+			data.page = 1;
+		}
+		//data.count = data.count || 20;
+		delete data.user_id;
+		if(!callbackFn) return;
+        var params = {
+            url: url,
+            type: 'get',
+            play_load: 'user',
+            data: data
+        };
+        this._sendRequest(params, callbackFn);
+	},
+	
+	format_result: function(data, play_load, args) {
+		if($.isArray(data)) {
+	    	for(var i in data) {
+	    		data[i] = this.format_result_item(data[i], play_load);
+	    	}
+	    } else {
+	    	data = this.format_result_item(data, play_load);
+	    }
+		// 若是follwers api，则需要封装成cursor接口
+		// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
+		// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
+		if(args.url == this.config.followers || args.url == this.config.friends) {
+			data = {users: data, next_cursor: args.data.page + 1, previous_cursor: args.data.page};
+			if(data.users.length == 0) {
+				data.next_cursor = 0;
+			}
+		}
+		return data;
+	},
 	
 	format_result_item: function(data, play_load, args) {
 		if(play_load == 'status' && data.id) {
-//			delete data.picPath;
-//			if(data.in_reply_to_status_id != '0' && data.in_reply_to_status_id != '') {
-//				data.retweeted_status = {
-//					id: data.in_reply_to_status_id,
-//					user: {
-//						id: data.in_reply_to_user_id,
-//						screen_name: data.in_reply_to_screen_name,
-//						name: data.in_reply_to_user_name
-//					}
-//				};
-//				this.format_result_item(data.retweeted_status.user, 'user', args);
-//			}
+			if(data.mms_img_pre) {
+				data.thumbnail_pic = data.mms_img_pre;
+				data.bmiddle_pic = data.mms_img;
+				data.original_pic = data.bmiddle_pic;
+				delete data.mms_img_pre;
+				delete data.mms_img;
+			}
+			if(data.in_reply_to_status_id) {
+				data.retweeted_status = {
+					id: data.in_reply_to_status_id,
+					user: {
+						id: data.in_reply_to_user_id,
+						screen_name: data.in_reply_to_screen_name,
+						name: data.in_reply_to_screen_name
+					}
+				};
+				this.format_result_item(data.retweeted_status.user, 'user', args);
+			}
 			this.format_result_item(data.user, 'user', args)
 		} else if(play_load == 'user' && data && data.id) {
-			data.t_url = data.url || ('http://zuosa.com/' + (data.name || data.id));
+			data.t_url = 'http://zuosa.com/' + (data.screen_name || data.name);
 		} 
 		else if(play_load == 'comment') {
 			this.format_result_item(data.user, 'user', args)
