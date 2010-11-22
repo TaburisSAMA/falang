@@ -36,8 +36,9 @@ function setMaxMsgId(t, id, user_uniqueKey){
 //用户跟随放到background view这里处理
 var friendships = {
     create: function(user_id, callback){ //更随某人
-        var params = {user_id:user_id};
-        sinaApi.friendships_create(params, function(user_info, textStatus, statuCode){
+    	var user = getUser();
+        var params = {id:user_id, user:user};
+        tapi.friendships_create(params, function(user_info, textStatus, statuCode){
             if(textStatus != 'error' && user_info.id){
                 showMsg('跟随 "' + user_info.screen_name + '" 成功');
                 if(callback){ callback(user_info, textStatus, statuCode); }
@@ -47,8 +48,9 @@ var friendships = {
         });
     },
     destroy: function(user_id, callback){ //取消更随某人
-        var params = {user_id:user_id};
-        sinaApi.friendships_destroy(params, function(user_info, textStatus, statuCode){
+    	var user = getUser();
+        var params = {id:user_id, user:user};
+        tapi.friendships_destroy(params, function(user_info, textStatus, statuCode){
             if(textStatus != 'error' && user_info.id){
                 showMsg('你已经取消跟随 "' + user_info.screen_name + '"');
                 if(callback){ callback(user_info, textStatus, statuCode); }
@@ -58,8 +60,9 @@ var friendships = {
         });
     },
     show: function(user_id){ //查看与某人的更随关系
-        var params = {user_id:user_id};
-        sinaApi.friendships_show(params, function(sinaMsgs, textStatus){});
+    	var user = getUser();
+        var params = {id:user_id, user:user};
+        tapi.friendships_show(params, function(sinaMsgs, textStatus){});
     }
 }; 
 
@@ -371,9 +374,9 @@ r_method_manager = {
     },
     publicQuickSendMsg: function(request, sender, sendResponse){
         var msg = request.sendMsg;
-        var data = {};
-        data['status'] = msg;
-        sinaApi.update(data, function(sinaMsg, textStatus){
+        var user = getUser();
+        var data = {status: msg, user:user};
+        tapi.update(data, function(sinaMsg, textStatus){
             if(sinaMsg.id){
                 setTimeout(checkNewMsg, 1000);
             }

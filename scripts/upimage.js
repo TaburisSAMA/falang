@@ -69,7 +69,7 @@ function initTxtContentEven(){
 function sendSinaMsg(){
 
     var check = true;
-    var user = localStorage.getObject(CURRENT_USER_KEY);
+    var user = getUser();
     if(!user){
         _showMsg('用户未指定，请在选项里面添加');
         check = false;

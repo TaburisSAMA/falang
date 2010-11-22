@@ -663,7 +663,7 @@ function showComments(ele,tweetId, page, notHide){
         }
         showLoading();
         page = page || 1;
-        var user = localStorage.getObject(CURRENT_USER_KEY);
+        var user = getUser();
         var data = {id:tweetId, page:page, count:COMMENT_PAGE_SIZE, user:user};
         tapi.comments(data, function(comments, textStatus){
             if(textStatus != 'error' && comments && !comments.error){
@@ -908,7 +908,7 @@ function sendSinaMsg(msg, isReply){
     txt.attr('disabled','true');
     data['status'] = msg;
     
-    var user = localStorage.getObject(CURRENT_USER_KEY);
+    var user = getUser();
     data['user'] = user;
     tapi.update(data, function(sinaMsg, textStatus){
         if(sinaMsg.id){
@@ -934,7 +934,7 @@ function sendWhisper(msg){
     txt = $("#replyTextarea");
     var toUserId = $('#whisperToUserId').val();
     data = {text: msg, id:toUserId};
-    var user = localStorage.getObject(CURRENT_USER_KEY);
+    var user = getUser();
     data['user'] = user;
     btn.attr('disabled','true');
     txt.attr('disabled','true');
@@ -958,7 +958,7 @@ function sendRepost(msg, repostTweetId, notSendMord){
     txt = $("#replyTextarea");
     repostTweetId = repostTweetId || $('#repostTweetId').val();
     data = {status: msg, id:repostTweetId};
-    var user = localStorage.getObject(CURRENT_USER_KEY);
+    var user = getUser();
     data['user'] = user;
     btn.attr('disabled','true');
     txt.attr('disabled','true');
@@ -992,7 +992,7 @@ function sendComment(msg, commentTweetId, notSendMord){
     cid = $('#commentCommentId').val();
     commentTweetId = commentTweetId || $('#commentTweetId').val();
     data = {comment: msg, id:commentTweetId, cid:cid};
-    var user = localStorage.getObject(CURRENT_USER_KEY);
+    var user = getUser();
     data['user'] = user;
     btn.attr('disabled','true');
     txt.attr('disabled','true');
@@ -1158,7 +1158,7 @@ function doRT(ele){//RT
 function doDelTweet(tweetId, ele){//删除自己的微博
     if(!tweetId){return;}
     showLoading();
-    var user = localStorage.getObject(CURRENT_USER_KEY);
+    var user = getUser();
     tapi.destroy({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
             $(ele).closest('li').remove();
@@ -1184,7 +1184,7 @@ function doDelTweet(tweetId, ele){//删除自己的微博
 function doDelComment(ele, screen_name, tweetId){//删除评论
     if(!tweetId){return;}
     showLoading();
-    var user = localStorage.getObject(CURRENT_USER_KEY);
+    var user = getUser();
     tapi.comment_destroy({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
             $(ele).closest('li').remove();
@@ -1210,7 +1210,7 @@ function doDelComment(ele, screen_name, tweetId){//删除评论
 function delDirectMsg(ele, screen_name, tweetId){//删除私信
     if(!tweetId){return;}
     showLoading();
-    var user = localStorage.getObject(CURRENT_USER_KEY);
+    var user = getUser();
     tapi.destroy_msg({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
             $(ele).closest('li').remove();
@@ -1239,7 +1239,7 @@ function addFavorites(ele, screen_name, tweetId){//添加收藏
     var _a = $(ele);
     var _aHtml = _a[0].outerHTML;
     _a.hide();
-    var user = localStorage.getObject(CURRENT_USER_KEY);
+    var user = getUser();
     tapi.favorites_create({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
             _a.after(_aHtml.replace('addFavorites','delFavorites')
@@ -1272,7 +1272,7 @@ function delFavorites(ele, screen_name, tweetId){//删除收藏
     var _a = $(ele);
     var _aHtml = _a[0].outerHTML;
     _a.hide();
-    var user = localStorage.getObject(CURRENT_USER_KEY);
+    var user = getUser();
     tapi.favorites_destroy({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
             _a.after(_aHtml.replace('delFavorites','addFavorites')

@@ -562,6 +562,11 @@ var sinaApi = {
             return;
     	}
     	var url = this.config.host + args.url.format(args.data) + this.config.result_format;
+    	// 删除已经填充到url中的参数
+    	var pattern = /\{\{([\w\s\.\(\)"',-]+)?\}\}/g;
+	    args.url.replace(pattern, function(match, key) {
+	    	delete args.data[key];
+	    });	
     	if(!callbackFn) return;
         var user = args.user || args.data.user || localStorage.getObject(CURRENT_USER_KEY);
         if(args.data && args.data.user) delete args.data.user;
@@ -658,6 +663,7 @@ function make_base_auth_url(domain, user, password) {
 };
 
 // 搜狐微博api
+// 删除接口暂时无效
 var TSohuAPI = $.extend({}, sinaApi);
 
 $.extend(TSohuAPI, {
@@ -667,8 +673,19 @@ $.extend(TSohuAPI, {
 		source: 'WbbRPziVG6', // 搜狐不是按key来限制的
 	    source2: 'WbbRPziVG6',
 	    
+	    favorites_create: '/favourites/create/{{id}}',
+	    favorites_destroy: '/favourites/destroy/{{id}}',
+	    repost: '/statuses/transmit/{{id}}',
+	    friendships_create:   '/friendship/create/{{id}}',
+        friendships_destroy:  '/friendship/destroy/{{id}}',
+        counts: '/statuses/counts/{{ids}}',
 	    mentions: '/statuses/mentions_timeline'
 	}),
+	
+	// 不支持批量获取，暂时屏蔽
+	counts: function(data, callback) {
+	
+	},
 	
 	format_result_item: function(data, play_load, args) {
 		if(play_load == 'status' && data.id) {
