@@ -678,11 +678,11 @@ var tapi = {
 	// 自动判断当前用户所使用的api, 根据user.blogType判断
     // tapi.g('fridens_timeline')(data, function(){})
 	g: function(method_name){
-        return T_APIS[data.user ? data.user.blogType : data.blogType][method_name];
+        return T_APIS[(data.user ? data.user.blogType : data.blogType) || 'tsina'][method_name];
     },
     // 自动判断当前用户所使用的api, 根据user.blogType判断
     api_dispatch: function(data) {
-		return T_APIS[data.user ? data.user.blogType : data.blogType];
+		return T_APIS[(data.user ? data.user.blogType : data.blogType) || 'tsina'];
 	},
 	
 	verify_credentials: function(user, callbackFn, data){
