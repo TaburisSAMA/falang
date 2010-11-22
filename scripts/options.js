@@ -156,15 +156,15 @@ function initJtip(){
 }
 //初始化设置未读提示信息
 function initSetBadgeText(){
-    for(i in T_LIST){
-        $("#set_badge_" + T_LIST[i]).attr("checked", isSetBadgeText(T_LIST[i]));
+    for(i in T_LIST.all){
+        $("#set_badge_" + T_LIST.all[i]).attr("checked", isSetBadgeText(T_LIST.all[i]));
     }
 };
 
 //初始化设置新消息是否在页面显示
 function initShowInPage(){
-    for(i in T_LIST){
-        $("#set_show_in_page_" + T_LIST[i]).attr("checked", isShowInPage(T_LIST[i]));
+    for(i in T_LIST.all){
+        $("#set_show_in_page_" + T_LIST.all[i]).attr("checked", isShowInPage(T_LIST.all[i]));
     }
 };
 

@@ -59,6 +59,22 @@ li { line-height:16px;}
 div.mainContent{word-wrap: break-word;}
 .list li .msg .msgInfo a{color:#888;}
 
+.gototop{
+	background: #F5F5F5;
+	border-bottom: 1px solid #CCC;
+	border-bottom-left-radius: 4px 4px;
+	-webkit-box-shadow: #eee 1px 2px 2px;
+	border-left: 1px solid #CCC;
+	cursor: pointer;
+	display: none;
+	padding: 2px 3px;
+	position: absolute;
+	right: 15px;
+	text-align: center;
+	top: 24px;
+	z-index: 999;
+}
+
 #txtContent{resize: none;}
 #diguReplies { display:none;}
 

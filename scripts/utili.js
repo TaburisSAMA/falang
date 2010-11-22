@@ -269,18 +269,35 @@ function syncUnreadCountToSinaPage(t, user_uniqueKey){
 //获取在插件icon上显示的tooltip内容
 function getTooltip(){
     
-    var tip = '';
+    var tip = '', _new=0, _mention=0, _comment=0, _direct=0;
     var userList = getUserList();
     for(j in userList){
         var user = userList[j];
+        _new = getUnreadTimelineCount('friends_timeline', user.uniqueKey);
+        _mention = getUnreadTimelineCount('mentions', user.uniqueKey);
+        _comment = getUnreadTimelineCount('comments_timeline', user.uniqueKey);
+        _direct = getUnreadTimelineCount('direct_messages', user.uniqueKey);
+        var u_tip = '';
+        if(_new){ u_tip += _new + '新'; }
+        if(_mention){
+            u_tip = u_tip ? u_tip + ',  ' : u_tip;
+            u_tip += _mention + '@';
+        }
+        if(_comment){
+            u_tip = u_tip ? u_tip + ',  ' : u_tip;
+            u_tip += _comment + '评';
+        }
+        if(_direct){
+            u_tip = u_tip ? u_tip + ',  ' : u_tip;
+            u_tip += _direct + '私';
+        }
+        if(u_tip){
+            u_tip = '(' + T_NAMES[user.blogType] + ')' + user.screen_name + ': ' + u_tip;
+        }
         if(tip){
             tip += '\r\n';
         }
-        tip = tip + '(' + T_NAMES[user.blogType] + ')' + user.screen_name + ': '
-            + '　新微博: ' + getUnreadTimelineCount('friends_timeline', user.uniqueKey) + ','
-            + '　新@我: ' + getUnreadTimelineCount('mentions', user.uniqueKey) + ','
-            + '　新评论: ' + getUnreadTimelineCount('comments_timeline', user.uniqueKey) + ','
-            + '　新私信: ' + getUnreadTimelineCount('direct_messages', user.uniqueKey);
+        tip = tip + u_tip;
     }
     
     return tip;
