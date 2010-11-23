@@ -313,7 +313,7 @@ div.mainContent{word-wrap: break-word;}
 }
 
 /* Dock */
-#accountListDock{position: absolute; bottom:0; width:100%;}
+#accountListDock{position: absolute; bottom:0; width:100%; z-index:10;}
 #accountListDock ul {
     text-align: center;
 	width:100%;
