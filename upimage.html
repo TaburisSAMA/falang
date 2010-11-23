@@ -24,12 +24,14 @@
  </head>
 
  <body onload="initOnLoad();" style="margin:0 auto;">
+    
 	<div style="padding-top:10px;">
 		<textarea id="txtContent" style="width:100%;" rows="5" class="" ></textarea>
 	</div>
 	<div id="submitWarp" >
+	    <span class="fawaveUserInfo"><a href="" target="_blank"><img src="" class="userImg" /></a><img src="" class="blogType" /></span>
 		<input id="btnSend" type="button" value="发微!" title="ctrl+enter" class="btn" />&nbsp;
-		<a href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');" title="点击添加表情"><img src="images/face.gif" style="vertical-align: top;" />表情</a>&nbsp;
+		<a href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');" title="点击添加表情"><img src="images/face.gif" />表情</a>&nbsp;
 		<input type="button" value="清空" onclick="cleanTxtContent();" class="btn"/>&nbsp;
 		<input type="button" value="关闭" onclick="window.close();" class="btn"/>
 		<span id="wordCount">140</span>

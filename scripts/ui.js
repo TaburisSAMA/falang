@@ -251,7 +251,7 @@ function bildMsgLi(sinaMsg, t){
         }
         var r = Shotenjin.render(tp, context);
     }catch(err){
-        console.log(JSON.stringify(err));
+        log(JSON.stringify(err));
         return '';
     }
     sinaMsg.readed = true;

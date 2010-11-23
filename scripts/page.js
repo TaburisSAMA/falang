@@ -196,7 +196,7 @@ var QUICK_SEND_TEMPLATE = ' \
                 </div>\
                 <span class="fawaveUserInfo">\
                     <span></span>\
-                    <a target="_blank"><img src="" /><a>\
+                    <a target="_blank"><img src="" /></a><img src="" class="blogType" />\
                 </span>\
             </div> \
         </div>\
@@ -228,8 +228,9 @@ function fawaveInitTemplate(){
     if(CURRENT_USER){
         var f_u_info = $("#fawaveSendMsgWrap .fawaveUserInfo");
         f_u_info.find('span').html(CURRENT_USER.screen_name)
-            .end().find('a').attr('href', 'http://t.sina.com.cn/' + CURRENT_USER.domain||CURRENT_USER.id)
-            .end().find('img').attr('src', CURRENT_USER.profile_image_url);
+            .end().find('a').attr('href', CURRENT_USER.t_url)
+            .end().find('a img').attr('src', CURRENT_USER.profile_image_url)
+        	.end().find('img.blogType').attr('src', chrome.extension.getURL('images/blogs/' + CURRENT_USER.blogType + '_16.png'));
     }
     $("#fawaveSendMsgWrap .fawavemodal-close").click(function(){
         showFawaveAlertMsg('');
@@ -334,10 +335,11 @@ $(function(){
                     if(CURRENT_USER.profile_image_url != response.c_user.profile_image_url){
                         CURRENT_USER = response.c_user;
                         if(CURRENT_USER){
-                            var f_u_info = $("#fawaveSendMsgWrap .fawaveUserInfo");
+                        	var f_u_info = $("#fawaveSendMsgWrap .fawaveUserInfo");
                             f_u_info.find('span').html(CURRENT_USER.screen_name)
-                                .end().find('a').attr('href', 'http://t.sina.com.cn/' + CURRENT_USER.domain||CURRENT_USER.id)
-                                .end().find('img').attr('src', CURRENT_USER.profile_image_url);
+                                .end().find('a').attr('href', CURRENT_USER.t_url)
+                                .end().find('a img').attr('src', CURRENT_USER.profile_image_url)
+                            	.end().find('img.blogType').attr('src', chrome.extension.getURL('images/blogs/' + CURRENT_USER.blogType + '_16.png'));
                         }
                     }
                 });

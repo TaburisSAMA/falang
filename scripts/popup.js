@@ -1,12 +1,11 @@
 // @author qleelulu@gmail.com
 
 var t_changeUser = '<table id="changeUser" class="tab-none" cellspacing="0" ><tr><td>'
-            + '<span class="userName" title="">{{screen_name}}</span>'
+            + '<img src="images/blogs/{{blogType}}_16.png" class="blogType" /> <span class="userName" title="">{{screen_name}}</span>'
             + '<div id="changeUserListWrap" style="display:none;"><ul>{{user_list}}</lu></div></td>'
-            + '<td><a target="_blank" class="user_home" href="http://t.sina.com.cn/{{domain}}" title="点击打开我的主页"><img style="width:24px;height:24px;" class="userImg" src="{{profile_image_url}}" /></a></td></tr></table>';
+            + '<td><a target="_blank" class="user_home" href="{{t_url}}" title="点击打开我的主页"><img style="width:24px;height:24px;" class="userImg" src="{{profile_image_url}}" /></a></td></tr></table>';
 
 var fawave = {};
-//var PAGE_SIZE = 20;
 var timeline_offset = {};
 function getTimelineOffset(t){
     return timeline_offset[t] || PAGE_SIZE;
@@ -385,6 +384,7 @@ function changeUser(uniqueKey){
             $("#" + T_LIST.all[i] + '_timeline .list').html('');
         }
         $("#tl_tabs .unreadCount").html('');
+        $("#changeUser .blogType").attr('src', 'images/blogs/' + to_user.blogType + '_16.png');
         $("#changeUser .userName").html(to_user.screen_name);
         $("#changeUser .userImg").attr('src', to_user.profile_image_url || '');
         $("#changeUser .user_home").attr('href', to_user.t_url);
@@ -1426,9 +1426,7 @@ fawave.face = {
         this.hide();
     }
 };
-//<<<<=====
 
-//====>>>>
 function _showLoading(){
     $("#loading").show();
 };
@@ -1436,4 +1434,3 @@ function _showLoading(){
 function _hideLoading(){
     $("#loading").hide();
 };
-//<<<<=====

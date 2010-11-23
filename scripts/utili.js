@@ -99,30 +99,30 @@ function getCacheCount(){
     return count;
 };
 
+function formatScreenName(user) {
+	return '[' + T_NAMES[user.blogType] + ']' + user.screen_name || user.name;
+}
+
 ///获取当前登陆用户信息
 function getUser(){
-//    if(window.c_user){
-//        return window.c_user;
-//    }else{
-        var c_user = localStorage.getObject(CURRENT_USER_KEY);
-        if(c_user && c_user.uniqueKey){
-            //window.c_user = c_user;
-        }else{
-            var userList = localStorage.getObject(USER_LIST_KEY);
-            if(userList){
-                for(key in userList){
-                    c_user = userList[key];
-                    if(c_user){
-                        setUser(c_user);
-                        break;
-                    }
+    var c_user = localStorage.getObject(CURRENT_USER_KEY);
+    if(c_user && c_user.uniqueKey){
+        //window.c_user = c_user;
+    }else{
+        var userList = localStorage.getObject(USER_LIST_KEY);
+        if(userList){
+            for(var key in userList){
+                c_user = userList[key];
+                if(c_user){
+                    setUser(c_user);
+                    break;
                 }
             }
         }
-        return c_user;
-//    }
-
+    }
+    return c_user;
 };
+
 //设置当前登陆用户
 function setUser(user){
     localStorage.setObject(CURRENT_USER_KEY, user);

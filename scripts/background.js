@@ -104,10 +104,10 @@ function checkTimeline(t, p, user_uniqueKey){
         default:
             m = t;
     }
-	log('start checkTimeline ' + user_uniqueKey + ' ' + m);
+//	log('start checkTimeline ' + user_uniqueKey + ' ' + m);
     tapi[m](params, function(sinaMsgs, textStatus){
     	if(sinaMsgs == null) {
-    		log(user_uniqueKey + ' ' + m + ': null, hideLoading()');
+//    		log(user_uniqueKey + ' ' + m + ': null, hideLoading()');
     		hideLoading();
     		return;
     	}
@@ -130,7 +130,7 @@ function checkTimeline(t, p, user_uniqueKey){
         if(sinaMsgs.users){ //粉丝列表
             sinaMsgs = sinaMsgs.users;
         }
-        log('finish checkTimeline ' + user_uniqueKey + ' ' + m + ': ' + (sinaMsgs ? sinaMsgs.length : 0));
+//        log('finish checkTimeline ' + user_uniqueKey + ' ' + m + ': ' + (sinaMsgs ? sinaMsgs.length : 0));
         if(sinaMsgs && sinaMsgs.length > 0){
             
             _last_id = sinaMsgs[0].id;
@@ -226,10 +226,10 @@ function getTimelinePage(user_uniqueKey, t, p){
         default:
             m = t;
     }
-    log('start getTimelinePage ' + user_uniqueKey + ' ' + m);
+//    log('start getTimelinePage ' + user_uniqueKey + ' ' + m);
     tapi[m](params, function(sinaMsgs, textStatus){
     	if(sinaMsgs == null) {
-    		log(user_uniqueKey + ' ' + m + ': null, hideLoading()');
+//    		log(user_uniqueKey + ' ' + m + ': null, hideLoading()');
     		hideLoading();
     		return;
     	}
@@ -252,7 +252,7 @@ function getTimelinePage(user_uniqueKey, t, p){
             tweets[_key] = tweets[_key].concat(sinaMsgs);
             _max_id = sinaMsgs[sinaMsgs.length-1].id;
 
-            log('finish getTimelinePage ' + user_uniqueKey + ' ' + m + ': ' + sinaMsgs.length);/////
+//            log('finish getTimelinePage ' + user_uniqueKey + ' ' + m + ': ' + sinaMsgs.length);/////
             
             var current_user = getUser();
             //防止获取分页内容后已经切换了用户

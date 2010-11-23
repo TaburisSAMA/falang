@@ -16,8 +16,13 @@ function initOnLoad(){
 };
 
 function init(){
+	var user = getUser();
+	$('.fawaveUserInfo img.blogType').attr('src', 'images/blogs/' + user.blogType + '_16.png');
+	$('.fawaveUserInfo img.userImg').attr('src', user.profile_image_url);
+	$('.fawaveUserInfo a').attr('href', user.t_url).attr('title', user.screen_name);
+	
     $("#txtContent").focus();
-
+    
     initTxtContentEven();
 
     initIamDoing();

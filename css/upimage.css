@@ -71,3 +71,15 @@
 .graph .bar span { position: absolute; left: 3px; }
 
 #progressInfo {margin-bottom:10px;}
+
+.fawaveUserInfo{position:relative;}
+.fawaveUserInfo img.userImg{
+    width:40px; height:40px; background:#fff; padding:2px; border:solid 1px #ccc; 
+    vertical-align:bottom;
+}
+.fawaveUserInfo img.blogType {
+    opacity: 0.8;
+    right: 0px;
+    bottom:-5px;
+    position: absolute;
+}
