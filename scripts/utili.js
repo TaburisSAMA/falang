@@ -296,7 +296,7 @@ function getTooltip(){
         if(u_tip){
             u_tip = '(' + T_NAMES[user.blogType] + ')' + user.screen_name + ': ' + u_tip;
         }
-        if(tip){
+        if(tip && u_tip){
             tip += '\r\n';
         }
         tip = tip + u_tip;
