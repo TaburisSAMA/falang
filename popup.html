@@ -186,6 +186,9 @@
 							#{user.screen_name}<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
 						</a>
 						<span class="edit">
+							<?js if(tweet.related_dialogue_url){ ?>
+							<a href="#{tweet.related_dialogue_url}" title="查看相关对话" target="_blank"><img src="images/inreply.png" /></a>
+							<?js } ?>
 							#{ btn.addFavoritesMsgBtn + btn.delFavoritesMsgBtn + btn.replyBtn + btn.rtBtn + btn.repostBtn + btn.repostCounts + btn.commentBtn + btn.commentCounts + btn.new_msgBtn + btn.delTweetBtn + btn.delCommentBtn + btn.delDirectMsgBtn }
 						</span>
 					</div>
@@ -200,7 +203,7 @@
 							</div>
 							<?js } ?>
 						</div>
-						<?js if(tweet.retweeted_status){ ?>
+						<?js if(tweet.retweeted_status && tweet.retweeted_status.text){ ?>
 						<!-- 转发 -->
 						<!-- {{retweeted_status_in}} -->
 						<!-- 转发 End -->
@@ -218,7 +221,7 @@
 					<div class="msgInfo">#{new Date(tweet.created_at).format("yyyy-MM-dd hh:mm:ss")} 通过 #{tweet.source||'网站'}</div>
 				</div>
 			  </div> <!-- end .li_wrap -->
-				<?js if(tweet.retweeted_status){ ?>
+				<?js if(tweet.retweeted_status && tweet.retweeted_status.text){ ?>
 				<!-- 转发 -->
 				<!-- {{retweeted_status_out}} -->
 				<!-- 转发 End -->

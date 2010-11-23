@@ -125,7 +125,7 @@ function bildMsgLi(sinaMsg, t){
         if(c_user.id == user.id){
             sinaMsg.myTweet = true;
         }
-     
+     	var support_comment = tapi.support_comment(c_user);
         var crlBtn = {
                 delTweetBtn: '<a class="deltweet" href="javascript:void(0);" onclick="doDelTweet(' + sinaMsg.id + ', this);" title="点击删除微博">删</a>',
                 replyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');" title="进行@回复">@</a>',
@@ -153,6 +153,10 @@ function bildMsgLi(sinaMsg, t){
             crlBtn.rtCommentBtn = '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + rt_status.user.screen_name + '\',' + rt_status.id + ');" title="点击添加评论">评</a>';
             crlBtn.rtReplyBtn = '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + rt_status.user.screen_name + '\',' + rt_status.id + ');" title="进行@回复">@</a>';
             crlBtn.rtAddFavoritesMsgBtn = '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'' + rt_status.user.screen_name + '\',' + rt_status.id + ');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>';
+        }
+        // 不支持评论
+        if(!support_comment) {
+        	crlBtn.commentBtn = crlBtn.commentCounts = '';
         }
 
         switch(t){

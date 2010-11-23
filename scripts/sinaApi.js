@@ -9,6 +9,9 @@ var domain_sina = 'http://t.sina.com.cn';
 var api_domain_sina = 'http://api.t.sina.com.cn';
 
 var sinaApi = {
+	support_comment: true, // 判断是否支持评论
+	support_upload: true, // 是否支持上传图片
+	
 	config: {
 		host: 'http://api.t.sina.com.cn',
 		result_format: '.json',
@@ -738,6 +741,7 @@ $.extend(TSohuAPI, {
 var DiguAPI = $.extend({}, sinaApi);
 
 $.extend(DiguAPI, {
+	support_comment: false,
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.minicloud.com.cn',
@@ -888,15 +892,19 @@ $.extend(DiguAPI, {
 						name: data.in_reply_to_user_name
 					}
 				};
+				// 查看相关对话的url
+				data.related_dialogue_url = 'http://digu.com/relatedDialogue/' + data.id;
 				this.format_result_item(data.retweeted_status.user, 'user', args);
 			}
 			this.format_result_item(data.user, 'user', args);
 		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = data.url || ('http://digu.com/' + (data.name || data.id));
 			// 将小头像从 _24x24 => _48x48
-			data.profile_image_url = data.profile_image_url.replace(/([\/_])24x24/, function(m, $1) {
-				return $1 + '48x48';
-			});
+			if(data.profile_image_url) {
+				data.profile_image_url = data.profile_image_url.replace(/([\/_])24x24/, function(m, $1) {
+					return $1 + '48x48';
+				});
+			}
 		} else if(play_load == 'comment') {
 			this.format_result_item(data.user, 'user', args);
 		} else if(play_load == 'message') {
@@ -912,6 +920,7 @@ $.extend(DiguAPI, {
 var ZuosaAPI = $.extend({}, sinaApi);
 
 $.extend(ZuosaAPI, {
+	support_comment: false,
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.zuosa.com',
@@ -1021,6 +1030,8 @@ $.extend(ZuosaAPI, {
 						name: data.in_reply_to_screen_name
 					}
 				};
+				// 查看相关对话的url
+				data.related_dialogue_url = 'http://zuosa.com/Status/' + data.id;
 				this.format_result_item(data.retweeted_status.user, 'user', args);
 			}
 			this.format_result_item(data.user, 'user', args);
@@ -1055,6 +1066,14 @@ var tapi = {
     // 自动判断当前用户所使用的api, 根据user.blogType判断
     api_dispatch: function(data) {
 		return T_APIS[(data.user ? data.user.blogType : data.blogType) || 'tsina'];
+	},
+	
+	support_comment: function(user) {
+		return this.api_dispatch(user).support_comment;
+	},
+	
+	support_upload: function(user) {
+		return this.api_dispatch(user).support_upload;
 	},
 	
 	verify_credentials: function(user, callbackFn, data){
