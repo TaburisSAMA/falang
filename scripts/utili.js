@@ -43,13 +43,13 @@ var TP_LOOKING_KEY = 'idi_TP_LOOKING_KEY'; //我正在看的模板key
 var QUICK_SEND_HOT_KEY_KEY = 'idi_QUICK_SEND_HOT_KEY_KEY'; //快速发送热键key
 
 //['friends_timeline','mentions','comments_timeline','comments_by_me','direct_messages','favorites']
-//timeline的分类列表
+//需要不停检查更新的timeline的分类列表
 var T_LIST = {
-	'all': ['friends_timeline','mentions','comments_timeline','direct_messages', 'friends', 'followers', 'user_timeline'],
-	'tsina': ['friends_timeline','mentions','comments_timeline','direct_messages', 'friends', 'followers', 'user_timeline'],
-	'tsohu': ['friends_timeline','mentions','comments_timeline','direct_messages', 'friends', 'followers', 'user_timeline'],
-	'digu': ['friends_timeline','mentions','comments_timeline', 'direct_messages', 'friends', 'followers', 'user_timeline'],
-	'zuosa': ['friends_timeline','mentions','comments_timeline', 'direct_messages', 'friends', 'followers', 'user_timeline']
+	'all': ['friends_timeline','mentions','comments_timeline','direct_messages'],
+	'tsina': ['friends_timeline','mentions','comments_timeline','direct_messages'],
+	'tsohu': ['friends_timeline','mentions','comments_timeline','direct_messages'],
+	'digu': ['friends_timeline','mentions', 'direct_messages'],
+	'zuosa': ['friends_timeline','mentions','comments_timeline', 'direct_messages']
 }; 
 
 var T_NAMES = {
