@@ -6,7 +6,33 @@ a:hover { text-decoration:underline;}
 .nowrap{word-break:keep-all;white-space:nowrap;}
 .green{color:green;}
 ul { list-style:none;} 
-li { line-height:16px;} 
+li { line-height:16px;}
+/* 滚动条 */
+::-webkit-scrollbar{
+    width:11px;
+    height:30px;
+    background-color:#fff;
+}
+::-webkit-scrollbar:hover{
+    background-color:#eee;
+}
+::-webkit-resizer{
+    -webkit-border-radius:4px;
+    background-color:#666;
+}
+::-webkit-scrollbar-thumb{
+    min-height:30px;
+    min-width:11px;
+    -webkit-border-radius:4px;
+    background-color: #ddd;
+}
+::-webkit-scrollbar-thumb:hover{
+    background-color: #bbb;
+}
+::-webkit-scrollbar-thumb:active{
+    background-color:#888;
+}
+/* 滚动条 END */
 .warp { width:480px; position:relative; /*border:1px solid #ace; padding-bottom:10px;*/} 
 .list_warp { margin:0; height: 470px; overflow:auto;} 
 .tabs { overflow:hidden; background:#f1f7fc;height:24px;}
@@ -67,9 +93,9 @@ div.mainContent{word-wrap: break-word;}
 	border-left: 1px solid #CCC;
 	cursor: pointer;
 	display: none;
-	padding: 2px 3px;
+	padding: 2px 14px 2px 3px;
 	position: absolute;
-	right: 15px;
+	right: 0px;
 	text-align: center;
 	top: 24px;
 	z-index: 999;
