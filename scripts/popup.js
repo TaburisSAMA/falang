@@ -24,6 +24,17 @@ function initOnLoad(){
     setTimeout(init, 100); //为了打开的时候不会感觉太卡
 };
 
+// 方便根据不同用户获取缓存数据的方法
+function get_current_user_cache(cache) {
+	var c_user = getUser();
+	var _cache = cache[c_user.uniqueKey];
+	if(!_cache) {
+		_cache = {};
+		cache[c_user.uniqueKey] = _cache;
+	}
+	return _cache;
+};
+
 function init(){
     var c_user = getUser();
     if(!c_user){
@@ -354,10 +365,9 @@ function changeUser(uniqueKey){
         return;
     }
     friendsTimeline_offset = replys_offset = messages_offset = PAGE_SIZE;//复位分页
-    NEXT_CURSOR = {};
     var userList = getUserList();
     var to_user = null;
-    for(i in userList){
+    for(var i in userList){
         var user = userList[i];
         if(user.uniqueKey.toLowerCase() == uniqueKey.toLowerCase()){
             to_user = user;
@@ -365,22 +375,38 @@ function changeUser(uniqueKey){
         }
     }
     if(to_user){
-        for(i in T_LIST.all){
+    	// 获取当前的tab
+    	var cur_t = $("#tl_tabs li.active").attr('href').replace(/_timeline$/, '').substring(1);
+    	$("#" + cur_t + '_timeline .readMore').hide();
+        $("#" + cur_t + '_timeline .list').html('');
+        
+        for(var i in T_LIST.all){
             $("#" + T_LIST.all[i] + '_timeline .readMore').hide();
             $("#" + T_LIST.all[i] + '_timeline .list').html('');
         }
         $("#tl_tabs .unreadCount").html('');
         $("#changeUser .userName").html(to_user.screen_name);
         $("#changeUser .userImg").attr('src', to_user.profile_image_url || '');
-        $("#changeUser .user_home").attr('href', "http://t.sina.com.cn/" + (to_user.domain || to_user.id));
+        $("#changeUser .user_home").attr('href', to_user.t_url);
         $("#accountListDock").find('.current').removeClass('current')
             .end().find('.'+to_user.uniqueKey).addClass('current');
         setUser(to_user);
         var b_view = getBackgroundView();
         b_view.onChangeUser();
         addUnreadCountToTabs();
-        for(i in T_LIST[to_user.blogType]){
+        for(var i in T_LIST[to_user.blogType]){
             getSinaTimeline(T_LIST[to_user.blogType][i], true);
+            if(cur_t == T_LIST[to_user.blogType][i]) {
+            	cur_t = null; // 不用处理了
+            }
+        }
+        if(cur_t) { // 需要刷新一下数据
+        	if(cur_t == 'followers') {
+        		// 粉丝tab，直接执行onclick事件
+        		$('#fans_tab span.active').attr('onclick')();
+        	} else {
+        		getSinaTimeline(cur_t, true);
+        	}
         }
     }
 };
@@ -460,7 +486,8 @@ function f_destroy(user_id, ele){
 var SCROLL_TOP_CACHE = {};
 //@t : timeline类型
 function saveScrollTop(t){
-    SCROLL_TOP_CACHE[t] = $("#" + t + "_timeline .list_warp").scrollTop();
+	var _cache = get_current_user_cache(SCROLL_TOP_CACHE);
+    _cache[t] = $("#" + t + "_timeline .list_warp").scrollTop();
 };
 
 //复位到上次的位置
@@ -469,7 +496,8 @@ function resetScrollTop(t){
     if(t == 'user_timeline'){
         $("#" + t + "_timeline .list_warp").scrollTop(0);
     }else{
-        $("#" + t + "_timeline .list_warp").scrollTop(SCROLL_TOP_CACHE[t]);
+    	var _cache = get_current_user_cache(SCROLL_TOP_CACHE);
+        $("#" + t + "_timeline .list_warp").scrollTop(_cache[t] || 0);
     }
 };
 //====>>>>>>>>>>>>>>>>>>>>>>
@@ -481,38 +509,44 @@ var NEXT_CURSOR = {};
 var FANS_HTML_CACHE = {};
 //获取用户的粉丝列表
 function getFansList(t, cursor){
+	var c_user = getUser();
+    if(!c_user){
+        return;
+    }
     var list = $("#followers_timeline .list");
     var old_t = $("#fans_tab .active").attr('t');
-    FANS_HTML_CACHE[old_t] = list.html();
+    // 各微博自己cache
+    var html_cache = get_current_user_cache(FANS_HTML_CACHE);
+    if(old_t != t) {
+    	html_cache[old_t] = list.html();
+    }
     if(!cursor){ //点击tab的时候，而不是分页获取
         if(!$("#fans_tab .tab_" + t).hasClass('active')){
             $("#fans_tab span").removeClass('active');
             $("#fans_tab .tab_" + t).addClass('active');
         }
-        if(FANS_HTML_CACHE[t]){ //如果已经获取过，直接显示。
-            list.html(FANS_HTML_CACHE[t]);
+        if(html_cache[t]){ //如果已经获取过，直接显示。
+            list.html(html_cache[t]);
             return;
         }else{
             list.html('');
         }
     }
     cursor = cursor || -1;
-    var c_user = getUser();
-    if(!c_user){
-        return;
-    }
     showLoading();
     hideReadMore(t);
     var params = {user_id:c_user.id, cursor:cursor, user:c_user};
     tapi[t](params, function(users, textStatus, statuCode){
         if(textStatus != 'error' && users && !users.error){
-        	NEXT_CURSOR[t] = users.next_cursor;
+        	var cursor_cache = get_current_user_cache(NEXT_CURSOR);
+        	cursor_cache[t] = users.next_cursor;
             users = users.users;
             var html = '';
             for(i in users){
                 html += bildMsgLi(users[i], t); //TODO: 待优化
             }
             list.append(html);
+            html_cache[t] = list.html();
             if(users.length >=20){
                 showReadMore(t);
             }else{
@@ -579,7 +613,7 @@ function getSinaTimeline(t, notCheckNew){
         var tweets = tweetsAll.slice(0, PAGE_SIZE);
         var html = '';
         var ids = [];
-        for(i in tweets){
+        for(var i in tweets){
             html += bildMsgLi(tweets[i], t); //TODO: 待优化
             ids.push(tweets[i].id);
             if(tweets[i].retweeted_status){
@@ -606,8 +640,9 @@ function getSinaTimeline(t, notCheckNew){
         }
     }else if(!notCheckNew){
         b_view.checkTimeline(t);
+    } else { // 关闭动画
+    	hideLoading();
     }
-    //hideLoading();
 };
 //<<<<<<<<<<<<<<<<<<<<<<<========
 
@@ -776,7 +811,8 @@ function setScrollTotop(){
 
 function readMoreFans(){
     var t = $("#fans_tab .active").attr('t');
-    var cursor = NEXT_CURSOR[t];
+    var _cache = get_current_user_cache(NEXT_CURSOR);
+    var cursor = _cache[t];
     getFansList(t, cursor);
 };
 

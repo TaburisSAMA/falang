@@ -761,6 +761,7 @@ $.extend(DiguAPI, {
 	},
 	
 	comments_timeline: function(data, callback) {
+		callback();
 	},
 	
 	verify_credentials: function(user, callbackFn, data){
@@ -923,6 +924,7 @@ $.extend(ZuosaAPI, {
 	},
 	
 	comments_timeline: function(data, callback) {
+		callback();
 	},
 	
 	counts: function(data, callback) {
