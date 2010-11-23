@@ -890,11 +890,15 @@ $.extend(DiguAPI, {
 				};
 				this.format_result_item(data.retweeted_status.user, 'user', args);
 			}
-			this.format_result_item(data.user, 'user', args)
+			this.format_result_item(data.user, 'user', args);
 		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = data.url || ('http://digu.com/' + (data.name || data.id));
+			// 将小头像从 _24x24 => _48x48
+			data.profile_image_url = data.profile_image_url.replace(/([\/_])24x24/, function(m, $1) {
+				return $1 + '48x48';
+			});
 		} else if(play_load == 'comment') {
-			this.format_result_item(data.user, 'user', args)
+			this.format_result_item(data.user, 'user', args);
 		} else if(play_load == 'message') {
 			this.format_result_item(data.sender, 'user', args);
 			this.format_result_item(data.recipient, 'user', args);
@@ -1019,7 +1023,7 @@ $.extend(ZuosaAPI, {
 				};
 				this.format_result_item(data.retweeted_status.user, 'user', args);
 			}
-			this.format_result_item(data.user, 'user', args)
+			this.format_result_item(data.user, 'user', args);
 		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = 'http://zuosa.com/' + (data.screen_name || data.name);
 			if(data.profile_image_url) {

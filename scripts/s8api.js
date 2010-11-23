@@ -35,7 +35,7 @@ var multshorten_default = { //缩短多个URL API的默认参数
     longurls: '',
     source: SOURCE,
     format: 'json'
-}
+};
 
 s8Api.multshorten = function(params){
     var opts = $.extend(multshorten_default, params);

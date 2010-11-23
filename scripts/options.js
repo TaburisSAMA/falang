@@ -149,7 +149,7 @@ function initJtip(){
         $("#JT_close_left").html(_t.attr('jTitle')||'　');
         $("#JT_copy").html(_t.find('.c').html());
         var jWidth = _t.attr('jWidth') || '';
-        $("#JT").css({top:offset.top-5, left:offset.left + 25, width:jWidth}).css({visibility:'visible', opacity:'0.98'})
+        $("#JT").css({top:offset.top-5, left:offset.left + 25, width:jWidth}).css({visibility:'visible', opacity:'0.98'});
     }, function(){
         $("#JT").css({opacity:0, visibility:'hidden'});
     });

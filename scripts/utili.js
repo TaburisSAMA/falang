@@ -569,8 +569,9 @@ String.prototype.format = function(data) {
 // HTML 编码
 function HTMLEnCode(str){
     if(!str){ return ''; }
-    str = str.replace(/</ig, '&lt;');
-    str = str.replace(/>/ig, '&gt;');
+    str = str.replace(/</ig, '&lt;').replace(/>/ig, '&gt;');
+//    str = str.replace(/\&lt;br\s*\/?\&gt;/ig, '<br />');
+    // 支持<br/>
     return str;
 };
 
