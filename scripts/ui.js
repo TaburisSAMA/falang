@@ -300,7 +300,8 @@ function buildComment(comment){
 }
 
 function getUserCountsInfo(user){
-    var tp = '关注：' + user.friends_count + '个\r\n'
+	if(user.statuses_count == undefined) return '';
+    tp = '关注：' + user.friends_count + '个\r\n'
            + '粉丝：' + user.followers_count + '个\r\n'
            + '微博：' + user.statuses_count + '条';
     return tp;

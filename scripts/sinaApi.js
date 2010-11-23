@@ -1040,6 +1040,16 @@ $.extend(ZuosaAPI, {
 			if(data.profile_image_url) {
 				data.profile_image_url = data.profile_image_url.replace('/normal/', '/middle/');
 			}
+			if(data.homeprovince) {
+				log(data.city);
+				data.province = data.homeprovince;
+				delete data.homeprovince;
+			} else if(data.location) {
+				var province_city = data.location.split('.');
+				data.province = province_city[0];
+				data.city = province_city[1];
+				log(data);
+			}
 		} 
 		else if(play_load == 'comment') {
 			this.format_result_item(data.user, 'user', args);
