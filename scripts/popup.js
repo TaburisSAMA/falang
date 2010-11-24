@@ -17,6 +17,7 @@ function setTimelineOffset(t, offset){
 function resetTimelineOffset(t){
     timeline_offset[t] = PAGE_SIZE;
 }
+//TODO: 检查分页复位情况，貌似不对！
 //var friendsTimeline_offset = replys_offset = messages_offset = PAGE_SIZE;
 
 function initOnLoad(){
@@ -155,6 +156,7 @@ function initTxtContentEven(){
         //}
     });
 
+    /*
     $("#txtContent").blur(function(){
         var c = $.trim($(this).val());
         if(!c){
@@ -169,6 +171,7 @@ function initTxtContentEven(){
         showMsgInput();
         countInputText();
     });
+    */
 
     $("#txtContent").keydown(function(event){
         var c = $.trim($(this).val());
@@ -257,7 +260,7 @@ function countReplyText(){
 }
 
 function cleanTxtContent(){
-    $("#txtContent").val('');
+    $("#txtContent").val('').focus();
     countInputText();
 }
 
@@ -275,16 +278,13 @@ function initIamDoing(){
                         }
                         $("#txtContent").val( formatText(getLookingTemplate(), {title:(title||''), url:loc_url}) );
                         showMsgInput();
-                        countInputText();
                     },function(xhr, textStatus, errorThrown){
                         $("#txtContent").val( formatText(getLookingTemplate(), {title:(title||''), url:loc_url}) );
                         showMsgInput();
-                        countInputText();
                     });
                 }else{
                     $("#txtContent").val( formatText(getLookingTemplate(), {title:(title||''), url:loc_url}) );
                     showMsgInput();
-                    countInputText();
                 }
             }else{
                 showMsg('当前页面的URL不正确。');
@@ -1054,21 +1054,31 @@ function callCheckNewMsg(){
 }
 
 function showMsgInput(){
-    var h = WH[1] - 40 - 87;
+    var h = WH[1] - 41 - 103;
     $(".list_warp").css('height', h);
-    $("#doing").removeClass("doing").appendTo('#doingWarp');
-    $("#txtContent").show().attr('rows', 5).removeClass('padDoing');
-    $("#submitWarp").show();
+    $("#submitWarp").data('status', 'show').css('height', 103);
+    var _txt = $("#txtContent").val();
+    $("#txtContent").focus().val('').val(_txt); //光标在最后面
+    countInputText();
+    $("#header .write").addClass('active');
 };
 
 function hideMsgInput(){
     fawave.face.hide();
-    var v = $("#txtContent").val() || '     点此输入您要分享的内容';
-    $("#submitWarp").hide();
-    $("#txtContent").attr('rows', 1).val(v).addClass('padDoing');
-    var h = WH[1] - 40;
+    var h = WH[1] - 41;
     $(".list_warp").css('height', h);
-    $("#doing").addClass("doing").appendTo('body');
+    $("#submitWarp").data('status', 'hide').css('height', 0);
+    $("#header .write").removeClass('active');
+};
+
+function toogleMsgInput(ele){
+    if($("#submitWarp").data('status') != 'show'){
+        showMsgInput();
+        $(ele).find('b').addClass('up');
+    }else{
+        hideMsgInput();
+        $(ele).find('b').removeClass('up');
+    }
 };
 
 function hideReplyInput(){
@@ -1179,8 +1189,6 @@ function doRT(ele){//RT
     var _msg_user = data.user || data.sender;
     t.val('转: ' + '@' + _msg_user.screen_name + ' ' + data.text);
     showMsgInput();
-
-    countInputText();
 };
 
 function doDelTweet(tweetId, ele){//删除自己的微博

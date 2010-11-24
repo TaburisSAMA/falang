@@ -31,16 +31,13 @@
  </head>
 
  <body onload="initOnLoad();">
-	<div><textarea id="txtContent" style="display:none;width:100%;" rows="5" class="padDoing" >     点此输入您要分享的内容</textarea>
-		<a href="javascript:void(0);" id="doing" class="doing" title="分享你正在看的网页" ><img src="images/bc.gif" /></a>
-	</div>
-	<div id="submitWarp" style="display:none;">
-		<input id="btnSend" type="button" value="发微!" title="ctrl+enter" class="btn" />&nbsp;
+	<div id="submitWarp">
+		<textarea id="txtContent" ></textarea>
+		<input id="btnSend" type="button" value="发微!" title="ctrl + enter 发送" class="btn send" />&nbsp;
 		<a href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');" title="点击添加表情"><img src="images/face.gif" />表情</a>&nbsp;
 		<a href="javascript:void(0);" onclick="openUploadImage();" title="点击上传图片"><img src="images/image.gif" />图片</a>&nbsp;
 		<input type="button" value="清空" onclick="cleanTxtContent();" class="btn"/>&nbsp;
-		<input type="button" value="↑↑收起↑↑" onclick="hideMsgInput();" class="btn"/>&nbsp;
-		<span id="doingWarp"></span>
+		<span id="doingWarp"><a href="javascript:void(0);" id="doing" title="分享你正在看的网页" ><img src="images/bc.gif" /></a></span>
 		<span id="wordCount">140</span>
 	</div>
 	<div id="header">
@@ -50,7 +47,7 @@
 			<span class="info">
 				<span class="name"></span>
 			</span>
-			<span class="write" onclick="showMsgInput()">写微博</span>
+			<a href="javascript:" class="write" onclick="toogleMsgInput(this)">写微博<b></b></a>
 		</div>
 		<ul id="tl_tabs" class="tabs">
 			<li class="tab-friends_timeline active" href="#friends_timeline_timeline">首页<span class="unreadCount"></span></li>
