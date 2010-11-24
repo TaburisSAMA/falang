@@ -144,34 +144,12 @@ function initTxtContentEven(){
     var unsendTweet = localStorage.getObject(UNSEND_TWEET_KEY);
     if(unsendTweet){
         $("#txtContent").val(unsendTweet);
-        //showMsgInput();
-        //countInputText();
     }
 
     $("#txtContent").keyup(function(){
         var c = $(this).val();
         countInputText();
-        //if(c){
-        //    showMsgInput();
-        //}
     });
-
-    /*
-    $("#txtContent").blur(function(){
-        var c = $.trim($(this).val());
-        if(!c){
-            //hideMsgInput();
-        }
-    });
-
-    $("#txtContent").focus(function(){
-        if($(this).val()=='     点此输入您要分享的内容'){
-            $(this).val('');
-        }
-        showMsgInput();
-        countInputText();
-    });
-    */
 
     $("#txtContent").keydown(function(event){
         var c = $.trim($(this).val());
@@ -246,6 +224,11 @@ function countInputText() {
     var c = $("#txtContent").val();
     var len = 140 - c.len();
     $("#wordCount").html(len);
+    if(len == 140){
+        $("#btnSend").attr('disabled', 'disabled');
+    }else{
+        $("#btnSend").removeAttr('disabled');
+    }
 }
 
 function countReplyText(){
@@ -298,9 +281,9 @@ function initChangeUserList(){
     var c_user = getUser();
     if(c_user){
         showHeaderUserInfo(c_user);
-        var userList = getUserList();
-        //$('#tl_tabs').append(formatText(t_changeUser, c_user));
 
+        var userList = getUserList();
+        if(userList.length < 2){ return; } //多个用户才显示
         //底部Dock
         var u_tp = '<li class="{{uniqueKey}} {{current}}">' +
                        '<span class="username">{{screen_name}}</span>' +
@@ -381,6 +364,45 @@ function changeUser(uniqueKey){
         }
     }
 };
+
+function initSelectSendAccounts(){
+    var afs = $("#accountsForSend");
+    if(afs.data('inited')){
+        return;
+    }
+    var userList = getUserList();
+    if(userList.length < 2){ return; } //多个用户才显示
+    var li_tp = '<li class="{{sel}}" uniqueKey="{{uniqueKey}}" onclick="toggleSelectSendAccount(this)">' +
+                   
+                   '<img src="{{profile_image_url}}" />' +
+                   '{{screen_name}}' +
+                   '<img src="/images/blogs/{{blogType}}_16.png" class="blogType" />' +
+               '</li>';
+    var li = [];
+    var c_user = getUser();
+    for(i in userList){
+        user = userList[i];
+        if(user.uniqueKey == c_user.uniqueKey){
+            user.sel = 'sel';
+        }else{
+            user.sel = '';
+        }
+        li.push(li_tp.format(user));
+    }
+    afs.html('TO: ' + li.join(''));
+    afs.data('inited', 'true');
+};
+function toggleSelectSendAccount(ele){
+    var _t = $(ele);
+    if(_t.hasClass('sel')){
+        if($("#accountsForSend .sel").length > 1){
+            _t.removeClass('sel');
+        }
+    }else{
+        _t.addClass('sel');
+    }
+};
+// <<-- 多用户 END
 
 function addUnreadCountToTabs(){
     var ur = 0;
@@ -1054,9 +1076,11 @@ function callCheckNewMsg(){
 }
 
 function showMsgInput(){
-    var h = WH[1] - 41 - 103;
+    initSelectSendAccounts();
+    var h_submitWrap = $("#submitWarp .w").height();
+    var h = WH[1] - 41 - h_submitWrap;
     $(".list_warp").css('height', h);
-    $("#submitWarp").data('status', 'show').css('height', 103);
+    $("#submitWarp").data('status', 'show').css('height', h_submitWrap);
     var _txt = $("#txtContent").val();
     $("#txtContent").focus().val('').val(_txt); //光标在最后面
     countInputText();

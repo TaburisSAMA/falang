@@ -32,14 +32,19 @@
 
  <body onload="initOnLoad();">
 	<div id="submitWarp">
+	  <div class="w">
+		<ul id="accountsForSend"></ul>
 		<textarea id="txtContent" ></textarea>
-		<input id="btnSend" type="button" value="发微!" title="ctrl + enter 发送" class="btn send" />&nbsp;
-		<a href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');" title="点击添加表情"><img src="images/face.gif" />表情</a>&nbsp;
-		<a href="javascript:void(0);" onclick="openUploadImage();" title="点击上传图片"><img src="images/image.gif" />图片</a>&nbsp;
-		<input type="button" value="清空" onclick="cleanTxtContent();" class="btn"/>&nbsp;
-		<span id="doingWarp"><a href="javascript:void(0);" id="doing" title="分享你正在看的网页" ><img src="images/bc.gif" /></a></span>
-		<span id="wordCount">140</span>
-	</div>
+		<div class="ctr">
+			<input id="btnSend" type="button" value="发微!" title="ctrl + enter 发送" class="btn send" disabled="disabled" />&nbsp;
+			<a href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');" title="点击添加表情"><img src="images/face.gif" />表情</a>&nbsp;
+			<a href="javascript:void(0);" onclick="openUploadImage();" title="点击上传图片"><img src="images/image.gif" />图片</a>&nbsp;
+			<input type="button" value="清空" onclick="cleanTxtContent();" class="btn"/>&nbsp;
+			<span id="doingWarp"><a href="javascript:void(0);" id="doing" title="分享你正在看的网页" ><img src="images/bc.gif" /></a></span>
+			<span id="wordCount">140</span>
+		</div>
+	  </div>
+	</div><!-- submitWarp END -->
 	<div id="header">
 		<span id="loading"><img src="images/loader.gif" /></span>
 		<div class="user">

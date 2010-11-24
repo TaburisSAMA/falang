@@ -36,6 +36,7 @@ li { line-height:16px;}
 	border-bottom:solid 1px #fff;
 	-webkit-transition: height .6s ease;
 }
+#submitWarp .ctr{margin-top:2px;}
 #wordCount{float:right;font-size:13px;font-weight: bold;}
 #header{
 	position: relative;
@@ -115,6 +116,43 @@ li { line-height:16px;}
 }
 /* 头部 END */
 
+/* 用户发送列表选择 */
+#accountsForSend { }
+#accountsForSend li{
+	cursor:pointer;
+	padding:2px;
+	margin: 2px 3px 2px 0;
+	display:inline-block;
+	border: 1px solid #ccc;
+	border-radius:3px;
+	
+	background: #eee;
+	opacity: 0.5;
+}
+#accountsForSend li:hover{
+	background: #DDE1E8;
+	border-color:#B2B9C7;
+}
+#accountsForSend li.sel{
+	background: #5CC04F;
+	color: #fff;
+	border-color:#538312;
+	opacity: 1;
+	-webkit-box-shadow: rgba(0, 0, 0, 0.5) 1px 1px 2px;
+}
+#accountsForSend li img{
+	margin: 0 1px;
+	width:16px;
+	height:16px;
+	vertical-align:top;
+}
+#accountsForSend li img.blogType{
+	width:13px;
+	height:13px;
+	vertical-align:bottom;
+}
+/* 用户发送列表选择 END */
+
 .warp { width:480px; position:relative; /*border:1px solid #ace; padding-bottom:10px;*/} 
 .list_warp { margin:0; height: 470px; overflow:auto; -webkit-transition: height .6s ease;} 
 /*
@@ -169,6 +207,13 @@ li { line-height:16px;}
 }
 .btn:hover{
 	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(white), to(#EDEDED));
+}
+.btn:disabled {
+	-webkit-box-shadow: none;
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(whiteSmoke), to(white));
+	color: #BBB;
+	cursor: default;
+	opacity: 0.6;
 }
 .btn.send{ font-weight:bold; padding: 2px 8px;}
 
