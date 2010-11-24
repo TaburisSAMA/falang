@@ -1134,14 +1134,20 @@ function doReply(ele, userName, tweetId){//@回复
     @reTweetId: 转发的微薄id
 */
 function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
+	var user = getUser();
+    var config = tapi.get_config(user);
     $('#actionType').val('repost');
     $('#repostTweetId').val(tweetId);
     $('#replyUserName').val(userName);
     $('#ye_dialog_title').html('转发@' + userName + ' 的信息');
-
-    $('#chk_sendOneMore').attr("checked", false).val(tweetId).show();
-    $('#txt_sendOneMore').text('同时给 @' + userName + ' 评论').show();
-    if(rtUserName && reTweetId){
+    if(config.support_comment) {
+    	$('#chk_sendOneMore').attr("checked", false).val(tweetId).show();
+        $('#txt_sendOneMore').text('同时给 @' + userName + ' 评论').show();
+    } else { // 不支持repost，则屏蔽
+    	$('#chk_sendOneMore').attr("checked", false).val(tweetId).hide();
+        $('#txt_sendOneMore').text('').hide();
+    }
+    if(config.support_comment && rtUserName && reTweetId){
         $('#chk_sendOneMore2').attr("checked", false).val(reTweetId).show();
         $('#txt_sendOneMore2').text('同时给 @' + rtUserName + ' 评论').show();
     }else{
@@ -1158,8 +1164,6 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
         d = null;
     }
     var v = '';
-    var user = getUser();
-    var config = tapi.get_config(user);
     var t = $('#replyTextarea');
     t.focus().val('').blur();
     // 判断是否支持转载，不支持，则自己拼接一个

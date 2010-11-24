@@ -164,6 +164,10 @@ function bildMsgLi(sinaMsg, t){
         if(!support_favorites) {
         	crlBtn.addFavoritesMsgBtn = crlBtn.delFavoritesMsgBtn = '';
         }
+        // 不支持repost
+        if(!config.support_repost) {
+        	crlBtn.repostCounts = crlBtn.rtRepostCounts = '';
+        }
 
         switch(t){
             case 'friends_timeline':
