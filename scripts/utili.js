@@ -56,7 +56,9 @@ var T_NAMES = {
 	'tsina': '新浪微博',
 	'tsohu': '搜狐微博',
 	'digu': '嘀咕',
-	'zuosa': '做啥'
+	'zuosa': '做啥',
+	'follow5': 'Follow5',
+	'leihou': '雷猴'
 };
 
 

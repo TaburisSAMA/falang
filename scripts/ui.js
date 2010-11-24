@@ -125,7 +125,9 @@ function bildMsgLi(sinaMsg, t){
         if(c_user.id == user.id){
             sinaMsg.myTweet = true;
         }
-     	var support_comment = tapi.support_comment(c_user);
+     	var config = tapi.get_config(c_user);
+     	var support_comment = config.support_comment;
+     	var support_favorites = config.support_favorites;
         var crlBtn = {
                 delTweetBtn: '<a class="deltweet" href="javascript:void(0);" onclick="doDelTweet(' + sinaMsg.id + ', this);" title="点击删除微博">删</a>',
                 replyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');" title="进行@回复">@</a>',
@@ -157,6 +159,10 @@ function bildMsgLi(sinaMsg, t){
         // 不支持评论
         if(!support_comment) {
         	crlBtn.commentBtn = crlBtn.commentCounts = '';
+        }
+        // 不支持收藏
+        if(!support_favorites) {
+        	crlBtn.addFavoritesMsgBtn = crlBtn.delFavoritesMsgBtn = '';
         }
 
         switch(t){

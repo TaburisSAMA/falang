@@ -9,14 +9,20 @@ var domain_sina = 'http://t.sina.com.cn';
 var api_domain_sina = 'http://api.t.sina.com.cn';
 
 var sinaApi = {
-	support_comment: true, // 判断是否支持评论
-	support_upload: true, // 是否支持上传图片
 	
 	config: {
 		host: 'http://api.t.sina.com.cn',
 		result_format: '.json',
 		source: '3538199806',
         source2: '2721776383', // other key
+        
+        support_comment: true, // 判断是否支持评论
+		support_upload: true, // 是否支持上传图片
+		support_favorites: true,
+		// 是否支持max_id 分页
+		support_max_id: true,
+		// 转发是否需要@user
+		repost_need_at: false,
         
 		// api
         public_timeline:      '/statuses/public_timeline',
@@ -741,12 +747,14 @@ $.extend(TSohuAPI, {
 var DiguAPI = $.extend({}, sinaApi);
 
 $.extend(DiguAPI, {
-	support_comment: false,
+	
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.minicloud.com.cn',
 		source: 'fawave', 
 	    source2: 'fawave',
+	    
+	    support_comment: false,
 	    
 	    verify_credentials:   '/account/verify',
 	    
@@ -762,6 +770,7 @@ $.extend(DiguAPI, {
 	}),
 	
 	counts: function(data, callback) {
+		callback();
 	},
 	
 	comments_timeline: function(data, callback) {
@@ -920,12 +929,15 @@ $.extend(DiguAPI, {
 var ZuosaAPI = $.extend({}, sinaApi);
 
 $.extend(ZuosaAPI, {
-	support_comment: false,
+	
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.zuosa.com',
 		source: 'fawave', 
 	    source2: 'fawave',
+	    
+	    support_comment: false,
+	    
 	    upload: '/statuses/update',
 	    repost: '/statuses/update',
 	    comment: '/statuses/update'
@@ -941,7 +953,7 @@ $.extend(ZuosaAPI, {
 	},
 	
 	counts: function(data, callback) {
-	
+		callback();
 	},
 	
 	// {"authorized":True}，需要再调用 users/show获取用户信息
@@ -1060,11 +1072,244 @@ $.extend(ZuosaAPI, {
 	}
 });
 
+// 雷猴api
+var LeiHouAPI = $.extend({}, sinaApi);
+
+$.extend(LeiHouAPI, {
+	
+	// 覆盖不同的参数
+	config: $.extend({}, sinaApi.config, {
+		host: 'http://leihou.com',
+		source: 'fawave', 
+	    source2: 'fawave',
+	    
+	    support_comment: false,
+		repost_need_at: true,
+		support_favorites: false,
+	
+	    upload: '/statuses/update',
+	    repost: '/statuses/update',
+	    comment: '/statuses/update'
+	}),
+	
+	// 无需urlencode
+	url_encode: function(text) {
+		return text;
+	},
+	
+	comments_timeline: function(data, callback) {
+		callback();
+	},
+	
+	counts: function(data, callback) {
+		callback();
+	},
+	
+	before_sendRequest: function(args) {
+		if(args.url == this.config.friends || args.url == this.config.followers) {
+			// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
+			// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
+			args.data.page = args.data.cursor == -1 ? 1 : args.data.cursor;
+			delete args.data.cursor;
+			if(!args.data.page) {
+				args.data.page = 1;
+			}
+		} else if(args.url == this.config.repost) {
+			// id => in_reply_to_status_id
+			if(args.data.id) {
+				args.data.in_reply_to_status_id = args.data.id;
+				delete args.data.id;
+			}
+		} 
+    },
+	
+	format_result: function(data, play_load, args) {
+		if($.isArray(data)) {
+	    	for(var i in data) {
+	    		data[i] = this.format_result_item(data[i], play_load);
+	    	}
+	    } else {
+	    	data = this.format_result_item(data, play_load);
+	    }
+		// 若是follwers api，则需要封装成cursor接口
+		// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
+		// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
+		if(args.url == this.config.followers || args.url == this.config.friends) {
+			data = {users: data, next_cursor: args.data.page + 1, previous_cursor: args.data.page};
+			if(data.users.length == 0) {
+				data.next_cursor = 0;
+			}
+		}
+		return data;
+	},
+	
+	format_result_item: function(data, play_load, args) {
+		if(play_load == 'status' && data.id) {
+			// 'text': u'http://pic.leihou.com/428ed1 \u6d4b\u8bd523\u5e26\u56fe\u7247\u7684\u5fae\u535a\u4fe1\u606f',
+			var pic = /http:\/\/pic\.leihou\.com\/(\w+)/.exec(data.text);
+			if(pic && pic.length == 2) {
+				data.thumbnail_pic = 'http://pic.leihou.com/pic/' + pic[1] + '_medium.jpg';
+				data.bmiddle_pic = 'http://pic.leihou.com/pic/' + pic[1] + '_large.jpg';
+				data.original_pic = data.bmiddle_pic;
+			}
+			if(data.in_reply_to_status_id) {
+				data.retweeted_status = {
+					id: data.in_reply_to_status_id,
+					user: {
+						id: data.in_reply_to_user_id,
+						screen_name: data.in_reply_to_screen_name,
+						name: data.in_reply_to_screen_name
+					}
+				};
+				// 查看相关对话的url
+				data.related_dialogue_url = 'http://leihou.com/dialog/' + data.id;
+				this.format_result_item(data.retweeted_status.user, 'user', args);
+			}
+			this.format_result_item(data.user, 'user', args);
+		} else if(play_load == 'user' && data && data.id) {
+			data.t_url = 'http://leihou.com/' + (data.screen_name || data.id);
+			if(data.profile_image_url) {
+				// 'profile_image_url': u'http://a1.leihou.com/avatar/5c/0c/13879_0_m.png'
+				data.profile_image_url = data.profile_image_url.replace('_m.', '_s.');
+			}
+			if(data.location) {
+				var province_city = data.location.split('.');
+				data.province = province_city[0];
+				data.city = province_city[1] || province_city[0];
+			}
+		} 
+		else if(play_load == 'comment') {
+			this.format_result_item(data.user, 'user', args);
+		} else if(play_load == 'message') {
+			this.format_result_item(data.sender, 'user', args);
+			data.sender.id = data.sender.screen_name;
+			this.format_result_item(data.recipient, 'user', args);
+		}
+		return data;
+	}
+});
+
+// follow5 api: http://www.follow5.com/f5/jsp/other/api/api.jsp
+var Follow5API = $.extend({}, sinaApi);
+
+$.extend(Follow5API, {
+	
+	// 覆盖不同的参数
+	config: $.extend({}, sinaApi.config, {
+		host: 'http://api.follow5.com/api',
+		source: '34140E56A31887F770053C2AF6D7B2AC', // 需要申请
+	    source2: '34140E56A31887F770053C2AF6D7B2AC',
+	    
+	    repost_need_at: true,
+	    support_max_id: false,
+
+	    verify_credentials: '/users/verify_credentials',
+	    mentions: '/statuses/mentions_me',
+	    upload: '/statuses/update',
+	    repost: '/statuses/update'
+	}),
+	
+	// 无需urlencode
+	url_encode: function(text) {
+		return text;
+	},
+	
+//	comments_timeline: function(data, callback) {
+//		callback();
+//	},
+	
+	counts: function(data, callback) {
+		callback();
+	},
+	
+	before_sendRequest: function(args) {
+		// args.data.source => args.data.app_key
+		args.data.api_key = args.data.source;
+		delete args.data.source;
+		if(args.url == this.config.friends || args.url == this.config.followers) {
+			// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
+			// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
+			args.data.page = args.data.cursor == -1 ? 1 : args.data.cursor;
+			delete args.data.cursor;
+			if(!args.data.page) {
+				args.data.page = 1;
+			}
+		} 
+//		else if(args.url == this.config.repost) {
+//			// id => in_reply_to_status_id
+//			if(args.data.id) {
+//				args.data.in_reply_to_status_id = args.data.id;
+//				delete args.data.id;
+//			}
+//		} 
+    },
+	
+	format_result: function(data, play_load, args) {
+		if($.isArray(data)) {
+			if(data.length == 1 && data[0] == null) {
+				// [null]
+				data = [];
+			}
+	    	for(var i in data) {
+	    		data[i] = this.format_result_item(data[i], play_load);
+	    	}
+	    } else {
+	    	data = this.format_result_item(data, play_load);
+	    }
+		// 若是follwers api，则需要封装成cursor接口
+		// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
+		// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
+		if(args.url == this.config.followers || args.url == this.config.friends) {
+			data = {users: data, next_cursor: args.data.page + 1, previous_cursor: args.data.page};
+			if(data.users.length == 0) {
+				data.next_cursor = 0;
+			}
+		}
+		return data;
+	},
+	
+	format_result_item: function(data, play_load, args) {
+		if(play_load == 'status' && data.id) {
+			// 'image_address': u'http://pic2.follow5.com/imgs/note/2010/11/24/20/58/49/26101101124205849_l.jpg',
+			if(data.image_address) {
+				data.thumbnail_pic = data.image_address.replace('_l.', '_s.');
+				data.bmiddle_pic = data.image_address.replace('_l.', '_m.');
+				data.original_pic = data.image_address;
+				delete data.image_address;
+			}
+			this.format_result_item(data.user, 'user', args);
+		} else if(play_load == 'user' && data && data.id) {
+			data.t_url = data.url;
+			if(!data.screen_name) {
+				data.screen_name = data.name;
+			}
+			if(data.location) {
+				// 'location': u'440100', 44 广东 1广州
+				data.province = data.location.substring(0, 2);
+				if(data.province) {
+					data.province = parseInt(data.province).toString();
+					data.city = parseInt(data.location.substring(2, 4)).toString();
+				}
+			}
+		} 
+		else if(play_load == 'comment') {
+			this.format_result_item(data.user, 'user', args);
+		} else if(play_load == 'message') {
+			this.format_result_item(data.sender, 'user', args);
+			data.sender.id = data.sender.screen_name;
+			this.format_result_item(data.recipient, 'user', args);
+		}
+		return data;
+	}
+});
+
 var T_APIS = {
 	'tsina': sinaApi,
 	'tsohu': TSohuAPI,
 	'digu': DiguAPI,
-	'zuosa': ZuosaAPI
+	'zuosa': ZuosaAPI,
+	'leihou': LeiHouAPI,
+	'follow5': Follow5API
 };
 
 
@@ -1076,12 +1321,8 @@ var tapi = {
 		return T_APIS[(data.user ? data.user.blogType : data.blogType) || 'tsina'];
 	},
 	
-	support_comment: function(user) {
-		return this.api_dispatch(user).support_comment;
-	},
-	
-	support_upload: function(user) {
-		return this.api_dispatch(user).support_upload;
+	get_config: function(user) {
+		return this.api_dispatch(user).config;
 	},
 	
 	verify_credentials: function(user, callbackFn, data){

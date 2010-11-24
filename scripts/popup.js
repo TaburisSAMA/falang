@@ -1138,7 +1138,13 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
     if(reTweetId && d && d.retweeted_status){
         v = '//@' + userName + ':' + d.text;
     }else{
-        v = '转发微博.';
+    	var user = getUser();
+    	// 判断转发微博是否需要@username 
+    	if(tapi.get_config(user).repost_need_at) {
+    		v = '//@' + userName;
+    	} else {
+    		v = '转发微博.';
+    	}
     }
     var t = $('#replyTextarea');
     t.focus().val('').blur();
