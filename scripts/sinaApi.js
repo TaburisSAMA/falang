@@ -18,11 +18,11 @@ var sinaApi = {
         
         support_comment: true, // 判断是否支持评论
 		support_upload: true, // 是否支持上传图片
+		support_repost: true, // 是否支持转载
+		repost_pre: '', // 转发前缀
 		support_favorites: true,
 		// 是否支持max_id 分页
 		support_max_id: true,
-		// 转发是否需要@user
-		repost_need_at: false,
         
 		// api
         public_timeline:      '/statuses/public_timeline',
@@ -755,6 +755,8 @@ $.extend(DiguAPI, {
 	    source2: 'fawave',
 	    
 	    support_comment: false,
+	    support_repost: false,
+	    repost_pre: '转载: ',
 	    
 	    verify_credentials:   '/account/verify',
 	    
@@ -794,21 +796,16 @@ $.extend(DiguAPI, {
 	/* content[可选]：更新的Digu消息内容， 请确定必要时需要进行UrlEncode编码，另外，不超过140个中文或者英文字。
 	 */
 	before_sendRequest: function(args) {
-		if(args.url == this.config.update) { // repost, comment, reply
-			// id => reply_user_id[可选]：指明要回复的用户的id
+		if(args.url == this.config.update) { // repost, update, reply
 			// status => content
-			// comment => content
-			// id => digu_id
+			// sina_id => digu_id @回应 reply
 			if(args.data.status) {
 				args.data.content = args.data.status;
 				delete args.data.status;
-			} else if(args.data.comment) {
-				args.data.content = args.data.comment;
-				delete args.data.comment;
 			}
-			if(args.data.id) {
-				args.data.digu_id = args.data.id;
-				delete args.data.id;
+			if(args.data.sina_id) {
+				args.data.digu_id = args.data.sina_id;
+				delete args.data.sina_id;
 			}
 		} else if(args.url == this.config.friends || args.url == this.config.followers) {
 			// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
@@ -937,6 +934,8 @@ $.extend(ZuosaAPI, {
 	    source2: 'fawave',
 	    
 	    support_comment: false,
+	    support_repost: false,
+	    repost_pre: 'ZT:',
 	    
 	    upload: '/statuses/update',
 	    repost: '/statuses/update',
@@ -988,14 +987,14 @@ $.extend(ZuosaAPI, {
 			//data.count = data.count || 20;
 			delete args.data.user_id;
 		} else if(args.url == this.config.repost) {
-			// id => in_reply_to_status_id
-			if(args.data.id) {
-				args.data.in_reply_to_status_id = args.data.id;
+			// sina_id => in_reply_to_status_id
+			// id=> in_reply_to_status_id 转 ZT:
+			if(args.data.sina_id) {
+				args.data.in_reply_to_status_id = args.data.sina_id;
+				delete args.data.sina_id;
+			} else if(args.data.id) {
+//				args.data.in_reply_to_status_id = args.data.id;
 				delete args.data.id;
-			}
-			if(args.data.comment) {
-				args.data.status = args.data.comment;
-				delete args.data.comment;
 			}
 		} else if(args.url == this.config.new_message) {
 			// id => user
@@ -1043,7 +1042,7 @@ $.extend(ZuosaAPI, {
 					}
 				};
 				// 查看相关对话的url
-				data.related_dialogue_url = 'http://zuosa.com/Status/' + data.id;
+				data.related_dialogue_url = 'http://zuosa.com/reply?eid=' + data.in_reply_to_status_id;
 				this.format_result_item(data.retweeted_status.user, 'user', args);
 			}
 			this.format_result_item(data.user, 'user', args);
@@ -1084,7 +1083,8 @@ $.extend(LeiHouAPI, {
 	    source2: 'fawave',
 	    
 	    support_comment: false,
-		repost_need_at: true,
+	    support_repost: false,
+	    
 		support_favorites: false,
 	
 	    upload: '/statuses/update',
@@ -1200,11 +1200,16 @@ $.extend(Follow5API, {
 		source: '34140E56A31887F770053C2AF6D7B2AC', // 需要申请
 	    source2: '34140E56A31887F770053C2AF6D7B2AC',
 	    
-	    repost_need_at: true,
 	    support_max_id: false,
 
 	    verify_credentials: '/users/verify_credentials',
+	    followers: '/users/followed',
+        friends: '/users/followers',
+        friendships_create: '/follow/create',
+        friendships_destroy: '/follow/destroy',
+        comments_timeline: '/statuses/replies_timeline',
 	    mentions: '/statuses/mentions_me',
+	    destroy: '/statuses/destroy',
 	    upload: '/statuses/update',
 	    repost: '/statuses/update'
 	}),

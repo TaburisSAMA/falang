@@ -199,16 +199,16 @@ function sendMsgByActionType(c){//c:要发送的内容
     if(c){
         var actionType = $('#actionType').val();
         switch(actionType){
-            case 'newmsg':
+            case 'newmsg': // 发
                 sendWhisper(c);
                 break;
-            case 'repost':
+            case 'repost': // 转
                 sendRepost(c);
                 break;
-            case 'comment':
+            case 'comment': // 评
                 sendComment(c);
                 break;
-            case 'reply':
+            case 'reply': // @
                 sendSinaMsg(c, true);
                 break;
             default:
@@ -937,7 +937,6 @@ function addPageMsgs(msgs, t){
     }
     hideLoading();
 };
-//<<<<<<<<<<<<<<<<====
 
 function sendSinaMsg(msg, isReply){
     var btn, txt, data;
@@ -947,7 +946,7 @@ function sendSinaMsg(msg, isReply){
         var userName = $("#ye_dialog_title").text();
         msg = userName + ' ' + msg;
         var tweetId = $("#replyTweetId").val();
-        data = {sina_id: tweetId};
+        data = {sina_id: tweetId}; // @回复
     }else{
         btn = $("#btnSend");
         txt = $("#txtContent");
@@ -1159,20 +1158,24 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
         d = null;
     }
     var v = '';
-    if(reTweetId && d && d.retweeted_status){
-        v = '//@' + userName + ':' + d.text;
-    }else{
-    	var user = getUser();
-    	// 判断转发微博是否需要@username 
-    	if(tapi.get_config(user).repost_need_at) {
-    		v = '//@' + userName;
-    	} else {
-    		v = '转发微博.';
-    	}
-    }
+    var user = getUser();
+    var config = tapi.get_config(user);
     var t = $('#replyTextarea');
     t.focus().val('').blur();
-    t.val(v).focus();
+    // 判断是否支持转载，不支持，则自己拼接一个
+    if(config.support_repost) {
+    	if(reTweetId && d && d.retweeted_status){
+            v = '//@' + userName + ':' + d.text;
+        } else {
+        	v = '转发微博.';
+        }
+    	// 光标在前
+    	t.val(v).focus();
+    } else { // 嘀咕不支持repost
+    	v = config.repost_pre + '@' + userName + ' ' + d.text;
+    	// 光标在后
+    	t.focus().val(v);
+    }
     if(v=='转发微博.'){t.select();}
     countReplyText();
 };
