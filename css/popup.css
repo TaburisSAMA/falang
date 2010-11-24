@@ -9,20 +9,15 @@ ul { list-style:none;}
 li { line-height:16px;}
 /* 滚动条 */
 ::-webkit-scrollbar{
-    width:11px;
+    width:10px;
     height:30px;
     background-color:#fff;
 }
 ::-webkit-scrollbar:hover{
     background-color:#eee;
 }
-::-webkit-resizer{
-    -webkit-border-radius:4px;
-    background-color:#666;
-}
+::-webkit-resizer{}
 ::-webkit-scrollbar-thumb{
-    min-height:30px;
-    min-width:11px;
     -webkit-border-radius:4px;
     background-color: #ddd;
 }
