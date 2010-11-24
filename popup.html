@@ -31,7 +31,7 @@
  </head>
 
  <body onload="initOnLoad();">
-	<div><textarea id="txtContent" style="width:100%;" rows="1" class="padDoing" >     点此输入您要分享的内容</textarea>
+	<div><textarea id="txtContent" style="display:none;width:100%;" rows="5" class="padDoing" >     点此输入您要分享的内容</textarea>
 		<a href="javascript:void(0);" id="doing" class="doing" title="分享你正在看的网页" ><img src="images/bc.gif" /></a>
 	</div>
 	<div id="submitWarp" style="display:none;">
@@ -43,8 +43,26 @@
 		<span id="doingWarp"></span>
 		<span id="wordCount">140</span>
 	</div>
-	
+	<div id="header">
+		<span id="loading"><img src="images/loader.gif" /></span>
+		<div class="user">
+			<a class="face" href="#"><img src="http://tp4.sinaimg.cn/1777767487/50/0/1" /></a>
+			<span class="info">
+				<span class="name"></span>
+			</span>
+			<span class="write" onclick="showMsgInput()">写微博</span>
+		</div>
+		<ul id="tl_tabs" class="tabs">
+			<li class="tab-friends_timeline active" href="#friends_timeline_timeline">首页<span class="unreadCount"></span></li>
+			<li class="tab-mentions" href="#mentions_timeline">@我<span class="unreadCount"></span></li>
+			<li class="tab-comments_timeline" href="#comments_timeline_timeline">评论<span class="unreadCount"></span></li>
+			<li class="tab-direct_messages" href="#direct_messages_timeline">私信<span class="unreadCount"></span></li>
+			<li class="tab-followers" href="#followers_timeline">粉丝<span class="unreadCount"></span></li>
+			<li class="tab-user_timeline" href="#user_timeline_timeline">微博<span class="unreadCount"></span></li>
+		</ul>
+	</div>
 	<div class="warp">
+	<!--
 	  <ul id="tl_tabs" class="tabs">
 		<li class="tab-friends_timeline active" href="#friends_timeline_timeline">首页<span class="unreadCount"></span></li>
 		<li class="tab-mentions" href="#mentions_timeline">@我<span class="unreadCount"></span></li>
@@ -55,6 +73,7 @@
 		<li class="shadow"></li>
 		<span id="loading"><img src="images/loader.gif" /></span>
 	  </ul>
+	-->
 	  <div id='friends_timeline_timeline' class="list_p">
 		<div class="list_warp">
 			<ul class="list"></ul>

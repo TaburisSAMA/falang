@@ -1,3 +1,4 @@
+/*
 .tabs{background-color:#fff; padding-left:2px; position:relative; margin-top:1px;}
 .tabs li{
 	border-top-right-radius:5px;
@@ -26,9 +27,10 @@
 	border-bottom-color:#CDD2E0; color:#2B477D; z-index:3;
 	background: -webkit-gradient(linear,left bottom,left top,from(#fff),to(#CDD2E0), color-stop(0.5,#fff));
 }
+*/
 
 #submitwarp {border-bottom: 1px solid #fff;}
-.unreadcount{color:yellow;}
+/* .unreadcount{color:yellow;} */
 
 div.usericon {
 	float:left; margin:2px 0 0 5px;

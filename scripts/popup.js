@@ -297,42 +297,9 @@ function initIamDoing(){
 function initChangeUserList(){
     var c_user = getUser();
     if(c_user){
+        showHeaderUserInfo(c_user);
         var userList = getUserList();
-        /*
-        var li = [];
-        for(i in userList){
-            user = userList[i];
-            if(user.uniqueKey != c_user.uniqueKey){
-                li.push('<li class="tab-none">' + user.screen_name + '</li>');
-            }else{
-                li.push('<li class="tab-none current">' + user.screen_name + '</li>');
-            }
-        }
-        if(li && li.length>1){
-            c_user.screen_name = c_user.screen_name;
-            c_user.user_list = li.join('');
-            c_user.domain = c_user.domain || c_user.id;
-            $('#tl_tabs').append(formatText(t_changeUser, c_user));
-            var tl_offset = $('#changeUser').offset();
-            $("#changeUserListWrap").appendTo('body').css({top:tl_offset.top+25});
-            $("#changeUser .userName").click(function(){
-                $("#changeUserListWrap").toggle();
-            });
-            $("#changeUserListWrap ul li").click(function(){
-                var li = $(this);
-                if(!li.hasClass('current')){
-                    changeUser(li.text());
-                    li.siblings().removeClass('current').end()
-                    .addClass('current');
-                }
-                $("#changeUserListWrap").toggle();
-            });
-        }else if(li){
-            c_user.user_list = li.join('');
-            $('#tl_tabs').append(formatText(t_changeUser, c_user));
-        }
-        */
-        $('#tl_tabs').append(formatText(t_changeUser, c_user));
+        //$('#tl_tabs').append(formatText(t_changeUser, c_user));
 
         //底部Dock
         var u_tp = '<li class="{{uniqueKey}} {{current}}">' +
@@ -356,6 +323,13 @@ function initChangeUserList(){
 
 
     }
+};
+
+function showHeaderUserInfo(c_user){
+    var h_user = $("#header .user");
+    h_user.find('.face').attr('href', c_user.t_url);
+    h_user.find('.face img').attr('src', c_user.profile_image_url);
+    h_user.find('.info .name').html(c_user.screen_name);
 };
 
 function changeUser(uniqueKey){
@@ -384,13 +358,10 @@ function changeUser(uniqueKey){
             $("#" + T_LIST.all[i] + '_timeline .list').html('');
         }
         $("#tl_tabs .unreadCount").html('');
-        $("#changeUser .blogType").attr('src', 'images/blogs/' + to_user.blogType + '_16.png');
-        $("#changeUser .userName").html(to_user.screen_name);
-        $("#changeUser .userImg").attr('src', to_user.profile_image_url || '');
-        $("#changeUser .user_home").attr('href', to_user.t_url);
+        setUser(to_user);
+        showHeaderUserInfo(to_user);
         $("#accountListDock").find('.current').removeClass('current')
             .end().find('.'+to_user.uniqueKey).addClass('current');
-        setUser(to_user);
         var b_view = getBackgroundView();
         b_view.onChangeUser();
         addUnreadCountToTabs();
@@ -1086,7 +1057,7 @@ function showMsgInput(){
     var h = WH[1] - 40 - 87;
     $(".list_warp").css('height', h);
     $("#doing").removeClass("doing").appendTo('#doingWarp');
-    $("#txtContent").attr('rows', 5).removeClass('padDoing');
+    $("#txtContent").show().attr('rows', 5).removeClass('padDoing');
     $("#submitWarp").show();
 };
 
