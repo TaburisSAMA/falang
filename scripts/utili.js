@@ -46,14 +46,10 @@ var QUICK_SEND_HOT_KEY_KEY = 'idi_QUICK_SEND_HOT_KEY_KEY'; //快速发送热键k
 //需要不停检查更新的timeline的分类列表
 var T_LIST = {
 	'all': ['friends_timeline','mentions','comments_timeline','direct_messages'],
-	'tsina': ['friends_timeline','mentions','comments_timeline','direct_messages'],
-	'tsohu': ['friends_timeline','mentions','comments_timeline','direct_messages'],
-	'digu': ['friends_timeline','mentions', 'direct_messages'],
-	'zuosa': ['friends_timeline','mentions', 'direct_messages'],
-	'follow5': ['friends_timeline','mentions', 'direct_messages'],
-	'leihou': ['friends_timeline','mentions', 'direct_messages'],
-	'twitter': ['friends_timeline','mentions', 'direct_messages']
-}; 
+	'digu': ['friends_timeline','mentions', 'direct_messages']
+};
+T_LIST.tsina = T_LIST.tsohu = T_LIST.all;
+T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.digu;
 
 var T_NAMES = {
 	'tsina': '新浪微博',

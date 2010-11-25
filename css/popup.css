@@ -41,7 +41,7 @@ li { line-height:16px;}
 #header{
 	position: relative;
 	border:solid 1px #ccc;
-	padding:3px;
+	padding:3px 0 10px;
 	margin-bottom: 1px;
 	border-radius:3px;
 	background: -webkit-gradient(linear,left bottom,left top,from(#fff), to(#eee), color-stop(0.4, #fff));
@@ -82,6 +82,7 @@ li { line-height:16px;}
 	border-color: rgba(255,255,255,.1) rgba(255,255,255,.1) #666;
 	border-width: 0 5px 6px;
 }
+#header .user .face{ float:left; margin-left:10px;}
 #header .user .face img{
 	width:40px;
 	height:40px;
@@ -89,8 +90,9 @@ li { line-height:16px;}
 	-webkit-box-shadow: #888 0px 0px 5px;
 	vertical-align: top;
 }
-#header .user .info{ margin-left:2px; }
+#header .user .info{ display:inline-block; margin-left:8px; }
 #header .user .info .name{color:green;font-weight:bold;}
+#header .user .info .nums{line-height: 22px; color:#888;}
 .tabs { overflow:hidden; position:absolute; bottom:-1px; right:3px;}
 .tabs li{
 	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#DDD));
@@ -421,7 +423,7 @@ div.mainContent{word-wrap: break-word;}
 	margin:6px 3px;
 	padding:6px;
 	-webkit-border-radius:3px;
-	-webkit-box-shadow:0 0 9px #000;
+	-webkit-box-shadow:0 0 9px #888;
 }
 .userinfo_detail p, .fans p{margin:3px 0;}
 .userinfo_detail .follow, .fans .follow{

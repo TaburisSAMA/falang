@@ -21,13 +21,7 @@
   ],
   "permissions": [
                    "tabs",
-                   "http://s8.hk/",
-                   "http://api.t.sina.com.cn/",
-                   "http://api.minicloud.com.cn/",
-                   "http://api.t.sohu.com/",
-                   "http://api.zuosa.com/",
-                   "http://api.follow5.com/",
-                   "http://leihou.com/",
-                   "http://net4twitter.appspot.com/"
+                   "http://*/*",
+                   "https://*/*"
                  ]
 }

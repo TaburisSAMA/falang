@@ -1,10 +1,5 @@
 // @author qleelulu@gmail.com
 
-var t_changeUser = '<table id="changeUser" class="tab-none" cellspacing="0" ><tr><td>'
-            + '<img src="images/blogs/{{blogType}}_16.png" class="blogType" /> <span class="userName" title="">{{screen_name}}</span>'
-            + '<div id="changeUserListWrap" style="display:none;"><ul>{{user_list}}</lu></div></td>'
-            + '<td><a target="_blank" class="user_home" href="{{t_url}}" title="点击打开我的主页"><img style="width:24px;height:24px;" class="userImg" src="{{profile_image_url}}" /></a></td></tr></table>';
-
 var fawave = {};
 var timeline_offset = {};
 function getTimelineOffset(t){
@@ -109,6 +104,7 @@ function initTabs(){
             $("#user_timeline_timeline ul.list").html('');
         }else if(c_t =='followers'){
             getFansList('followers');
+            checkShowGototop();
             return;
         }
         if(!c_ul.find('ul.list').html()){
@@ -128,7 +124,19 @@ function initTabs(){
         }else{
             $("#accountListDock ." + c_user.uniqueKey + " .unr").html('').hide();
         }
+
+        checkShowGototop(); //检查是否要显示返回顶部按钮
     });
+
+    var c_user = getUser();
+    var userT = T_LIST[c_user.blogType];
+    for(var i in T_LIST.all){
+        if(userT.indexOf(T_LIST.all[i]) < 0){ //如果当前博客不支持该tab timeline
+            $("#tl_tabs .tab-" + T_LIST.all[i]).hide();
+        }else{
+            $("#tl_tabs .tab-" + T_LIST.all[i]).show();
+        }
+    }
 };
 
 function initOnUnload(){
@@ -317,11 +325,14 @@ function initChangeUserList(){
     }
 };
 
+//头部的用户信息
 function showHeaderUserInfo(c_user){
     var h_user = $("#header .user");
     h_user.find('.face').attr('href', c_user.t_url);
     h_user.find('.face img').attr('src', c_user.profile_image_url);
     h_user.find('.info .name').html(c_user.screen_name);
+    var nums = '粉{{friends_count}}, {{followers_count}}粉, {{statuses_count}}微博'.format(c_user);
+    h_user.find('.info .nums').html(nums);
 };
 
 function changeUser(uniqueKey){
@@ -342,13 +353,28 @@ function changeUser(uniqueKey){
     if(to_user){
     	// 获取当前的tab
     	var cur_t = $("#tl_tabs li.active").attr('href').replace(/_timeline$/, '').substring(1);
-    	$("#" + cur_t + '_timeline .readMore').hide();
-        $("#" + cur_t + '_timeline .list').html('');
         
+        var userT = T_LIST[to_user.blogType];
+        var cur_t_new = '';
         for(var i in T_LIST.all){
-            $("#" + T_LIST.all[i] + '_timeline .readMore').hide();
+            hideReadMore(T_LIST.all[i]);
             $("#" + T_LIST.all[i] + '_timeline .list').html('');
+            if(userT.indexOf(T_LIST.all[i]) < 0){ //如果当前博客不支持该tab timeline
+                var _tab = $("#tl_tabs .tab-" + T_LIST.all[i]);
+                _tab.hide();
+                $("#" + T_LIST.all[i] + '_timeline').hide();
+                if(cur_t == T_LIST.all[i]){ //如果不支持的tab刚好是当前tab
+                    _tab.removeClass('active');
+                    window.currentTab = '#friends_timeline_timeline';
+                    cur_t_new = 'friends_timeline';
+                    $("#tl_tabs .tab-friends_timeline").addClass('active');
+                    $('#friends_timeline_timeline').show();
+                }
+            }else{
+                $("#tl_tabs .tab-" + T_LIST.all[i]).show();
+            }
         }
+        cur_t = cur_t_new || cur_t;
         $("#tl_tabs .unreadCount").html('');
         setUser(to_user);
         showHeaderUserInfo(to_user);
@@ -607,6 +633,7 @@ function getUserTimeline(screen_name, user_id){
         }
 
         hideLoading();
+        checkShowGototop();
     });
 };
 
@@ -987,8 +1014,8 @@ function sendReplyMsg(msg){
 //发送微博
 function sendMsg(msg){
     var btn = $("#btnSend"),
-        txt = $("#txtContent"),
-        data = {};
+        txt = $("#txtContent");
+        
     
     btn.attr('disabled','true');
     txt.attr('disabled','true');
@@ -1007,6 +1034,7 @@ function sendMsg(msg){
     }
     var userCount = users.length, sendedCount = 0, successCount = 0;
     for(i in users){
+        var data = {};
         data['status'] = msg; //放到这里重置一下，否则会被编码两次
         data['user'] = users[i];
         tapi.update(data, function(sinaMsg, textStatus){
