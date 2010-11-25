@@ -230,6 +230,7 @@
 						<?js if(tweet.retweeted_status && tweet.retweeted_status.text){ ?>
 						<!-- 转发 -->
 						<!-- {{retweeted_status_in}} -->
+						<!-- {{retweeted_retweeted_status_in}} -->
 						<!-- 转发 End -->
 						<?js } ?>
 					</div>
@@ -248,6 +249,7 @@
 				<?js if(tweet.retweeted_status && tweet.retweeted_status.text){ ?>
 				<!-- 转发 -->
 				<!-- {{retweeted_status_out}} -->
+				<!-- {{retweeted_retweeted_status_out}} -->
 				<!-- 转发 End -->
 				<?js } ?>
 				<div class="msgObjJson" style="display:none;">
@@ -260,7 +262,7 @@
 						<!-- 转发 -->
 						<div class="msg">
 							<div class="tweetItem retweeted commentWrap showCounts_#{tweet.retweeted_status.id}" id="tweet#{tweet.retweeted_status.id}">
-								<div class="userName"><?js if(tType=='comments_timeline'){ ?>评<?js }else{ ?>转<?js } ?>
+								<div class="userName"><?js if(tweet.retweeted_status.is_rt){ ?><a href="javascript:getUserTimeline('#{tweet.retweeted_status.user.screen_name}', '#{tweet.retweeted_status.user.id}');">@#{tweet.status.user.screen_name}</a> <?js } ?><?js if(tType=='comments_timeline' && !tweet.retweeted_status.is_rt){ ?>评<?js }else{ ?>转<?js } ?>
 									<span class="showtip">
 										<a target="_blank" 
 											href="javascript:getUserTimeline('#{tweet.retweeted_status.user.screen_name}', '#{tweet.retweeted_status.user.id}');" 

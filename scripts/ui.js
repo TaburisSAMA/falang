@@ -260,10 +260,22 @@ function bildMsgLi(sinaMsg, t, c_user){
             tp = TEMPLATE_FANS;
         }
         var theme = getTheme();
+        var need_rt_rt = sinaMsg.retweeted_status && sinaMsg.retweeted_status.retweeted_status;
+        var rt_rt_tpl = null;
+        if(need_rt_rt) {
+        	sinaMsg.retweeted_status.retweeted_status.is_rt = true;
+        	rt_rt_tpl = TEMPLATE_RT.replace(/tweet\.retweeted_status\./g, 'tweet.retweeted_status.retweeted_status.');
+        }
         if(theme=='pip_io'){
             tp = tp.replace('<!-- {{retweeted_status_out}} -->', TEMPLATE_RT);
+            if(need_rt_rt) {
+            	tp = tp.replace('<!-- {{retweeted_retweeted_status_out}} -->', rt_rt_tpl);
+            }
         }else{
             tp = tp.replace('<!-- {{retweeted_status_in}} -->', TEMPLATE_RT);
+            if(need_rt_rt) {
+            	tp = tp.replace('<!-- {{retweeted_retweeted_status_in}} -->', rt_rt_tpl);
+            }
         }
         var r = Shotenjin.render(tp, context);
     }catch(err){
