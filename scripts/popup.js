@@ -142,16 +142,18 @@ function initOnUnload(){
 function initTxtContentEven(){
 //>>>发送微博事件初始化 开始<<<
     var unsendTweet = localStorage.getObject(UNSEND_TWEET_KEY);
+    var txtContent = $("#txtContent");
     if(unsendTweet){
-        $("#txtContent").val(unsendTweet);
+        txtContent.val(unsendTweet);
     }
 
-    $("#txtContent").keyup(function(){
-        var c = $(this).val();
-        countInputText();
-    });
+    //txtContent.bind('keyup', function(){
+    //    countInputText();
+    //});
 
-    $("#txtContent").keydown(function(event){
+    txtContent[0].oninput = txtContent[0].onfocus = countInputText;
+
+    txtContent.keydown(function(event){
         var c = $.trim($(this).val());
         if(event.ctrlKey && event.keyCode==13){
             if(c){
@@ -449,17 +451,19 @@ function addUnreadCountToTabs(){
 }
 
 function initMsgHover(){
-    $(".list li").live("mouseover", function(){
+    /*
+    $(".list li").live("mouseenter", function(){ //mouseover
         var li = $(this);
         li.addClass("activeTweet");
         li.find('.edit').show();
     });
 
-    $(".list li").live("mouseout", function(){
+    $(".list li").live("mouseleave", function(){ //mouseout
         var li = $(this);
         li.removeClass("activeTweet");
         li.find('.edit').hide();
     });
+    */
 };
 
 //====>>>>>>>>>>>>>>>>>>>>>>
@@ -1137,7 +1141,7 @@ function showMsgInput(){
     var _txt = $("#txtContent").val();
     $("#txtContent").focus().val('').val(_txt); //光标在最后面
     countInputText();
-    $("#header .write").addClass('active');
+    $("#header .write").addClass('active').find('b').addClass('up');;
 };
 
 function hideMsgInput(){
@@ -1145,16 +1149,14 @@ function hideMsgInput(){
     var h = WH[1] - 41;
     $(".list_warp").css('height', h);
     $("#submitWarp").data('status', 'hide').css('height', 0);
-    $("#header .write").removeClass('active');
+    $("#header .write").removeClass('active').find('b').removeClass('up');
 };
 
 function toogleMsgInput(ele){
     if($("#submitWarp").data('status') != 'show'){
         showMsgInput();
-        $(ele).find('b').addClass('up');
     }else{
         hideMsgInput();
-        $(ele).find('b').removeClass('up');
     }
 };
 

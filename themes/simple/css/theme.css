@@ -9,12 +9,13 @@ div.msgInfo {padding-top:3px;}
 .list li div.retweeted .userName{color:green;font-weight:normal;}
 .list li div.retweeted .edit a{color:green;font-weight:bold;}
 .list li div.retweeted .commentCounts a{color:green;font-weight:normal;}
+.list li div.retweeted.rt_retweeted{border-left:5px solid #ccc;}
 .list_p{margin:0;padding:0;}
 .list_warp { margin:0; height: 470px; overflow:auto;} 
 .list li {border-bottom:1px solid #ddd; padding:5px 0; margin: 0 2px; /*overflow:hidden;*/}
 .list li .msg a, .comments a{color:#F77004;}
 .unread-item{background-color: #FFFFDF;}
-.list li.activeTweet{background-color: #FFFFEF;color:black;}
+.list li:hover{background-color: #FFFFEF;color:black;}
 .list li .edit{display:none; float:right;}
 .list li .edit a{padding:0 0 0 5px;}
 .list li .commentCounts, .list li .repostCounts{color:#888;font-weight:normal;}

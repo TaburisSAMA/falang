@@ -250,6 +250,7 @@ function bildMsgLi(sinaMsg, t, c_user){
                         provinces: provinces,
                         tType: t,
                         getUserCountsInfo: getUserCountsInfo,
+                        buildTipboxUserInfo: buildTipboxUserInfo,
                         processMsg: processMsg,
                         user: user,
                         tweet: sinaMsg,
@@ -283,6 +284,16 @@ function bildMsgLi(sinaMsg, t, c_user){
         return '';
     }
     sinaMsg.readed = true;
+    return r;
+};
+
+// 生成Tipbox用户信息(鼠标移到用户头像时显示的用户信息)
+function buildTipboxUserInfo(user){
+    var context = {
+                    provinces: provinces,
+                    user: user
+                   };
+    var r = Shotenjin.render(TEMPLATE_TIPBOX_USER_INFO, context);
     return r;
 };
 
