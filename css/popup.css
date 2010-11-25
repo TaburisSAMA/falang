@@ -505,7 +505,7 @@ div.mainContent{word-wrap: break-word;}
 	display:inline;
 }
 #accountListDock li .unr{
-	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ED1C24), to(#AA1317));
+	background: #AA1317; /* -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ED1C24), to(#AA1317)); */
 	border-radius:2px;
 	font-size: 11px;
 	line-height: 12px;
