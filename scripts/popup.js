@@ -571,7 +571,7 @@ function getFansList(t, cursor){
     cursor = cursor || -1;
     showLoading();
     hideReadMore(t);
-    var params = {user_id:c_user.id, cursor:cursor, user:c_user};
+    var params = {user_id:c_user.id, cursor:cursor, user:c_user, count:PAGE_SIZE};
     tapi[t](params, function(users, textStatus, statuCode){
         if(textStatus != 'error' && users && !users.error){
         	var cursor_cache = get_current_user_cache(NEXT_CURSOR);
@@ -1250,20 +1250,13 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
     var v = '';
     var t = $('#replyTextarea');
     t.focus().val('').blur();
-    // 判断是否支持转载，不支持，则自己拼接一个
-    if(config.support_repost) {
-    	if(reTweetId && d && d.retweeted_status){
-            v = '//@' + userName + ':' + d.text;
-        } else {
-        	v = '转发微博.';
-        }
-    	// 光标在前
-    	t.val(v).focus();
-    } else { // 嘀咕不支持repost
-    	v = config.repost_pre + '@' + userName + ' ' + d.text;
-    	// 光标在后
-    	t.focus().val(v);
+    if(reTweetId && d && d.retweeted_status){
+        v = '//@' + userName + ':' + d.text;
+    } else {
+    	v = '转发微博.';
     }
+	// 光标在前
+	t.val(v).focus();
     if(v=='转发微博.'){t.select();}
     countReplyText();
 };

@@ -18,7 +18,7 @@ var sinaApi = {
         
         support_comment: true, // 判断是否支持评论
 		support_upload: true, // 是否支持上传图片
-		support_repost: true, // 是否支持转载
+		support_repost: true, // 是否支持新浪形式转载
 		repost_pre: '', // 转发前缀
 		support_favorites: true,
 		// 是否支持max_id 分页
@@ -591,6 +591,7 @@ var sinaApi = {
         delete args.play_load;
         // 请求前调用
         this.before_sendRequest(args);
+        var callmethod = user.uniqueKey + ':' + args.url;
         $.ajax({
             url: url,
             username: user.userName,
@@ -608,13 +609,13 @@ var sinaApi = {
                     data = JSON.parse(data);
                 }
                 catch(err){
-                    data = {error:'服务器返回结果错误，本地解析错误。' + err, error_code:500};
+                    data = {error:callmethod + ' 服务器返回结果错误，本地解析错误。' + err, error_code:500};
                     textStatus = 'error';
                 }
                 var error_code = null;
                 if(data){
                     if(data.error || data.error_code){
-                        showMsg('error: ' + (data.error || data.wrong) + ', error_code: ' + data.error_code);
+                        showMsg(callmethod + ' error: ' + (data.error || data.wrong) + ', error_code: ' + data.error_code);
                         error_code = data.error_code || error_code;
                     } else {
                         //成功再去格式化结果
@@ -638,13 +639,13 @@ var sinaApi = {
                         catch(err){
                             r = null;
                         }
-                        if(r){showMsg('error_code:' + r.error_code + ', error:' + r.error);}
+                        if(r){showMsg(callmethod + ' error_code:' + r.error_code + ', error:' + r.error);}
                     }
                 }
                 if(!r){
                     textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';
                     errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
-                    r = {error:'error: ' + textStatus + errorThrown + 'statuCode: ' + status};
+                    r = {error:callmethod + ' error: ' + textStatus + errorThrown + 'statuCode: ' + status};
                     showMsg(r.error);
                 }
                 callbackFn(r||{}, 'error', status); //不管什么状态，都返回 error
@@ -1080,6 +1081,7 @@ $.extend(LeiHouAPI, {
 	    
 	    support_comment: false,
 	    support_repost: false,
+	    support_upload: false,
 	    
 		support_favorites: false,
 	
@@ -1197,8 +1199,11 @@ $.extend(Follow5API, {
 	    source2: '34140E56A31887F770053C2AF6D7B2AC',
 	    
 	    support_max_id: false,
+	    support_comment: false,
+	    support_repost: false,
 
 	    verify_credentials: '/users/verify_credentials',
+	    direct_messages: '/destroy_messages', 
 	    followers: '/users/followed',
         friends: '/users/followers',
         friendships_create: '/follow/create',
@@ -1236,13 +1241,18 @@ $.extend(Follow5API, {
 				args.data.page = 1;
 			}
 		} 
-//		else if(args.url == this.config.repost) {
-//			// id => in_reply_to_status_id
-//			if(args.data.id) {
-//				args.data.in_reply_to_status_id = args.data.id;
-//				delete args.data.id;
-//			}
-//		} 
+		else if(args.url == this.config.new_message) {
+			// id => fid
+			// text => status
+			if(args.data.id) {
+				args.data.fid = args.data.id;
+				delete args.data.id;
+			}
+			if(args.data.text) {
+				args.data.status = args.data.text;
+				delete args.data.text;
+			}
+		} 
     },
 	
 	format_result: function(data, play_load, args) {
@@ -1292,6 +1302,10 @@ $.extend(Follow5API, {
 					data.city = parseInt(data.location.substring(2, 4)).toString();
 				}
 			}
+			// 'profile_image_url': u'http://pic1.follow5.com/imgs/account/00/00/10/04/09/100409_l.jpg',
+			if(data.profile_image_url) {
+				data.profile_image_url = data.profile_image_url.replace('_l.', '_s.');
+			}
 		} 
 		else if(play_load == 'comment') {
 			this.format_result_item(data.user, 'user', args);
@@ -1317,7 +1331,7 @@ $.extend(TwitterAPI, {
 	    
 	    support_comment: false,
 	    support_repost: false,
-	    support_update: false,
+	    support_upload: false,
 	    
 //	    upload: '/statuses/update',
 	    repost: '/statuses/update'

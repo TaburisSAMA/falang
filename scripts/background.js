@@ -102,7 +102,7 @@ function checkTimeline(t, p, user_uniqueKey){
     
     setDoChecking(user_uniqueKey, t, 'checking', true);
     showLoading();
-    var params = {user:c_user, count:100};
+    var params = {user:c_user, count:PAGE_SIZE};
     var last_id = getLastMsgId(t, user_uniqueKey);
     if(last_id){
         params['since_id'] = last_id;
@@ -151,39 +151,44 @@ function checkTimeline(t, p, user_uniqueKey){
         if(sinaMsgs && sinaMsgs.length > 0){
             
             _last_id = sinaMsgs[0].id;
-            _max_id = sinaMsgs[sinaMsgs.length-1].id;
-            tweets[_key] = sinaMsgs.concat(tweets[_key]);
-            
-            var _unreadCount = 0, _msg_user = null;
-            for(var i in sinaMsgs){
-                _msg_user = sinaMsgs[i].user || sinaMsgs[i].sender;
-                //if(!_msg_user) {console.dir(m); console.dir(c_user);console.dir(sinaMsgs);}
-                if(_msg_user && _msg_user.id != c_user.id){
-                    _unreadCount += 1;
-                }
+            var has_news = true;
+            if(params.since_id && Number(_last_id) == Number(params.since_id)){
+            	has_news = false;
             }
-            var current_user = getUser();
-            if(popupView){
-                if(!popupView.addTimelineMsgs(tweets[_key].slice(0, sinaMsgs.length), t, user_uniqueKey)){
-                    setUnreadTimelineCount(_unreadCount, t, user_uniqueKey);
-                }else{
-                    if(current_user.uniqueKey == c_user.uniqueKey){
-                        popupView._showMsg('有新微博');
+            if(has_news) {
+            	_max_id = sinaMsgs[sinaMsgs.length-1].id;
+                tweets[_key] = sinaMsgs.concat(tweets[_key]);
+                
+                var _unreadCount = 0, _msg_user = null;
+                for(var i in sinaMsgs){
+                    _msg_user = sinaMsgs[i].user || sinaMsgs[i].sender;
+                    //if(!_msg_user) {console.dir(m); console.dir(c_user);console.dir(sinaMsgs);}
+                    if(_msg_user && _msg_user.id != c_user.id){
+                        _unreadCount += 1;
                     }
                 }
-            }else{
-                setUnreadTimelineCount(_unreadCount, t, user_uniqueKey);
-                showNewMsg(sinaMsgs, t, c_user.id); //在页面显示新消息
-            }
+                var current_user = getUser();
+                if(popupView){
+                    if(!popupView.addTimelineMsgs(tweets[_key].slice(0, sinaMsgs.length), t, user_uniqueKey)){
+                        setUnreadTimelineCount(_unreadCount, t, user_uniqueKey);
+                    }else{
+                        if(current_user.uniqueKey == c_user.uniqueKey){
+                            popupView._showMsg('有新微博');
+                        }
+                    }
+                }else{
+                    setUnreadTimelineCount(_unreadCount, t, user_uniqueKey);
+                    showNewMsg(sinaMsgs, t, c_user.id); //在页面显示新消息
+                }
 
-            if(_last_id){
-                setLastMsgId(_last_id, t, user_uniqueKey);
+                if(_last_id){
+                    setLastMsgId(_last_id, t, user_uniqueKey);
+                }
+                if(_max_id && !getMaxMsgId(t, user_uniqueKey)){
+                    setMaxMsgId(t, _max_id, user_uniqueKey);
+                }
             }
-            if(_max_id && !getMaxMsgId(t, user_uniqueKey)){
-                setMaxMsgId(t, _max_id, user_uniqueKey);
-            }
-
-        }else{
+        } else {
             setUnreadTimelineCount(0, t, user_uniqueKey);
         }
         //window.checking[t] = false;
@@ -195,11 +200,10 @@ function checkTimeline(t, p, user_uniqueKey){
                 popupView.showReadMore(t);
                 popupView.setTimelineOffset(t, sinaMsgs.length);
             }
-        }else if(popupView && sinaMsgs && sinaMsgs.length >= PAGE_SIZE){
+        } else if(popupView && sinaMsgs && sinaMsgs.length >= PAGE_SIZE){
             popupView.showReadMore(t);
             popupView.setTimelineOffset(t, sinaMsgs.length);
         }
-
         hideLoading();
     });
 };
