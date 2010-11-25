@@ -1308,13 +1308,62 @@ $.extend(Follow5API, {
 	}
 });
 
+//twitter api
+var TwitterAPI = $.extend({}, sinaApi);
+
+$.extend(TwitterAPI, {
+	
+	// 覆盖不同的参数
+	config: $.extend({}, sinaApi.config, {
+		host: 'http://net4twitter.appspot.com',
+		source: 'fawave', 
+	    source2: 'fawave',
+	    
+	    support_comment: false,
+	    support_repost: false,
+	    support_update: false,
+	    
+//	    upload: '/statuses/update',
+	    repost: '/statuses/update'
+	}),
+	
+	// 无需urlencode
+	url_encode: function(text) {
+		return text;
+	},
+	
+	comments_timeline: function(data, callback) {
+		callback();
+	},
+	
+	counts: function(data, callback) {
+		callback();
+	},
+	
+	before_sendRequest: function(args) {
+		if(args.url == this.config.repost) {
+			if(args.data.sina_id) {
+				args.data.in_reply_to_status_id = args.data.sina_id;
+				delete args.data.sina_id;
+			} else if(args.data.id) {
+				delete args.data.id;
+			}
+		} else if(args.url == this.config.new_message) {
+			// id => user
+			args.data.user = args.data.id;
+			delete args.data.id;
+		}
+    }
+});
+
 var T_APIS = {
 	'tsina': sinaApi,
 	'tsohu': TSohuAPI,
 	'digu': DiguAPI,
 	'zuosa': ZuosaAPI,
 	'leihou': LeiHouAPI,
-	'follow5': Follow5API
+	'follow5': Follow5API,
+	'twitter': TwitterAPI // fxxx gxfxw first.
 };
 
 

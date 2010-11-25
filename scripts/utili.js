@@ -58,7 +58,8 @@ var T_NAMES = {
 	'digu': '嘀咕',
 	'zuosa': '做啥',
 	'follow5': 'Follow5',
-	'leihou': '雷猴'
+	'leihou': '雷猴',
+	'twitter': 'Twitter'
 };
 
 
