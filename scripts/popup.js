@@ -140,7 +140,7 @@ function initOnUnload(){
 }
 
 function initTxtContentEven(){
-//>>>发送微博开始<<<
+//>>>发送微博事件初始化 开始<<<
     var unsendTweet = localStorage.getObject(UNSEND_TWEET_KEY);
     if(unsendTweet){
         $("#txtContent").val(unsendTweet);
@@ -155,7 +155,7 @@ function initTxtContentEven(){
         var c = $.trim($(this).val());
         if(event.ctrlKey && event.keyCode==13){
             if(c){
-                sendSinaMsg(c);
+                sendMsg(c);
             }else{
                 showMsg('请输入要发送的内容');
             }
@@ -167,14 +167,14 @@ function initTxtContentEven(){
         var txt = $("#txtContent");
         var c = $.trim(txt.val());
         if(c){
-            sendSinaMsg(c);
+            sendMsg(c);
         }else{
             showMsg('请输入要发送的内容');
         }
     });
-//>>>发送嘀咕结束<<<
+//>>>发送微博事件初始化 结束<<<
 
-//>>>回复开始<<<
+//>>>回复事件初始化开始<<<
     $("#replyTextarea").keyup(function(){
         countReplyText();
     });
@@ -199,7 +199,7 @@ function sendMsgByActionType(c){//c:要发送的内容
     if(c){
         var actionType = $('#actionType').val();
         switch(actionType){
-            case 'newmsg': // 发
+            case 'newmsg': // 私信
                 sendWhisper(c);
                 break;
             case 'repost': // 转
@@ -209,7 +209,7 @@ function sendMsgByActionType(c){//c:要发送的内容
                 sendComment(c);
                 break;
             case 'reply': // @
-                sendSinaMsg(c, true);
+                sendReplyMsg(c);
                 break;
             default:
                 showMsg('检查发送类型出错。');
@@ -217,7 +217,7 @@ function sendMsgByActionType(c){//c:要发送的内容
     }else{
         showMsg('请输入要发送的内容');
     }
-}
+};
 
 //统计字数
 function countInputText() {
@@ -283,7 +283,14 @@ function initChangeUserList(){
         showHeaderUserInfo(c_user);
 
         var userList = getUserList();
-        if(userList.length < 2){ return; } //多个用户才显示
+        var userLength = 0;
+        for(var k in userList){ 
+            userLength++;
+            if(userLength > 1){
+                break; //多个用户才显示(我只想看看是否有多个用户而已，为什么为什么要这么麻烦)
+            }
+        }
+        if(userLength < 2){ return; }
         //底部Dock
         var u_tp = '<li class="{{uniqueKey}} {{current}}">' +
                        '<span class="username">{{screen_name}}</span>' +
@@ -370,10 +377,16 @@ function initSelectSendAccounts(){
     if(afs.data('inited')){
         return;
     }
-    var userList = getUserList();
-    if(userList.length < 2){ return; } //多个用户才显示
+    var userList = getUserList(); // userList 的类型是 {} 而不是 []
+    var userLength = 0;
+    for(var k in userList){ 
+        userLength++;
+        if(userLength > 1){
+            break; //我只想看看是否有多个用户而已，为什么为什么要这么麻烦
+        }
+    }
+    if(userLength < 2){ return; } //多个用户才显示
     var li_tp = '<li class="{{sel}}" uniqueKey="{{uniqueKey}}" onclick="toggleSelectSendAccount(this)">' +
-                   
                    '<img src="{{profile_image_url}}" />' +
                    '{{screen_name}}' +
                    '<img src="/images/blogs/{{blogType}}_16.png" class="blogType" />' +
@@ -938,20 +951,14 @@ function addPageMsgs(msgs, t){
     hideLoading();
 };
 
-function sendSinaMsg(msg, isReply){
-    var btn, txt, data;
-    if(isReply){
-        btn = $("#replySubmit");
-        txt = $("#replyTextarea");
-        var userName = $("#ye_dialog_title").text();
-        msg = userName + ' ' + msg;
-        var tweetId = $("#replyTweetId").val();
-        data = {sina_id: tweetId}; // @回复
-    }else{
-        btn = $("#btnSend");
-        txt = $("#txtContent");
-        data = {};
-    }
+//发送 @回复
+function sendReplyMsg(msg){
+    var btn = $("#replySubmit"),
+        txt = $("#replyTextarea"),
+        userName = $("#ye_dialog_title").text();
+    msg = userName + ' ' + msg;
+    var tweetId = $("#replyTweetId").val();
+    data = {sina_id: tweetId}; // @回复
     
     btn.attr('disabled','true');
     txt.attr('disabled','true');
@@ -961,20 +968,67 @@ function sendSinaMsg(msg, isReply){
     data['user'] = user;
     tapi.update(data, function(sinaMsg, textStatus){
         if(sinaMsg.id){
-            if(isReply){
-                hideReplyInput();
-            }else{
-                hideMsgInput();
-            }
+            hideReplyInput();
             txt.val('');
             setTimeout(callCheckNewMsg, 1000);
-            showMsg('发送成功！');
+            showMsg(userName + ' 成功！');
         }else if(sinaMsg.error){
             showMsg('error: ' + sinaMsg.error);
         }
         btn.removeAttr('disabled');
         txt.removeAttr('disabled');
     });
+};
+
+//发送微博
+function sendMsg(msg){
+    var btn = $("#btnSend"),
+        txt = $("#txtContent"),
+        data = {};
+    
+    btn.attr('disabled','true');
+    txt.attr('disabled','true');
+    
+    var users = [], selLi = $("#accountsForSend .sel");
+    if(selLi.length){
+        selLi.each(function(){
+            var uniqueKey = $(this).attr('uniqueKey');
+            var _user = getUserByUniqueKey(uniqueKey);
+            if(_user){
+                users.push(_user);
+            }
+        });
+    }else{
+        users.push(getUser());
+    }
+    var userCount = users.length, sendedCount = 0, successCount = 0;
+    for(i in users){
+        data['status'] = msg; //放到这里重置一下，否则会被编码两次
+        data['user'] = users[i];
+        tapi.update(data, function(sinaMsg, textStatus){
+            sendedCount++;
+            if(sinaMsg.id){
+                successCount++;
+            }else if(sinaMsg.error){
+                showMsg('error: ' + sinaMsg.error);
+            }
+            if(successCount >= userCount){//全部发送成功
+                hideMsgInput();
+                txt.val('');
+                showMsg('发送成功！');
+            }
+            if(sendedCount >= userCount){//全部发送完成
+                btn.removeAttr('disabled');
+                txt.removeAttr('disabled');
+                if(successCount > 0){ //有发送成功的
+                    setTimeout(callCheckNewMsg, 1000);
+                    if(userCount > 1){ //多个用户的
+                        showMsg(successCount + '发送成功，' + (userCount - successCount) + '失败。');
+                    }
+                }
+            }
+        });
+    }
 };
 
 function sendWhisper(msg){

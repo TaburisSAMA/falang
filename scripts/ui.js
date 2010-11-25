@@ -114,10 +114,12 @@ var emotionalDict={
     "花心":"http://timg.sjs.sinajs.cn/t3/style/images/common/face/ext/normal/64/hs_org.gif"
 };
 
-function bildMsgLi(sinaMsg, t){
+function bildMsgLi(sinaMsg, t, c_user){
     if(!sinaMsg){ return ''; }
     try{
-        var c_user = getUser();
+        if(!c_user){
+            c_user = getUser();
+        }
         var user = sinaMsg.user || sinaMsg.sender;
         if(t == 'friends' || t == 'followers'){ //粉丝列表
             user = sinaMsg;
@@ -164,9 +166,13 @@ function bildMsgLi(sinaMsg, t){
         if(!support_favorites) {
         	crlBtn.addFavoritesMsgBtn = crlBtn.delFavoritesMsgBtn = '';
         }
-        // 不支持repost
+        // 不支持repost(转发)
         if(!config.support_repost) {
         	crlBtn.repostCounts = crlBtn.rtRepostCounts = crlBtn.repostBtn = '';
+        }
+
+        if(c_user.blogType == 'digu' ){
+            crlBtn.replyBtn = crlBtn.replyBtn.replace('>@<', '>回复<');
         }
 
         switch(t){
