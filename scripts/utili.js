@@ -49,7 +49,10 @@ var T_LIST = {
 	'tsina': ['friends_timeline','mentions','comments_timeline','direct_messages'],
 	'tsohu': ['friends_timeline','mentions','comments_timeline','direct_messages'],
 	'digu': ['friends_timeline','mentions', 'direct_messages'],
-	'zuosa': ['friends_timeline','mentions','comments_timeline', 'direct_messages']
+	'zuosa': ['friends_timeline','mentions', 'direct_messages'],
+	'follow5': ['friends_timeline','mentions', 'direct_messages'],
+	'leihou': ['friends_timeline','mentions', 'direct_messages'],
+	'twitter': ['friends_timeline','mentions', 'direct_messages']
 }; 
 
 var T_NAMES = {
