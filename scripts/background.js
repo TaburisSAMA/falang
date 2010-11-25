@@ -3,6 +3,7 @@
 var itv; //Interval
 var tweets = {};
 var MAX_MSG_ID = {};
+var LAST_PAGES = {};
 //var THEME = localStorage.getObject('popup_theme') || 'default';
 window.checking={}; //正在检查是否有最新微博
 window.paging={}; //正在获取分页微博
@@ -31,6 +32,22 @@ function setMaxMsgId(t, id, user_uniqueKey){
     }
     var _key = user_uniqueKey + t + '_max_msg_id';
     MAX_MSG_ID[_key] = Number(id)-1;
+};
+
+function getLastPage(t, user_uniqueKey){
+    if(!user_uniqueKey){
+        user_uniqueKey = getUser().uniqueKey;
+    }
+    var _key = user_uniqueKey + t + '_last_page';
+    return LAST_PAGES[_key];
+};
+
+function setLastPage(t, page, user_uniqueKey){
+    if(!user_uniqueKey){
+        user_uniqueKey = getUser().uniqueKey;
+    }
+    var _key = user_uniqueKey + t + '_last_page';
+    LAST_PAGES[_key] = page;
 };
 
 //用户跟随放到background view这里处理
@@ -209,25 +226,29 @@ function getTimelinePage(user_uniqueKey, t, p){
     showLoading();
 
     var params = {user:c_user, count:PAGE_SIZE};
-    var max_id = getMaxMsgId(t, user_uniqueKey);
-    if(max_id){
-        params['max_id'] = max_id;
+    var config = tapi.get_config(c_user)
+    // 判断是否支持max_id形式获取数据
+    if(config.support_max_id) {
+	    var max_id = getMaxMsgId(t, user_uniqueKey);
+	    if(max_id){
+	        params['max_id'] = max_id;
+	    }
+    } else {
+    	// count, page 形式
+    	var page = getLastPage(t, user_uniqueKey);
+    	if(page) {
+    		page += 1;
+    		params['page'] = page;
+    	}
     }
+    
     if(p){
         for(var key in p){
             params[key] = p[key];
         }
     }
-    var m = '';
-    switch(t){
-        case 'friends_timeline': //示例，如有特殊才需特别定义
-            m = 'friends_timeline';
-            break;
-        default:
-            m = t;
-    }
 //    log('start getTimelinePage ' + user_uniqueKey + ' ' + m);
-    tapi[m](params, function(sinaMsgs, textStatus){
+    tapi[t](params, function(sinaMsgs, textStatus){
     	if(sinaMsgs == null) {
 //    		log(user_uniqueKey + ' ' + m + ': null, hideLoading()');
     		hideLoading();
@@ -270,6 +291,12 @@ function getTimelinePage(user_uniqueKey, t, p){
 
             if(_max_id){
                 setMaxMsgId(t, _max_id, user_uniqueKey);
+            }
+            if(!config.support_max_id) {
+            	if(!page) {
+	            	page = 1;
+	            }
+	            setLastPage(t, page, user_uniqueKey);
             }
         }else{
             var current_user = getUser();

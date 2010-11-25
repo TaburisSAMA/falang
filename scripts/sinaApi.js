@@ -1115,10 +1115,10 @@ $.extend(LeiHouAPI, {
 				args.data.page = 1;
 			}
 		} else if(args.url == this.config.repost) {
-			// id => in_reply_to_status_id
-			if(args.data.id) {
-				args.data.in_reply_to_status_id = args.data.id;
-				delete args.data.id;
+			// sina_id => in_reply_to_status_id
+			if(args.data.sina_id) {
+				args.data.in_reply_to_status_id = args.data.sina_id;
+				delete args.data.sina_id;
 			}
 		} 
     },
