@@ -935,11 +935,10 @@ $.extend(ZuosaAPI, {
 	    
 	    support_comment: false,
 	    support_repost: false,
-	    repost_pre: 'ZT:',
+	    support_max_id: false,
 	    
 	    upload: '/statuses/update',
-	    repost: '/statuses/update',
-	    comment: '/statuses/update'
+	    repost: '/statuses/update'
 	}),
 	
 	// 无需urlencode
@@ -984,16 +983,12 @@ $.extend(ZuosaAPI, {
 			if(!args.data.page) {
 				args.data.page = 1;
 			}
-			//data.count = data.count || 20;
 			delete args.data.user_id;
 		} else if(args.url == this.config.repost) {
-			// sina_id => in_reply_to_status_id
-			// id=> in_reply_to_status_id 转 ZT:
 			if(args.data.sina_id) {
 				args.data.in_reply_to_status_id = args.data.sina_id;
 				delete args.data.sina_id;
 			} else if(args.data.id) {
-//				args.data.in_reply_to_status_id = args.data.id;
 				delete args.data.id;
 			}
 		} else if(args.url == this.config.new_message) {
@@ -1053,6 +1048,7 @@ $.extend(ZuosaAPI, {
 			}
 			if(data.homeprovince) {
 				data.province = data.homeprovince;
+				data.city = data.province;
 				delete data.homeprovince;
 			} else if(data.location) {
 				var province_city = data.location.split('.');
