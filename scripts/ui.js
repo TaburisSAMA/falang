@@ -166,7 +166,7 @@ function bildMsgLi(sinaMsg, t){
         }
         // 不支持repost
         if(!config.support_repost) {
-        	crlBtn.repostCounts = crlBtn.rtRepostCounts = '';
+        	crlBtn.repostCounts = crlBtn.rtRepostCounts = crlBtn.repostBtn = '';
         }
 
         switch(t){
