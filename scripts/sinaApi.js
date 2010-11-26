@@ -678,8 +678,8 @@ $.extend(TSohuAPI, {
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.t.sohu.com',
-		source: 'WbbRPziVG6', // 搜狐不是按key来限制的
-	    source2: 'fawave',
+		source: 'WbbRPziVG6', // 取得appkey的第三方进行分级处理，分为500，800和1500三个等级。
+	    source2: 'WbbRPziVG6',
 	    
 	    favorites_create: '/favourites/create/{{id}}',
 	    favorites_destroy: '/favourites/destroy/{{id}}',
