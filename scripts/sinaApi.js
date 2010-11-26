@@ -1110,6 +1110,10 @@ $.extend(LeiHouAPI, {
 	url_encode: function(text) {
 		return text;
 	},
+
+    rate_limit_status: function(data, callback){
+        callback({error:'not support'});
+    },
 	
 	comments_timeline: function(data, callback) {
 		callback();
@@ -1235,6 +1239,10 @@ $.extend(Follow5API, {
 	url_encode: function(text) {
 		return text;
 	},
+
+    rate_limit_status: function(data, callback){
+        callback({error:'not support'});
+    },
 	
 //	comments_timeline: function(data, callback) {
 //		callback();

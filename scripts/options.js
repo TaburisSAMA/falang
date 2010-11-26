@@ -9,8 +9,8 @@ var SUPPORT_AUTH_TYPES = {
 	'tsohu': ['baseauth', 'xauth'],
 	'digu': ['baseauth', 'oauth', 'xauth'],
 	'zuosa': ['baseauth', 'oauth', 'xauth'],
-	'follow5': ['baseauth', 'oauth', 'xauth'],
-	'leihou': ['baseauth', 'oauth', 'xauth'],
+	'follow5': ['baseauth'],
+	'leihou': ['baseauth'],
 	'twitter': ['baseauth', 'oauth', 'xauth']
 };
 
@@ -35,6 +35,7 @@ $(function(){
         $("#save-account").val('添加');
         $("#account-name").val('');
         $("#account-pwd").val('');
+        onSelBlogTypeChange();
         $("#new-account").show();
     });
 
