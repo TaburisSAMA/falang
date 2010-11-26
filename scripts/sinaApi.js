@@ -1363,7 +1363,20 @@ $.extend(TwitterAPI, {
 			args.data.user = args.data.id;
 			delete args.data.id;
 		}
-    }
+    },
+
+    format_result_item: function(data, play_load, args) {
+		if(play_load == 'status' && data.id) {
+
+		} else if(play_load == 'user' && data && data.id) {
+			data.t_url = 'http://twitter.com/' + (data.screen_name || data.id);
+			if(data.profile_image_url) {
+			}
+			if(data.location) {
+			}
+		}
+		return data;
+	}
 });
 
 var T_APIS = {

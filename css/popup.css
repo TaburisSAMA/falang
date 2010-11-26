@@ -41,7 +41,7 @@ li { line-height:16px;}
 #header{
 	position: relative;
 	border:solid 1px #ccc;
-	padding:3px 0 10px;
+	padding:3px 0 15px;
 	margin-bottom: 1px;
 	border-radius:3px;
 	background: -webkit-gradient(linear,left bottom,left top,from(#fff), to(#eee), color-stop(0.4, #fff));
@@ -82,13 +82,18 @@ li { line-height:16px;}
 	border-color: rgba(255,255,255,.1) rgba(255,255,255,.1) #666;
 	border-width: 0 5px 6px;
 }
-#header .user .face{ float:left; margin-left:10px;}
-#header .user .face img{
+#header .user .face{ float:left; margin-left:10px; position:relative;}
+#header .user .face .icon{
 	width:40px;
 	height:40px;
 	border-radius:3px;
 	-webkit-box-shadow: #888 0px 0px 5px;
 	vertical-align: top;
+}
+#header .user .face .bt{
+	position:absolute;
+	bottom:-5px;
+	right:-5px;
 }
 #header .user .info{ display:inline-block; margin-left:8px; }
 #header .user .info .name{color:green;font-weight:bold;}
@@ -134,6 +139,7 @@ li { line-height:16px;}
 #accountsForSend li:hover{
 	background: #DDE1E8;
 	border-color:#B2B9C7;
+	opacity: 0.8;
 }
 #accountsForSend li.sel{
 	background: #5CC04F;

@@ -12,6 +12,10 @@
 	font-weight: bold;
 }
 
+#submitWarp{
+	height:auto;
+}
+
 .fileSel{
 	margin-top:15px;
 	border: 1px solid #0E774A;

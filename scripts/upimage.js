@@ -16,10 +16,7 @@ function initOnLoad(){
 };
 
 function init(){
-	var user = getUser();
-	$('.fawaveUserInfo img.blogType').attr('src', 'images/blogs/' + user.blogType + '_16.png');
-	$('.fawaveUserInfo img.userImg').attr('src', user.profile_image_url);
-	$('.fawaveUserInfo a').attr('href', user.t_url).attr('title', user.screen_name);
+	initSelectSendAccounts();
 	
     $("#txtContent").focus();
     
@@ -30,52 +27,12 @@ function init(){
     $(window).unload(function(){ initOnUnload(); }); 
 };
 
-function initTxtContentEven(){
-//>>>发送微博开始<<<
-    var unsendTweet = localStorage.getObject(UNSEND_TWEET_KEY);
-    if(unsendTweet){
-        $("#txtContent").val(unsendTweet);
-        //showMsgInput();
-        //countInputText();
-    }
 
-    $("#txtContent").keyup(function(){
-        var c = $(this).val();
-        countInputText();
-        //if(c){
-        //    showMsgInput();
-        //}
-    });
-
-    $("#txtContent").focus(function(){
-        showMsgInput();
-        countInputText();
-    });
-
-    $("#txtContent").keydown(function(event){
-        var c = $.trim($(this).val());
-        if(event.ctrlKey && event.keyCode==13){
-            if(c){
-                sendSinaMsg(c);
-            }else{
-                _showMsg('请输入要发送的内容');
-            }
-            return false;
-        }
-    });
-
-    $("#btnSend").click(function(){
-        sendSinaMsg();
-    });
-//>>>发送嘀咕结束<<<
-};
-
-
-function sendSinaMsg(){
+function sendMsg(){ //覆盖popup.js的同名方法
 
     var check = true;
-    var user = getUser();
-    if(!user){
+    var c_user = getUser();
+    if(!c_user){
         _showMsg('用户未指定，请在选项里面添加');
         check = false;
     }
@@ -91,22 +48,62 @@ function sendSinaMsg(){
 
     if(!check){ return; }
 	
-    var pic = {file: file};
-    var data = {status: msg};
-    
-    tapi.upload(user, data, pic, 
-    	function() {
-    		_showLoading();
-    		disabledUpload();
-    	}, 
-    	function(ev) {
-    		onprogress(ev);
-    	}, 
-    	function(data, textStatus, error_code) {
-    		processUploadResult(data, textStatus, error_code);
-            _hideLoading();
-    	}
-    );
+    var users = [], selLi = $("#accountsForSend .sel");
+    if(selLi.length){
+        selLi.each(function(){
+            var uniqueKey = $(this).attr('uniqueKey');
+            var _user = getUserByUniqueKey(uniqueKey);
+            if(_user){
+                users.push(_user);
+            }
+        });
+    }else{
+        users.push(getUser());
+    }
+    var userCount = users.length, sendedCount = 0, successCount = 0;
+    for(i in users){
+        var user = users[i];
+        var pic = {file: file};
+        var data = {status: msg};
+        
+        tapi.upload(user, data, pic, 
+            function() {
+                _showLoading();
+                disabledUpload();
+            }, 
+            function(ev) {
+                onprogress(ev);
+            }, 
+            function(data, textStatus, error_code) {
+                //processUploadResult(data, textStatus, error_code);
+
+                sendedCount++;
+                if(textStatus != 'error' && data && !data.error){
+                    successCount++;
+                }else if(data.error){
+                    _showMsg('error: ' + data.error);
+                }
+                if(successCount >= userCount){//全部发送成功
+                    _showMsg('发送成功');
+                    $("#txtContent").val('');
+                    $("#imgPreview").html('');
+                    $("#progressInfo").html('');
+                    $("#progressBar span").html("");
+                }
+                if(sendedCount >= userCount){//全部发送完成
+                    $("#progressBar")[0].style.width = "0%";
+                    enabledUpload();
+                    _hideLoading();
+                    if(successCount > 0){ //有发送成功的
+                        setTimeout(callCheckNewMsg, 1000);
+                        if(userCount > 1){ //多个用户的
+                            _showMsg(successCount + '发送成功，' + (userCount - successCount) + '失败。');
+                        }
+                    }
+                }
+            }
+        );
+    }
 };
 
 var FILECHECK = {maxFileSize: 1024000,
@@ -171,20 +168,6 @@ function selectFile(fileEle){
         }
     }
 };
-
-function processUploadResult(tweet, textStatus, statusCode){
-    if(textStatus != 'error' && tweet && !tweet.error){
-        _showMsg('发送成功');
-        $("#txtContent").val('');
-        $("#imgPreview").html('');
-        $("#progressInfo").html('');
-        $("#progressBar")[0].style.width = "0%";
-        $("#progressBar span").html("");
-    }else{
-    }
-    enabledUpload();
-};
-
 
 function disabledUpload(){
     $("#btnSend").attr('disabled', true);

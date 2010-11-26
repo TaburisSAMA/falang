@@ -25,17 +25,20 @@
 
  <body onload="initOnLoad();" style="margin:0 auto;">
     
-	<div style="padding-top:10px;">
-		<textarea id="txtContent" style="width:100%;" rows="5" class="" ></textarea>
-	</div>
-	<div id="submitWarp" >
-	    <span class="fawaveUserInfo"><a href="" target="_blank"><img src="" class="userImg" /></a><img src="" class="blogType" /></span>
-		<input id="btnSend" type="button" value="发微!" title="ctrl+enter" class="btn" />&nbsp;
-		<a href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');" title="点击添加表情"><img src="images/face.gif" />表情</a>&nbsp;
-		<input type="button" value="清空" onclick="cleanTxtContent();" class="btn"/>&nbsp;
-		<input type="button" value="关闭" onclick="window.close();" class="btn"/>
-		<span id="wordCount">140</span>
-	</div>
+	<div id="submitWarp"  style="margin-top:10px;">
+	  <div class="w">
+		<ul id="accountsForSend"></ul>
+		<textarea id="txtContent" ></textarea>
+		<div class="ctr">
+			<input id="btnSend" type="button" value="发微!" title="ctrl + enter 发送" class="btn send" disabled="disabled" />&nbsp;
+			<a href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');" title="点击添加表情"><img src="images/face.gif" />表情</a>&nbsp;
+			<input type="button" value="清空" onclick="cleanTxtContent();" class="btn"/>&nbsp;
+			<input type="button" value="关闭" onclick="window.close();" class="btn"/>&nbsp;
+			<span id="wordCount">140</span>
+		</div>
+	  </div>
+	</div><!-- submitWarp END -->
+
 	<div>
 		<div class="fileSel graph">
 			<strong id="progressBar" class="bar" style="width: 0%;"><span></span></strong>
@@ -57,7 +60,7 @@
 	<a class="close" href="javascript:void(fawave.face.hide())" title="关闭"></a>
 	</div>
 	<div class="faceItemPicbg">
-	<ul id="face_icons"><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[足球]" title="足球"><img src="images/faces/football.gif" alt="足球"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[哨子]" title="哨子"><img src="images/faces/shao.gif" alt="哨子"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[红牌]" title="红牌"><img src="images/faces/redcard.gif" alt="红牌"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[黄牌]" title="黄牌"><img src="images/faces/yellowcard.gif" alt="黄牌"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[哈哈]" title="哈哈"><img src="images/faces/laugh.gif" alt="哈哈"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[呵呵]" title="呵呵"><img src="images/faces/smile.gif" alt="呵呵"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[衰]" title="衰"><img src="images/faces/cry.gif" alt="衰"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[汗]" title="汗"><img src="images/faces/sweat.gif" alt="汗"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[爱你]" title="爱你"><img src="images/faces/love.gif" alt="爱你"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[嘻嘻]" title="嘻嘻"><img src="images/faces/tooth.gif" alt="嘻嘻"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[哼]" title="哼"><img src="images/faces/hate.gif" alt="哼"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[心]" title="心"><img src="images/faces/heart.gif" alt="心"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[晕]" title="晕"><img src="images/faces/dizzy.gif" alt="晕"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[怒]" title="怒"><img src="images/faces/angry.gif" alt="怒"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[蛋糕]" title="蛋糕"><img src="images/faces/cake.gif" alt="蛋糕"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[花]" title="花"><img src="images/faces/flower.gif" alt="花"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[抓狂]" title="抓狂"><img src="images/faces/crazy.gif" alt="抓狂"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[困]" title="困"><img src="images/faces/sleepy.gif" alt="困"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[干杯]" title="干杯"><img src="images/faces/cheer.gif" alt="干杯"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[太阳]" title="太阳"><img src="images/faces/sun.gif" alt="太阳"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[下雨]" title="下雨"><img src="images/faces/rain.gif" alt="下雨"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[泪]" title="泪"><img src="images/faces/sad.gif" alt="泪"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[月亮]" title="月亮"><img src="images/faces/moon.gif" alt="月亮"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[猪头]" title="猪头"><img src="images/faces/pig.gif" alt="猪头"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[蜡烛]" title="蜡烛"><img src="images/faces/candle.gif" alt="蜡烛"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[伤心]" title="伤心"><img src="images/faces/unheart.gif" alt="伤心"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[风扇]" title="风扇"><img src="images/faces/fan.gif" alt="风扇"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[冰棍]" title="冰棍"><img src="images/faces/ice.gif" alt="冰棍"></a></li><li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[西瓜]" title="西瓜"><img src="images/faces/watermelon.gif" alt="西瓜"></a></li></ul>
+	<ul id="face_icons"></ul>
 	</div></div></div></div>
 	<input id="face_box_target_id" type="hidden" value="" />
 	<!-- 表情选择 End -->

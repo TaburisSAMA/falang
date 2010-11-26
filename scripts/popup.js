@@ -329,7 +329,8 @@ function initChangeUserList(){
 function showHeaderUserInfo(c_user){
     var h_user = $("#header .user");
     h_user.find('.face').attr('href', c_user.t_url);
-    h_user.find('.face img').attr('src', c_user.profile_image_url);
+    h_user.find('.face .icon').attr('src', c_user.profile_image_url);
+    h_user.find('.face .bt').attr('src', 'images/blogs/'+c_user.blogType+'_16.png');
     h_user.find('.info .name').html(c_user.screen_name);
     var nums = '粉{{friends_count}}, {{followers_count}}粉, {{statuses_count}}微博'.format(c_user);
     h_user.find('.info .nums').html(nums);
