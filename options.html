@@ -58,17 +58,30 @@
 			<ul>
 				<li>新浪微博的API，由于cookie信息会干扰Basic Authentcation的认证，而我至今未找到解决办法，所以在添加或者编辑用户信息的时候，为了确保你可以正确设置你的账号信息，请你先<b><a href="http://t.sina.com.cn/logout.php?backurl=/" target="_blank">退出新浪微博</a></b></li>
 				<li>
-					<label for="account-blogType">微　博：</label>
-					<select id="account-blogType">
+					<label for="account-blogType">微　　博：</label>
+					<select id="account-blogType" onchange="onSelBlogTypeChange()">
 					</select>
+					<img id="account-blogType-img" src="images/blogs/tsina_16.png" />
 				</li>
 				<li>
-					<label for="account-name">用户名：</label>
+					<label for="account-authType">验证类型：</label>
+					<select id="account-authType">
+					</select>
+					<span class="jTip" jTitle="验证类型说明:　">?
+						<span class="c">TODO:待补充</span>
+					</span>
+				</li>
+				<li>
+					<label for="account-pin">　授权码：</label>
+					<input type="text" id="account-pin" /> TODO:根据认证类型判断隐藏、显示
+				</li>
+				<li>
+					<label for="account-name">　用户名：</label>
 					<input type="text" id="account-name" />
 					<input type="hidden" id="edit-account-key" />
 				</li>
 				<li>
-					<label for="account-pwd">密　码：</label>
+					<label for="account-pwd">密　　码：</label>
 					<input type="password" id="account-pwd" />
 				</li>
 				<li>

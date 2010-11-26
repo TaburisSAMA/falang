@@ -4,6 +4,16 @@ var KEYCODE_MAP = {8:"BackSpace", 9:"Tab", 12:"Clear", 13:"Enter", 16:"Shift", 1
 
 var LOCAL_STORAGE_NUM_KEY = 'idi_local_storage_num';
 
+var SUPPORT_AUTH_TYPES = {
+	'tsina': [ ['baseauth', 'Base Auth'], ['oauth', 'oAuth'], ['xauth', 'xAuth'] ],
+	'tsohu': [ ['baseauth', 'Base Auth'], ['xauth', 'xAuth'] ],
+	'digu': [ ['baseauth', 'Base Auth'], ['oauth', 'oAuth'], ['xauth', 'xAuth'] ],
+	'zuosa': [ ['baseauth', 'Base Auth'], ['oauth', 'oAuth'], ['xauth', 'xAuth'] ],
+	'follow5': [ ['baseauth', 'Base Auth'], ['oauth', 'oAuth'], ['xauth', 'xAuth'] ],
+	'leihou': [ ['baseauth', 'Base Auth'], ['oauth', 'oAuth'], ['xauth', 'xAuth'] ],
+	'twitter': [ ['baseauth', 'Base Auth'], ['oauth', 'oAuth'], ['xauth', 'xAuth'] ]
+};
+
 $(function(){
     initTab();
 
@@ -92,6 +102,7 @@ function showAccountList(){
     	blogtype_options += '<option value="{{value}}">{{name}}</option>'.format({name: T_NAMES[k], value: k});
     }
     $('#account-blogType').html(blogtype_options);
+    showSupportAuthTypes($('#account-blogType').val());
     
 }
 
@@ -257,7 +268,7 @@ function initQuickSendHotKey(){
 //如果其他微博类型的字段名与新浪的不同，则与新浪的为准，修改后再保存
 // 保存的账号信息有以下附加属性：
 //   - uniqueKey: 唯一标识账号的键， blogType_userId , userId为返回的用户信息的用户id. 用下划线分隔是因为下划线可以用在css class里面
-//   - authType: 认证类型：oauth, baseauth,
+//   - authType: 认证类型：oauth, baseauth, xauth
 //   - userName: baseAuth认证的用户名
 //   - password: baseAuth认证的密码
 //   - oauth_token_key: oauth认证获取到的的key
@@ -267,6 +278,7 @@ function saveAccount(){
     var userName = $.trim($("#account-name").val());
     var pwd = $.trim($("#account-pwd").val());
     var blogType = $.trim($("#account-blogType").val()) || 'tsina'; //微博类型，兼容，默认tsina
+    var authType = $.trim($("#account-authType").val()); //登录验证类型
     if(userName && pwd){
         userName = userName.toLowerCase(); //小写
         var userList = getUserList();
@@ -291,6 +303,7 @@ function saveAccount(){
                 data.userName = user.userName;//兼容预览版
                 data.password = user.password;
                 data.blogType = blogType;
+                data.authType = authType;
                 data.uniqueKey = blogType + '_' + data.id;
                 data.screen_name = data.screen_name || data.name;
                 userList[data.uniqueKey] = data;
@@ -313,7 +326,29 @@ function saveAccount(){
     }else{
         _showMsg('请输入用户名和密码！');
     }
-}
+};
+
+function onSelBlogTypeChange(){
+    var blogType = $("#account-blogType").val();
+    $("#account-blogType-img").attr('src', 'images/blogs/' + blogType + '_16.png');
+    showSupportAuthTypes(blogType);
+};
+
+function showSupportAuthTypes(blogType){
+    var types = SUPPORT_AUTH_TYPES[blogType];
+    if(!types){
+        _showMsg('没有"' + blogType + '"支持的验证类型');
+        return;
+    }
+    var selAT = $("#account-authType");
+    selAT.html('');
+    // 添加认证类型
+    var authtype_options = '';
+    for(var i in types) {
+    	authtype_options += '<option value="{{value}}">{{name}}</option>'.format({name: types[i][1], value: types[i][0]});
+    }
+    selAT.html(authtype_options);
+};
 
 function showEditAccount(uniqueKey){
     if(uniqueKey){
@@ -326,12 +361,13 @@ function showEditAccount(uniqueKey){
         if(user){
             $("#new-account").show();
             $("#account-blogType").val(user.blogType);
+            showSupportAuthTypes(user.blogType);
             $("#account-name").val(user.userName);
             $("#account-pwd").val(user.password);
             $("#save-account").val('保存');
         }
     }
-}
+};
 
 function delAccount(uniqueKey){
     if(uniqueKey){
@@ -360,7 +396,7 @@ function delAccount(uniqueKey){
         }
         _showMsg('成功删除账号"' + u_name + '"！');
     }
-}
+};
 
 function saveAll(){
     var t = $("#selRefreshTime").val(); //刷新频率
@@ -478,9 +514,9 @@ function refreshAccountWarp(userList, r_user, stat){
             //userList[user.userName] = user;
             stat.errorCount++;
         }else{
-            data.userName = user.userName;//兼容预览版
-            data.password = user.password;
-            data.blogType = user.blogType || 'tsina'; //兼容单微博版
+            user.blogType = user.blogType || 'tsina'; //兼容单微博版
+            user.authType = user.authType || 'baseauth'; //兼容单微博版
+            data = $.extend({},user, data); //合并，以data的数据为准
             data.uniqueKey = data.blogType + '_' + data.id;
             userList[data.uniqueKey] = data;
             stat.successCount++;
