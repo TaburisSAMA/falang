@@ -162,7 +162,7 @@ li { line-height:16px;}
 /* 用户发送列表选择 END */
 
 .warp { width:480px; position:relative; /*border:1px solid #ace; padding-bottom:10px;*/} 
-.list_warp { margin:0; height: 470px; overflow:auto; -webkit-transition: height .6s ease;} 
+.list_warp { margin:0; height: 470px; overflow-x:hidden; overflow-y:auto; -webkit-transition: height .6s ease;} 
 /*
 .tabs { overflow:hidden; background:#f1f7fc;height:24px;}
 .tabs li {line-height:23px; height:23px; border:1px solid #ace; border-width:0 1px 1px 0; background:#f1f7fc; padding:0 5px; text-align:center; float:left; cursor:pointer;} 

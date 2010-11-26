@@ -1164,7 +1164,7 @@ function callCheckNewMsg(){
 function showMsgInput(){
     initSelectSendAccounts();
     var h_submitWrap = $("#submitWarp .w").height();
-    var h = WH[1] - 41 - h_submitWrap;
+    var h = WH[1] - 61 - h_submitWrap;
     $(".list_warp").css('height', h);
     $("#submitWarp").data('status', 'show').css('height', h_submitWrap);
     var _txt = $("#txtContent").val();
@@ -1175,7 +1175,7 @@ function showMsgInput(){
 
 function hideMsgInput(){
     fawave.face.hide();
-    var h = WH[1] - 41;
+    var h = WH[1] - 61;
     $(".list_warp").css('height', h);
     $("#submitWarp").data('status', 'hide').css('height', 0);
     $("#header .write").removeClass('active').find('b').removeClass('up');
