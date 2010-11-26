@@ -5,13 +5,19 @@ var KEYCODE_MAP = {8:"BackSpace", 9:"Tab", 12:"Clear", 13:"Enter", 16:"Shift", 1
 var LOCAL_STORAGE_NUM_KEY = 'idi_local_storage_num';
 
 var SUPPORT_AUTH_TYPES = {
-	'tsina': [ ['baseauth', 'Base Auth'], ['oauth', 'oAuth'], ['xauth', 'xAuth'] ],
-	'tsohu': [ ['baseauth', 'Base Auth'], ['xauth', 'xAuth'] ],
-	'digu': [ ['baseauth', 'Base Auth'], ['oauth', 'oAuth'], ['xauth', 'xAuth'] ],
-	'zuosa': [ ['baseauth', 'Base Auth'], ['oauth', 'oAuth'], ['xauth', 'xAuth'] ],
-	'follow5': [ ['baseauth', 'Base Auth'], ['oauth', 'oAuth'], ['xauth', 'xAuth'] ],
-	'leihou': [ ['baseauth', 'Base Auth'], ['oauth', 'oAuth'], ['xauth', 'xAuth'] ],
-	'twitter': [ ['baseauth', 'Base Auth'], ['oauth', 'oAuth'], ['xauth', 'xAuth'] ]
+	'tsina': ['baseauth', 'oauth', 'xauth'],
+	'tsohu': ['baseauth', 'xauth'],
+	'digu': ['baseauth', 'oauth', 'xauth'],
+	'zuosa': ['baseauth', 'oauth', 'xauth'],
+	'follow5': ['baseauth', 'oauth', 'xauth'],
+	'leihou': ['baseauth', 'oauth', 'xauth'],
+	'twitter': ['baseauth', 'oauth', 'xauth']
+};
+
+var AUTH_TYPE_NAME = {
+    'baseauth': 'Base Auth',
+    'oauth': 'oAuth',
+    'xauth': 'xAuth'
 };
 
 $(function(){
@@ -345,7 +351,7 @@ function showSupportAuthTypes(blogType){
     // 添加认证类型
     var authtype_options = '';
     for(var i in types) {
-    	authtype_options += '<option value="{{value}}">{{name}}</option>'.format({name: types[i][1], value: types[i][0]});
+    	authtype_options += '<option value="{{value}}">{{name}}</option>'.format({name: AUTH_TYPE_NAME[types[i]], value: types[i]});
     }
     selAT.html(authtype_options);
 };
