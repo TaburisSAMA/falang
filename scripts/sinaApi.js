@@ -14,7 +14,7 @@ var sinaApi = {
 		host: 'http://api.t.sina.com.cn',
 		result_format: '.json',
 		source: '3538199806',
-        source2: '2721776383', // other key
+        source2: '3538199806', //'2721776383', // other key
         
         support_comment: true, // 判断是否支持评论
 		support_upload: true, // 是否支持上传图片
@@ -48,6 +48,7 @@ var sinaApi = {
         direct_messages:      '/direct_messages', 
         new_message:          '/direct_messages/new',
         verify_credentials:   '/account/verify_credentials',
+        rate_limit_status:    '/account/rate_limit_status',
         friendships_create:   '/friendships/create',
         friendships_destroy:  '/friendships/destroy',
         friendships_show:     '/friendships/show',
@@ -70,6 +71,17 @@ var sinaApi = {
             type: 'get',
             user: user,
             play_load: 'user',
+            data: data
+        };
+        this._sendRequest(params, callbackFn);
+	},
+        
+    rate_limit_status: function(data, callbackFn){
+        if(!callbackFn) return;
+        var params = {
+            url: this.config.rate_limit_status,
+            type: 'get',
+            play_load: 'rate',
             data: data
         };
         this._sendRequest(params, callbackFn);
@@ -771,6 +783,10 @@ $.extend(DiguAPI, {
         comment:              '/statuses/update',
         reply:                '/statuses/update'
 	}),
+
+    rate_limit_status: function(data, callback){
+        callback({error:'not support'});
+    },
 	
 	counts: function(data, callback) {
 		callback();
@@ -1404,6 +1420,10 @@ var tapi = {
 	
 	verify_credentials: function(user, callbackFn, data){
 	    return this.api_dispatch(user).verify_credentials(user, callbackFn, data);
+	},
+        
+    rate_limit_status: function(data, callbackFn){
+	    return this.api_dispatch(data).rate_limit_status(data, callbackFn);
 	},
 
 	// since_id, max_id, count, page 
