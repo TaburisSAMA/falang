@@ -34,7 +34,7 @@
 		function getRateLimits(){
 			var userList = getUserList();
 			var tbody = $("#rateLimitTable tbody");
-			tbody.html();
+			tbody.html('');
 			for(var i in userList){
 				var user = userList[i];
 				tbody.append(tr_tp.format(user));
@@ -49,7 +49,7 @@
 			tapi.rate_limit_status(data, function(data, textStatus, errorCode){
 				if(data && data.hourly_limit ){
 					$("#user_"+user.uniqueKey + " td:eq(2)").html(data.remaining_hits + '/' + data.hourly_limit);
-					$("#user_"+user.uniqueKey + " td:eq(3)").html(Math.round(data.reset_time_in_seconds/60) + '分钟后');
+					$("#user_"+user.uniqueKey + " td:eq(3)").html(new Date(data.reset_time).format("yyyy-MM-dd hh:mm:ss"));
 				}else{
 					$("#user_"+user.uniqueKey + " td:eq(2)").html('<span class="error">请求出错： ' + data.error + '</span>');
 				}
