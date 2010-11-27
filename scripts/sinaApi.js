@@ -14,10 +14,8 @@ var sinaApi = {
 		host: 'http://api.t.sina.com.cn',
 		result_format: '.json',
 		source: '3538199806',
-//        oauth_key: '3538199806',
-//        oauth_secret: '18cf587d60e11e3c160114fd92dd1f2b',
-        oauth_key: '38950085',
-        oauth_secret: '4c6e31814287063de180f0fb5ca139b6',
+        oauth_key: '3538199806',
+        oauth_secret: '18cf587d60e11e3c160114fd92dd1f2b',
         
         support_comment: true, // 判断是否支持评论
 		support_upload: true, // 是否支持上传图片
