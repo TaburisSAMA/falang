@@ -149,6 +149,7 @@
 		<input type="hidden" id="actionType" value="" />
 		<input type="hidden" id="replyTweetId" value="" />
 		<input type="hidden" id="replyUserName" value="" />
+		<input type="hidden" id="replyUserId" value="" />
 		<input type="hidden" id="whisperToUserId" value="" />
 		<input type="hidden" id="repostTweetId" value="" />
 		<input type="hidden" id="commentTweetId" value="" />
@@ -179,7 +180,7 @@
 				<div class="usericon">
 				    <span class="showtip">
 						<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" rhref="#{user.t_url}">
-							<img src="#{user.profile_image_url.replace('24x24', '48x48')}">
+							<img src="#{user.profile_image_url.replace('24x24', '48x48')}" />
 						</a>
 						#{buildTipboxUserInfo(user)}
 				    </span>

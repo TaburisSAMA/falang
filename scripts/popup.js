@@ -730,8 +730,10 @@ function showCounts(t, ids){
 //@tweetId: 微博ID
 //@page: 分页
 //@notHide: 不要隐藏评论列表
-function showComments(ele,tweetId, page, notHide){
+function showComments(ele, tweetId, page, notHide){
     if(tweetId){
+    	// 获取status的screen_name
+    	var screen_name = $.trim($(ele).parents('.userName').find('.showtip a').html()).substring(1);
         var comment_p = $(ele).closest('.commentWrap');
         var commentWrap = comment_p.children('.comments');
         if(!notHide && commentWrap.css('display') != 'none'){
@@ -750,7 +752,7 @@ function showComments(ele,tweetId, page, notHide){
                 if(comments.length && comments.length>0){
                     var _html = '';
                     for(i in comments){
-                        var comment_li = buildComment(comments[i]);
+                        var comment_li = buildComment(comments[i], tweetId, screen_name);
                         _html += comment_li;
                     }
                     commentWrap.children('.comment_list').html(_html);
@@ -1134,13 +1136,18 @@ function sendComment(msg, commentTweetId, notSendMord){
     txt = $("#replyTextarea");
     cid = $('#commentCommentId').val();
     commentTweetId = commentTweetId || $('#commentTweetId').val();
-    data = {comment: msg, id:commentTweetId, cid:cid};
+    data = {comment: msg, id: commentTweetId};
     var user = getUser();
     data['user'] = user;
     btn.attr('disabled','true');
     txt.attr('disabled','true');
     var m = 'comment';
-    if(cid){ m = 'reply';} //如果是回复别人的微博
+    if(cid){ //如果是回复别人的微博
+    	m = 'reply';
+    	data.cid = cid;
+    	var reply_user_id = $('#replyUserId').val();
+    	data.reply_user_id = reply_user_id;
+    } 
     tapi[m](data, function(sinaMsg, textStatus){
         if(sinaMsg.id){
             hideReplyInput();
@@ -1284,10 +1291,11 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
     countReplyText();
 };
 
-function doComment(ele, userName, tweetId, replyUserName, cid){//评论 cid:回复的评论ID
+function doComment(ele, userName, tweetId, replyUserName, replyUserId, cid){//评论 cid:回复的评论ID
     $('#actionType').val('comment');
     $('#commentTweetId').val(tweetId);
     $('#replyUserName').val(userName);
+    $('#replyUserId').val(replyUserId || '');
     $('#commentCommentId').val(cid||'');
     $('#ye_dialog_title').html('评论@' + userName + ' 的信息');
     $('#ye_dialog_window').show();

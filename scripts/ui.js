@@ -207,7 +207,7 @@ function bildMsgLi(sinaMsg, t, c_user){
             case 'comments_timeline':
                 crlBtn.repostBtn = crlBtn.repostCounts = crlBtn.commentCounts = crlBtn.delTweetBtn = crlBtn.delDirectMsgBtn = crlBtn.addFavoritesMsgBtn = crlBtn.delFavoritesMsgBtn = '';
                 crlBtn.commentBtn = '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + 
-                	sinaMsg.status.user.screen_name + '\',' + sinaMsg.status.id + ',\'' + user.screen_name + '\', ' + sinaMsg.id + ');" title="点击回复评论">回复</a>';
+                	sinaMsg.status.user.screen_name + '\',' + sinaMsg.status.id + ',\'' + user.screen_name + '\', ' + user.id + ', ' + sinaMsg.id + ');" title="点击回复评论">回复</a>';
                 if(c_user.id == user.id){
                     crlBtn.new_msgBtn = '';
                 }else{
@@ -323,10 +323,21 @@ function buildFansLi(user, t){
 /**
  * 生成评论列表
  */
-function buildComment(comment){
+function buildComment(comment, status_id, status_user_screen_name){
     var c_user = getUser();
-    var commentBtn = '<a class="replyComment" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + comment.status.user.screen_name + '\',' + comment.status.id + ',\''+ comment.user.screen_name + '\',' + comment.id + ');" title="评论回复">回复</a>';
-    
+    if(comment.status && comment.status.id) {
+    	status_id = comment.status.id;
+    	if(comment.status.user) {
+    		status_user_screen_name = comment.status.user.screen_name;
+    	}
+    }
+    var commentBtn = '<a class="replyComment" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{status_user_screen_name}}\',{{status_id}},\'{{comment_user_screen_name}}\',{{comment_user_id}},{{comment_id}});" title="评论回复">回复</a>'.format({
+    	status_id: status_id,
+    	status_user_screen_name: status_user_screen_name,
+    	comment_id: comment.id,
+    	comment_user_screen_name: comment.user.screen_name,
+    	comment_user_id: comment.user.id
+    });
     var tp = '<li>' 
             + processMsg('@'
                         + comment.user.screen_name

@@ -815,15 +815,11 @@ $.extend(TSohuAPI, {
 	    repost: '/statuses/transmit/{{id}}',
 	    friendships_create:   '/friendship/create/{{id}}',
         friendships_destroy:  '/friendship/destroy/{{id}}',
-        counts: '/statuses/counts/{{ids}}',
 	    mentions: '/statuses/mentions_timeline',
+	    comments: '/statuses/comments/{{id}}',
+	    reply: '/statuses/comment',
 	    user_timeline: '/statuses/user_timeline/{{id}}'
 	}),
-	
-	// 不支持批量获取，暂时屏蔽
-	counts: function(data, callback) {
-	
-	},
 	
 	before_sendRequest: function(args) {
 		if(args.url == this.config.new_message) {
@@ -868,6 +864,11 @@ $.extend(TSohuAPI, {
 		} else if(play_load == 'message') {
 			this.format_result_item(data.sender, 'user', args);
 			this.format_result_item(data.recipient, 'user', args);
+		} else if(play_load == 'count') {
+			data.rt = data.transmit_count;
+			data.comments = data.comments_count;
+			delete data.transmit_count;
+			delete data.comments_count;
 		}
 		return data;
 	}
