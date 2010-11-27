@@ -23,6 +23,8 @@
 	<script type="text/javascript" src="/scripts/lib/facebox.js" ></script>
 	<script type="text/javascript" src="/scripts/lib/Base64.js" ></script>
 	<script type="text/javascript" src="/scripts/utili.js" ></script>
+	<script type="text/javascript" src="scripts/lib/sha1.js" ></script>
+    <script type="text/javascript" src="scripts/lib/oauth.js" ></script>
 	<script type="text/javascript" src="/scripts/sinaApi.js" ></script>
 	<script type="text/javascript" >
 		var tr_tp = '<tr id="user_{{uniqueKey}}"><td><img class="icon" src="{{profile_image_url}}" />{{screen_name}}</td>\
@@ -71,7 +73,7 @@
 			应用推荐： <a href="http://timgs.sinaapp.com/" target="_blank">微博图墙</a>
 		</span>
 	</div>
-<div>
+</div>
 <div>
 	<h2>API访问频率限制</h2>
 	<a href="javascript:" onclick="getRateLimits()">刷新</a>
