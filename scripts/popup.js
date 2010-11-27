@@ -659,16 +659,22 @@ function getSinaTimeline(t, notCheckNew){
     var _key = c_user.uniqueKey + t + '_tweets';
     if(b_view && b_view.tweets[_key] != undefined && b_view.tweets[_key].length>0){
         var tweetsAll = b_view.tweets[_key];
-        var tweets = tweetsAll.slice(0, PAGE_SIZE);
+        var msgs = tweetsAll.slice(0, PAGE_SIZE);
         var html = '';
         var ids = [];
-        for(var i in tweets){
-            html += bildMsgLi(tweets[i], t); //TODO: 待优化
-            ids.push(tweets[i].id);
-            if(tweets[i].retweeted_status){
-                ids.push(tweets[i].retweeted_status.id);
-            }else if(tweets[i].status){
-                ids.push(tweets[i].status.id);
+        for(var i in msgs){
+            html += bildMsgLi(msgs[i], t); //TODO: 待优化
+            ids.push(msgs[i].id);
+            if(msgs[i].retweeted_status){
+                ids.push(msgs[i].retweeted_status.id);
+                if(msgs[i].retweeted_status.retweeted_status) {
+                	ids.push(msgs[i].retweeted_status.retweeted_status.id);
+                }
+            }else if(msgs[i].status){
+                ids.push(msgs[i].status.id);
+                if(msgs[i].status.retweeted_status) {
+                	ids.push(msgs[i].status.retweeted_status.id);
+                }
             }
         }
         _ul.append(html);
@@ -878,16 +884,22 @@ function readMore(t){
     if(getTimelineOffset(t) >= cache.length){
         _b_view.getTimelinePage(c_user.uniqueKey, t);
     }else{
-        var tweets = cache.slice(getTimelineOffset(t), getTimelineOffset(t) + PAGE_SIZE);
+        var msgs = cache.slice(getTimelineOffset(t), getTimelineOffset(t) + PAGE_SIZE);
         var _html = '';
         var ids = [];
-        for(i in tweets){
-            _html += bildMsgLi(tweets[i], t);
-            ids.push(tweets[i].id);
-            if(tweets[i].retweeted_status){
-                ids.push(tweets[i].retweeted_status.id);
-            }else if(tweets[i].status){
-                ids.push(tweets[i].status.id);
+        for(var i in msgs){
+            _html += bildMsgLi(msgs[i], t);
+            ids.push(msgs[i].id);
+            if(msgs[i].retweeted_status){
+                ids.push(msgs[i].retweeted_status.id);
+                if(msgs[i].retweeted_status.retweeted_status) {
+                	ids.push(msgs[i].retweeted_status.retweeted_status.id);
+                }
+            }else if(msgs[i].status){
+                ids.push(msgs[i].status.id);
+                if(msgs[i].status.retweeted_status) {
+                	ids.push(msgs[i].status.retweeted_status.id);
+                }
             }
         }
         //moreEle.before(_html);
@@ -952,8 +964,14 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
             ids.push(msgs[i].id);
             if(msgs[i].retweeted_status){
                 ids.push(msgs[i].retweeted_status.id);
+                if(msgs[i].retweeted_status.retweeted_status) {
+                	ids.push(msgs[i].retweeted_status.retweeted_status.id);
+                }
             }else if(msgs[i].status){
                 ids.push(msgs[i].status.id);
+                if(msgs[i].status.retweeted_status) {
+                	ids.push(msgs[i].status.retweeted_status.id);
+                }
             }
         }
         var _ul = $("#" + t + "_timeline ul.list");
@@ -979,8 +997,14 @@ function addPageMsgs(msgs, t){
         ids.push(msgs[i].id);
         if(msgs[i].retweeted_status){
             ids.push(msgs[i].retweeted_status.id);
+            if(msgs[i].retweeted_status.retweeted_status) {
+            	ids.push(msgs[i].retweeted_status.retweeted_status.id);
+            }
         }else if(msgs[i].status){
             ids.push(msgs[i].status.id);
+            if(msgs[i].status.retweeted_status) {
+            	ids.push(msgs[i].status.retweeted_status.id);
+            }
         }
     }
     var _ul = $("#" + t + "_timeline ul.list");

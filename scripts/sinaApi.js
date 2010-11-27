@@ -836,7 +836,7 @@ $.extend(TSohuAPI, {
 	    
 	    oauth_key: 'WbbRPziVG6',
         oauth_secret: 'Ca(R$X(Ikxzm4RoYXh0afc8C210J%8',
-	    
+        favorites: '/favourites',
 	    favorites_create: '/favourites/create/{{id}}',
 	    favorites_destroy: '/favourites/destroy/{{id}}',
 	    repost: '/statuses/transmit/{{id}}',

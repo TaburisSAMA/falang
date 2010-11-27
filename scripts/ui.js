@@ -137,9 +137,11 @@ function bildMsgLi(sinaMsg, t, c_user){
                 repostBtn: '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + user.screen_name + '\',' + sinaMsg.id + ',\'' + (sinaMsg.retweeted_status ? sinaMsg.retweeted_status.user.screen_name : '') + '\',' + (sinaMsg.retweeted_status ? sinaMsg.retweeted_status.id : '0') + ');" title="转发这条微博">转</a>',
                 repostCounts: '<span class="repostCounts">(-)</span>',
                 rtRepostCounts: '<span class="repostCounts">(-)</span>',
+                rtrtRepostCounts: '<span class="repostCounts">(-)</span>',
                 commentBtn: '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');" title="点击添加评论">评</a>',
                 commentCounts: '<span class="commentCounts">(-)</span>',
                 rtCommentCounts: '<span class="commentCounts">(-)</span>',
+                rtrtCommentCounts: '<span class="commentCounts">(-)</span>',
                 delCommentBtn: '<a class="delcommenttweet" href="javascript:void(0);" onclick="javascript:doDelComment(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');" title="点击删除评论">删</a>',
                 new_msgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="doNewMessage(this,\'' + user.screen_name + '\',\'' + user.id + '\');" title="发送私信">私</a>',
                 delDirectMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="delDirectMsg(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');" title="点击删除私信">删</a>',
@@ -148,7 +150,12 @@ function bildMsgLi(sinaMsg, t, c_user){
                 rtRepostBtn: '',
                 rtCommentBtn: '',
                 rtReplyBtn: '',
-                rtAddFavoritesMsgBtn: ''
+                rtAddFavoritesMsgBtn: '',
+                // rt rt
+                rtrtRepostBtn: '',
+                rtrtCommentBtn: '',
+                rtrtReplyBtn: '',
+                rtrtAddFavoritesMsgBtn: ''
         };
 
         var rt_status = sinaMsg.retweeted_status || sinaMsg.status;
@@ -157,6 +164,16 @@ function bildMsgLi(sinaMsg, t, c_user){
             crlBtn.rtCommentBtn = '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + rt_status.user.screen_name + '\',' + rt_status.id + ');" title="点击添加评论">评</a>';
             crlBtn.rtReplyBtn = '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + rt_status.user.screen_name + '\',' + rt_status.id + ');" title="进行@回复">@</a>';
             crlBtn.rtAddFavoritesMsgBtn = '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'' + rt_status.user.screen_name + '\',' + rt_status.id + ');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>';
+            if(rt_status.retweeted_status && rt_status.retweeted_status.user) {
+            	log(rt_status);
+            	var rtrt_screen_name = rt_status.retweeted_status.user.screen_name;
+            	var rtrt_id = rt_status.retweeted_status.id;
+            	crlBtn.rtrtRepostBtn = '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + rtrt_screen_name + '\',' + rtrt_id + ');" title="转发这条微博">转</a>';
+                crlBtn.rtrtCommentBtn = '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + rtrt_screen_name + '\',' + rtrt_id + ');" title="点击添加评论">评</a>';
+                crlBtn.rtrtReplyBtn = '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + rtrt_screen_name + '\',' + rtrt_id + ');" title="进行@回复">@</a>';
+                crlBtn.rtrtAddFavoritesMsgBtn = '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'' + rtrt_screen_name + '\',' + rtrt_id + ');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>';
+                
+            }
         }
         // 不支持评论
         if(!support_comment) {
@@ -265,6 +282,7 @@ function bildMsgLi(sinaMsg, t, c_user){
         if(need_rt_rt) {
         	sinaMsg.retweeted_status.retweeted_status.is_rt = true;
         	rt_rt_tpl = TEMPLATE_RT.replace(/tweet\.retweeted_status\./g, 'tweet.retweeted_status.retweeted_status.');
+        	rt_rt_tpl = rt_rt_tpl.replace(/btn\.rt/g, 'btn.rtrt');
         }
         if(theme=='pip_io'){
             tp = tp.replace('<!-- {{retweeted_status_out}} -->', TEMPLATE_RT);
