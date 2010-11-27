@@ -49,6 +49,7 @@ $(function(){
         if($(this).val()){
             $("#show-edit-account").removeAttr('disabled');
             $("#del-account").removeAttr('disabled');
+            $("#stop-account").removeAttr('disabled');
         }
     });
 
@@ -56,6 +57,15 @@ $(function(){
         if(confirm('你确定要删除该账号吗？')){
             delAccount($("#account-list").val());
         }
+    });
+    
+    $("#stop-account").click(function(){
+        var uniqueKey = $("#account-list").val();
+        var _user = toggleStopAccount(uniqueKey);
+        var stat = _user.disabled ? '停用' : '启用';
+        showAccountList();
+        $("#account-list").val(uniqueKey);
+        _showMsg(_user.screen_name + ' 的状态修改为: ' + stat);
     });
 
     $("#show-edit-account").click(function(){
@@ -91,12 +101,12 @@ $(function(){
 });
 
 function showAccountList(){
-    var userList = getUserList();
+    var userList = getUserList(true);
     var userCount = 0;
     var needRefresh = false;
     if(userList){
         var op = '';
-        var tpl = '<option value="{{uniqueKey}}">({{blogTypeName}}){{screen_name}}</option>';
+        var tpl = '<option value="{{uniqueKey}}">({{stat}}) ({{blogTypeName}}) {{screen_name}}</option>';
         for(var i in userList){
             userCount++;
             var user = userList[i];
@@ -104,6 +114,7 @@ function showAccountList(){
                 needRefresh = true;
             } else {
             	user.blogTypeName = T_NAMES[user.blogType];
+                user.stat = user.disabled ? '停用' : '启用';
             	op += tpl.format(user);
             }
         }
@@ -301,7 +312,7 @@ function _verify_credentials(user) {
                 _showMsg('出现错误，保存失败。' + err_msg);
             }
         } else {
-        	var userList = getUserList();
+        	var userList = getUserList(true);
             if(!userList){
                 userList = {};
             }
@@ -340,6 +351,7 @@ function _verify_credentials(user) {
 //   - oauth_token_key: oauth认证获取到的的key
 //   - oauth_token_secret: oAuth认证获取到的secret
 //   - blogType: 微博类型：tsina, t163, tsohu, twitter, digu
+//   - disabled: 账号是否已停用
 function saveAccount(){
     var userName = $.trim($("#account-name").val());
     var pwd = $.trim($("#account-pwd").val());
@@ -408,7 +420,7 @@ function showSupportAuthTypes(blogType, authType){
 function showEditAccount(uniqueKey){
     if(uniqueKey){
         var option = $("#account-list").find('option:selected');
-        var userList = getUserList();
+        var userList = getUserList(true);
         if(!userList){
             userList = {};
         }
@@ -429,7 +441,7 @@ function delAccount(uniqueKey){
         var option = $("#account-list").find('option:selected');
         var u_name = option.text();
         option.remove();
-        var userList = getUserList();
+        var userList = getUserList(true);
         if(!userList){
             userList = {};
         }
@@ -451,6 +463,27 @@ function delAccount(uniqueKey){
         }
         _showMsg('成功删除账号"' + u_name + '"！');
     }
+};
+
+//停、启用用户账号
+function toggleStopAccount(uniqueKey, is_stop){
+    if(!uniqueKey){ return null; }
+    var userList = getUserList(true);
+    if(!userList || !userList[uniqueKey]){
+        return null;
+    }
+    
+    userList[uniqueKey].disabled = (is_stop == undefined) ? (!userList[uniqueKey].disabled) : is_stop;
+    saveUserList(userList);
+    var c_user = getUser();
+    if(c_user && c_user.uniqueKey.toLowerCase() == uniqueKey.toLowerCase()){
+        var b_view = getBackgroundView();
+        if(b_view){
+            b_view.setUser('');
+            b_view.onChangeUser();
+        }
+    }
+    return userList[uniqueKey];
 };
 
 function saveAll(){
@@ -543,7 +576,7 @@ function refreshAccountInfo(){
     stat.len = 0;
     stat.errorCount = 0;
     stat.successCount = 0;
-    var userList = getUserList();
+    var userList = getUserList(true);
     if(userList){
         $("#refresh-account").attr("disabled", true);
         var temp_userList = {};

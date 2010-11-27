@@ -132,8 +132,17 @@ function setUser(user){
     window.c_user = user;
 };
 //获取所有用户列表
-function getUserList(){
-    return localStorage.getObject(USER_LIST_KEY);
+//@isAll: 默认只返回启用的用户，如果isAll为true，则返回全部用户
+function getUserList(isAll){
+    var userList = localStorage.getObject(USER_LIST_KEY);
+    if(!isAll){
+        for(var key in userList){
+            if(userList[key].disabled){
+                delete userList[key];
+            }
+        }
+    }
+    return userList;
 };
 //保存用户列表
 function saveUserList(userlist){
@@ -143,12 +152,7 @@ function saveUserList(userlist){
 function getUserByUniqueKey(uniqueKey){
     if(!uniqueKey){return null;}
     var userList = getUserList();
-    for(i in userList){
-        if(uniqueKey == userList[i].uniqueKey){
-            return userList[i];
-        }
-    }
-    return null;
+    return userList[uniqueKey] || null;
 }
 
 //获取用户的全部timeline的未读信息数
