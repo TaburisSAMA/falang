@@ -403,7 +403,7 @@ function refreshAccountInfo(){
     stat.len = 0;
     stat.errorCount = 0;
     stat.successCount = 0;
-    var userList = getUserList();
+    var userList = getUserList(true); //不管账号启用还是停用，都更新
     if(userList){
         var temp_userList = {};
         for(key in userList){

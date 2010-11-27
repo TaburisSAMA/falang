@@ -100,6 +100,10 @@ $(function(){
     }));
 });
 
+function disabledUserEditBtns(){
+    $("#show-edit-account, #del-account, #stop-account").attr('disabled', true);
+};
+
 function showAccountList(){
     var userList = getUserList(true);
     var userCount = 0;
@@ -450,6 +454,13 @@ function delAccount(uniqueKey){
                 delete userList[key];
                 saveUserList(userList);
                 //TODO: 删除该用户的缓存数据？
+                for(key in localStorage){
+                    if(key.indexOf(uniqueKey)>-1){
+                        if(key != USER_LIST_KEY && key != CURRENT_USER_KEY){
+                            localStorage.removeItem(key);
+                        }
+                    }
+                }
                 var c_user = getUser();
                 if(c_user && c_user.uniqueKey.toLowerCase() == uniqueKey.toLowerCase()){
                     var b_view = getBackgroundView();
@@ -461,6 +472,7 @@ function delAccount(uniqueKey){
                 break;
             }
         }
+        disabledUserEditBtns();
         _showMsg('成功删除账号"' + u_name + '"！');
     }
 };
