@@ -387,6 +387,7 @@ var sinaApi = {
      * callback: finish callback function
      * */
     upload: function(user, data, pic, before_request, onprogress, callback) {
+    	var auth_args = {type: 'post', data: {}, headers: {}};
     	this.format_upload_params(user, data, pic);
     	pic.keyname = pic.keyname || 'pic';
     	data.source = data.source || this.config.source;
@@ -407,6 +408,7 @@ var sinaApi = {
 		    builder += crlf;
 		    builder += crlf; 
 		     /* Append form data. */
+		    var value = this.url_encode(data[key]);
 		    builder += this.url_encode(data[key]);
 		    builder += crlf;
 		    
@@ -414,6 +416,9 @@ var sinaApi = {
 		    builder += dashdash;
 		    builder += boundary;
 		    builder += crlf;
+		    
+		    // set auth params
+		    auth_args.data[key] = value;
 	    }
 	    
 	    /* Generate headers. [PIC] */            
@@ -444,10 +449,10 @@ var sinaApi = {
 	    	before_request();
 	    }
 		var url = this.config.host + this.config.upload + this.config.result_format;
+		// 设置认证头部
+        this.apply_auth(url, auth_args, user);
 	    $.ajax({
 	        url: url,
-	        username: user.userName,
-	        password: user.password,
 	        cache: false,
 	        timeout: 5*60*1000, //5分钟超时
 	        type : 'post',
@@ -456,7 +461,9 @@ var sinaApi = {
 	        contentType: 'multipart/form-data; boundary=' + boundary,
 	        processData: false,
 	        beforeSend: function(req) {
-	            req.setRequestHeader('Authorization', make_base_auth_header(user.userName, user.password));
+		    	for(var k in auth_args.headers) {
+		    		req.setRequestHeader(k, auth_args.headers[k]);
+	    		}
 	            if(onprogress) {
 	            	if(req.upload){
 		                req.upload.onprogress = function(ev){
@@ -465,7 +472,7 @@ var sinaApi = {
 		            }
 	            }
 	        },
-	        success: function (data, textStatus) {
+	        success: function(data, textStatus) {
 	            try{
 	                data = JSON.parse(data);
 	            }
@@ -694,17 +701,16 @@ var sinaApi = {
             callbackFn({}, 'error', '400');
             return;
         }
-        // 请求前调用
-        this.before_sendRequest(args);
-        // 设置认证头部
-        this.apply_auth(url, args, user);
-        
         if(args.data.status){
         	args.data.status = this.url_encode(args.data.status);
         }
         if(args.data.comment){
         	args.data.comment = this.url_encode(args.data.comment);
         }
+        // 请求前调用
+        this.before_sendRequest(args);
+        // 设置认证头部
+        this.apply_auth(url, args, user);
         var $this = this;
         var play_load = args.play_load; // 返回的是什么类型的数据格式
         delete args.play_load;
