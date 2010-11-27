@@ -777,20 +777,24 @@ var sinaApi = {
             },
             error: function (xhr, textStatus, errorThrown) {
                 var r = null, status = 'unknow';
-                if(xhr){
-                    if(xhr.status){
-                        status = xhr.status;
-                    }
-                    if(xhr.responseText){
-                        var r = xhr.responseText;
-                        try{
-                            r = JSON.parse(r);
+                try{
+                    if(xhr){
+                        if(xhr.status){
+                            status = xhr.status;
                         }
-                        catch(err){
-                            r = null;
+                        if(xhr.responseText){
+                            var r = xhr.responseText;
+                            try{
+                                r = JSON.parse(r);
+                            }
+                            catch(err){
+                                r = null;
+                            }
+                            if(r){showMsg(callmethod + ' error_code:' + r.error_code + ', error:' + r.error);}
                         }
-                        if(r){showMsg(callmethod + ' error_code:' + r.error_code + ', error:' + r.error);}
                     }
+                }catch(err){
+                    r = null;
                 }
                 if(!r){
                     textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';

@@ -630,8 +630,7 @@ function refreshAccountWarp(userList, r_user, stat){
             }else{
                 _showMsg('刷新“' + user.screen_name + '”的信息失败，原因：出现未知错误。');
             }
-            //user.userName = (user.userName||user.name).toLowerCase();
-            //userList[user.userName] = user;
+            userList[user.uniqueKey] = user;
             stat.errorCount++;
         }else{
             user.blogType = user.blogType || 'tsina'; //兼容单微博版

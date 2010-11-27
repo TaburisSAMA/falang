@@ -421,6 +421,7 @@ function refreshAccountWarp(userList, r_user, stat){
     var user = r_user;
     tapi.verify_credentials(user,function(data, textStatus, errorCode){
         if(errorCode){
+            userList[user.uniqueKey] = user;
             stat.errorCount++;
         }else{
             user.blogType = user.blogType || 'tsina'; //兼容单微博版
