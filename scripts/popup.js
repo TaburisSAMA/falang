@@ -55,6 +55,10 @@ function init(){
         }
     });
 
+    if(window.is_new_win_popup){
+        resizeFawave();
+    }
+
     changeAlertMode(getAlertMode());
 
     $('#ye_dialog_close').click(function(){ hideReplyInput(); });
@@ -77,6 +81,10 @@ function init(){
     initScrollPaging();
 
     $(window).unload(function(){ initOnUnload(); }); 
+
+    $(window).resize(function(){
+        resizeFawave();
+    });
 };
 
 function initTabs(){
@@ -318,9 +326,7 @@ function initChangeUserList(){
             li.push(u_tp.format(user));
         }
         $("#accountListDock").html('<ul>' + li.join('') + '</ul>');
-
-
-
+        $("#msgInfoWarp").css('bottom', 40); //防止被用户列表遮挡
     }
 };
 
@@ -1163,7 +1169,7 @@ function callCheckNewMsg(){
 function showMsgInput(){
     initSelectSendAccounts();
     var h_submitWrap = $("#submitWarp .w").height();
-    var h = WH[1] - 61 - h_submitWrap;
+    var h = window.innerHeight - 70 - h_submitWrap;
     $(".list_warp").css('height', h);
     $("#submitWarp").data('status', 'show').css('height', h_submitWrap);
     var _txt = $("#txtContent").val();
@@ -1175,7 +1181,7 @@ function showMsgInput(){
 
 function hideMsgInput(){
     fawave.face.hide();
-    var h = WH[1] - 61;
+    var h = window.innerHeight - 70;
     $(".list_warp").css('height', h);
     $("#submitWarp").data('status', 'hide').css('height', 0);
     $("#header .write").removeClass('active').find('b').removeClass('up');
@@ -1193,6 +1199,19 @@ function toogleMsgInput(ele){
 function hideReplyInput(){
     fawave.face.hide();
     $("#ye_dialog_window").hide();
+};
+
+function resizeFawave(w, h){
+    if(!w){
+        w = window.innerWidth;
+    }
+    if(!h){
+        h = window.innerHeight;
+    }
+    var wh_css = '#wrapper{width:'+ w +'px;}'
+				   + '.warp{width:' + w + 'px;}.list_warp{height:' + (h-70) + 'px;}'
+				   + '#facebox img, #facebox canvas{max-width:'+ (w-50) +'px;}';
+	$("#styleCustomResize").html(wh_css);
 };
 
 //====>>>>>>>>>>>>>>>
@@ -1455,7 +1474,7 @@ function delFavorites(ele, screen_name, tweetId){//删除收藏
 
 function showFacebox(ele){
     jQuery.facebox({ image: $(ele).attr('bmiddle'), original: $(ele).attr('original') });
-}
+};
 
 //====>>>>
 //打开上传图片窗口
@@ -1470,10 +1489,16 @@ function openUploadImage(){
 //在新窗口打开popup页
 function openPopupInNewWin(){
     initOnUnload();
+    /*
+    if(getNewWinPopupView()){
+        getNewWinPopupView().blur();
+        getNewWinPopupView().focus();
+        return;
+    } */
     var WH = getWidthAndHeight();
     var l = (window.screen.availWidth-WH[0])/2;
     window.theViewName = 'not_popup';
-    window.open('popup.html?is_new_win=true', '_blank', 'left=' + l + ',top=30,width=' + WH[0] + ',height=' + (WH[1]+10) + ',menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
+    getBackgroundView().new_win_popup.window = window.open('popup.html?is_new_win=true', 'FaWave', 'left=' + l + ',top=30,width=' + WH[0] + ',height=' + (WH[1]+10) + ',menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
 };
 
 //====>>>>

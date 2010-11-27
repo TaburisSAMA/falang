@@ -6,7 +6,6 @@
 	<link rel="stylesheet" media="screen" type="text/css" href="css/popup.css" />
 	<link rel="stylesheet" media="screen" type="text/css" href="" id="cssTheme" />
 	<link rel="stylesheet" media="screen" type="text/css" href="css/facebox/facebox.css">
-	<script type="text/javascript" > window.theViewName = 'popup'; </script>
 	<script type="text/javascript" src="scripts/lib/jquery-1.4.js" ></script>
 	<script type="text/javascript" src="scripts/lib/Base64.js" ></script>
 	<script type="text/javascript" src="scripts/lib/jquery.rotate.1-1.js" ></script>
@@ -14,6 +13,12 @@
 	<script type="text/javascript" src="/scripts/lib/shotenjin.js" ></script>
 	<script type="text/javascript" src="scripts/provinces.js" ></script>
 	<script type="text/javascript" src="scripts/utili.js" ></script>
+	<script type="text/javascript" >
+		window.theViewName = 'popup';
+		if(window.location.search.indexOf('is_new_win=true')>0){
+			window.is_new_win_popup = true;
+		}
+	</script>
 	<script type="text/javascript" src="scripts/lib/sha1.js" ></script>
 	<script type="text/javascript" src="scripts/lib/oauth.js" ></script>
 	<script type="text/javascript" src="scripts/s8api.js" ></script>
@@ -21,12 +26,14 @@
 	<script type="text/javascript" src="scripts/ui.js" ></script>
 	<script type="text/javascript" src="scripts/popup.js" ></script>
 	<style id="styleCustom" ></style>
+	<style id="styleCustomResize" ></style>
 	<script>
 		var THEME = getTheme();
 		$("#cssTheme").attr('href', '/themes/' + THEME + '/css/theme.css');
 
 		var WH = getWidthAndHeight();
-		var wh_css = 'body{width:'+ WH[0] +'px;font-family:"'+ getFont() +'";font-size:'+ getFontSize() +'px;}'
+		var wh_css = 'body{font-family:"'+ getFont() +'";font-size:'+ getFontSize() +'px;}'
+				   + '#wrapper{width:'+ WH[0] +'px;}'
 				   + '.warp{width:' + WH[0] + 'px;}.list_warp{height:' + (WH[1]-61) + 'px;}'
 				   + '#facebox img, #facebox canvas{max-width:'+ (WH[0]-50) +'px;}';
 		$("#styleCustom").html(wh_css);
@@ -34,96 +41,97 @@
  </head>
 
  <body onload="initOnLoad();">
-	<div id="submitWarp">
-	  <div class="w">
-		<ul id="accountsForSend"></ul>
-		<textarea id="txtContent" ></textarea>
-		<div class="ctr">
-			<input id="btnSend" type="button" value="发微!" title="ctrl + enter 发送" class="btn send" disabled="disabled" />&nbsp;
-			<a href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');" title="点击添加表情"><img src="images/face.gif" />表情</a>&nbsp;
-			<a href="javascript:void(0);" onclick="openUploadImage();" title="点击上传图片"><img src="images/image.gif" />图片</a>&nbsp;
-			<input type="button" value="清空" onclick="cleanTxtContent();" class="btn"/>&nbsp;
-			<span id="doingWarp"></span>
-			<span id="wordCount">140</span>
+	 <div id="wrapper">
+		<div id="submitWarp">
+		  <div class="w">
+			<ul id="accountsForSend"></ul>
+			<textarea id="txtContent" ></textarea>
+			<div class="ctr">
+				<input id="btnSend" type="button" value="发微!" title="ctrl + enter 发送" class="btn send" disabled="disabled" />&nbsp;
+				<a href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');" title="点击添加表情"><img src="images/face.gif" />表情</a>&nbsp;
+				<a href="javascript:void(0);" onclick="openUploadImage();" title="点击上传图片"><img src="images/image.gif" />图片</a>&nbsp;
+				<input type="button" value="清空" onclick="cleanTxtContent();" class="btn"/>&nbsp;
+				<span id="doingWarp"></span>
+				<span id="wordCount">140</span>
+			</div>
+		  </div>
+		</div><!-- submitWarp END -->
+		<div id="header">
+			<span id="loading"><img src="images/loader.gif" /></span>
+			<div class="user">
+				<a class="face" href="#"><img class="icon" src="images/1.gif" /><img class="bt" scr="images/1.gif" /></a>
+				<span class="info">
+					<span class="name"></span><br/>
+					<span class="nums"></span>
+				</span>
+				<a href="javascript:" class="write" onclick="toogleMsgInput(this)">写微博<b></b></a>
+			</div>
+			<ul id="tl_tabs" class="tabs">
+				<span class="btns">
+					<a id="doing" href="javascript:" title="分享你正在看的网页"><img src="images/world_link.png" /></a>
+					<a href="javascript:" title="点击马上获取最新"><img src="images/refresh.png" /></a>
+					<a id="btnNewWinPopup" href="javascript:" onclick="openPopupInNewWin()" title="弹出到新窗口"><img src="images/new_win.png" /></a>
+					<a id="btnAlertMode" href="javascript:" title="" mode="alert" onclick="changeAlertMode()"><img src="images/alert_mode.png" /></a>
+				</span>
+				<li class="tab-friends_timeline active" href="#friends_timeline_timeline">首页<span class="unreadCount"></span></li>
+				<li class="tab-mentions" href="#mentions_timeline">@我<span class="unreadCount"></span></li>
+				<li class="tab-comments_timeline" href="#comments_timeline_timeline">评论<span class="unreadCount"></span></li>
+				<li class="tab-direct_messages" href="#direct_messages_timeline">私信<span class="unreadCount"></span></li>
+				<li class="tab-followers" href="#followers_timeline">粉丝<span class="unreadCount"></span></li>
+				<li class="tab-user_timeline" href="#user_timeline_timeline">微博<span class="unreadCount"></span></li>
+			</ul>
+			<div class="clearFix"></div>
 		</div>
-	  </div>
-	</div><!-- submitWarp END -->
-	<div id="header">
-		<span id="loading"><img src="images/loader.gif" /></span>
-		<div class="user">
-			<a class="face" href="#"><img class="icon" src="images/1.gif" /><img class="bt" scr="images/1.gif" /></a>
-			<span class="info">
-				<span class="name"></span><br/>
-				<span class="nums"></span>
-			</span>
-			<a href="javascript:" class="write" onclick="toogleMsgInput(this)">写微博<b></b></a>
-		</div>
-		<ul id="tl_tabs" class="tabs">
-			<span class="btns">
-				<a id="doing" href="javascript:" title="分享你正在看的网页"><img src="images/world_link.png" /></a>
-				<a href="javascript:" title="点击马上获取最新"><img src="images/refresh.png" /></a>
-				<a href="javascript:" onclick="openPopupInNewWin()" title="弹出到新窗口"><img src="images/new_win.png" /></a>
-				<a id="btnAlertMode" href="javascript:" title="" mode="alert" onclick="changeAlertMode()"><img src="images/alert_mode.png" /></a>
-			</span>
-			<li class="tab-friends_timeline active" href="#friends_timeline_timeline">首页<span class="unreadCount"></span></li>
-			<li class="tab-mentions" href="#mentions_timeline">@我<span class="unreadCount"></span></li>
-			<li class="tab-comments_timeline" href="#comments_timeline_timeline">评论<span class="unreadCount"></span></li>
-			<li class="tab-direct_messages" href="#direct_messages_timeline">私信<span class="unreadCount"></span></li>
-			<li class="tab-followers" href="#followers_timeline">粉丝<span class="unreadCount"></span></li>
-			<li class="tab-user_timeline" href="#user_timeline_timeline">微博<span class="unreadCount"></span></li>
-		</ul>
-		<div class="clearFix"></div>
-	</div>
-	<div class="warp">
-	  <div id='friends_timeline_timeline' class="list_p">
-		<div class="list_warp">
-			<ul class="list"></ul>
-		</div>
-	  </div>
-	  <div id="mentions_timeline" class="list_p" style="display:none;">
-		<div class="list_warp">
-			<ul class="list"></ul>
-		</div>
-	  </div>
-	  <div id="comments_timeline_timeline" class="list_p" style="display:none;">
-		<div class="list_warp">
-			<ul class="list"></ul>
-		</div>
-	  </div>
-	  <div id="direct_messages_timeline" class="list_p" style="display:none;">
-		<div class="list_warp">
-			<ul class="list"></ul>
-		</div>
-	  </div>
-	  <div id="followers_timeline" class="list_p" style="display:none;">
-		<div class="list_warp">
-			<div id="fans_tab" class="tab2"><p>
-				<span class="tab_friends" onclick="getFansList('friends')" t="friends">我关注的</span>
-				<span class="active tab_followers"  onclick="getFansList('followers')" t="followers">我的粉丝</span>
-			</p></div>
-			<ul class="list"></ul>
-		</div>
-	  </div>
-	  <div id="user_timeline_timeline" class="list_p" style="display:none;">
-		<div class="list_warp">
-			<ul class="list"></ul>
-		</div>
-	  </div>
-	  
-	  <div id="accountListDock">
-		<ul><!--
-			<li>
-				<span class="username">QLeelulu</span>
-				<a href="javascript:"><img src="http://tp3.sinaimg.cn/1710476902/50/1280470075/1" alt="FaWave" width="30"/></a>
-				<img src="/images/blogs/tsina_16.png" class="blogType" />
-			</li> -->
-		</ul>
-	  </div><!-- accountListDock END -->
+		<div class="warp">
+		  <div id='friends_timeline_timeline' class="list_p">
+			<div class="list_warp">
+				<ul class="list"></ul>
+			</div>
+		  </div>
+		  <div id="mentions_timeline" class="list_p" style="display:none;">
+			<div class="list_warp">
+				<ul class="list"></ul>
+			</div>
+		  </div>
+		  <div id="comments_timeline_timeline" class="list_p" style="display:none;">
+			<div class="list_warp">
+				<ul class="list"></ul>
+			</div>
+		  </div>
+		  <div id="direct_messages_timeline" class="list_p" style="display:none;">
+			<div class="list_warp">
+				<ul class="list"></ul>
+			</div>
+		  </div>
+		  <div id="followers_timeline" class="list_p" style="display:none;">
+			<div class="list_warp">
+				<div id="fans_tab" class="tab2"><p>
+					<span class="tab_friends" onclick="getFansList('friends')" t="friends">我关注的</span>
+					<span class="active tab_followers"  onclick="getFansList('followers')" t="followers">我的粉丝</span>
+				</p></div>
+				<ul class="list"></ul>
+			</div>
+		  </div>
+		  <div id="user_timeline_timeline" class="list_p" style="display:none;">
+			<div class="list_warp">
+				<ul class="list"></ul>
+			</div>
+		  </div>
+		  
+		  <div id="accountListDock">
+			<ul><!--
+				<li>
+					<span class="username">QLeelulu</span>
+					<a href="javascript:"><img src="http://tp3.sinaimg.cn/1710476902/50/1280470075/1" alt="FaWave" width="30"/></a>
+					<img src="/images/blogs/tsina_16.png" class="blogType" />
+				</li> -->
+			</ul>
+		  </div><!-- accountListDock END -->
 
-	  <span id="gototop" class="gototop" onclick="setScrollTotop();" title="返回顶部"><img src="/images/go_to_top.png" /></span>
+		  <span id="gototop" class="gototop" onclick="setScrollTotop();" title="返回顶部"><img src="/images/go_to_top.png" /></span>
 
-	</div><!-- div.wrap END -->
-
+		</div><!-- div.wrap END -->
+	</div><!-- wrapper END -->
 	<div id="ye_dialog_window" >
 		<a title="关闭" href="javascript:void(0);" id="ye_dialog_close"></a>
 		<div id="ye_dialog_title"></div>

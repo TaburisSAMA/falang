@@ -522,6 +522,18 @@ function getPopupView(){
     }
     return null;
 };
+
+//获取弹出窗的popup view
+function getNewWinPopupView(){
+    var views = chrome.extension.getViews();
+    for (var i = 0; i < views.length; i++) {
+        var view = views[i];
+        if (view.is_new_win_popup) {
+            return view;
+        }
+    }
+    return null;
+};
 //<<<<<<<<<<<<<<<<=====
 
 

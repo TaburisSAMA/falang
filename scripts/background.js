@@ -1,9 +1,10 @@
 // @author qleelulu@gmail.com
 
 var itv; //Interval
-var tweets = {};
-var MAX_MSG_ID = {};
-var LAST_PAGES = {};
+var tweets = {}, 
+    new_win_popup = Object(),
+    MAX_MSG_ID = {},
+    LAST_PAGES = {};
 //var THEME = localStorage.getObject('popup_theme') || 'default';
 window.checking={}; //正在检查是否有最新微博
 window.paging={}; //正在获取分页微博
