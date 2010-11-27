@@ -582,19 +582,23 @@ function getFansList(t, cursor){
     var params = {user_id:c_user.id, cursor:cursor, user:c_user, count:PAGE_SIZE};
     tapi[t](params, function(users, textStatus, statuCode){
         if(textStatus != 'error' && users && !users.error){
-        	var cursor_cache = get_current_user_cache(NEXT_CURSOR);
-        	cursor_cache[t] = users.next_cursor;
+        	if(users.next_cursor) {
+        		var cursor_cache = get_current_user_cache(NEXT_CURSOR);
+            	cursor_cache[t] = users.next_cursor;
+        	}
             users = users.users;
-            var html = '';
-            for(i in users){
-                html += bildMsgLi(users[i], t); //TODO: 待优化
-            }
-            list.append(html);
-            html_cache[t] = list.html();
-            if(users.length >=20){
-                showReadMore(t);
-            }else{
-                hideReadMore(t);
+            if(users) {
+            	var html = '';
+                for(var i in users){
+                    html += bildMsgLi(users[i], t); //TODO: 待优化
+                }
+                list.append(html);
+                html_cache[t] = list.html();
+                if(users.length >=20){
+                    showReadMore(t);
+                }else{
+                    hideReadMore(t);
+                }
             }
         }
     });

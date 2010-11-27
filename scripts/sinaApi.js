@@ -108,12 +108,16 @@ var sinaApi = {
     get_authorization_url: function(user, callbackFn) {
     	if(user.authType == 'oauth') {
     		var login_url = this.config.host + this.config.oauth_authorize + '?oauth_token=';
-    		this.get_request_token(user, function(token) {
-    			user.oauth_token_key = token.oauth_token;
-    			user.oauth_token_secret = token.oauth_token_secret;
-    			// 返回登录url给用户登录
-    			login_url += user.oauth_token_key;
-    			callbackFn(login_url);
+    		this.get_request_token(user, function(token, text_status, error_code) {
+    			if(token) {
+    				user.oauth_token_key = token.oauth_token;
+        			user.oauth_token_secret = token.oauth_token_secret;
+        			// 返回登录url给用户登录
+        			login_url += user.oauth_token_key;
+    			} else {
+    				login_url = null;
+    			}
+    			callbackFn(login_url, text_status, error_code);
     		});
     	} else {
     		throw new Error(user.authType + ' not support get_authorization_url');
@@ -129,9 +133,17 @@ var sinaApi = {
 	            play_load: 'string',
 	            need_source: false
 	        };
-    		this._sendRequest(params, function(token_str) {
-    			var token = decodeForm(token_str);
-    			callbackFn(token);
+    		this._sendRequest(params, function(token_str, text_status, error_code) {
+    			var token = null;
+    			if(text_status != 'error') {
+    				token = decodeForm(token_str);
+    				if(!token.oauth_token) {
+    					token = null;
+    					error_code = token_str;
+    					text_status = 'error';
+    				}
+    			}
+    			callbackFn(token, text_status, error_code);
     		});
     	} else {
     		throw new Error(user.authType + ' not support get_request_token');
@@ -149,11 +161,20 @@ var sinaApi = {
 	            data: {'oauth_verifier': user.oauth_pin},
 	            need_source: false
 	        };
-    		this._sendRequest(params, function(token_str) {
-    			var token = decodeForm(token_str);
-    			user.oauth_token_key = token.oauth_token;
-    			user.oauth_token_secret = token.oauth_token_secret;
-    			callbackFn(user);
+    		this._sendRequest(params, function(token_str, text_status, error_code) {
+    			var token = null;
+    			if(text_status != 'error') {
+    				token = decodeForm(token_str);
+    				if(!token.oauth_token) {
+    					token = null;
+    					error_code = token_str;
+    					text_status = 'error';
+    				} else {
+    					user.oauth_token_key = token.oauth_token;
+            			user.oauth_token_secret = token.oauth_token_secret;
+    				}
+    			}
+    			callbackFn(user, text_status, error_code);
     		});
     	} else {
     		throw new Error(user.authType + ' not support get_access_token');
@@ -685,7 +706,11 @@ var sinaApi = {
             callbackFn({}, 'error', '400');
             return;
     	}
-    	var url = this.config.host + args.url.format(args.data);
+    	var user = args.user || args.data.user || localStorage.getObject(CURRENT_USER_KEY);
+        if(args.data && args.data.user) delete args.data.user;
+        
+    	var api = user.apiProxy || this.config.host;
+    	var url = api + args.url.format(args.data);
     	if(args.play_load != 'string') {
     		url += this.config.result_format;
     	}
@@ -694,8 +719,6 @@ var sinaApi = {
 	    args.url.replace(pattern, function(match, key) {
 	    	delete args.data[key];
 	    });
-        var user = args.user || args.data.user || localStorage.getObject(CURRENT_USER_KEY);
-        if(args.data && args.data.user) delete args.data.user;
         if(!user){
             showMsg('用户未指定');
             callbackFn({}, 'error', '400');
@@ -808,7 +831,9 @@ $.extend(TSohuAPI, {
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.t.sohu.com',
 		source: 'WbbRPziVG6', // 取得appkey的第三方进行分级处理，分为500，800和1500三个等级。
-	    source2: 'WbbRPziVG6',
+	    
+	    oauth_key: 'WbbRPziVG6',
+        oauth_secret: 'Ca(R$X(Ikxzm4RoYXh0afc8C210J%8',
 	    
 	    favorites_create: '/favourites/create/{{id}}',
 	    favorites_destroy: '/favourites/destroy/{{id}}',
@@ -1467,15 +1492,13 @@ $.extend(TwitterAPI, {
 	
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
-		host: 'http://net4twitter.appspot.com',
+		host: 'http://api.twitter.com',
 		source: 'fawave', 
-	    source2: 'fawave',
-	    
+
 	    support_comment: false,
 	    support_repost: false,
 	    support_upload: false,
 	    
-//	    upload: '/statuses/update',
 	    repost: '/statuses/update'
 	}),
 	

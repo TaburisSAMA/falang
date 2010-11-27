@@ -77,7 +77,8 @@ OAuth.setProperties(OAuth, // utility functions
         s = s.replace("!", "%21", "g");
         s = s.replace("*", "%2A", "g");
         s = s.replace("'", "%27", "g");
-        s = s.replace("(", "%28", "g");
+        // s = s.replace("(", "%28", "g");
+        s = s.replace(/\(/g, "%28");
         s = s.replace(")", "%29", "g");
         return s;
     }
@@ -210,7 +211,10 @@ OAuth.setProperties(OAuth, // utility functions
 ,
     /** Construct the value of the Authorization header for an HTTP request. */
     getAuthorizationHeader: function getAuthorizationHeader(realm, parameters) {
-        var header = 'OAuth realm="' + OAuth.percentEncode(realm) + '"';
+        var header = '';
+        if(realm) {
+        	header += ', realm="' + OAuth.percentEncode(realm) + '"';
+        }
         var list = OAuth.getParameterList(parameters);
         for (var p = 0; p < list.length; ++p) {
             var parameter = list[p];
@@ -219,6 +223,7 @@ OAuth.setProperties(OAuth, // utility functions
                 header += ', ' + OAuth.percentEncode(name) + '="' + OAuth.percentEncode(parameter[1]) + '"';
             }
         }
+        header = 'OAuth ' + header.substring(2);
         return header;
     }
 ,
@@ -283,7 +288,8 @@ OAuth.setProperties(OAuth.SignatureMethod.prototype, // instance members
             consumerSecret = accessor.consumerSecret;
         }
         this.key = OAuth.percentEncode(consumerSecret)
-             +"&"+ OAuth.percentEncode(accessor.tokenSecret);
+        	+"&"+ OAuth.percentEncode(accessor.tokenSecret);
+//        log('key: ' + this.key);
     }
 });
 

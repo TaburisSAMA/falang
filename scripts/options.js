@@ -4,7 +4,7 @@ var KEYCODE_MAP = {8:"BackSpace", 9:"Tab", 12:"Clear", 13:"Enter", 16:"Shift", 1
 
 var SUPPORT_AUTH_TYPES = {
 	'tsina': ['oauth', 'baseauth'],
-	'tsohu': ['baseauth', 'xauth'],
+	'tsohu': ['oauth', 'baseauth'],
 	'digu': ['baseauth'],
 	'zuosa': ['baseauth'],
 	'follow5': ['baseauth'],
@@ -355,6 +355,7 @@ function _verify_credentials(user) {
 //   - oauth_token_key: oauth认证获取到的的key
 //   - oauth_token_secret: oAuth认证获取到的secret
 //   - blogType: 微博类型：tsina, t163, tsohu, twitter, digu
+//   - apiProxy: api代理, 目前twitter支持
 //   - disabled: 账号是否已停用
 function saveAccount(){
     var userName = $.trim($("#account-name").val());
@@ -362,9 +363,14 @@ function saveAccount(){
     var blogType = $.trim($("#account-blogType").val()) || 'tsina'; //微博类型，兼容，默认tsina
     var authType = $.trim($("#account-authType").val()); //登录验证类型
     var pin = $.trim($('#account-pin').val()); // oauth pin码
+    var apiProxy = $.trim($('#account-proxy-api').val());
     var user = {
     	blogType: blogType, authType: authType
     };
+    // 目前只允许twitter设置代理
+    if(blogType == 'twitter' && apiProxy) {
+    	user.apiProxy = apiProxy;
+    }
     if((authType == 'baseauth' || authType == 'xauth') && userName && pwd){
         //userName = userName.toLowerCase(); //小写
         user.userName = userName;
@@ -382,13 +388,19 @@ function saveAccount(){
     			_verify_credentials(auth_user);
     		});
     	} else { // 跳到登录页面
-    		tapi.get_authorization_url(user, function(login_url) {
-    			// 在当前页保存 request token
-    			$('#account-request-token-key').val(user.oauth_token_key);
-    			$('#account-request-token-secret').val(user.oauth_token_secret);
-        		var l = (window.screen.availWidth-510)/2;
-        	    window.open(login_url, '_blank', 'left=' + l + ',top=30,width=510,height=450,menubar=no,location=yes,resizable=no,scrollbars=yes,status=yes');
-        	});
+    		tapi.get_authorization_url(user, function(login_url, text_status, error_code) {
+    			if(!login_url) {
+    				_showMsg('get_authorization_url error: ' + text_status + ' code: ' + error_code);
+    			} else {
+    				// 在当前页保存 request token
+        			$('#account-request-token-key').val(user.oauth_token_key);
+        			$('#account-request-token-secret').val(user.oauth_token_secret);
+            		var l = (window.screen.availWidth-510)/2;
+            	    var win = window.open(login_url, '_blank', 'left=' + l 
+            	    	+ ',top=30,width=600,height=450,menubar=no,location=yes,resizable=no,scrollbars=yes,status=yes');
+            	    
+    			}
+    		});
     	}
     } else {
         _showMsg('请输入用户名和密码！');
@@ -419,6 +431,11 @@ function showSupportAuthTypes(blogType, authType){
     }
     selAT.html(authtype_options);
     selAT.change();
+    if(blogType == 'twitter') {
+    	$('.account-proxy').show();
+    } else {
+    	$('.account-proxy').hide();
+    }
 };
 
 function showEditAccount(uniqueKey){
@@ -435,6 +452,7 @@ function showEditAccount(uniqueKey){
             showSupportAuthTypes(user.blogType, user.authType);
             $("#account-name").val(user.userName || '');
             $("#account-pwd").val(user.password || '');
+            $("#account-proxy-api").val(user.apiProxy || '');
             $("#save-account").val('保存');
         }
     }
