@@ -4,10 +4,6 @@
 
 var result_format = '.json';
 
-var domain_sina = 'http://t.sina.com.cn';
-
-var api_domain_sina = 'http://api.t.sina.com.cn';
-
 var sinaApi = {
 	
 	config: {
@@ -60,8 +56,8 @@ var sinaApi = {
         oauth_request_token:  '/oauth/request_token',
         oauth_access_token:   '/oauth/access_token',
 
-        detailUrl:        domain_sina + '/jump?aid=detail&twId=',
-        searchUrl:        domain_sina + '/search/'
+        detailUrl:        '/jump?aid=detail&twId=',
+        searchUrl:        '/search/'
     },
     
 

@@ -232,9 +232,6 @@ function removeUnreadTimelineCount(t, user_uniqueKey){
         for(j in userList){
             var user = userList[j];
             for(i in T_LIST[user.blogType]){
-                if(T_LIST[user.blogType][i]==t){
-                    continue;
-                }
                 if(isSetBadgeText(T_LIST[user.blogType][i], user.uniqueKey)){
                     total += getUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
                 }
