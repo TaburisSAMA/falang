@@ -8,6 +8,8 @@ var sinaApi = {
 	
 	config: {
 		host: 'http://api.t.sina.com.cn',
+        user_home_url: 'http://t.sina.com.cn/n/',
+        search_url: 'http://t.sina.com.cn/k/',
 		result_format: '.json',
 		source: '3538199806',
         oauth_key: '3538199806',

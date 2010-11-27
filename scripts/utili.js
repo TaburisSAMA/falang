@@ -110,7 +110,7 @@ function formatScreenName(user) {
 function getUser(){
     var c_user = localStorage.getObject(CURRENT_USER_KEY);
     if(c_user && c_user.uniqueKey){
-        //window.c_user = c_user;
+        window.c_user = c_user;
     }else{
         var userList = localStorage.getObject(USER_LIST_KEY);
         if(userList){
