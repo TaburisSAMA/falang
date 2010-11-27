@@ -250,6 +250,10 @@ function initQuickSendHotKey(){
     $("#set_quick_send_key_inp").focus(function(){
         $("#set_quick_send_key_tip").show();
         $(this).bind('keydown', function(e){
+            if(e.keyCode == 8){ //如果是退格键，则通行
+                $("#set_quick_send_key_inp").val('');
+                return true;
+            }
             //如果是同一个键,则无视
             if(TEMP_SET_KEYS.length && e.keyCode == TEMP_SET_KEYS[TEMP_SET_KEYS.length-1]){
                 return false;
@@ -481,7 +485,9 @@ function saveAll(){
 
     setLookingTemplate($("#tp_looking").val()); //我正在看模板
 
-    setQuickSendHotKey($("#set_quick_send_key").val()); //快速发送微博快捷键
+    if($("#set_quick_send_key_inp").val()){
+        setQuickSendHotKey($("#set_quick_send_key").val()); //快速发送微博快捷键
+    }
 
     saveSetBadgeText();
     saveSetShowInPage();

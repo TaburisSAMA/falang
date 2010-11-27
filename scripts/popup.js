@@ -30,6 +30,8 @@ function get_current_user_cache(cache) {
 	return _cache;
 };
 
+var isNewTabSelected = window.is_new_win_popup ? true : false; //如果是弹出窗，则激活新打开的标签
+
 function init(){
     var c_user = getUser();
     if(!c_user){
@@ -43,14 +45,14 @@ function init(){
     $('a').live('click', function(e){
         var url = $.trim($(this).attr('href'));
         if(url && !url.toLowerCase().indexOf('javascript')==0){
-            chrome.tabs.create({url:$(this).attr('href'), selected:false});
+            chrome.tabs.create({url:$(this).attr('href'), selected:isNewTabSelected});
             return false;
         }
     }).live('mousedown', function(e){
         if(e.button == 2){ //右键点击
             var url = $.trim($(this).attr('rhref'));
             if(url){
-                chrome.tabs.create({url:url, selected:false});
+                chrome.tabs.create({url:url, selected:isNewTabSelected});
             }
         }
     });
