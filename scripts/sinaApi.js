@@ -1492,6 +1492,8 @@ $.extend(TwitterAPI, {
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.twitter.com',
 		source: 'fawave', 
+        oauth_key: 'i1aAkHo2GkZRWbUOQe8zA',
+        oauth_secret: 'MCskw4dW5dhWAYKGl3laRVTLzT8jTonOIOpmzEY',
 
 	    support_comment: false,
 	    support_repost: false,
