@@ -41,6 +41,7 @@ var DEFAULT_WIDTH_AND_HEIGHT = [480, 520]; //默认宽高
 
 var TP_LOOKING_KEY = 'idi_TP_LOOKING_KEY'; //我正在看的模板key
 var QUICK_SEND_HOT_KEY_KEY = 'idi_QUICK_SEND_HOT_KEY_KEY'; //快速发送热键key
+var ALERT_MODE_KEY = 'idi_ALERT_MODE_KEY'; //信息提醒模式key
 
 //['friends_timeline','mentions','comments_timeline','comments_by_me','direct_messages','favorites']
 //需要不停检查更新的timeline的分类列表
@@ -179,6 +180,7 @@ function getUnreadTimelineCount(t, user_uniqueKey){
     return count;
 };
 
+//@count: 增加的未读数
 //@t: timeline的类型
 function setUnreadTimelineCount(count, t, user_uniqueKey){
     if(!user_uniqueKey){
@@ -187,20 +189,24 @@ function setUnreadTimelineCount(count, t, user_uniqueKey){
     var setBadgeText = isSetBadgeText(t, user_uniqueKey);
     count += getUnreadTimelineCount(t, user_uniqueKey);
     localStorage.setObject(user_uniqueKey + t + UNREAD_TIMELINE_COUNT_KEY, count);
-    if(setBadgeText){
-        var total = 0;
-        var userList = getUserList();
-        for(j in userList){
-            var user = userList[j];
-            for(i in T_LIST[user.blogType]){
-                if(isSetBadgeText(T_LIST[user.blogType][i], user.uniqueKey)){
-                    total += getUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
+    if(getAlertMode()=='dnd'){ //免打扰模式
+        chrome.browserAction.setBadgeText({text: '/'});
+    }else{
+        if(setBadgeText){
+            var total = 0;
+            var userList = getUserList();
+            for(j in userList){
+                var user = userList[j];
+                for(i in T_LIST[user.blogType]){
+                    if(isSetBadgeText(T_LIST[user.blogType][i], user.uniqueKey)){
+                        total += getUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
+                    }
                 }
             }
-        }
-        if(total > 0){
-            total = total.toString();
-            chrome.browserAction.setBadgeText({text: total});
+            if(total > 0){
+                total = total.toString();
+                chrome.browserAction.setBadgeText({text: total});
+            }
         }
     }
     chrome.browserAction.setTitle({title:getTooltip()});
@@ -214,24 +220,28 @@ function removeUnreadTimelineCount(t, user_uniqueKey){
     if(getIsSyncUnread(user_uniqueKey)){ //如果同步未读数
         syncUnreadCountToSinaPage(t, user_uniqueKey);
     }
-    var total = 0;
-    var userList = getUserList();
-    for(j in userList){
-        var user = userList[j];
-        for(i in T_LIST[user.blogType]){
-            if(T_LIST[user.blogType][i]==t){
-                continue;
-            }
-            if(isSetBadgeText(T_LIST[user.blogType][i], user.uniqueKey)){
-                total += getUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
+    if(getAlertMode()=='dnd'){ //免打扰模式
+        chrome.browserAction.setBadgeText({text: '/'});
+    }else{
+        var total = 0;
+        var userList = getUserList();
+        for(j in userList){
+            var user = userList[j];
+            for(i in T_LIST[user.blogType]){
+                if(T_LIST[user.blogType][i]==t){
+                    continue;
+                }
+                if(isSetBadgeText(T_LIST[user.blogType][i], user.uniqueKey)){
+                    total += getUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
+                }
             }
         }
-    }
-    if(total > 0){
-        total = total.toString();
-        chrome.browserAction.setBadgeText({text: total});
-    }else{
-        chrome.browserAction.setBadgeText({text: ''});
+        if(total > 0){
+            total = total.toString();
+            chrome.browserAction.setBadgeText({text: total});
+        }else{
+            chrome.browserAction.setBadgeText({text: ''});
+        }
     }
     chrome.browserAction.setTitle({title:getTooltip()});
 };
@@ -272,7 +282,9 @@ function syncUnreadCountToSinaPage(t, user_uniqueKey){
 
 //获取在插件icon上显示的tooltip内容
 function getTooltip(){
-    
+    if(getAlertMode()=='dnd'){
+        return 'FaWave(发微): 免打扰模式';
+    }
     var tip = '', _new=0, _mention=0, _comment=0, _direct=0;
     var userList = getUserList();
     for(j in userList){
@@ -441,7 +453,7 @@ function getWidthAndHeight(){
 function setWidthAndHeight(width, height){
     width = Number(width);
     height = Number(height);
-    if(isNaN(width) || width<300){
+    if(isNaN(width) || width<350){
         width = DEFAULT_WIDTH_AND_HEIGHT[0];
     }
     if(isNaN(height) || height<350){
@@ -455,6 +467,17 @@ function setWidthAndHeight(width, height){
 
 function setThteme(v){
     return localStorage.setObject(THEME_KEY, v);
+};
+//<<--
+
+//-- 信息提示模式 (alert or dnd ) --
+function getAlertMode(){
+    var mode = localStorage.getObject(ALERT_MODE_KEY);
+    return mode || 'alert';
+};
+
+function setAlertMode(mode){
+    localStorage.setObject(ALERT_MODE_KEY, mode);
 };
 //<<--
 

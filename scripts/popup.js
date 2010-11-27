@@ -55,6 +55,8 @@ function init(){
         }
     });
 
+    changeAlertMode(getAlertMode());
+
     $('#ye_dialog_close').click(function(){ hideReplyInput(); });
 
     initTabs();
@@ -63,10 +65,7 @@ function init(){
 
     initChangeUserList();
 
-    //for(i in T_LIST){
-    //    getSinaTimeline(T_LIST[i]);
-    //}
-    getSinaTimeline('friends_timeline');
+    getSinaTimeline('friends_timeline'); //只显示首页的，其他的tab点击的时候再去获取
 
     initMsgHover();
 
@@ -1170,7 +1169,8 @@ function showMsgInput(){
     var _txt = $("#txtContent").val();
     $("#txtContent").focus().val('').val(_txt); //光标在最后面
     countInputText();
-    $("#header .write").addClass('active').find('b').addClass('up');;
+    $("#header .write").addClass('active').find('b').addClass('up');
+    $("#doing").appendTo('#doingWarp');
 };
 
 function hideMsgInput(){
@@ -1179,6 +1179,7 @@ function hideMsgInput(){
     $(".list_warp").css('height', h);
     $("#submitWarp").data('status', 'hide').css('height', 0);
     $("#header .write").removeClass('active').find('b').removeClass('up');
+    $("#doing").prependTo('#tl_tabs .btns');
 };
 
 function toogleMsgInput(ele){
@@ -1464,6 +1465,30 @@ function openUploadImage(){
     window.open('upimage.html', '_blank', 'left=' + l + ',top=30,width=510,height=600,menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
 };
 //<<<<=====
+
+//====>>>>
+//在新窗口打开popup页
+function openPopupInNewWin(){
+    initOnUnload();
+    var WH = getWidthAndHeight();
+    var l = (window.screen.availWidth-WH[0])/2;
+    window.theViewName = 'not_popup';
+    window.open('popup.html?is_new_win=true', '_blank', 'left=' + l + ',top=30,width=' + WH[0] + ',height=' + (WH[1]+10) + ',menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
+};
+
+//====>>>>
+//新消息提示模式：提示模式、免打扰模式
+function changeAlertMode(to_mode){
+    var btn = $("#btnAlertMode");
+    if(!to_mode){
+        var mode = btn.attr('mode');
+        to_mode = (mode == 'alert') ? 'dnd' : 'alert';
+    }
+    setAlertMode(to_mode);
+    var tip = (to_mode=='alert') ? '提示模式。点击切换到免打扰模式' : '已开启免打扰模式。点击切换到提示模式';
+    btn.attr('mode', to_mode).attr('title', tip).find('img').attr('src', 'images/' + to_mode + '_mode.png');
+    setUnreadTimelineCount(0, 'friends_timeline');
+};
 
 //====>>>>
 //表情添加

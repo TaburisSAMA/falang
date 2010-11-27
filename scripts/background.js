@@ -347,6 +347,7 @@ function setDoChecking(user_uniqueKey, t, c_t, v){
 //在页面显示提示信息
 //@userId: 插件当前登录的用户ID
 function showNewMsg(msgs, t, userId){
+    if(getAlertMode()=='dnd'){ return; } //免打扰模式
     if(isShowInPage(t)){
         chrome.tabs.getSelected(null, function(tab) {
             chrome.tabs.sendRequest(tab.id, {method:'showNewMsgInPage', msgs: msgs, t:t, userId:userId}, function handler(response) {

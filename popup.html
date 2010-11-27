@@ -2,7 +2,7 @@
 <html>
  <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<title> 发微--新浪微博插件 </title>
+	<title>FaWave(发微)-- 多微博插件 </title>
 	<link rel="stylesheet" media="screen" type="text/css" href="css/popup.css" />
 	<link rel="stylesheet" media="screen" type="text/css" href="" id="cssTheme" />
 	<link rel="stylesheet" media="screen" type="text/css" href="css/facebox/facebox.css">
@@ -41,7 +41,7 @@
 			<a href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');" title="点击添加表情"><img src="images/face.gif" />表情</a>&nbsp;
 			<a href="javascript:void(0);" onclick="openUploadImage();" title="点击上传图片"><img src="images/image.gif" />图片</a>&nbsp;
 			<input type="button" value="清空" onclick="cleanTxtContent();" class="btn"/>&nbsp;
-			<span id="doingWarp"><a href="javascript:void(0);" id="doing" title="分享你正在看的网页" ><img src="images/bc.gif" /></a></span>
+			<span id="doingWarp"></span>
 			<span id="wordCount">140</span>
 		</div>
 	  </div>
@@ -57,6 +57,12 @@
 			<a href="javascript:" class="write" onclick="toogleMsgInput(this)">写微博<b></b></a>
 		</div>
 		<ul id="tl_tabs" class="tabs">
+			<span class="btns">
+				<a id="doing" href="javascript:" title="分享你正在看的网页"><img src="images/world_link.png" /></a>
+				<a href="javascript:" title="点击马上获取最新"><img src="images/refresh.png" /></a>
+				<a href="javascript:" onclick="openPopupInNewWin()" title="弹出到新窗口"><img src="images/new_win.png" /></a>
+				<a id="btnAlertMode" href="javascript:" title="" mode="alert" onclick="changeAlertMode()"><img src="images/alert_mode.png" /></a>
+			</span>
 			<li class="tab-friends_timeline active" href="#friends_timeline_timeline">首页<span class="unreadCount"></span></li>
 			<li class="tab-mentions" href="#mentions_timeline">@我<span class="unreadCount"></span></li>
 			<li class="tab-comments_timeline" href="#comments_timeline_timeline">评论<span class="unreadCount"></span></li>
