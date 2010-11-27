@@ -102,28 +102,31 @@ function checkTimeline(t, p, user_uniqueKey){
     if(isDoChecking(user_uniqueKey, t, 'checking')){ return; }
     
     setDoChecking(user_uniqueKey, t, 'checking', true);
-    showLoading();
+    
     var params = {user:c_user, count:PAGE_SIZE};
-    var last_id = getLastMsgId(t, user_uniqueKey);
-    if(last_id){
-        params['since_id'] = last_id;
+    if(t == 'favorites') { // 收藏只支持page参数
+    	params.page = getLastPage(t, user_uniqueKey);
+    	if(params.page == 0){ //已经到底了
+    		return;
+    	} else if(params.page == undefined) {
+    		params.page = 1;
+    	} else {
+    		params.page += 1;
+    	}
+    } else {
+    	var last_id = getLastMsgId(t, user_uniqueKey);
+        if(last_id){
+            params['since_id'] = last_id;
+        }
     }
-
     if(p){
         for(var key in p){
             params[key] = p[key];
         }
     }
-    var m = '';
-    switch(t){
-        case 'friends_timeline': //示例，如有特殊才需特别定义
-            m = 'friends_timeline';
-            break;
-        default:
-            m = t;
-    }
-//	log('start checkTimeline ' + user_uniqueKey + ' ' + m);
-    tapi[m](params, function(sinaMsgs, textStatus){
+    showLoading();
+//	log('start checkTimeline ' + user_uniqueKey + ' ' + t);
+    tapi[t](params, function(sinaMsgs, textStatus){
     	if(sinaMsgs == null) {
 //    		log(user_uniqueKey + ' ' + m + ': null, hideLoading()');
     		hideLoading();
@@ -150,7 +153,6 @@ function checkTimeline(t, p, user_uniqueKey){
         }
 //        log('finish checkTimeline ' + user_uniqueKey + ' ' + m + ': ' + (sinaMsgs ? sinaMsgs.length : 0));
         if(sinaMsgs && sinaMsgs.length > 0){
-            
             _last_id = sinaMsgs[0].id;
             var has_news = true;
             if(params.since_id && Number(_last_id) == Number(params.since_id)){
@@ -163,7 +165,6 @@ function checkTimeline(t, p, user_uniqueKey){
                 var _unreadCount = 0, _msg_user = null;
                 for(var i in sinaMsgs){
                     _msg_user = sinaMsgs[i].user || sinaMsgs[i].sender;
-                    //if(!_msg_user) {console.dir(m); console.dir(c_user);console.dir(sinaMsgs);}
                     if(_msg_user && _msg_user.id != c_user.id){
                         _unreadCount += 1;
                     }
@@ -189,8 +190,15 @@ function checkTimeline(t, p, user_uniqueKey){
                     setMaxMsgId(t, _max_id, user_uniqueKey);
                 }
             }
+        	if(t == 'favorites') {
+        		setLastPage(t, params.page, user_uniqueKey);
+        	}
         } else {
             setUnreadTimelineCount(0, t, user_uniqueKey);
+            if(t == 'favorites') {
+            	// 已经获取完了
+        		setLastPage(t, 0, user_uniqueKey);
+        	}
         }
         //window.checking[t] = false;
         setDoChecking(user_uniqueKey, t, 'checking', false);
@@ -226,14 +234,11 @@ function getTimelinePage(user_uniqueKey, t, p){
     if(t == 'followers'){ return; } //忽略粉丝列表
     if(isDoChecking(user_uniqueKey, t, 'paging')){ return; }
     
-    setDoChecking(user_uniqueKey, t, 'paging', true);
-    
-    showLoading();
-
     var params = {user:c_user, count:PAGE_SIZE};
-    var config = tapi.get_config(c_user)
+    var config = tapi.get_config(c_user);
+    var not_support_max_id = config.support_max_id || t == 'favorites';
     // 判断是否支持max_id形式获取数据
-    if(config.support_max_id) {
+    if(!not_support_max_id) {
 	    var max_id = getMaxMsgId(t, user_uniqueKey);
 	    if(max_id){
 	        params['max_id'] = max_id;
@@ -241,10 +246,14 @@ function getTimelinePage(user_uniqueKey, t, p){
     } else {
     	// count, page 形式
     	var page = getLastPage(t, user_uniqueKey);
-    	if(page) {
+    	if(page == 0) {
+    		return; // 到底了
+    	} else if(page == undefined) {
+    		page = 1;
+    	} else {
     		page += 1;
-    		params['page'] = page;
     	}
+    	params['page'] = page;
     }
     
     if(p){
@@ -252,10 +261,14 @@ function getTimelinePage(user_uniqueKey, t, p){
             params[key] = p[key];
         }
     }
+
+    setDoChecking(user_uniqueKey, t, 'paging', true);
+    
+    showLoading();
+
 //    log('start getTimelinePage ' + user_uniqueKey + ' ' + m);
     tapi[t](params, function(sinaMsgs, textStatus){
-    	if(sinaMsgs == null) {
-//    		log(user_uniqueKey + ' ' + m + ': null, hideLoading()');
+    	if(sinaMsgs == null || textStatus == 'error') {
     		hideLoading();
     		return;
     	}
@@ -297,13 +310,10 @@ function getTimelinePage(user_uniqueKey, t, p){
             if(_max_id){
                 setMaxMsgId(t, _max_id, user_uniqueKey);
             }
-            if(!config.support_max_id) {
-            	if(!page) {
-	            	page = 1;
-	            }
+            if(not_support_max_id) {
 	            setLastPage(t, page, user_uniqueKey);
             }
-        }else{
+        } else {
             var current_user = getUser();
             if(current_user.uniqueKey == c_user.uniqueKey){ //TODO:更详细逻辑有待改进
                 var popupView = getPopupView();
@@ -311,6 +321,9 @@ function getTimelinePage(user_uniqueKey, t, p){
                     popupView.hideReadMore(t);
                     popupView.hideLoading();
                 }
+            }
+            if(not_support_max_id) { // 到底了
+	            setLastPage(t, 0, user_uniqueKey);
             }
         }
 

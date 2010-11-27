@@ -118,7 +118,7 @@ function initTabs(){
         }
         if(!c_ul.find('ul.list').html()){
             getSinaTimeline(c_t);
-        }else if(c_t =='user_timeline'){ //用户自己的微薄，不定期自己获取更新，所以要通知后台去取一下
+        } else if(c_t =='user_timeline'){ //用户自己的微薄，不定期自己获取更新，所以要通知后台去取一下
             showLoading();
             var b_view = getBackgroundView();
             b_view.checkTimeline(c_t);
@@ -582,7 +582,7 @@ function getFansList(t, cursor){
     var params = {user_id:c_user.id, cursor:cursor, user:c_user, count:PAGE_SIZE};
     tapi[t](params, function(users, textStatus, statuCode){
         if(textStatus != 'error' && users && !users.error){
-        	if(users.next_cursor) {
+        	if(users.next_cursor != undefined) {
         		var cursor_cache = get_current_user_cache(NEXT_CURSOR);
             	cursor_cache[t] = users.next_cursor;
         	}

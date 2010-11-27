@@ -177,6 +177,7 @@ function bildMsgLi(sinaMsg, t, c_user){
 
         switch(t){
             case 'friends_timeline':
+            case 'favorites':
                 crlBtn.delDirectMsgBtn = crlBtn.delCommentBtn = '';
                 if(c_user.id == user.id){
                     //crlBtn.repostBtn = '<a>转</a>';
@@ -234,8 +235,6 @@ function bildMsgLi(sinaMsg, t, c_user){
                 }else{
                     crlBtn.delTweetBtn = '';
                 }
-                break;
-            case 'favorites':
                 break;
             default:
                 //
