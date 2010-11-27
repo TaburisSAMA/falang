@@ -73,6 +73,21 @@ $(function(){
     $("#save-all").click(function(){
         saveAll();
     });
+    
+    // 绑定认证类型变化时的显示切换
+    if($("#account-authType").change(function() {
+    	if($(this).val() == 'oauth') {
+    		$('.account-oauth').show();
+    		$('.account-baseauth').hide('');
+    	} else {
+    		$('.account-oauth').hide();
+    		$('.account-baseauth').show('');
+    		// 清空缓存的数据
+    		$('#account-pin').val('');
+    		$('#account-request-token-key').val('');
+    		$('#account-request-token-secret').val('');
+    	}
+    }));
 });
 
 function showAccountList(){
@@ -269,6 +284,48 @@ function initQuickSendHotKey(){
     });
 };
 
+function _verify_credentials(user) {
+	tapi.verify_credentials(user, function(data, textStatus, errorCode){
+        if(errorCode || textStatus=='error'){
+            if(errorCode==400||errorCode==401||errorCode==403){
+                _showMsg('用户名或者密码不正确，请修改');
+            }else{
+                var err_msg = '';
+                if(data.error){
+                    err_msg = 'error: ' + data.error;
+                }
+                _showMsg('出现错误，保存失败。' + err_msg);
+            }
+        } else {
+        	var userList = getUserList();
+            if(!userList){
+                userList = {};
+            }
+            var temp_uniqueKey = $("#edit-account-key").val();
+            delete userList[temp_uniqueKey];
+            for(var key in user) {
+            	data[key] = user[key];
+            }
+            data.uniqueKey = user.blogType + '_' + data.id;
+            data.screen_name = data.screen_name || data.name;
+            userList[data.uniqueKey] = data;
+            saveUserList(userList);
+            var c_user = getUser();
+            if(!c_user || c_user.uniqueKey == temp_uniqueKey){
+                setUser(data);
+            }
+            var btnVal = $("#save-account").val();
+            showAccountList();
+
+            $("#new-account").hide();
+            $("#account-name").val('');
+            $("#account-pwd").val('');
+            $("#account-pin").val('');
+            _showMsg(btnVal + '用户"' + data.screen_name + '"成功！');
+        }
+    });
+}
+
 //保存用户账号
 //如果其他微博类型的字段名与新浪的不同，则与新浪的为准，修改后再保存
 // 保存的账号信息有以下附加属性：
@@ -284,51 +341,36 @@ function saveAccount(){
     var pwd = $.trim($("#account-pwd").val());
     var blogType = $.trim($("#account-blogType").val()) || 'tsina'; //微博类型，兼容，默认tsina
     var authType = $.trim($("#account-authType").val()); //登录验证类型
-    if(userName && pwd){
-        userName = userName.toLowerCase(); //小写
-        var userList = getUserList();
-        if(!userList){
-            userList = {};
-        }
-        var user = {blogType: blogType, userName:userName, password:pwd};
-        tapi.verify_credentials(user,function(data, textStatus, errorCode){
-            if(errorCode || textStatus=='error'){
-                if(errorCode==400||errorCode==401||errorCode==403){
-                    _showMsg('用户名或者密码不正确，请修改');
-                }else{
-                    var err_msg = '';
-                    if(data.error){
-                        err_msg = 'error: ' + data.error;
-                    }
-                    _showMsg('出现错误，保存失败。' + err_msg);
-                }
-            }else{
-                var temp_uniqueKey = $("#edit-account-key").val();
-                delete userList[temp_uniqueKey];
-                data.userName = user.userName;//兼容预览版
-                data.password = user.password;
-                data.blogType = blogType;
-                data.authType = authType;
-                data.uniqueKey = blogType + '_' + data.id;
-                data.screen_name = data.screen_name || data.name;
-                userList[data.uniqueKey] = data;
-                saveUserList(userList);
-                var c_user = getUser();
-                if(!c_user || c_user.uniqueKey == temp_uniqueKey){
-                    setUser(data);
-                }
-                var btnVal = $("#save-account").val();
-                showAccountList();
-                    
-                $("#new-account").hide();
-                $("#account-name").val('');
-                $("#account-pwd").val('');
-                _showMsg(btnVal + '用户"' + data.screen_name + '"成功！');
-            }
-        });
-
-        
-    }else{
+    var pin = $.trim($('#account-pin').val()); // oauth pin码
+    var user = {
+    	blogType: blogType, authType: authType
+    };
+    if((authType == 'baseauth' || authType == 'xauth') && userName && pwd){
+        //userName = userName.toLowerCase(); //小写
+        user.userName = userName;
+        user.password = pwd;
+        _verify_credentials(user);
+    } else if(authType == 'oauth') {
+    	var request_token_key = $('#account-request-token-key').val();
+    	var request_token_secret = $('#account-request-token-secret').val();
+    	if(pin && request_token_key && request_token_secret) {
+    		user.oauth_pin = pin;
+    		// 设置request token
+    		user.oauth_token_key = request_token_key;
+    		user.oauth_token_secret = request_token_secret;
+    		tapi.get_access_token(user, function(auth_user) {
+    			_verify_credentials(auth_user);
+    		});
+    	} else { // 跳到登录页面
+    		tapi.get_authorization_url(user, function(login_url) {
+    			// 在当前页保存 request token
+    			$('#account-request-token-key').val(user.oauth_token_key);
+    			$('#account-request-token-secret').val(user.oauth_token_secret);
+        		var l = (window.screen.availWidth-510)/2;
+        	    window.open(login_url, '_blank', 'left=' + l + ',top=30,width=510,height=450,menubar=no,location=yes,resizable=no,scrollbars=yes,status=yes');
+        	});
+    	}
+    } else {
         _showMsg('请输入用户名和密码！');
     }
 };
@@ -339,7 +381,7 @@ function onSelBlogTypeChange(){
     showSupportAuthTypes(blogType);
 };
 
-function showSupportAuthTypes(blogType){
+function showSupportAuthTypes(blogType, authType){
     var types = SUPPORT_AUTH_TYPES[blogType];
     if(!types){
         _showMsg('没有"' + blogType + '"支持的验证类型');
@@ -350,9 +392,13 @@ function showSupportAuthTypes(blogType){
     // 添加认证类型
     var authtype_options = '';
     for(var i in types) {
-    	authtype_options += '<option value="{{value}}">{{name}}</option>'.format({name: AUTH_TYPE_NAME[types[i]], value: types[i]});
+    	authtype_options += '<option value="{{value}}" {{selected}}>{{name}}</option>'.format({
+    		name: AUTH_TYPE_NAME[types[i]], value: types[i],
+    		selected: types[i] == authType ? 'selected="selected"' : ''
+    	});
     }
     selAT.html(authtype_options);
+    selAT.change();
 };
 
 function showEditAccount(uniqueKey){
@@ -366,9 +412,9 @@ function showEditAccount(uniqueKey){
         if(user){
             $("#new-account").show();
             $("#account-blogType").val(user.blogType);
-            showSupportAuthTypes(user.blogType);
-            $("#account-name").val(user.userName);
-            $("#account-pwd").val(user.password);
+            showSupportAuthTypes(user.blogType, user.authType);
+            $("#account-name").val(user.userName || '');
+            $("#account-pwd").val(user.password || '');
             $("#save-account").val('保存');
         }
     }

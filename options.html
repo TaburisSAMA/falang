@@ -8,6 +8,8 @@
 	<script type="text/javascript" src="/scripts/lib/facebox.js" ></script>
 	<script type="text/javascript" src="/scripts/lib/Base64.js" ></script>
 	<script type="text/javascript" src="/scripts/utili.js" ></script>
+	<script type="text/javascript" src="scripts/lib/sha1.js" ></script>
+    <script type="text/javascript" src="scripts/lib/oauth.js" ></script>
 	<script type="text/javascript" src="/scripts/sinaApi.js" ></script>
 	<script type="text/javascript" src="/scripts/options.js" ></script>
 </head>
@@ -71,16 +73,18 @@
 						<span class="c">TODO:待补充</span>
 					</span>
 				</li>
-				<li>
+				<li class="account-oauth">
 					<label for="account-pin">　授权码：</label>
 					<input type="text" id="account-pin" /> TODO:根据认证类型判断隐藏、显示
+					<input type="hidden" id="account-request-token-key" />
+					<input type="hidden" id="account-request-token-secret" />
 				</li>
-				<li>
+				<li class="account-baseauth">
 					<label for="account-name">　用户名：</label>
 					<input type="text" id="account-name" />
 					<input type="hidden" id="edit-account-key" />
 				</li>
-				<li>
+				<li class="account-baseauth">
 					<label for="account-pwd">密　　码：</label>
 					<input type="password" id="account-pwd" />
 				</li>

@@ -14,7 +14,10 @@ var sinaApi = {
 		host: 'http://api.t.sina.com.cn',
 		result_format: '.json',
 		source: '3538199806',
-        source2: '3538199806', //'2721776383', // other key
+//        oauth_key: '3538199806',
+//        oauth_secret: '18cf587d60e11e3c160114fd92dd1f2b',
+        oauth_key: '38950085',
+        oauth_secret: '4c6e31814287063de180f0fb5ca139b6',
         
         support_comment: true, // 判断是否支持评论
 		support_upload: true, // 是否支持上传图片
@@ -54,9 +57,109 @@ var sinaApi = {
         friendships_show:     '/friendships/show',
         reset_count:          '/statuses/reset_count',
         user_show:            '/users/show/{{id}}',
+        
+        oauth_authorize: 	  '/oauth/authorize',
+        oauth_request_token:  '/oauth/request_token',
+        oauth_access_token:   '/oauth/access_token',
 
         detailUrl:        domain_sina + '/jump?aid=detail&twId=',
         searchUrl:        domain_sina + '/search/'
+    },
+    
+
+	// 设置认证头
+	apply_auth: function(url, args, user) {
+		if(user.authType == 'baseauth') {
+			args.headers['Authorization'] = make_base_auth_header(user.userName, user.password);
+		} else if(user.authType == 'oauth' || user.authType == 'xauth') {
+			var accessor = {
+				consumerSecret: this.config.oauth_secret
+			};
+			// 已通过oauth认证
+			if(user.oauth_token_secret) {
+				accessor.tokenSecret = user.oauth_token_secret;
+			}
+			var parameters = {};
+			for(var k in args.data) {
+				parameters[k] = args.data[k];
+				if(k.substring(0, 6) == 'oauth_') { // 删除oauth_verifier相关参数
+					delete args.data[k];
+				}
+			}
+			var message = {
+				action: url,
+				method: args.type, 
+				parameters: parameters
+	        };
+			message.parameters.oauth_consumer_key = this.config.oauth_key;
+			message.parameters.oauth_version = '1.0';
+			// 已通过oauth认证
+			if(user.oauth_token_key) {
+				message.parameters.oauth_token = user.oauth_token_key;
+			}
+			// 设置时间戳
+			OAuth.setTimestampAndNonce(message);
+			// 签名参数
+		    OAuth.SignatureMethod.sign(message, accessor);
+		    // 获取认证头部
+		    args.headers['Authorization'] = OAuth.getAuthorizationHeader('', message.parameters);
+		}
+	},
+	
+    // 获取认证url
+    get_authorization_url: function(user, callbackFn) {
+    	if(user.authType == 'oauth') {
+    		var login_url = this.config.host + this.config.oauth_authorize + '?oauth_token=';
+    		this.get_request_token(user, function(token) {
+    			user.oauth_token_key = token.oauth_token;
+    			user.oauth_token_secret = token.oauth_token_secret;
+    			// 返回登录url给用户登录
+    			login_url += user.oauth_token_key;
+    			callbackFn(login_url);
+    		});
+    	} else {
+    		throw new Error(user.authType + ' not support get_authorization_url');
+    	}
+    },
+    
+    get_request_token: function(user, callbackFn) {
+    	if(user.authType == 'oauth') {
+    		var params = {
+	            url: this.config.oauth_request_token,
+	            type: 'get',
+	            user: user,
+	            play_load: 'string',
+	            need_source: false
+	        };
+    		this._sendRequest(params, function(token_str) {
+    			var token = decodeForm(token_str);
+    			callbackFn(token);
+    		});
+    	} else {
+    		throw new Error(user.authType + ' not support get_request_token');
+    	}
+    },
+    
+    // 必须设置user.oauth_pin
+    get_access_token: function(user, callbackFn) {
+    	if(user.authType == 'oauth' || user.authType == 'xauth') {
+    		var params = {
+	            url: this.config.oauth_access_token,
+	            type: 'get',
+	            user: user,
+	            play_load: 'string',
+	            data: {'oauth_verifier': user.oauth_pin},
+	            need_source: false
+	        };
+    		this._sendRequest(params, function(token_str) {
+    			var token = decodeForm(token_str);
+    			user.oauth_token_key = token.oauth_token;
+    			user.oauth_token_secret = token.oauth_token_secret;
+    			callbackFn(user);
+    		});
+    	} else {
+    		throw new Error(user.authType + ' not support get_access_token');
+    	}
     },
     
     /*
@@ -93,7 +196,6 @@ var sinaApi = {
         var params = {
             url: this.config.friends_timeline,
             type: 'get',
-            source: this.config.source2,
             play_load: 'status',
             data: data
         };
@@ -118,7 +220,6 @@ var sinaApi = {
         var params = {
             url: this.config.comments_timeline,
             type: 'get',
-            source: this.config.source2,
             play_load: 'comment',
             data: data
         };
@@ -131,7 +232,6 @@ var sinaApi = {
         var params = {
             url: this.config.mentions,
             type: 'get',
-            source: this.config.source2,
             play_load: 'status',
             data: data
         };
@@ -204,7 +304,6 @@ var sinaApi = {
         var params = {
             url: this.config.counts,
             type: 'get',
-            source: this.config.source2,
             play_load: 'count',
             data: data
         };
@@ -229,7 +328,6 @@ var sinaApi = {
         var params = {
             url: this.config.direct_messages,
             type: 'get',
-            source: this.config.source2,
             play_load: 'message',
             data: data
         };
@@ -569,22 +667,28 @@ var sinaApi = {
 	},
 	
     _sendRequest: function(params, callbackFn) {
-    	var args = {type: 'get', play_load: 'status'};
+    	var args = {type: 'get', play_load: 'status', headers: {}};
     	$.extend(args, params);
     	args.data = args.data || {};
     	args.data.source = args.data.source || this.config.source;
+    	if(args.need_source === false) {
+    		delete args.need_source;
+    		delete args.data.source;
+    	}
     	if(!args.url) {
     		showMsg('url未指定');
             callbackFn({}, 'error', '400');
             return;
     	}
-    	var url = this.config.host + args.url.format(args.data) + this.config.result_format;
+    	var url = this.config.host + args.url.format(args.data);
+    	if(args.play_load != 'string') {
+    		url += this.config.result_format;
+    	}
     	// 删除已经填充到url中的参数
     	var pattern = /\{\{([\w\s\.\(\)"',-]+)?\}\}/g;
 	    args.url.replace(pattern, function(match, key) {
 	    	delete args.data[key];
-	    });	
-    	if(!callbackFn) return;
+	    });
         var user = args.user || args.data.user || localStorage.getObject(CURRENT_USER_KEY);
         if(args.data && args.data.user) delete args.data.user;
         if(!user){
@@ -592,6 +696,11 @@ var sinaApi = {
             callbackFn({}, 'error', '400');
             return;
         }
+        // 请求前调用
+        this.before_sendRequest(args);
+        // 设置认证头部
+        this.apply_auth(url, args, user);
+        
         if(args.data.status){
         	args.data.status = this.url_encode(args.data.status);
         }
@@ -601,29 +710,33 @@ var sinaApi = {
         var $this = this;
         var play_load = args.play_load; // 返回的是什么类型的数据格式
         delete args.play_load;
-        // 请求前调用
-        this.before_sendRequest(args);
+        
         var callmethod = user.uniqueKey + ':' + args.url;
         $.ajax({
             url: url,
-            username: user.userName,
-            password: user.password,
+//            username: user.userName,
+//            password: user.password,
 //            cache: false, // chrome不会出现ie本地cache的问题, 若url参数带有_=xxxxx，digu无法获取完整的用户信息
             timeout: 60*1000, //一分钟超时
             type: args.type,
             data: args.data,
             dataType: 'text',
             beforeSend: function(req) {
-                req.setRequestHeader('Authorization', make_base_auth_header(user.userName, user.password));
+        		for(var key in args.headers) {
+        			req.setRequestHeader(key, args.headers[key]);
+        		}
+//                req.setRequestHeader('Authorization', make_base_auth_header(user.userName, user.password));
             },
             success: function (data, textStatus) {
-                try{
-                    data = JSON.parse(data);
-                }
-                catch(err){
-                    data = {error:callmethod + ' 服务器返回结果错误，本地解析错误。' + err, error_code:500};
-                    textStatus = 'error';
-                }
+            	if(play_load != 'string') {
+            		try{
+                        data = JSON.parse(data);
+                    }
+                    catch(err){
+                        data = {error:callmethod + ' 服务器返回结果错误，本地解析错误。' + err, error_code:500};
+                        textStatus = 'error';
+                    }
+            	}
                 var error_code = null;
                 if(data){
                     if(data.error || data.error_code){
@@ -1424,6 +1537,18 @@ var tapi = {
 	
 	get_config: function(user) {
 		return this.api_dispatch(user).config;
+	},
+	
+	get_authorization_url: function(user, callbackFn) {
+		return this.api_dispatch(user).get_authorization_url(user, callbackFn);
+	},
+	
+	get_request_token: function(user, callbackFn) {
+		return this.api_dispatch(user).get_request_token(user, callbackFn);
+	},
+	
+	get_access_token: function(user, callbackFn) {
+		return this.api_dispatch(user).get_access_token(user, callbackFn);
 	},
 	
 	verify_credentials: function(user, callbackFn, data){
