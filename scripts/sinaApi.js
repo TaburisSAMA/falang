@@ -22,6 +22,7 @@ var sinaApi = {
 		support_favorites: true,
 		// 是否支持max_id 分页
 		support_max_id: true,
+		support_destroy_msg: true, //是否支持删除私信
         
 		// api
         public_timeline:      '/statuses/public_timeline',
@@ -943,20 +944,6 @@ $.extend(DiguAPI, {
 		callback();
 	},
 	
-	verify_credentials: function(user, callbackFn, data){
-		data = data || {};
-		data.isAllInfo = true;
-	    if(!user || !callbackFn) return;
-	    var params = {
-	        url: this.config.verify_credentials,
-	        type: 'get',
-	        user: user,
-	        play_load: 'user',
-	        data: data
-	    };
-	    this._sendRequest(params, callbackFn);
-	},
-	
 	/* content[可选]：更新的Digu消息内容， 请确定必要时需要进行UrlEncode编码，另外，不超过140个中文或者英文字。
 	 */
 	before_sendRequest: function(args) {
@@ -999,6 +986,8 @@ $.extend(DiguAPI, {
 				args.data.userIdOrName = args.data.screen_name;
 				delete args.data.screen_name;
 			}
+		} else if(args.url = this.config.verify_credentials) {
+			args.data.isAllInfo = true;
 		}
     },
 	
@@ -1133,7 +1122,7 @@ $.extend(ZuosaAPI, {
 	    	if(!error_code && data.authorized) { // 继续获取用户信息
 	    		$this.user_show({user: user, id: user.userName}, callbackFn);
 	    	} else {
-	    		callbackFn(data, textStatus, error_code);
+	    		callbackFn(null, 'error', 401);
 	    	}
 	    });
 	},
@@ -1247,6 +1236,7 @@ $.extend(LeiHouAPI, {
 	    support_upload: false,
 	    
 		support_favorites: false,
+		support_destroy_msg: false,
 	
 	    upload: '/statuses/update',
 	    repost: '/statuses/update',
@@ -1285,7 +1275,11 @@ $.extend(LeiHouAPI, {
 				args.data.in_reply_to_status_id = args.data.sina_id;
 				delete args.data.sina_id;
 			}
-		} 
+		} else if(args.url == this.config.new_message) {
+			// id => user
+			args.data.user = args.data.id;
+			delete args.data.id;
+		}
     },
 	
 	format_result: function(data, play_load, args) {

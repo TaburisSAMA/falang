@@ -187,6 +187,10 @@ function bildMsgLi(sinaMsg, t, c_user){
         if(!config.support_repost) {
         	crlBtn.repostCounts = crlBtn.rtRepostCounts = crlBtn.repostBtn = '';
         }
+        // 不支持删除私信
+        if(!config.support_destroy_msg) {
+        	crlBtn.delDirectMsgBtn = '';
+        }
 
         if(c_user.blogType == 'digu' ){
             crlBtn.replyBtn = crlBtn.replyBtn.replace('>@<', '>回复<');

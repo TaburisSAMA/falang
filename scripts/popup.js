@@ -293,11 +293,18 @@ function checkSupportedTabs(user){
         user = getUser();
     }
     var config = tapi.get_config(user);
-    if(!config.support_comment){
-        $("#tl_tabs .tab-comments_timeline").hide();
-        $("#comments_timeline_timeline").hide();
-    }else{
-        $("#tl_tabs .tab-comments_timeline").show();
+    var checks = {
+    	support_comment: ['#tl_tabs .tab-comments_timeline, #comments_timeline_timeline', // 需要隐藏的
+    	                  '#tl_tabs .tab-comments_timeline'], // 需要显示的
+    	support_favorites: ['#tl_tabs .tab-favorites, #favorites_timeline',
+    	                    '#tl_tabs .tab-favorites']
+    };
+    for(var key in checks) {
+    	if(!config[key]){
+    		$(checks[key][0]).hide();
+        }else{
+        	$(checks[key][1]).show();
+        }
     }
 };
 
@@ -1106,12 +1113,12 @@ function sendMsg(msg){
     }
 };
 
+// 发生私信
 function sendWhisper(msg){
-    var btn, txt, data;
-    btn = $("#replySubmit");
-    txt = $("#replyTextarea");
+    var btn = $("#replySubmit");
+    var txt = $("#replyTextarea");
     var toUserId = $('#whisperToUserId').val();
-    data = {text: msg, id:toUserId};
+    var data = {text: msg, id: toUserId};
     var user = getUser();
     data['user'] = user;
     btn.attr('disabled','true');
@@ -1122,7 +1129,7 @@ function sendWhisper(msg){
             txt.val('');
             //setTimeout(callCheckNewMsg, 1000);
             showMsg('发送成功！');
-        }else if(sinaMsg.error){
+        } else if (sinaMsg.error){
             showMsg('error: ' + sinaMsg.error);
         }
         btn.removeAttr('disabled');
