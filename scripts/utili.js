@@ -54,12 +54,14 @@ T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.digu;
 
 var T_NAMES = {
 	'tsina': '新浪微博',
-	'tsohu': '搜狐微博',
 	'digu': '嘀咕',
+	'tsohu': '搜狐微博',
+//	't163': '网易微博',
 	'zuosa': '做啥',
-	'follow5': 'Follow5',
-	'leihou': '雷猴',
-	'twitter': 'Twitter'
+//	'follow5': 'Follow5',
+	'twitter': 'Twitter',
+	'leihou': '雷猴'
+	
 };
 
 

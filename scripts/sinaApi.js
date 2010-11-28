@@ -1546,6 +1546,22 @@ $.extend(TwitterAPI, {
 	}
 });
 
+var T163API = $.extend({}, sinaApi);
+
+$.extend(T163API, {
+	
+	// 覆盖不同的参数
+	config: $.extend({}, sinaApi.config, {
+		host: 'http://api.t.163.com',
+		source: 'CMlCI0PLHNtmjzCA', // 需要申请
+		oauth_key: 'CMlCI0PLHNtmjzCA',
+        oauth_secret: 'tYU2lK30IlSRhuX8ouUtEx8Uk2fRf8Yk',
+        
+        oauth_authorize: '/oauth/authenticate',
+        friends_timeline: '/statuses/home_timeline',
+	})
+});
+
 var T_APIS = {
 	'tsina': sinaApi,
 	'tsohu': TSohuAPI,
@@ -1553,6 +1569,7 @@ var T_APIS = {
 	'zuosa': ZuosaAPI,
 	'leihou': LeiHouAPI,
 	'follow5': Follow5API,
+	't163': T163API,
 	'twitter': TwitterAPI // fxxx gxfxw first.
 };
 
