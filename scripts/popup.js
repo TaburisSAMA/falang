@@ -1332,7 +1332,8 @@ function resizeFawave(w, h){
         h = window.innerHeight;
     }
     var wh_css = '#wrapper{width:'+ w +'px;}'
-				   + '.warp{width:' + w + 'px;}.list_warp{height:' + (h-70) + 'px;}'
+                   + '#txtContent{width:'+ (w-2) +'px;}'
+				   + '.warp{width:' + w + 'px;} .list_warp{height:' + (h-70) + 'px;}'
 				   + '#facebox img, #facebox canvas{max-width:'+ (w-50) +'px;}';
 	$("#styleCustomResize").html(wh_css);
 };
