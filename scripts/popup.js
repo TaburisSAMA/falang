@@ -1139,38 +1139,53 @@ function sendMsg(msg){
                 users.push(_user);
             }
         });
-    }else{
+    }else if(!$("#accountsForSend li").length){
         users.push(getUser());
+    }else{
+        showMsg('请选择要发送的账号');
+        btn.removeAttr('disabled');
+        txt.removeAttr('disabled');
+        return;
     }
-    var userCount = users.length, sendedCount = 0, successCount = 0;
+    var stat = {};
+    stat.userCount = users.length;
+    stat.sendedCount = 0;
+    stat.successCount = 0;
     for(var i in users){
-        var data = {};
-        data['status'] = msg; //放到这里重置一下，否则会被编码两次
-        data['user'] = users[i];
-        tapi.update(data, function(sinaMsg, textStatus){
-            sendedCount++;
-            if(sinaMsg.id){
-                successCount++;
-            }else if(sinaMsg.error){
-                showMsg('error: ' + sinaMsg.error);
-            }
-            if(successCount >= userCount){//全部发送成功
-                hideMsgInput();
-                txt.val('');
-                showMsg('发送成功！');
-            }
-            if(sendedCount >= userCount){//全部发送完成
-                btn.removeAttr('disabled');
-                txt.removeAttr('disabled');
-                if(successCount > 0){ //有发送成功的
-                    setTimeout(callCheckNewMsg, 1000);
-                    if(userCount > 1){ //多个用户的
-                        showMsg(successCount + '发送成功，' + (userCount - successCount) + '失败。');
-                    }
+        _sendMsgWraper(msg, users[i], stat);
+    }
+};
+
+function _sendMsgWraper(msg, user, stat){
+    var data = {};
+    data['status'] = msg; //放到这里重置一下，否则会被编码两次
+    data['user'] = user;
+    tapi.update(data, function(sinaMsg, textStatus){
+        stat.sendedCount++;
+        if(sinaMsg.id){
+            stat.successCount++;
+            $("#accountsForSend li[uniquekey=" + user.uniqueKey +"]").removeClass('sel');
+        }else if(sinaMsg.error){
+            showMsg('error: ' + sinaMsg.error);
+        }
+        if(stat.successCount >= stat.userCount){//全部发送成功
+            hideMsgInput();
+            $("#txtContent").val('');
+            showMsg('发送成功！');
+        }
+        if(stat.sendedCount >= stat.userCount){//全部发送完成
+            $("#btnSend").removeAttr('disabled');
+            $("#txtContent").removeAttr('disabled');
+            if(stat.successCount > 0){ //有发送成功的
+                setTimeout(callCheckNewMsg, 1000);
+                if(stat.userCount > 1){ //多个用户的
+                    showMsg(stat.successCount + '发送成功，' + (stat.userCount - stat.successCount) + '失败。');
                 }
             }
-        });
-    }
+        }
+        user = null;
+        stat = null;
+    });
 };
 
 // 发生私信

@@ -176,6 +176,7 @@ li { line-height:16px;}
 
 .warp { width:480px; position:relative; /*border:1px solid #ace; padding-bottom:10px;*/} 
 .list_warp { margin:0; height: 470px; overflow-x:hidden; overflow-y:auto; -webkit-transition: height .6s ease;} 
+li .pic{max-width:80%;}
 
 .tab2{
 	background-color: #FAFAFA;

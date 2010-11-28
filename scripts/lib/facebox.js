@@ -128,7 +128,7 @@
 
       $('#facebox').css({
         top:	getPageScroll()[1] + (getPageHeight() / 10),
-        left:	385.5
+        right:	1
       }).show();
 
       $(document).bind('keydown.facebox', function(e) {
@@ -144,7 +144,7 @@
       $('#facebox .content').append(data);
       $('#facebox .loading').remove();
       $('#facebox .body').children().fadeIn('normal');
-      $('#facebox').css('left', $(window).width() / 2 - ($('#facebox table').width() / 2));
+      //$('#facebox').css('left', $(window).width() / 2 - ($('#facebox table').width() / 2));
       $(document).trigger('reveal.facebox').trigger('afterReveal.facebox');
     },
 
