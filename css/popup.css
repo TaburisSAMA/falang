@@ -41,6 +41,7 @@ li { line-height:16px;}
 #submitWarp .ctr{margin-top:2px;}
 #wordCount{float:right;font-size:13px;font-weight: bold;}
 #header{
+	font-size:12px;
 	position: relative;
 	border:solid 1px #ccc;
 	padding:3px 0 20px;
@@ -129,11 +130,12 @@ li { line-height:16px;}
 #header:hover #tl_tabs .btns{ display:block; }
 #tl_tabs .btns{
 	display:none;
+	height: 15px;
 	float:left;
 	margin-right:10px;
 }
 #tl_tabs .btns a{ margin:0 1px; }
-#tl_tabs .btns img{ vertical-align:middle; width:15px; height:15px;}
+#tl_tabs .btns img{ vertical-align:bottom; width:15px; height:15px;}
 
 /* 用户发送列表选择 */
 #accountsForSend { }
