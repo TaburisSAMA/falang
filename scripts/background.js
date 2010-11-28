@@ -104,20 +104,9 @@ function checkTimeline(t, p, user_uniqueKey){
     setDoChecking(user_uniqueKey, t, 'checking', true);
     
     var params = {user:c_user, count:PAGE_SIZE};
-    if(t == 'favorites') { // 收藏只支持page参数
-    	params.page = getLastPage(t, user_uniqueKey);
-    	if(params.page == 0){ //已经到底了
-    		return;
-    	} else if(params.page == undefined) {
-    		params.page = 1;
-    	} else {
-    		params.page += 1;
-    	}
-    } else {
-    	var last_id = getLastMsgId(t, user_uniqueKey);
-        if(last_id){
-            params['since_id'] = last_id;
-        }
+    var last_id = getLastMsgId(t, user_uniqueKey);
+    if(last_id){
+        params['since_id'] = last_id;
     }
     if(p){
         for(var key in p){
@@ -190,15 +179,8 @@ function checkTimeline(t, p, user_uniqueKey){
                     setMaxMsgId(t, _max_id, user_uniqueKey);
                 }
             }
-        	if(t == 'favorites') {
-        		setLastPage(t, params.page, user_uniqueKey);
-        	}
         } else {
             setUnreadTimelineCount(0, t, user_uniqueKey);
-            if(t == 'favorites') {
-            	// 已经获取完了
-        		setLastPage(t, 0, user_uniqueKey);
-        	}
         }
         //window.checking[t] = false;
         setDoChecking(user_uniqueKey, t, 'checking', false);
@@ -236,7 +218,7 @@ function getTimelinePage(user_uniqueKey, t, p){
     
     var params = {user:c_user, count:PAGE_SIZE};
     var config = tapi.get_config(c_user);
-    var not_support_max_id = config.support_max_id || t == 'favorites';
+    var not_support_max_id = config.support_max_id;
     // 判断是否支持max_id形式获取数据
     if(!not_support_max_id) {
 	    var max_id = getMaxMsgId(t, user_uniqueKey);

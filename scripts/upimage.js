@@ -16,7 +16,7 @@ function initOnLoad(){
 };
 
 function init(){
-	initSelectSendAccounts();
+	initSelectSendAccounts(true);
 	
     $("#txtContent").focus();
     

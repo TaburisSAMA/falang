@@ -468,7 +468,8 @@ var sinaApi = {
 	    if(before_request) {
 	    	before_request();
 	    }
-		var url = this.config.host + this.config.upload + this.config.result_format;
+	    var api = user.apiProxy || this.config.host;
+		var url = api + this.config.upload + this.config.result_format;
 		// 设置认证头部
         this.apply_auth(url, auth_args, user);
 	    $.ajax({
@@ -988,6 +989,7 @@ $.extend(DiguAPI, {
 			}
 		} else if(args.url = this.config.verify_credentials) {
 			args.data.isAllInfo = true;
+			delete args.data.source;
 		}
     },
 	
@@ -1233,7 +1235,6 @@ $.extend(LeiHouAPI, {
 	    
 	    support_comment: false,
 	    support_repost: false,
-	    support_upload: false,
 	    
 		support_favorites: false,
 		support_destroy_msg: false,
@@ -1362,6 +1363,7 @@ $.extend(Follow5API, {
 	    support_max_id: false,
 	    support_comment: false,
 	    support_repost: false,
+	    support_upload: false,
 
 	    verify_credentials: '/users/verify_credentials',
 	    direct_messages: '/destroy_messages', 
@@ -1372,7 +1374,7 @@ $.extend(Follow5API, {
         comments_timeline: '/statuses/replies_timeline',
 	    mentions: '/statuses/mentions_me',
 	    destroy: '/statuses/destroy',
-	    upload: '/statuses/update',
+//	    upload: '/statuses/update',
 	    repost: '/statuses/update'
 	}),
 	

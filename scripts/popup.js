@@ -19,13 +19,21 @@ function initOnLoad(){
     setTimeout(init, 100); //为了打开的时候不会感觉太卡
 };
 
+var POPUP_CACHE = {};
 // 方便根据不同用户获取缓存数据的方法
-function get_current_user_cache(cache) {
+function get_current_user_cache(cache, t) {
 	var c_user = getUser();
-	var _cache = cache[c_user.uniqueKey];
+	var key = c_user.uniqueKey;
+	if(t != undefined) {
+		key += '_' + t;
+	}
+	if(!cache) {
+		cache = POPUP_CACHE;
+	}
+	var _cache = cache[key];
 	if(!_cache) {
 		_cache = {};
-		cache[c_user.uniqueKey] = _cache;
+		cache[key] = _cache;
 	}
 	return _cache;
 };
@@ -113,6 +121,10 @@ function initTabs(){
             $("#user_timeline_timeline ul.list").html('');
         }else if(c_t =='followers'){
             getFansList('followers');
+            checkShowGototop();
+            return;
+        } else if(c_t == 'favorites') {
+        	getFavorites();
             checkShowGototop();
             return;
         }
@@ -420,7 +432,8 @@ function changeUser(uniqueKey){
     }
 };
 
-function initSelectSendAccounts(){
+// 初始化用户选择视图, is_upload === true 代表是上传
+function initSelectSendAccounts(is_upload){
     var afs = $("#accountsForSend");
     if(afs.data('inited')){
         return;
@@ -441,8 +454,11 @@ function initSelectSendAccounts(){
                '</li>';
     var li = [];
     var c_user = getUser();
-    for(i in userList){
+    for(var i in userList){
         user = userList[i];
+        if(is_upload === true && tapi.get_config(user).support_upload === false) {
+        	continue;
+        }
         if(user.uniqueKey == c_user.uniqueKey){
             user.sel = 'sel';
         }else{
@@ -600,13 +616,13 @@ function getFansList(t, cursor){
         	}
             users = users.users;
             if(users) {
-            	var html = '';
                 for(var i in users){
-                    html += bildMsgLi(users[i], t); //TODO: 待优化
+//                    html += bildMsgLi(users[i], t); //TODO: 待优化
+                    list.append(bildMsgLi(users[i], t));
                 }
-                list.append(html);
+//                list.append(html);
                 html_cache[t] = list.html();
-                if(users.length >=20){
+                if(users.length >= PAGE_SIZE){
                     showReadMore(t);
                 }else{
                     hideReadMore(t);
@@ -658,6 +674,46 @@ function getUserTimeline(screen_name, user_id){
 
         hideLoading();
         checkShowGototop();
+    });
+};
+
+// 获取用户收藏
+var FAVORITE_HTML_CACHE = {};
+function getFavorites(page){
+	var c_user = getUser();
+    if(!c_user){
+        return;
+    }
+    var list = $("#favorites_timeline .list");
+    var t = 'favorites';
+    var user_cache = get_current_user_cache();
+    if(page == undefined) { // 点击
+    	if(user_cache[t]) {
+    		list.html(user_cache[t]);
+    		return;
+    	} else {
+    		list.html('');
+    		page = 1;
+    	}
+    }
+    showLoading();
+    hideReadMore(t);
+    var params = {page: page, user: c_user, count: PAGE_SIZE};
+    tapi[t](params, function(status, textStatus, statuCode){
+        if(textStatus != 'error' && status && !status.error){
+        	for(var i in status){
+	            list.append(bildMsgLi(status[i], t));
+	        }
+        	user_cache[t] = list.html();
+	        if(status.length > 0){
+	            showReadMore(t);
+	            setPopupNextPage(t, page + 1);
+	        }else{
+	            hideReadMore(t);
+	        }
+        } else {
+        	showReadMore(t);
+        }
     });
 };
 
@@ -848,7 +904,9 @@ function scrollPaging(){
     if(list_warp.scrollTop() >= h){
         if(tl == 'followers'){ //粉丝列表特殊处理
             readMoreFans();
-        }else{
+        } else if(tl == 'favorites') {
+        	readMoreFavorites(tl);
+        } else {
             readMore(tl);
         }
     }
@@ -883,6 +941,23 @@ function readMoreFans(){
     var _cache = get_current_user_cache(NEXT_CURSOR);
     var cursor = _cache[t];
     getFansList(t, cursor);
+};
+
+var POPUP_PAGE_CACHE = {};
+function getPopupNextPage(t) {
+	var _cache = get_current_user_cache(POPUP_PAGE_CACHE);
+    var page = _cache[t];
+    return page;
+};
+
+function setPopupNextPage(t, page) {
+	var _cache = get_current_user_cache(POPUP_PAGE_CACHE);
+	_cache[t] = page;
+};
+
+function readMoreFavorites(t){
+	var page = getPopupNextPage(t);
+    getFavorites(page);
 };
 
 function readMore(t){
