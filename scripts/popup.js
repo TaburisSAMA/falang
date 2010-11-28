@@ -119,7 +119,9 @@ function initTabs(){
         c_ul.show();
         window.currentTab = t.attr('href');
         if(c_t =='user_timeline'){ //用户自己的微薄，清空内容。防止查看别人的微薄的时候内容混合
-            $("#user_timeline_timeline ul.list").html('');
+            getUserTimeline();
+            checkShowGototop();
+            return;
         }else if(c_t =='followers'){
             getFansList('followers');
             checkShowGototop();
@@ -604,6 +606,7 @@ function getFansList(t, cursor){
             list.html(html_cache[t]);
             return;
         }else{
+        	html_cache[t] = '';
             list.html('');
         }
     }
@@ -619,12 +622,15 @@ function getFansList(t, cursor){
         	}
             users = users.users;
             if(users) {
+            	var html = '';
                 for(var i in users){
-//                    html += bildMsgLi(users[i], t); //TODO: 待优化
-                    list.append(bildMsgLi(users[i], t));
+                    html += bildMsgLi(users[i], t); //TODO: 待优化
                 }
-//                list.append(html);
-                html_cache[t] = list.html();
+                if(t == $("#fans_tab .active").attr('t')) {
+                	// 还是当前页
+                	list.append(html);
+                }
+                html_cache[t] += html;
                 if(users.length >= PAGE_SIZE){
                     showReadMore(t);
                 }else{
@@ -636,45 +642,77 @@ function getFansList(t, cursor){
 };
 
 //查看用户的微薄
-function getUserTimeline(screen_name, user_id){
+function getUserTimeline(screen_name, user_id, read_more){
     var c_user = getUser();
     if(!c_user){
         return;
     }
-    showLoading();
-    var params = {count:40, screen_name:screen_name, user: c_user};
+    var t = $("#tl_tabs .tab-user_timeline");
+    var max_id = null;
+    var page = 1;
+    // 直接点击tab，获取当前用户的
+    if(screen_name == undefined) {
+    	screen_name = c_user.screen_name;
+    	user_id = c_user.id;
+    } else if(read_more) {
+    	max_id = t.attr('max_id');
+        page = Number(t.attr('page') || 1);
+    }
+    var params = {count: PAGE_SIZE, screen_name: screen_name, user: c_user};
     if(user_id) {
     	params.id = user_id;
     }
+    var support_max_id = tapi.get_config(c_user).support_max_id;
+    if(support_max_id) {
+    	if(max_id) {
+    		params.max_id = max_id;
+    	}
+    } else {
+    	params.page = page;
+    }
+    showLoading();
     var m = 'user_timeline';
+    hideReadMore(m);
     tapi[m](params, function(sinaMsgs, textStatus){
+    	// 如果用户已经切换，则不处理
+    	var now_user = getUser();
+    	if(now_user.uniqueKey != c_user.uniqueKey) {
+    		return;
+    	}
         if(sinaMsgs && sinaMsgs.length > 0){
-            var t = $("#tl_tabs .tab-user_timeline");
-            //添加当前激活的状态
-            t.siblings().removeClass('active').end()
-                    .addClass('active');
-            //切换tab前先保护滚动条位置
-            var old_t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
-            saveScrollTop(old_t);
-            //切换tab
-            $('.list_p').hide();
-            
-            $("#user_timeline_timeline").show();
-            $("#user_timeline_timeline ul.list").html('');
+        	if(window.currentTab != "#user_timeline_timeline") {
+        		//添加当前激活的状态
+                t.siblings().removeClass('active').end().addClass('active');
+                //切换tab前先保护滚动条位置
+                var old_t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
+                saveScrollTop(old_t);
+                //切换tab
+                $('.list_p').hide();
+                
+                $("#user_timeline_timeline").show();
+                $("#user_timeline_timeline ul.list").html('');
 
-            window.currentTab = "#user_timeline_timeline";
-
+                window.currentTab = "#user_timeline_timeline";
+        	}
+            if(!read_more) {
+            	$("#user_timeline_timeline ul.list").html('');
+            }
             addTimelineMsgs(sinaMsgs, m);
-
-            hideReadMore('user_timeline');
-
-            var user = sinaMsgs[0].user || sinaMsgs[0].sender;
-            var userinfo_html = buildUserInfo(user);
-            $("#user_timeline_timeline ul.list").prepend(userinfo_html);
-
-            resetScrollTop(m);
+            max_id = Number(sinaMsgs[sinaMsgs.length - 1].id) - 1;
+            page += 1;
+            // 保存数据，用于翻页
+            t.attr('max_id', max_id);
+            t.attr('page', page);
+            t.attr('screen_name', screen_name);
+            t.attr('user_id', user_id);
+            showReadMore(m);
+            if(!read_more) {
+            	var user = sinaMsgs[0].user || sinaMsgs[0].sender;
+                var userinfo_html = buildUserInfo(user);
+                $("#user_timeline_timeline ul.list").prepend(userinfo_html);
+                resetScrollTop(m);
+            }
         }
-
         hideLoading();
         checkShowGototop();
     });
@@ -705,13 +743,11 @@ function getFavorites(is_click){
     var params = {page: page, user: c_user, count: PAGE_SIZE};
     tapi[t](params, function(status, textStatus, statuCode){
         if(textStatus != 'error' && status && !status.error){
-        	for(var i in status){
-	            list.append(bildMsgLi(status[i], t));
-	        }
-        	user_cache[t] = list.html();
 	        if(status.length > 0){
+	        	addTimelineMsgs(status, t, c_user.uniqueKey);
 	            showReadMore(t);
 	            user_cache[t + '_page'] = page + 1;
+	            user_cache[t] = list.html();
 	        }else{
 	            hideReadMore(t);
 	        }
@@ -732,31 +768,34 @@ function getSinaTimeline(t, notCheckNew){
     if(b_view && b_view.tweets[_key] != undefined && b_view.tweets[_key].length>0){
         var tweetsAll = b_view.tweets[_key];
         var msgs = tweetsAll.slice(0, PAGE_SIZE);
-        var html = '';
+//        var html = '';
         var ids = [];
         for(var i in msgs){
-            html += bildMsgLi(msgs[i], t); //TODO: 待优化
-            ids.push(msgs[i].id);
-            if(msgs[i].retweeted_status){
-                ids.push(msgs[i].retweeted_status.id);
-                if(msgs[i].retweeted_status.retweeted_status) {
-                	ids.push(msgs[i].retweeted_status.retweeted_status.id);
+//            html += bildMsgLi(msgs[i], t); //TODO: 待优化
+            var msg = msgs[i];
+        	_ul.append(bildMsgLi(msg, t));
+            ids.push(msg.id);
+            if(msg.retweeted_status){
+                ids.push(msg.retweeted_status.id);
+                if(msg.retweeted_status.retweeted_status) {
+                	ids.push(msg.retweeted_status.retweeted_status.id);
                 }
-            }else if(msgs[i].status){
-                ids.push(msgs[i].status.id);
-                if(msgs[i].status.retweeted_status) {
-                	ids.push(msgs[i].status.retweeted_status.id);
+            }else if(msg.status){
+                ids.push(msg.status.id);
+                if(msg.status.retweeted_status) {
+                	ids.push(msg.status.retweeted_status.id);
                 }
             }
         }
-        _ul.append(html);
         if(ids.length>0){
             if(ids.length > 100){
                 var ids2 = ids.slice(0, 99);
                 ids = ids.slice(99, ids.length);
                 showCounts(t, ids2.join(','));
             }
-            showCounts(t, ids.join(','));
+            if(ids.length > 0) {
+            	showCounts(t, ids.join(','));
+            }
         }
         if(tweetsAll.length >= (PAGE_SIZE/2)){
             showReadMore(t);
@@ -910,6 +949,10 @@ function scrollPaging(){
             readMoreFans();
         } else if(tl == 'favorites') {
         	getFavorites();
+        } else if(tl == 'user_timeline') {
+        	// 获取screen_name, user_id
+        	var $t = $("#tl_tabs .tab-user_timeline");
+        	getUserTimeline($t.attr('screen_name'), $t.attr('user_id'), true);
         } else {
             readMore(tl);
         }
@@ -959,35 +1002,7 @@ function readMore(t){
         _b_view.getTimelinePage(c_user.uniqueKey, t);
     }else{
         var msgs = cache.slice(getTimelineOffset(t), getTimelineOffset(t) + PAGE_SIZE);
-        var _html = '';
-        var $list = $("#" + t + "_timeline ul.list");
-        var ids = [];
-        for(var i in msgs){
-        	$list.append(bildMsgLi(msgs[i], t));
-            ids.push(msgs[i].id);
-            if(msgs[i].retweeted_status){
-                ids.push(msgs[i].retweeted_status.id);
-                if(msgs[i].retweeted_status.retweeted_status) {
-                	ids.push(msgs[i].retweeted_status.retweeted_status.id);
-                }
-            }else if(msgs[i].status){
-                ids.push(msgs[i].status.id);
-                if(msgs[i].status.retweeted_status) {
-                	ids.push(msgs[i].status.retweeted_status.id);
-                }
-            }
-        }
-        setTimelineOffset(t, PAGE_SIZE);
-        showReadMore(t);
-        hideLoading();
-        if(ids.length>0){
-            if(ids.length > 100){
-                var ids2 = ids.slice(0, 99);
-                ids = ids.slice(99, ids.length);
-                showCounts(t, ids2.join(','));
-            }
-            showCounts(t, ids.join(','));
-        }
+        addPageMsgs(msgs, t);
     }
 };
 
@@ -1002,18 +1017,13 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
     }
 
     var li = $('.tab-' + t);
+    var _ul = $("#" + t + "_timeline ul.list");
     if(!li.hasClass('active')){
         //清空，让下次点tab的时候重新取
-        $("#" + t + "_timeline ul.list").html('');
-        
+    	_ul.html('');
         var _msg_user = null, _unreadCount = 0;
         for(var i in msgs){
             _msg_user = msgs[i].user || msgs[i].sender;
-//            if(!_msg_user || !c_user) {
-//            	console.dir(t);
-//            	console.dir(msgs[i]);
-//            	console.dir(msgs);
-//            }
             if(_msg_user && c_user && _msg_user.id != c_user.id){
                 _unreadCount += 1;
             }
@@ -1026,45 +1036,17 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
         }
         return false;
     }else{
-        setTimelineOffset(t, msgs.length);
-        var html = '';
-        var ids = [];
-        var _unreadCount = 0;
-        for(var i in msgs){
-            html += bildMsgLi(msgs[i], t);
-            ids.push(msgs[i].id);
-            if(msgs[i].retweeted_status){
-                ids.push(msgs[i].retweeted_status.id);
-                if(msgs[i].retweeted_status.retweeted_status) {
-                	ids.push(msgs[i].retweeted_status.retweeted_status.id);
-                }
-            }else if(msgs[i].status){
-                ids.push(msgs[i].status.id);
-                if(msgs[i].status.retweeted_status) {
-                	ids.push(msgs[i].status.retweeted_status.id);
-                }
-            }
-        }
-        var _ul = $("#" + t + "_timeline ul.list");
-        _ul.prepend(html);
-        if(ids.length>0){
-            if(ids.length > 100){
-                var ids2 = ids.slice(0, 99);
-                ids = ids.slice(99, ids.length);
-                showCounts(t, ids2.join(','));
-            }
-            showCounts(t, ids.join(','));
-        }
+    	addPageMsgs(msgs, t);
     }
     return true;
 };
 
 function addPageMsgs(msgs, t){
     setTimelineOffset(t, msgs.length);
-    var html = '';
     var ids = [];
+    var _ul = $("#" + t + "_timeline ul.list");
     for(var i in msgs){
-        html += bildMsgLi(msgs[i], t);
+    	_ul.append(bildMsgLi(msgs[i], t));
         ids.push(msgs[i].id);
         if(msgs[i].retweeted_status){
             ids.push(msgs[i].retweeted_status.id);
@@ -1078,8 +1060,6 @@ function addPageMsgs(msgs, t){
             }
         }
     }
-    var _ul = $("#" + t + "_timeline ul.list");
-    _ul.append(html);
     if(ids.length>0){
         if(ids.length > 100){
             var ids2 = ids.slice(0, 99);
@@ -1088,7 +1068,6 @@ function addPageMsgs(msgs, t){
         }
         showCounts(t, ids.join(','));
     }
-    hideLoading();
 };
 
 //发送 @回复

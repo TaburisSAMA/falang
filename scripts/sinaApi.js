@@ -837,7 +837,7 @@ $.extend(TSohuAPI, {
         user_home_url: 'http://t.sohu.com/n/',
         search_url: 'http://t.sohu.com/k/',
 		source: 'WbbRPziVG6', // 取得appkey的第三方进行分级处理，分为500，800和1500三个等级。
-	    
+		support_max_id: false,
 	    oauth_key: 'WbbRPziVG6',
         oauth_secret: 'Ca(R$X(Ikxzm4RoYXh0afc8C210J%8',
         favorites: '/favourites',
