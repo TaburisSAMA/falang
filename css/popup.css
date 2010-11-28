@@ -19,7 +19,7 @@ li { line-height:16px;}
 ::-webkit-resizer{}
 ::-webkit-scrollbar-thumb{
     -webkit-border-radius:4px;
-    background-color: #ddd;
+    background-color: #ccc;
 }
 ::-webkit-scrollbar-thumb:hover{
     background-color: #bbb;

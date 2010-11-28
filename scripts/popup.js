@@ -374,21 +374,14 @@ function changeUser(uniqueKey){
     if(c_user.uniqueKey == uniqueKey){
         return;
     }
-    friendsTimeline_offset = replys_offset = messages_offset = PAGE_SIZE;//复位分页
     var userList = getUserList();
-    var to_user = null;
-    for(var i in userList){
-        var user = userList[i];
-        if(user.uniqueKey.toLowerCase() == uniqueKey.toLowerCase()){
-            to_user = user;
-            break;
-        }
-    }
+    var to_user = userList[uniqueKey] || null;
     if(to_user){
         setUser(to_user);
         showHeaderUserInfo(to_user);
         var b_view = getBackgroundView();
         b_view.onChangeUser();
+        friendsTimeline_offset = replys_offset = messages_offset = PAGE_SIZE;//复位分页
     	// 获取当前的tab
         var activeLi = $("#tl_tabs li.active");
     	var cur_t = activeLi.attr('href').replace(/_timeline$/, '').substring(1);
