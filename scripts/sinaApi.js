@@ -832,6 +832,8 @@ $.extend(TSohuAPI, {
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.t.sohu.com',
+        user_home_url: 'http://t.sohu.com/n/',
+        search_url: 'http://t.sohu.com/k/',
 		source: 'WbbRPziVG6', // 取得appkey的第三方进行分级处理，分为500，800和1500三个等级。
 	    
 	    oauth_key: 'WbbRPziVG6',

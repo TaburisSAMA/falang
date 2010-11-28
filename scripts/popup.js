@@ -4,14 +4,14 @@ var fawave = {};
 var timeline_offset = {};
 function getTimelineOffset(t){
     return timeline_offset[t] || PAGE_SIZE;
-}
+};
 function setTimelineOffset(t, offset){
     var n = getTimelineOffset(t);
     timeline_offset[t] = n + offset;
-}
+};
 function resetTimelineOffset(t){
     timeline_offset[t] = PAGE_SIZE;
-}
+};
 //TODO: 检查分页复位情况，貌似不对！
 //var friendsTimeline_offset = replys_offset = messages_offset = PAGE_SIZE;
 
@@ -136,16 +136,8 @@ function initTabs(){
 
         checkShowGototop(); //检查是否要显示返回顶部按钮
     });
-
-    var c_user = getUser();
-    var userT = T_LIST[c_user.blogType];
-    for(var i in T_LIST.all){
-        if(userT.indexOf(T_LIST.all[i]) < 0){ //如果当前博客不支持该tab timeline
-            $("#tl_tabs .tab-" + T_LIST.all[i]).hide();
-        }else{
-            $("#tl_tabs .tab-" + T_LIST.all[i]).show();
-        }
-    }
+    
+    checkSupportedTabs();
 };
 
 function initOnUnload(){
@@ -154,7 +146,7 @@ function initOnUnload(){
         c='';
     }
     localStorage.setObject(UNSEND_TWEET_KEY, c||'');
-}
+};
 
 function initTxtContentEven(){
 //>>>发送微博事件初始化 开始<<<
@@ -248,7 +240,7 @@ function countInputText() {
     }else{
         $("#btnSend").removeAttr('disabled');
     }
-}
+};
 
 function countReplyText(){
     var c = $("#replyTextarea").val();
@@ -259,12 +251,12 @@ function countReplyText(){
         len = '(<em style="color:red;">已超出' + (-len) + '字</em>)';
     }
     $("#replyInputCount").html(len);
-}
+};
 
 function cleanTxtContent(){
     $("#txtContent").val('').focus();
     countInputText();
-}
+};
 
 //我正在看
 function initIamDoing(){
@@ -293,7 +285,21 @@ function initIamDoing(){
             }
         });
     });
-}
+};
+
+//隐藏那些不支持的Timeline Tab
+function checkSupportedTabs(user){
+    if(!user){
+        user = getUser();
+    }
+    var config = tapi.get_config(user);
+    if(!config.support_comment){
+        $("#tl_tabs .tab-comments_timeline").hide();
+        $("#comments_timeline_timeline").hide();
+    }else{
+        $("#tl_tabs .tab-comments_timeline").show();
+    }
+};
 
 //多用户切换
 function initChangeUserList(){
@@ -360,28 +366,26 @@ function changeUser(uniqueKey){
     }
     if(to_user){
     	// 获取当前的tab
-    	var cur_t = $("#tl_tabs li.active").attr('href').replace(/_timeline$/, '').substring(1);
+        var activeLi = $("#tl_tabs li.active");
+    	var cur_t = activeLi.attr('href').replace(/_timeline$/, '').substring(1);
         
         var userT = T_LIST[to_user.blogType];
-        var cur_t_new = '';
-        for(var i in T_LIST.all){
-            hideReadMore(T_LIST.all[i]);
-            $("#" + T_LIST.all[i] + '_timeline .list').html('');
-            if(userT.indexOf(T_LIST.all[i]) < 0){ //如果当前博客不支持该tab timeline
-                var _tab = $("#tl_tabs .tab-" + T_LIST.all[i]);
-                _tab.hide();
-                $("#" + T_LIST.all[i] + '_timeline').hide();
-                if(cur_t == T_LIST.all[i]){ //如果不支持的tab刚好是当前tab
-                    _tab.removeClass('active');
-                    window.currentTab = '#friends_timeline_timeline';
-                    cur_t_new = 'friends_timeline';
-                    $("#tl_tabs .tab-friends_timeline").addClass('active');
-                    $('#friends_timeline_timeline').show();
-                }
-            }else{
-                $("#tl_tabs .tab-" + T_LIST.all[i]).show();
-            }
+        var _li = null, _t = '', cur_t_new = '';
+        $("#tl_tabs li").each(function(){
+            _li = $(this);
+            _t = _li.attr('href').replace(/_timeline$/i,'').substring(1);
+            $("#" + _t + '_timeline .list').html('');
+            showReadMore(_t); //TODO: show or hide ?
+        });
+        checkSupportedTabs(to_user);
+        if(activeLi.css('display')=='none'){ //如果不支持的tab刚好是当前tab
+            activeLi.removeClass('active');
+            window.currentTab = '#friends_timeline_timeline';
+            cur_t_new = 'friends_timeline';
+            $("#tl_tabs .tab-friends_timeline").addClass('active');
+            $('#friends_timeline_timeline').show();
         }
+
         cur_t = cur_t_new || cur_t;
         $("#tl_tabs .unreadCount").html('');
         setUser(to_user);
@@ -402,7 +406,8 @@ function changeUser(uniqueKey){
         		// 粉丝tab，直接执行onclick事件
         		$('#fans_tab span.active').attr('onclick')();
         	} else {
-        		getSinaTimeline(cur_t, true);
+        		//getSinaTimeline(cur_t, true);
+                $("#tl_tabs li.active").click();
         	}
         }
     }

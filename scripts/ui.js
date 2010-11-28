@@ -165,7 +165,7 @@ function bildMsgLi(sinaMsg, t, c_user){
             crlBtn.rtReplyBtn = '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + rt_status.user.screen_name + '\',' + rt_status.id + ');" title="进行@回复">@</a>';
             crlBtn.rtAddFavoritesMsgBtn = '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'' + rt_status.user.screen_name + '\',' + rt_status.id + ');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>';
             if(rt_status.retweeted_status && rt_status.retweeted_status.user) {
-            	log(rt_status);
+            	//log(rt_status);
             	var rtrt_screen_name = rt_status.retweeted_status.user.screen_name;
             	var rtrt_id = rt_status.retweeted_status.id;
             	crlBtn.rtrtRepostBtn = '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + rtrt_screen_name + '\',' + rtrt_id + ');" title="转发这条微博">转</a>';
