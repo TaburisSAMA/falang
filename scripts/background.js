@@ -218,9 +218,9 @@ function getTimelinePage(user_uniqueKey, t, p){
     
     var params = {user:c_user, count:PAGE_SIZE};
     var config = tapi.get_config(c_user);
-    var not_support_max_id = config.support_max_id;
+    var support_max_id = config.support_max_id;
     // 判断是否支持max_id形式获取数据
-    if(!not_support_max_id) {
+    if(support_max_id) {
 	    var max_id = getMaxMsgId(t, user_uniqueKey);
 	    if(max_id){
 	        params['max_id'] = max_id;
@@ -248,7 +248,8 @@ function getTimelinePage(user_uniqueKey, t, p){
     
     showLoading();
 
-//    log('start getTimelinePage ' + user_uniqueKey + ' ' + m);
+    log('start getTimelinePage ' + user_uniqueKey + ' ' + t 
+    	+ ' page:' + params.page + ' max_id:' + params.max_id);
     tapi[t](params, function(sinaMsgs, textStatus){
     	if(sinaMsgs == null || textStatus == 'error') {
     		hideLoading();
@@ -273,7 +274,8 @@ function getTimelinePage(user_uniqueKey, t, p){
             tweets[_key] = tweets[_key].concat(sinaMsgs);
             _max_id = sinaMsgs[sinaMsgs.length-1].id;
 
-//            log('finish getTimelinePage ' + user_uniqueKey + ' ' + m + ': ' + sinaMsgs.length);/////
+            log('finish getTimelinePage ' + user_uniqueKey + ' ' + t + ': ' + sinaMsgs.length 
+            		+ ' page:' + params.page + ' max_id:' + params.max_id);
             
             var current_user = getUser();
             //防止获取分页内容后已经切换了用户
@@ -292,7 +294,7 @@ function getTimelinePage(user_uniqueKey, t, p){
             if(_max_id){
                 setMaxMsgId(t, _max_id, user_uniqueKey);
             }
-            if(not_support_max_id) {
+            if(!support_max_id) {
 	            setLastPage(t, page, user_uniqueKey);
             }
         } else {
@@ -304,7 +306,7 @@ function getTimelinePage(user_uniqueKey, t, p){
                     popupView.hideLoading();
                 }
             }
-            if(not_support_max_id) { // 到底了
+            if(!support_max_id) { // 到底了
 	            setLastPage(t, 0, user_uniqueKey);
             }
         }

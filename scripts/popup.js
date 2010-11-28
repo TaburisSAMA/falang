@@ -958,9 +958,10 @@ function readMore(t){
     }else{
         var msgs = cache.slice(getTimelineOffset(t), getTimelineOffset(t) + PAGE_SIZE);
         var _html = '';
+        var $list = $("#" + t + "_timeline ul.list");
         var ids = [];
         for(var i in msgs){
-            _html += bildMsgLi(msgs[i], t);
+        	$list.append(bildMsgLi(msgs[i], t));
             ids.push(msgs[i].id);
             if(msgs[i].retweeted_status){
                 ids.push(msgs[i].retweeted_status.id);
@@ -974,8 +975,6 @@ function readMore(t){
                 }
             }
         }
-        //moreEle.before(_html);
-        $("#" + t + "_timeline ul.list").append(_html);
         setTimelineOffset(t, PAGE_SIZE);
         showReadMore(t);
         hideLoading();
