@@ -162,6 +162,7 @@ function checkTimeline(t, p, user_uniqueKey){
                 if(popupView){
                     if(!popupView.addTimelineMsgs(tweets[_key].slice(0, sinaMsgs.length), t, user_uniqueKey)){
                         setUnreadTimelineCount(_unreadCount, t, user_uniqueKey);
+                        popupView.updateDockUserUnreadCount(user_uniqueKey);
                     }else{
                         if(current_user.uniqueKey == c_user.uniqueKey){
                             popupView._showMsg('有新微博');

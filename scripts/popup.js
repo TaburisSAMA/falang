@@ -486,7 +486,7 @@ function addUnreadCountToTabs(){
         for(var i in T_LIST[user.blogType]){
             ur = getUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
             if(ur>0 && c_user.uniqueKey == user.uniqueKey){ //当前用户，则设置timeline tab上的提示
-                tab = $(".tab-" + T_LIST[user.blogType][i]);
+                tab = $("#tl_tabs .tab-" + T_LIST[user.blogType][i]);
                 if(tab.length == 1 && !tab.hasClass('active')){
                     tab.find('.unreadCount').html('(' + ur + ')');
                     user_unread += ur;
@@ -504,7 +504,16 @@ function addUnreadCountToTabs(){
             $("#accountListDock ." + user.uniqueKey + " .unr").html('').hide();
         }
     }
-}
+};
+//更新底部dock上的未读提示数
+function updateDockUserUnreadCount(user_uniqueKey){
+    var user_unread = getUserUnreadTimelineCount(user_uniqueKey);
+    if(user_unread > 0){
+        $("#accountListDock ." + user_uniqueKey + " .unr").html(user_unread).show();
+    }else{
+        $("#accountListDock ." + user_uniqueKey + " .unr").html('').hide();
+    }
+};
 
 function initMsgHover(){
     /*
@@ -989,8 +998,6 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
         user_uniqueKey = c_user.uniqueKey;
     }
     if(c_user.uniqueKey != user_uniqueKey){
-        var unread_count = getUserUnreadTimelineCount(user_uniqueKey) + msgs.length;
-        $("#accountListDock ." + user_uniqueKey + " .unr").html(unread_count).show();
         return false;
     }
 
