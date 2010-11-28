@@ -124,7 +124,7 @@ function initTabs(){
             checkShowGototop();
             return;
         } else if(c_t == 'favorites') {
-        	getFavorites();
+        	getFavorites(true);
             checkShowGototop();
             return;
         }
@@ -679,7 +679,7 @@ function getUserTimeline(screen_name, user_id){
 
 // 获取用户收藏
 var FAVORITE_HTML_CACHE = {};
-function getFavorites(page){
+function getFavorites(is_click){
 	var c_user = getUser();
     if(!c_user){
         return;
@@ -687,7 +687,8 @@ function getFavorites(page){
     var list = $("#favorites_timeline .list");
     var t = 'favorites';
     var user_cache = get_current_user_cache();
-    if(page == undefined) { // 点击
+    var page = user_cache[t + '_page'];
+    if(page == undefined || is_click == true) { // 点击
     	if(user_cache[t]) {
     		list.html(user_cache[t]);
     		return;
@@ -707,7 +708,7 @@ function getFavorites(page){
         	user_cache[t] = list.html();
 	        if(status.length > 0){
 	            showReadMore(t);
-	            setPopupNextPage(t, page + 1);
+	            user_cache[t + '_page'] = page + 1;
 	        }else{
 	            hideReadMore(t);
 	        }
@@ -905,7 +906,7 @@ function scrollPaging(){
         if(tl == 'followers'){ //粉丝列表特殊处理
             readMoreFans();
         } else if(tl == 'favorites') {
-        	readMoreFavorites(tl);
+        	getFavorites();
         } else {
             readMore(tl);
         }
@@ -941,23 +942,6 @@ function readMoreFans(){
     var _cache = get_current_user_cache(NEXT_CURSOR);
     var cursor = _cache[t];
     getFansList(t, cursor);
-};
-
-var POPUP_PAGE_CACHE = {};
-function getPopupNextPage(t) {
-	var _cache = get_current_user_cache(POPUP_PAGE_CACHE);
-    var page = _cache[t];
-    return page;
-};
-
-function setPopupNextPage(t, page) {
-	var _cache = get_current_user_cache(POPUP_PAGE_CACHE);
-	_cache[t] = page;
-};
-
-function readMoreFavorites(t){
-	var page = getPopupNextPage(t);
-    getFavorites(page);
 };
 
 function readMore(t){
