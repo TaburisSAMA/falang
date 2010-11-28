@@ -210,6 +210,8 @@ function setUnreadTimelineCount(count, t, user_uniqueKey){
             if(total > 0){
                 total = total.toString();
                 chrome.browserAction.setBadgeText({text: total});
+            }else{
+                chrome.browserAction.setBadgeText({text: ''});
             }
         }
     }

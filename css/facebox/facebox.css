@@ -21,8 +21,7 @@
 #facebox {
   position: absolute;
   top: 0;
-  //left:0;
-  right: 1;
+  right:2;
   z-index: 100;
   text-align: left;
 }

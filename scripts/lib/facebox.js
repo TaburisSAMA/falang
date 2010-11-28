@@ -145,6 +145,7 @@
       $('#facebox .loading').remove();
       $('#facebox .body').children().fadeIn('normal');
       //$('#facebox').css('left', $(window).width() / 2 - ($('#facebox table').width() / 2));
+      $('#facebox').css('right', $("#wrapper").width() / 2 - ($('#facebox .popup').width() / 2));
       $(document).trigger('reveal.facebox').trigger('afterReveal.facebox');
     },
 
