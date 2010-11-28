@@ -306,9 +306,11 @@
 							 #{provinces[user.province] ? provinces[user.province].name : user.province}, #{provinces[user.province] ? provinces[user.province]["citys"][user.city]:user.city}
 							 <?js } ?>
 						</p>
+						<?js if(user.friends_count != undefined){ ?>
 						<p>关注: <span>#{user.friends_count}</span>个　
 							粉丝: <span>#{user.followers_count}</span>个</p>
 						<p>微博: <span>#{user.statuses_count}</span>条</p>
+						<?js } ?>
 					</div>
 				</div>
 				<?js if(user.description){ ?>
@@ -331,12 +333,15 @@
 						<img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 
 							title="<?js if(user.gender == 'm'){ ?>男<?js }else if(user.gender == 'f'){ ?>女<?js }else{ ?>性别未知<?js } ?>" />
 					      <?js if(user.province){ ?>
-	                      #{provinces[user.province].name}, #{provinces[user.province]["citys"][user.city]}
+	                      #{provinces[user.province] ? provinces[user.province].name : user.province}, 
+	                      #{provinces[user.province] ? provinces[user.province]["citys"][user.city] : user.city}
 	                      <?js } ?>
 	                </p>
+	                <?js if(user.friends_count != undefined){ ?>
 					<p>关注: <span>#{user.friends_count}</span>个　 
 						粉丝: <span>#{user.followers_count}</span>个　 
 						微博: <span>#{user.statuses_count}</span>条</p>
+					<?js } ?>
 					<?js if(user.url && user.url != 'http://1'){ ?>
 					<p>博客：<a href="#{user.url}">#{user.url}</a></p>
 					<?js } ?>
@@ -361,16 +366,18 @@
 					<?js } ?>
 					</div>
 					<p>
-						<img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 
+				     <img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 
 							title="<?js if(user.gender == 'm'){ ?>男<?js }else if(user.gender == 'f'){ ?>女<?js }else{ ?>性别未知<?js } ?>" />
-					<?js if(user.province){ ?>
+					 <?js if(user.province){ ?>
                           #{provinces[user.province] ? provinces[user.province].name : user.province}, 
                           #{provinces[user.province] ? provinces[user.province]["citys"][user.city] : user.city}
-                          <?js } ?>
+                     <?js } ?>
                     </p>
+                    <?js if(user.friends_count != undefined){ ?>
 					<p>关注: <span>#{user.friends_count}</span>个　 
 						粉丝: <span>#{user.followers_count}</span>个　 
 						微博: <span>#{user.statuses_count}</span>条</p>
+					<?js } ?>
 					<?js if(user.url && user.url != 'http://1'){ ?>
 					<p>博客：<a href="#{user.url}">#{user.url}</a></p>
 					<?js } ?>
