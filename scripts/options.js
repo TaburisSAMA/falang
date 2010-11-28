@@ -202,14 +202,14 @@ function initJtip(){
 }
 //初始化设置未读提示信息
 function initSetBadgeText(){
-    for(i in T_LIST.all){
+    for(var i in T_LIST.all){
         $("#set_badge_" + T_LIST.all[i]).attr("checked", isSetBadgeText(T_LIST.all[i]));
     }
 };
 
 //初始化设置新消息是否在页面显示
 function initShowInPage(){
-    for(i in T_LIST.all){
+    for(var i in T_LIST.all){
         $("#set_show_in_page_" + T_LIST.all[i]).attr("checked", isShowInPage(T_LIST.all[i]));
     }
 };
@@ -252,7 +252,7 @@ function initQuickSendHotKey(){
     var keys = getQuickSendHotKey();
     keys = keys.split(',');
     var key_maps = '';
-    for(i in keys){
+    for(var i in keys){
         var _i = keys[i];
         if(KEYCODE_MAP[_i]){
             _i = KEYCODE_MAP[_i];
@@ -467,12 +467,12 @@ function delAccount(uniqueKey){
         if(!userList){
             userList = {};
         }
-        for(key in userList){
+        for(var key in userList){
             if(key.toLowerCase() == uniqueKey.toLowerCase()){
                 delete userList[key];
                 saveUserList(userList);
                 //TODO: 删除该用户的缓存数据？
-                for(key in localStorage){
+                for(var key in localStorage){
                     if(key.indexOf(uniqueKey)>-1){
                         if(key != USER_LIST_KEY && key != CURRENT_USER_KEY){
                             localStorage.removeItem(key);
@@ -610,11 +610,11 @@ function refreshAccountInfo(){
     if(userList){
         $("#refresh-account").attr("disabled", true);
         var temp_userList = {};
-        for(key in userList){
+        for(var key in userList){
             stat.len++;
         }
         var user;
-        for(key in userList){
+        for(var key in userList){
             user = userList[key];
             refreshAccountWarp(temp_userList, user, stat);//由于闭包会造成变量共享问题，所以写多一个包装函数。
         }
@@ -662,7 +662,7 @@ function refreshAccountWarp(userList, r_user, stat){
 
 //清空本地缓存数据
 function cleanLocalStorageData(){
-    for(key in localStorage){
+    for(var key in localStorage){
         if(key.indexOf('idi')>-1){
             if(key != USER_LIST_KEY && key != CURRENT_USER_KEY){
                 localStorage.removeItem(key);

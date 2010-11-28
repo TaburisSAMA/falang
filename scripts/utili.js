@@ -160,7 +160,7 @@ function getUserUnreadTimelineCount(user_uniqueKey){
     var user = getUserByUniqueKey(user_uniqueKey);
     if(!user){ return 0; }
     var total = 0;
-    for(i in T_LIST[user.blogType]){
+    for(var i in T_LIST[user.blogType]){
         //key 大概如： tsina#11234598_friends_timeline_UNREAD_TIMELINE_COUNT_KEY
         var count = localStorage.getObject(user_uniqueKey + T_LIST[user.blogType][i] + UNREAD_TIMELINE_COUNT_KEY);
         if(!count){
@@ -199,9 +199,9 @@ function setUnreadTimelineCount(count, t, user_uniqueKey){
         if(setBadgeText){
             var total = 0;
             var userList = getUserList();
-            for(j in userList){
+            for(var j in userList){
                 var user = userList[j];
-                for(i in T_LIST[user.blogType]){
+                for(var i in T_LIST[user.blogType]){
                     if(isSetBadgeText(T_LIST[user.blogType][i], user.uniqueKey)){
                         total += getUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
                     }
@@ -229,9 +229,9 @@ function removeUnreadTimelineCount(t, user_uniqueKey){
     }else{
         var total = 0;
         var userList = getUserList();
-        for(j in userList){
+        for(var j in userList){
             var user = userList[j];
-            for(i in T_LIST[user.blogType]){
+            for(var i in T_LIST[user.blogType]){
                 if(isSetBadgeText(T_LIST[user.blogType][i], user.uniqueKey)){
                     total += getUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
                 }
@@ -288,7 +288,7 @@ function getTooltip(){
     }
     var tip = '', _new=0, _mention=0, _comment=0, _direct=0;
     var userList = getUserList();
-    for(j in userList){
+    for(var j in userList){
         var user = userList[j];
         _new = getUnreadTimelineCount('friends_timeline', user.uniqueKey);
         _mention = getUnreadTimelineCount('mentions', user.uniqueKey);

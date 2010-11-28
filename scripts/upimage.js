@@ -61,7 +61,7 @@ function sendMsg(){ //覆盖popup.js的同名方法
         users.push(getUser());
     }
     var userCount = users.length, sendedCount = 0, successCount = 0;
-    for(i in users){
+    for(var i in users){
         var user = users[i];
         var pic = {file: file};
         var data = {status: msg};

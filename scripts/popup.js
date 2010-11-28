@@ -344,7 +344,7 @@ function initChangeUserList(){
                        '<span class="unr"></span>' +
                    '</li>';
         var li = [];
-        for(i in userList){
+        for(var i in userList){
             user = userList[i];
             if(user.uniqueKey == c_user.uniqueKey){
                 user.current = 'current';
@@ -487,7 +487,7 @@ function addUnreadCountToTabs(){
     var tab = '';
     var userList = getUserList();
     var c_user = getUser();
-    for(j in userList){
+    for(var j in userList){
         var user = userList[j];
         var user_unread = 0;
         for(i in T_LIST[user.blogType]){
@@ -785,7 +785,7 @@ function showCounts(t, ids){
     tapi.counts(data, function(counts, textStatus){
         if(textStatus != 'error' && counts && !counts.error){
             if(counts.length && counts.length>0){
-                for(i in counts){
+                for(var i in counts){
                     $('#'+ t +'_timeline .showCounts_'+counts[i].id).each(function(){
                         var _li = $(this);
                         var _edit = _li.find('.edit:eq(0)');
@@ -831,7 +831,7 @@ function showComments(ele, tweetId, page, notHide){
             if(textStatus != 'error' && comments && !comments.error){
                 if(comments.length && comments.length>0){
                     var _html = '';
-                    for(i in comments){
+                    for(var i in comments){
                         var comment_li = buildComment(comments[i], tweetId, screen_name);
                         _html += comment_li;
                     }
@@ -1031,7 +1031,7 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
         var html = '';
         var ids = [];
         var _unreadCount = 0;
-        for(i in msgs){
+        for(var i in msgs){
             html += bildMsgLi(msgs[i], t);
             ids.push(msgs[i].id);
             if(msgs[i].retweeted_status){
@@ -1064,7 +1064,7 @@ function addPageMsgs(msgs, t){
     setTimelineOffset(t, msgs.length);
     var html = '';
     var ids = [];
-    for(i in msgs){
+    for(var i in msgs){
         html += bildMsgLi(msgs[i], t);
         ids.push(msgs[i].id);
         if(msgs[i].retweeted_status){
@@ -1143,7 +1143,7 @@ function sendMsg(msg){
         users.push(getUser());
     }
     var userCount = users.length, sendedCount = 0, successCount = 0;
-    for(i in users){
+    for(var i in users){
         var data = {};
         data['status'] = msg; //放到这里重置一下，否则会被编码两次
         data['user'] = users[i];
@@ -1450,7 +1450,7 @@ function doDelTweet(tweetId, ele){//删除自己的微博
             var b_view = getBackgroundView();
             if(b_view && b_view.tweets[cacheKey]){
                 var cache = b_view.tweets[cacheKey];
-                for(i in cache){
+                for(var i in cache){
                     if(cache[i].id == tweetId){
                         cache.splice(i, 1);
                         break;
@@ -1476,7 +1476,7 @@ function doDelComment(ele, screen_name, tweetId){//删除评论
             var b_view = getBackgroundView();
             if(b_view && b_view.tweets[cacheKey]){
                 var cache = b_view.tweets[cacheKey];
-                for(i in cache){
+                for(var i in cache){
                     if(cache[i].id == tweetId){
                         cache.splice(i, 1);
                         break;
@@ -1502,7 +1502,7 @@ function delDirectMsg(ele, screen_name, tweetId){//删除私信
             var b_view = getBackgroundView();
             if(b_view && b_view.tweets[cacheKey]){
                 var cache = b_view.tweets[cacheKey];
-                for(i in cache){
+                for(var i in cache){
                     if(cache[i].id == tweetId){
                         cache.splice(i, 1);
                         break;
@@ -1534,7 +1534,7 @@ function addFavorites(ele, screen_name, tweetId){//添加收藏
             var b_view = getBackgroundView();
             if(b_view && b_view.tweets[cacheKey]){
                 var cache = b_view.tweets[cacheKey];
-                for(i in cache){
+                for(var i in cache){
                     if(cache[i].id == tweetId){
                         cache[i].favorited = true;
                         break;
@@ -1567,7 +1567,7 @@ function delFavorites(ele, screen_name, tweetId){//删除收藏
             var b_view = getBackgroundView();
             if(b_view && b_view.tweets[cacheKey]){
                 var cache = b_view.tweets[cacheKey];
-                for(i in cache){
+                for(var i in cache){
                     if(cache[i].id == tweetId){
                         cache[i].favorited = false;
                         break;

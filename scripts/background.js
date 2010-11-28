@@ -267,7 +267,7 @@ function getTimelinePage(user_uniqueKey, t, p){
                 tweets[_key] = [];
             }
             sinaMsgs = sinaMsgs.slice(0, PAGE_SIZE);
-            for(i in sinaMsgs){
+            for(var i in sinaMsgs){
                 sinaMsgs[i].readed = true;
             }
             tweets[_key] = tweets[_key].concat(sinaMsgs);
@@ -358,9 +358,9 @@ function checkNewMsg(){
         //checkTimeline('mentions');
         //checkTimeline('direct_messages');
         var userList = getUserList();
-        for(j in userList){
+        for(var j in userList){
             var user = userList[j];
-            for(i in T_LIST[user.blogType]){
+            for(var i in T_LIST[user.blogType]){
                 checkTimeline(T_LIST[user.blogType][i], null, user.uniqueKey);
             }
         }
@@ -376,7 +376,7 @@ function onChangeUser(){
     if(c_user){
         window.c_user = c_user;
     }
-    for(i in T_LIST[c_user.blogType]){
+    for(var i in T_LIST[c_user.blogType]){
         setUnreadTimelineCount(0, T_LIST[[c_user.blogType]][i]);
     }
     //checkNewMsg();
@@ -401,11 +401,11 @@ function refreshAccountInfo(){
     var userList = getUserList(true); //不管账号启用还是停用，都更新
     if(userList){
         var temp_userList = {};
-        for(key in userList){
+        for(var key in userList){
             stat.len++;
         }
         var user;
-        for(key in userList){
+        for(var key in userList){
             user = userList[key];
             refreshAccountWarp(temp_userList, user, stat);//由于闭包会造成变量共享问题，所以写多一个包装函数。
         }
