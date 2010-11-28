@@ -67,6 +67,9 @@ function init(){
 
     if(window.is_new_win_popup){
         resizeFawave();
+        $(window).resize(function(){
+            resizeFawave();
+        });
     }
 
     changeAlertMode(getAlertMode());
@@ -92,9 +95,7 @@ function init(){
 
     $(window).unload(function(){ initOnUnload(); }); 
 
-    $(window).resize(function(){
-        resizeFawave();
-    });
+    
 };
 
 function initTabs(){
@@ -1310,6 +1311,7 @@ function hideReplyInput(){
 };
 
 function resizeFawave(w, h){
+    return;
     if(!w){
         w = window.innerWidth;
     }
