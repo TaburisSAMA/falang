@@ -1431,7 +1431,8 @@ function doRT(ele){//RT
     var t = $("#txtContent");
     t.focus();
     var _msg_user = data.user || data.sender;
-    t.val('转: ' + '@' + _msg_user.screen_name + ' ' + data.text);
+    var repost_pre = tapi.get_config(getUser()).repost_pre;
+    t.val(repost_pre + ' ' + '@' + _msg_user.screen_name + ' ' + data.text);
     showMsgInput();
 };
 

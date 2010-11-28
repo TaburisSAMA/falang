@@ -18,7 +18,7 @@ var sinaApi = {
         support_comment: true, // 判断是否支持评论
 		support_upload: true, // 是否支持上传图片
 		support_repost: true, // 是否支持新浪形式转载
-		repost_pre: '', // 转发前缀
+		repost_pre: '转:', // 转发前缀
 		support_favorites: true,
 		// 是否支持max_id 分页
 		support_max_id: true,
@@ -918,7 +918,7 @@ $.extend(DiguAPI, {
 	    
 	    support_comment: false,
 	    support_repost: false,
-	    repost_pre: '转载: ',
+	    repost_pre: '转载:',
 	    
 	    verify_credentials:   '/account/verify',
 	    
@@ -1086,7 +1086,7 @@ $.extend(ZuosaAPI, {
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.zuosa.com',
 		source: 'fawave', 
-	    source2: 'fawave',
+		repost_pre: 'ZT',
 	    
 	    support_comment: false,
 	    support_repost: false,
@@ -1231,7 +1231,7 @@ $.extend(LeiHouAPI, {
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://leihou.com',
 		source: 'fawave', 
-	    source2: 'fawave',
+		repost_pre: 'RT',
 	    
 	    support_comment: false,
 	    support_repost: false,
@@ -1358,7 +1358,7 @@ $.extend(Follow5API, {
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.follow5.com/api',
 		source: '34140E56A31887F770053C2AF6D7B2AC', // 需要申请
-	    source2: '34140E56A31887F770053C2AF6D7B2AC',
+		repost_pre: '转发:',
 	    
 	    support_max_id: false,
 	    support_comment: false,
@@ -1496,7 +1496,7 @@ $.extend(TwitterAPI, {
 		source: 'fawave', 
         oauth_key: 'i1aAkHo2GkZRWbUOQe8zA',
         oauth_secret: 'MCskw4dW5dhWAYKGl3laRVTLzT8jTonOIOpmzEY',
-
+        repost_pre: 'RT',
 	    support_comment: false,
 	    support_repost: false,
 	    support_upload: false,
