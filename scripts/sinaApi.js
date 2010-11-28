@@ -857,6 +857,9 @@ $.extend(TSohuAPI, {
 			// id => user
 			args.data.user = args.data.id;
 			delete args.data.id;
+		} else if(args.url == this.config.destroy) { 
+			// method => delete
+			args.type = 'delete';
 		}
 	},
 	

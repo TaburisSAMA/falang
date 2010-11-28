@@ -483,7 +483,7 @@ function addUnreadCountToTabs(){
     for(var j in userList){
         var user = userList[j];
         var user_unread = 0;
-        for(i in T_LIST[user.blogType]){
+        for(var i in T_LIST[user.blogType]){
             ur = getUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
             if(ur>0 && c_user.uniqueKey == user.uniqueKey){ //当前用户，则设置timeline tab上的提示
                 tab = $(".tab-" + T_LIST[user.blogType][i]);
