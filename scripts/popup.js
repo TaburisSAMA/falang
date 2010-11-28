@@ -385,6 +385,10 @@ function changeUser(uniqueKey){
         }
     }
     if(to_user){
+        setUser(to_user);
+        showHeaderUserInfo(to_user);
+        var b_view = getBackgroundView();
+        b_view.onChangeUser();
     	// 获取当前的tab
         var activeLi = $("#tl_tabs li.active");
     	var cur_t = activeLi.attr('href').replace(/_timeline$/, '').substring(1);
@@ -408,12 +412,8 @@ function changeUser(uniqueKey){
 
         cur_t = cur_t_new || cur_t;
         $("#tl_tabs .unreadCount").html('');
-        setUser(to_user);
-        showHeaderUserInfo(to_user);
         $("#accountListDock").find('.current').removeClass('current')
             .end().find('.'+to_user.uniqueKey).addClass('current');
-        var b_view = getBackgroundView();
-        b_view.onChangeUser();
         addUnreadCountToTabs();
         for(var i in T_LIST[to_user.blogType]){
             getSinaTimeline(T_LIST[to_user.blogType][i], true);
@@ -1311,7 +1311,6 @@ function hideReplyInput(){
 };
 
 function resizeFawave(w, h){
-    return;
     if(!w){
         w = window.innerWidth;
     }
