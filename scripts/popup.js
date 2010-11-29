@@ -697,7 +697,7 @@ function getUserTimeline(screen_name, user_id, read_more){
             if(!read_more) {
             	$("#user_timeline_timeline ul.list").html('');
             }
-            addTimelineMsgs(sinaMsgs, m);
+            addPageMsgs(sinaMsgs, m, true);
             max_id = Number(sinaMsgs[sinaMsgs.length - 1].id) - 1;
             page += 1;
             // 保存数据，用于翻页
@@ -744,7 +744,7 @@ function getFavorites(is_click){
     tapi[t](params, function(status, textStatus, statuCode){
         if(textStatus != 'error' && status && !status.error){
 	        if(status.length > 0){
-	        	addTimelineMsgs(status, t, c_user.uniqueKey);
+	        	addPageMsgs(status, t, true);
 	            showReadMore(t);
 	            user_cache[t + '_page'] = page + 1;
 	            user_cache[t] = list.html();
@@ -1036,7 +1036,7 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
         }
         return false;
     }else{
-    	addPageMsgs(msgs, t, true);
+    	addPageMsgs(msgs, t, false);
     }
     return true;
 };

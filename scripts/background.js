@@ -283,7 +283,7 @@ function getTimelinePage(user_uniqueKey, t, p){
             if(current_user.uniqueKey == c_user.uniqueKey){ //TODO:更详细逻辑有待改进
                 var popupView = getPopupView();
                 if(popupView){
-                    popupView.addPageMsgs(sinaMsgs, t);
+                    popupView.addPageMsgs(sinaMsgs, t, true);
                     if(sinaMsgs.length >= (PAGE_SIZE/2)){
                         popupView.showReadMore(t);
                     }else{
