@@ -1003,6 +1003,7 @@ function readMore(t){
     }else{
         var msgs = cache.slice(getTimelineOffset(t), getTimelineOffset(t) + PAGE_SIZE);
         addPageMsgs(msgs, t, true);
+        showReadMore(t);
     }
 };
 
