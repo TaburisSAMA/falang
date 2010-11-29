@@ -1,3 +1,4 @@
+#msginfowarp { position: fixed; }
 #needUpdateChrome{
 	background-color: #FEFEB6;
 	border: 1px solid #D5B163;
@@ -17,11 +18,10 @@
 }
 
 .fileSel{
-	margin-top:15px;
+	margin-top:5px;
 	border: 1px solid #0E774A;
 	background-color: #E9F4E9;
 	height: 50px;
-	width: 480px;
 	text-align:center;
 	color:#0C7823;
 	font-size: 20px;
@@ -32,7 +32,7 @@
 .fileSel .selTip{
 	margin-top: -50px;
 	position: absolute;
-	width:480px;
+	width: 100%;
 }
 
 #imageFile{
@@ -40,7 +40,7 @@
 	position: absolute;
 	margin-top:-66px;
 	height: 56px;
-	width: 486px;
+	width: 120%;
 	cursor: pointer;
 }
 
@@ -57,22 +57,47 @@
 	padding: 3px;
 }
 
+.bar { 
+    display: block;    
+    position: relative;
+    background: #B1D632; 
+    text-align: center; 
+    color: #fff; 
+}
+.bar span { position: absolute; left: 3px; }
+
 .graph { 
     position: relative;
     border: 1px solid #B1D632; 
     padding: 2px; 
     margin-bottom: .5em;                    
 }
-.graph .bar { 
-    display: block;    
-    position: relative;
-    background: #B1D632; 
-    text-align: center; 
-    color: #fff; 
-    height: 50px; 
+.graph .bar{
+	height: 50px; 
     line-height: 50px;
 }
-.graph .bar span { position: absolute; left: 3px; }
+
+#uploadinfo{margin:5px 2px;}
+#uploadinfo li{padding:3px 2px;}
+#uploadinfo li:nth-child(odd){ background-color:#eee; }
+#uploadinfo li:nth-child(even){ background-color:#fff; }
+#uploadinfo li img{
+	height: 16px;
+	margin: 0px 1px;
+	vertical-align: top;
+	width: 16px;
+}
+#uploadinfo .barWrap{
+	width:80px;
+	display: inline-block;
+	border:solid 1px green;
+	padding:1px 2px;
+}
+#uploadinfo li.error .barWrap{ border:solid 1px red; }
+#uploadinfo .bar{
+	height:12px;
+	line-height:12px;
+}
 
 #progressInfo {margin-bottom:10px;}
 

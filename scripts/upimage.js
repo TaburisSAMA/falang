@@ -28,6 +28,11 @@ function init(){
 };
 
 
+var TP_USER_UPLOAD_INFO =  '<li id="u_uploadinfo_{{uniqueKey}}">\
+                                <img src="{{profile_image_url}}">{{screen_name}}<img src="/images/blogs/{{blogType}}_16.png" class="blogType">: \
+                                <span class="barWrap"><strong class="bar" style="width: 10%;"><span></span></strong></span>\
+                                <span class="progressInfo"></span>\
+                            </li>';
 function sendMsg(){ //覆盖popup.js的同名方法
 
     var check = true;
@@ -57,53 +62,66 @@ function sendMsg(){ //覆盖popup.js的同名方法
                 users.push(_user);
             }
         });
+    }else if(!$("#accountsForSend li").length){
+        users.push(c_user);
     }else{
-        users.push(getUser());
+        showMsg('请选择要发送的账号');
+        return;
     }
-    var userCount = users.length, sendedCount = 0, successCount = 0;
+    var upInfo = $("#uploadinfo").html(''), stat = {uploaded:[]};
+    stat.userCount = users.length;
+    stat.sendedCount = 0;
+    stat.successCount = 0;
     for(var i in users){
         var user = users[i];
+        upInfo.append(TP_USER_UPLOAD_INFO.format(user));
         var pic = {file: file};
         var data = {status: msg};
         
-        tapi.upload(user, data, pic, 
-            function() {
-                _showLoading();
-                disabledUpload();
-            }, 
-            function(ev) {
-                onprogress(ev);
-            }, 
-            function(data, textStatus, error_code) {
-                //processUploadResult(data, textStatus, error_code);
+        _uploadWrap(user, data, pic, stat);
+    }
+};
 
-                sendedCount++;
-                if(textStatus != 'error' && data && !data.error){
-                    successCount++;
-                }else if(data.error){
-                    _showMsg('error: ' + data.error);
-                }
-                if(successCount >= userCount){//全部发送成功
-                    _showMsg('发送成功');
-                    $("#txtContent").val('');
-                    $("#imgPreview").html('');
-                    $("#progressInfo").html('');
-                    $("#progressBar span").html("");
-                }
-                if(sendedCount >= userCount){//全部发送完成
-                    $("#progressBar")[0].style.width = "0%";
-                    enabledUpload();
-                    _hideLoading();
-                    if(successCount > 0){ //有发送成功的
-                        setTimeout(callCheckNewMsg, 1000);
-                        if(userCount > 1){ //多个用户的
-                            _showMsg(successCount + '发送成功，' + (userCount - successCount) + '失败。');
-                        }
+function _uploadWrap(user, data, pic, stat){
+    tapi.upload(user, data, pic, 
+        function() {
+            _showLoading();
+            disabledUpload();
+        }, 
+        function(ev) {
+            onprogress(ev, user, stat);
+        }, 
+        function(data, textStatus, error_code) {
+            //processUploadResult(data, textStatus, error_code);
+
+            stat.sendedCount++;
+            if(textStatus != 'error' && data && !data.error){
+                stat.successCount++;
+                $("#accountsForSend li[uniquekey=" + user.uniqueKey +"]").removeClass('sel');
+                $("#u_uploadinfo_" + user.uniqueKey).find('.progressInfo').append(' (<span>成功</span>)');
+            }else if(data.error){
+                _showMsg('error: ' + data.error);
+                $("#u_uploadinfo_" + user.uniqueKey).addClass('error').find('.progressInfo').append(' (<span style="color:red">失败</span>)');
+            }
+            if(stat.successCount >= stat.userCount){//全部发送成功
+                _showMsg('发送成功');
+                $("#txtContent").val('');
+                $("#imgPreview").html('');
+                $("#progressBar span").html("");
+            }
+            if(stat.sendedCount >= stat.userCount){//全部发送完成
+                $("#progressBar")[0].style.width = "0%";
+                enabledUpload();
+                _hideLoading();
+                if(stat.successCount > 0){ //有发送成功的
+                    setTimeout(callCheckNewMsg, 1000);
+                    if(stat.userCount > 1){ //多个用户的
+                        _showMsg(stat.successCount + '发送成功，' + (stat.userCount - stat.successCount) + '失败。');
                     }
                 }
             }
-        );
-    }
+        }
+    );
 };
 
 var FILECHECK = {maxFileSize: 1024000,
@@ -128,16 +146,20 @@ function checkFile(file){
 };
 
 
-function onprogress(rpe){
-    $("#progressInfo").html(
-        [
-         "Sent: " + size(rpe.loaded) + " of " + size(rpe.total)
-        ].join("<br />")
-    );
+function onprogress(rpe, user, stat){
+    if(!user){return;}
+    stat.uploaded[user.uniqueKey] = rpe.loaded;
     //$("#progressBar")[0].style.width = ((rpe.loaded * 200 / rpe.total) >> 0) + "px";
     var precent = parseInt((rpe.loaded / rpe.total) * 100);
-    $("#progressBar")[0].style.width = precent + "%";
-    $("#progressBar span").html(precent + "%");
+    $("#u_uploadinfo_" + user.uniqueKey).find(".bar").css('width', precent + "%")
+        .end().find(".progressInfo").html("Sent: " + size(rpe.loaded) + " of " + size(rpe.total));
+    var allLoaded = 0;
+    for(key in stat.uploaded){
+        allLoaded += stat.uploaded[key];
+    }
+    var allPrecent = parseInt((allLoaded / (rpe.total*stat.userCount) ) * 100);
+    $("#progressBar")[0].style.width = allPrecent + "%";
+    $("#progressBar span").html(allPrecent + "%");
 };
 
 function size(bytes){   // simple function to show a friendly size
@@ -154,7 +176,6 @@ function selectFile(fileEle){
     var file = fileEle.files[0];
     if(file){
         $("#imgPreview").html('');
-        $("#progressInfo").html('');
         $("#progressBar")[0].style.width = "0%";
         $("#progressBar span").html("");
 
