@@ -631,10 +631,8 @@ function getFansList(t, cursor){
                 	list.append(html);
                 }
                 html_cache[t] += html;
-                if(users.length >= PAGE_SIZE){
+                if(users.length > 0){
                     showReadMore(t);
-                }else{
-                    hideReadMore(t);
                 }
             }
         }
