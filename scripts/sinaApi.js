@@ -672,9 +672,13 @@ var sinaApi = {
 			data.t_url = 'http://t.sina.com.cn/' + (data.domain || data.id);
 		} else if(play_load == 'status') {
 			this.format_result_item(data.user, 'user', args);
+			var tpl = this.config.host + '/{{user.id}}/statuses/{{id}}';
 			if(data.retweeted_status) {
 				this.format_result_item(data.retweeted_status.user, 'user', args);
+				data.retweeted_status.t_url = tpl.format(data.retweeted_status);
 			}
+			// 设置status的t_url
+			data.t_url = tpl.format(data);
 		} else if(play_load == 'message') {
 			this.format_result_item(data.sender, 'user', args);
 			this.format_result_item(data.recipient, 'user', args);
@@ -872,6 +876,7 @@ $.extend(TSohuAPI, {
 			delete data.small_pic;
 			data.bmiddle_pic = data.middle_pic;
 			delete data.middle_pic;
+			var tpl = 'http://t.sohu.com/m/';
 			if(data.in_reply_to_status_text) {
 				data.retweeted_status = {
 					id: data.in_reply_to_status_id,
@@ -880,12 +885,14 @@ $.extend(TSohuAPI, {
 					user: {
 						id: data.in_reply_to_user_id,
 						screen_name: data.in_reply_to_screen_name
-					}
+					},
+					t_url: tpl + data.in_reply_to_status_id
 				};
 				this.format_result_item(data.retweeted_status.user, 'user', args);
 				delete data.in_reply_to_has_image;
 				delete data.in_reply_to_status_text;
 			}
+			data.t_url = tpl + data.id;
 			this.format_result_item(data.user, 'user', args);
 		} else if(play_load == 'comment' && data.id) {
 			data.status = {
@@ -1053,6 +1060,7 @@ $.extend(DiguAPI, {
 				data.original_pic = data.thumbnail_pic.replace(/[\/_]100x75/, '');
 			}
 			delete data.picPath;
+			var tpl = 'http://digu.com/detail/';
 			if(data.in_reply_to_status_id != '0' && data.in_reply_to_status_id != '') {
 				data.retweeted_status = {
 					id: data.in_reply_to_status_id,
@@ -1062,10 +1070,12 @@ $.extend(DiguAPI, {
 						name: data.in_reply_to_user_name
 					}
 				};
+				data.retweeted_status.t_url = tpl + data.retweeted_status.id;
 				// 查看相关对话的url
 				data.related_dialogue_url = 'http://digu.com/relatedDialogue/' + data.id;
 				this.format_result_item(data.retweeted_status.user, 'user', args);
 			}
+			data.t_url = tpl + data.id;
 			this.format_result_item(data.user, 'user', args);
 		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = data.url || ('http://digu.com/' + (data.name || data.id));
@@ -1191,6 +1201,7 @@ $.extend(ZuosaAPI, {
 				delete data.mms_img_pre;
 				delete data.mms_img;
 			}
+			var tpl = 'http://zuosa.com/Status/';
 			if(data.in_reply_to_status_id) {
 				data.retweeted_status = {
 					id: data.in_reply_to_status_id,
@@ -1203,7 +1214,9 @@ $.extend(ZuosaAPI, {
 				// 查看相关对话的url
 				data.related_dialogue_url = 'http://zuosa.com/reply?eid=' + data.in_reply_to_status_id;
 				this.format_result_item(data.retweeted_status.user, 'user', args);
+				data.retweeted_status.t_url = tpl + data.retweeted_status.id;
 			}
+			data.t_url = tpl + data.id;
 			this.format_result_item(data.user, 'user', args);
 		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = 'http://zuosa.com/' + (data.screen_name || data.name);
@@ -1321,6 +1334,7 @@ $.extend(LeiHouAPI, {
 				data.bmiddle_pic = 'http://pic.leihou.com/pic/' + pic[1] + '_large.jpg';
 				data.original_pic = data.bmiddle_pic;
 			}
+			var tpl = 'http://leihou.com/{{user.screen_name}}/lei/{{id}}';
 			if(data.in_reply_to_status_id) {
 				data.retweeted_status = {
 					id: data.in_reply_to_status_id,
@@ -1333,8 +1347,10 @@ $.extend(LeiHouAPI, {
 				// 查看相关对话的url
 				data.related_dialogue_url = 'http://leihou.com/dialog/' + data.id;
 				this.format_result_item(data.retweeted_status.user, 'user', args);
+				data.retweeted_status.t_url = tpl.format(data.retweeted_status);
 			}
 			this.format_result_item(data.user, 'user', args);
+			data.t_url = tpl.format(data);
 		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = 'http://leihou.com/' + (data.screen_name || data.id);
 			if(data.profile_image_url) {
@@ -1465,6 +1481,7 @@ $.extend(Follow5API, {
 				delete data.image_address;
 			}
 			this.format_result_item(data.user, 'user', args);
+			data.t_url = 'http://www.follow5.com/f5/mwfm/home?c=note&nid=' + data.id;
 		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = data.url;
 			if(!data.screen_name) {
@@ -1543,13 +1560,17 @@ $.extend(TwitterAPI, {
 
     format_result_item: function(data, play_load, args) {
 		if(play_load == 'status' && data.id) {
-
+			var tpl = 'http://twitter.com/{{user.screen_name}}/status/{{id}}';
+			data.t_url = tpl.format(data);
+			if(data.retweeted_status) {
+				data.retweeted_status.t_url = tpl.format(data.retweeted_status);
+			}
 		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = 'http://twitter.com/' + (data.screen_name || data.id);
-			if(data.profile_image_url) {
-			}
-			if(data.location) {
-			}
+//			if(data.profile_image_url) {
+//			}
+//			if(data.location) {
+//			}
 		}
 		return data;
 	}
