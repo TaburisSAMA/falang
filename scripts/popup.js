@@ -1041,11 +1041,11 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
     return true;
 };
 
-function addPageMsgs(msgs, t, prepend){
+function addPageMsgs(msgs, t, append){
     setTimelineOffset(t, msgs.length);
     var ids = [];
     var _ul = $("#" + t + "_timeline ul.list");
-    var method = prepend ? 'prepend' : 'append';
+    var method = append ? 'append' : 'prepend';
     for(var i in msgs){
     	_ul[method](bildMsgLi(msgs[i], t));
         ids.push(msgs[i].id);
