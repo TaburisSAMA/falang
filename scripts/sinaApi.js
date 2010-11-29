@@ -66,6 +66,7 @@ var sinaApi = {
 
 	// 设置认证头
 	apply_auth: function(url, args, user) {
+        user.authType = user.authType || 'baseauth'; //兼容旧版本
 		if(user.authType == 'baseauth') {
 			args.headers['Authorization'] = make_base_auth_header(user.userName, user.password);
 		} else if(user.authType == 'oauth' || user.authType == 'xauth') {
