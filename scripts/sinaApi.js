@@ -837,10 +837,12 @@ $.extend(TSohuAPI, {
 		host: 'http://api.t.sohu.com',
         user_home_url: 'http://t.sohu.com/n/',
         search_url: 'http://t.sohu.com/k/',
-		source: 'WbbRPziVG6', // 取得appkey的第三方进行分级处理，分为500，800和1500三个等级。
-		support_max_id: false,
-	    oauth_key: 'WbbRPziVG6',
-        oauth_secret: 'Ca(R$X(Ikxzm4RoYXh0afc8C210J%8',
+		source: '5vi74qXPB5J97GNzsevN', // 取得appkey的第三方进行分级处理，分为500，800和1500三个等级。
+		
+	    oauth_key: '5vi74qXPB5J97GNzsevN',
+        oauth_secret: 'fxZbb-07bCvv-BCA1Qci2lO^7wnl0%pRE$mvG1K#',
+        
+        support_max_id: false,
         favorites: '/favourites',
 	    favorites_create: '/favourites/create/{{id}}',
 	    favorites_destroy: '/favourites/destroy/{{id}}',
