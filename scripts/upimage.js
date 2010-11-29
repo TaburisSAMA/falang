@@ -65,7 +65,7 @@ function sendMsg(){ //覆盖popup.js的同名方法
     }else if(!$("#accountsForSend li").length){
         users.push(c_user);
     }else{
-        showMsg('请选择要发送的账号');
+        _showMsg('请选择要发送的账号');
         return;
     }
     var upInfo = $("#uploadinfo").html(''), stat = {uploaded:[]};
