@@ -17,12 +17,9 @@ function initOnLoad(){
 
 function init(){
 	initSelectSendAccounts(true);
-	
-    $("#txtContent").focus();
-    
-    initTxtContentEven();
+	initTxtContentEven();
 
-    initIamDoing();
+    $("#txtContent").focus();
 
     $(window).unload(function(){ initOnUnload(); }); 
 };
@@ -78,11 +75,11 @@ function sendMsg(){ //覆盖popup.js的同名方法
         var pic = {file: file};
         var data = {status: msg};
         
-        _uploadWrap(user, data, pic, stat);
+        _uploadWrap(user, data, pic, stat, selLi);
     }
 };
 
-function _uploadWrap(user, data, pic, stat){
+function _uploadWrap(user, data, pic, stat, selLi){
     tapi.upload(user, data, pic, 
         function() {
             _showLoading();
@@ -105,11 +102,16 @@ function _uploadWrap(user, data, pic, stat){
             }
             if(stat.successCount >= stat.userCount){//全部发送成功
                 _showMsg('发送成功');
+                selLi.addClass('sel');
+                var ifw = $("#imageFileWrap");
+                ifw.html(ifw.html());
                 $("#txtContent").val('');
+                $("#btnSend").attr('disabled', true);
                 $("#imgPreview").html('');
                 $("#progressBar span").html("");
             }
             if(stat.sendedCount >= stat.userCount){//全部发送完成
+                selLi = null;
                 $("#progressBar")[0].style.width = "0%";
                 enabledUpload();
                 _hideLoading();
@@ -174,11 +176,10 @@ function size(bytes){   // simple function to show a friendly size
 
 function selectFile(fileEle){
     var file = fileEle.files[0];
+    $("#imgPreview").html('');
+    $("#progressBar")[0].style.width = "0%";
+    $("#progressBar span").html("");
     if(file){
-        $("#imgPreview").html('');
-        $("#progressBar")[0].style.width = "0%";
-        $("#progressBar span").html("");
-
         var check = checkFile(file);
         if(check){
             var reader = new FileReader();

@@ -48,7 +48,9 @@
 			<strong id="progressBar" class="bar" style="width: 0%;"><span></span></strong>
 			<div class="selTip">点此选择文件或者将文件拖放至此</div>
 		</div>
-		<input type="file" value="选择图片" id="imageFile" onchange="selectFile(this)" />
+		<span id="imageFileWrap" style="display:block;">
+			<input type="file" value="选择图片" id="imageFile" onchange="selectFile(this)" />
+		</span>
 		
 		<!-- <div style="width: 200px; "><span id="progressBar"></span></div> -->
 		<div id="imgPreview"></div>
