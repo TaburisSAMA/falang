@@ -1002,7 +1002,7 @@ function readMore(t){
         _b_view.getTimelinePage(c_user.uniqueKey, t);
     }else{
         var msgs = cache.slice(getTimelineOffset(t), getTimelineOffset(t) + PAGE_SIZE);
-        addPageMsgs(msgs, t);
+        addPageMsgs(msgs, t, true);
     }
 };
 
@@ -1036,17 +1036,18 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
         }
         return false;
     }else{
-    	addPageMsgs(msgs, t);
+    	addPageMsgs(msgs, t, true);
     }
     return true;
 };
 
-function addPageMsgs(msgs, t){
+function addPageMsgs(msgs, t, prepend){
     setTimelineOffset(t, msgs.length);
     var ids = [];
     var _ul = $("#" + t + "_timeline ul.list");
+    var method = prepend ? 'prepend' : 'append';
     for(var i in msgs){
-    	_ul.append(bildMsgLi(msgs[i], t));
+    	_ul[method](bildMsgLi(msgs[i], t));
         ids.push(msgs[i].id);
         if(msgs[i].retweeted_status){
             ids.push(msgs[i].retweeted_status.id);
