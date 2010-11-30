@@ -1,7 +1,5 @@
 // @author qleelulu@gmail.com
 
-$('embed').attr('wmode', 'transparent'); //flash over the div
-
 var FAWAVE_BASE_URL = chrome.extension.getURL("");
 
 /* 在页面上显示新信息 */
@@ -210,6 +208,7 @@ var QUICK_SEND_TEMPLATE = ' \
                 </span>\
             </div> \
             <div class="fawaveInfoMsg"></div>\
+            <iframe scr="about:blank" style="position:absolute;z-index:-1;top:0;left:0;height:100%;" width="420" frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="yes"></iframe>\
         </div>\
     </div>';
 
@@ -462,5 +461,6 @@ $(function(){
             }
         }
     }, false);
+
 });
 /* 快速发微博 end */
