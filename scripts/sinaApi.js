@@ -1527,7 +1527,8 @@ $.extend(TwitterAPI, {
 	    support_repost: false,
 	    support_upload: false,
 	    
-	    repost: '/statuses/update'
+	    repost: '/statuses/update',
+        friends_timeline: '/statuses/home_timeline'
 	}),
 	
 	// 无需urlencode
