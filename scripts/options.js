@@ -34,6 +34,7 @@ $(function(){
         $("#save-account").val('添加');
         $("#account-name").val('');
         $("#account-pwd").val('');
+        $("#edit-account-key").val('');
         onSelBlogTypeChange();
         $("#new-account").show();
     });
@@ -42,8 +43,15 @@ $(function(){
         $("#new-account").hide();
     });
 
-    $("#save-account, #get-account-pin").click(function(){
+    $("#save-account").click(function(){
         saveAccount();
+    });
+    
+    $("#get-account-pin").click(function(){
+    	$('#account-request-token-key').val('');
+        $('#account-request-token-secret').val('');
+        saveAccount();
+        $(this).fadeOut(500).delay(5000).fadeIn(500);
     });
 
     $("#account-list").change(function(){
@@ -305,6 +313,10 @@ function initQuickSendHotKey(){
 };
 
 function _verify_credentials(user) {
+	if(!user) {
+		_showMsg('用户名或者密码不正确，请修改');
+		return;
+	}
 	tapi.verify_credentials(user, function(data, textStatus, errorCode){
         if(errorCode || textStatus=='error'){
             if(errorCode==400||errorCode==401||errorCode==403){
@@ -397,9 +409,8 @@ function saveAccount(){
         			$('#account-request-token-key').val(user.oauth_token_key);
         			$('#account-request-token-secret').val(user.oauth_token_secret);
             		var l = (window.screen.availWidth-510)/2;
-            	    var win = window.open(login_url, '_blank', 'left=' + l 
-            	    	+ ',top=30,width=600,height=450,menubar=no,location=yes,resizable=no,scrollbars=yes,status=yes');
-            	    
+            		window.open(login_url, 'FaWaveOAuth', 'left=' + l 
+            	    		+ ',top=30,width=600,height=450,menubar=no,location=yes,resizable=no,scrollbars=yes,status=yes');
     			}
     		});
     	}

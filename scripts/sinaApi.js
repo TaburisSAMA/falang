@@ -174,7 +174,7 @@ var sinaApi = {
             			user.oauth_token_secret = token.oauth_token_secret;
     				}
     			}
-    			callbackFn(user, text_status, error_code);
+    			callbackFn(token ? user : null, text_status, error_code);
     		});
     	} else {
     		throw new Error(user.authType + ' not support get_access_token');
