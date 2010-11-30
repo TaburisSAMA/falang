@@ -133,18 +133,21 @@ function setUser(user){
     localStorage.setObject(CURRENT_USER_KEY, user);
     window.c_user = user;
 };
+
 //获取所有用户列表
 //@isAll: 默认只返回启用的用户，如果isAll为true，则返回全部用户
 function getUserList(isAll){
-    var userList = localStorage.getObject(USER_LIST_KEY);
-    if(!isAll){
-        for(var key in userList){
-            if(userList[key].disabled){
-                delete userList[key];
-            }
+    var userList = localStorage.getObject(USER_LIST_KEY) || [];
+    if(isAll && userList.length != undefined){ // 兼容旧格式
+    	return userList;
+    }
+    var items = [];
+    for(var i in userList){
+        if(!userList[i].disabled){
+        	items.push(userList[i]);
         }
     }
-    return userList;
+    return items;
 };
 //保存用户列表
 function saveUserList(userlist){
@@ -154,7 +157,12 @@ function saveUserList(userlist){
 function getUserByUniqueKey(uniqueKey){
     if(!uniqueKey){return null;}
     var userList = getUserList();
-    return userList[uniqueKey] || null;
+    for(var i in userList){
+    	if(userList[i].uniqueKey == uniqueKey){
+    		return userList[i];
+    	}
+    }
+    return null;
 }
 
 //获取用户的全部timeline的未读信息数
@@ -686,3 +694,15 @@ function decodeForm(form) {
     }
     return d;
 }
+
+// 获取一个字典的长度
+function getDictLength(d) {
+	var length = d.length;
+	if(length === undefined){
+		length = 0;
+		for(var i in d) {
+			length++;
+		}
+	}
+	return length;
+};

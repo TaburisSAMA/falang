@@ -331,14 +331,7 @@ function initChangeUserList(){
         showHeaderUserInfo(c_user);
 
         var userList = getUserList();
-        var userLength = 0;
-        for(var k in userList){ 
-            userLength++;
-            if(userLength > 1){
-                break; //多个用户才显示(我只想看看是否有多个用户而已，为什么为什么要这么麻烦)
-            }
-        }
-        if(userLength < 2){ return; }
+        if(userList.length < 2){ return; }
         //底部Dock
         var u_tp = '<li class="{{uniqueKey}} {{current}}">' +
                        '<span class="username">{{screen_name}}</span>' +
@@ -377,8 +370,7 @@ function changeUser(uniqueKey){
     if(c_user.uniqueKey == uniqueKey){
         return;
     }
-    var userList = getUserList();
-    var to_user = userList[uniqueKey] || null;
+    var to_user = getUserByUniqueKey(uniqueKey);
     if(to_user){
         setUser(to_user);
         showHeaderUserInfo(to_user);
@@ -419,13 +411,6 @@ function changeUser(uniqueKey){
         }
         if(cur_t) { // 需要刷新一下数据
         	$("#tl_tabs li.active").click();
-//        	if(cur_t == 'followers') {
-//        		// 粉丝tab，直接执行onclick事件
-//        		$('#fans_tab span.active').click();
-//        	} else {
-//        		//getSinaTimeline(cur_t, true);
-//                $("#tl_tabs li.active").click();
-//        	}
         }
     }
 };
@@ -436,15 +421,8 @@ function initSelectSendAccounts(is_upload){
     if(afs.data('inited')){
         return;
     }
-    var userList = getUserList(); // userList 的类型是 {} 而不是 []
-    var userLength = 0;
-    for(var k in userList){ 
-        userLength++;
-        if(userLength > 1){
-            break; //我只想看看是否有多个用户而已，为什么为什么要这么麻烦
-        }
-    }
-    if(userLength < 2){ return; } //多个用户才显示
+    var userList = getUserList();
+    if(userList.length < 2){ return; } //多个用户才显示
     var li_tp = '<li class="{{sel}}" uniqueKey="{{uniqueKey}}" onclick="toggleSelectSendAccount(this)">' +
                    '<img src="{{profile_image_url}}" />' +
                    '{{screen_name}}' +
@@ -1072,7 +1050,7 @@ function readMore(t){
     var c_user = getUser();
     var _key = c_user.uniqueKey + t + '_tweets';
     var cache = _b_view.tweets[_key];
-    if(getTimelineOffset(t) >= cache.length){
+    if(!cache || getTimelineOffset(t) >= cache.length){
         _b_view.getTimelinePage(c_user.uniqueKey, t);
     }else{
         var msgs = cache.slice(getTimelineOffset(t), getTimelineOffset(t) + PAGE_SIZE);

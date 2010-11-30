@@ -288,15 +288,8 @@ function initSelectSendAccounts(is_upload){
     if(afs.data('inited')){
         return;
     }
-    var userList = USER_LIST; // userList 的类型是 {} 而不是 []
-    var userLength = 0;
-    for(var k in userList){ 
-        userLength++;
-        if(userLength > 1){
-            break; //我只想看看是否有多个用户而已，为什么为什么要这么麻烦
-        }
-    }
-    if(userLength < 2){
+    var userList = USER_LIST;
+    if(userList.length < 2){
         if(CURRENT_USER){
             var f_u_info = $("#fawaveSendMsgWrap .fawaveUserInfo").show();
             f_u_info.find('span').html(CURRENT_USER.screen_name)
@@ -368,10 +361,12 @@ function sendFawaveMsg(){
     if(selLi.length){
         selLi.each(function(){
             var uniqueKey = $(this).attr('uniqueKey');
-            var _user = USER_LIST[uniqueKey];
-            if(_user){
-                users.push(_user);
-            }
+            $.each(USER_LIST, function(i, item){
+            	if(item.uniqueKey == uniqueKey){
+            		users.push(_user);
+            		return false;
+            	}
+            });
         });
     }else if(!$("#fawave_accountsForSend li").length){
         users.push(CURRENT_USER);

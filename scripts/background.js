@@ -397,51 +397,42 @@ itv = setInterval(checkNewMsg, getRefreshTime());
 
 //刷新账号信息
 function refreshAccountInfo(){
-    var stat = {};
-    stat.len = 0;
-    stat.errorCount = 0;
-    stat.successCount = 0;
-    var userList = getUserList(true); //不管账号启用还是停用，都更新
-    if(userList){
-        var temp_userList = {};
-        for(var key in userList){
-            stat.len++;
-        }
-        var user;
-        for(var key in userList){
-            user = userList[key];
-            refreshAccountWarp(temp_userList, user, stat);//由于闭包会造成变量共享问题，所以写多一个包装函数。
-        }
+    var stat = {errorCount: 0, successCount: 0};
+    // 获取排序信息
+    stat.userList = getUserList(true);
+    $("#refresh-account").attr("disabled", true);
+    for(var i in stat.userList){
+        refreshAccountWarp(stat.userList[i], stat);//由于闭包会造成变量共享问题，所以写多一个包装函数。
     }
 };
 
-function refreshAccountWarp(userList, r_user, stat){
-    var user = r_user;
-    tapi.verify_credentials(user,function(data, textStatus, errorCode){
+function refreshAccountWarp(user, stat){
+    tapi.verify_credentials(user, function(data, textStatus, errorCode){
+    	user.blogType = user.blogType || 'tsina'; //兼容单微博版
+        user.authType = user.authType || 'baseauth'; //兼容单微博版
         if(errorCode){
-            userList[user.uniqueKey] = user;
             stat.errorCount++;
-        }else{
-            user.blogType = user.blogType || 'tsina'; //兼容单微博版
-            user.authType = user.authType || 'baseauth'; //兼容单微博版
-            data = $.extend({},user, data); //合并，以data的数据为准
-            data.uniqueKey = data.blogType + '_' + data.id;
-            userList[data.uniqueKey] = data;
+        } else {
+            $.extend(user, data); //合并，以data的数据为准
+            user.uniqueKey = data.blogType + '_' + data.id;
             stat.successCount++;
         }
-        if((stat.errorCount + stat.successCount) == stat.len){
-            saveUserList(userList);
+        if((stat.errorCount + stat.successCount) == stat.userList.length){
+        	// 全部刷新完，更新
+            saveUserList(stat.userList);
             var c_user = getUser();
             if(c_user){
                 if(!c_user.uniqueKey){ //兼容单微博版本
                     c_user.uniqueKey = (c_user.blogType||'tsina') + '_' + c_user.id;
                 }
-                c_user = userList[c_user.uniqueKey.toLowerCase()];
+                $.each(stat.userList, function(index, item){
+                	if(c_user.uniqueKey.toLowerCase() == item.uniqueKey){
+                		c_user = item;
+                		return false;
+                	}
+                });
                 setUser(c_user);
             }
-            stat = null;
-            userList = null;
-            user = null;
         }
     });
 };

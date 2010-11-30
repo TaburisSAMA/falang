@@ -59,6 +59,7 @@ $(function(){
             $("#show-edit-account").removeAttr('disabled');
             $("#del-account").removeAttr('disabled');
             $("#stop-account").removeAttr('disabled');
+            $('#up-account, #down-account').removeAttr('disabled');
         }
     });
 
@@ -107,6 +108,28 @@ $(function(){
     		$('#account-request-token-secret').val('');
     	}
     }));
+    
+    // 帐号排序按钮
+    $('#up-account, #down-account').click(function(){
+    	var $item = $("#account-list option:selected");
+    	if($(this).attr('direction') == 'up') {
+    		$item.prev().before($item);
+    	} else {
+    		$item.next().after($item);
+    	}
+    	var new_list = [];
+    	var userlist = getUserList(true);
+    	$("#account-list option").each(function(){
+    		var uniqueKey = $(this).val();
+    		$.each(userlist, function(index, user){
+    			if(user.uniqueKey == uniqueKey){
+    				new_list.push(user);
+    				return false;
+    			}
+    		});
+    	});
+    	saveUserList(new_list);
+    });
 });
 
 function disabledUserEditBtns(){
@@ -330,21 +353,28 @@ function _verify_credentials(user) {
             }
         } else {
         	var userList = getUserList(true);
-            if(!userList){
-                userList = {};
-            }
             var temp_uniqueKey = $("#edit-account-key").val();
-            delete userList[temp_uniqueKey];
-            for(var key in user) {
-            	data[key] = user[key];
+            
+//            delete userList[temp_uniqueKey];
+            $.extend(user, data);
+            user.uniqueKey = user.blogType + '_' + user.id;
+            user.screen_name = user.screen_name || user.name;
+            // 删除旧数据，替换新的
+            var found = false;
+            $.each(userList, function(i, item){
+            	if(item.uniqueKey == temp_uniqueKey){
+            		userList[i] = user;
+            		found = true;
+            		return false;
+            	}
+            });
+            if(!found) {
+            	userList.push(user);
             }
-            data.uniqueKey = user.blogType + '_' + data.id;
-            data.screen_name = data.screen_name || data.name;
-            userList[data.uniqueKey] = data;
             saveUserList(userList);
             var c_user = getUser();
             if(!c_user || c_user.uniqueKey == temp_uniqueKey){
-                setUser(data);
+                setUser(user);
             }
             var btnVal = $("#save-account").val();
             showAccountList();
@@ -384,7 +414,7 @@ function saveAccount(){
     if(blogType == 'twitter' && apiProxy) {
     	user.apiProxy = apiProxy;
     }
-    if((authType == 'baseauth' || authType == 'xauth') && userName && pwd){
+    if((authType == 'baseauth' || authType == 'xauth') && userName && pwd){ // TODO: xauth还未支持
         //userName = userName.toLowerCase(); //小写
         user.userName = userName;
         user.password = pwd;
@@ -452,12 +482,15 @@ function showSupportAuthTypes(blogType, authType){
 
 function showEditAccount(uniqueKey){
     if(uniqueKey){
-        var option = $("#account-list").find('option:selected');
+        var option = $("#account-list option:selected");
         var userList = getUserList(true);
-        if(!userList){
-            userList = {};
-        }
-        var user = userList[uniqueKey];
+        var user = null;
+        $.each(userList, function(index, item) {
+        	if(item.uniqueKey == uniqueKey){
+        		user = item;
+        		return false;
+        	}
+        });
         if(user){
             $("#new-account").show();
             $("#account-blogType").val(user.blogType);
@@ -471,61 +504,63 @@ function showEditAccount(uniqueKey){
 };
 
 function delAccount(uniqueKey){
-    if(uniqueKey){
-        var option = $("#account-list").find('option:selected');
-        var u_name = option.text();
-        option.remove();
-        var userList = getUserList(true);
-        if(!userList){
-            userList = {};
-        }
-        for(var key in userList){
-            if(key.toLowerCase() == uniqueKey.toLowerCase()){
-                delete userList[key];
-                saveUserList(userList);
-                //TODO: 删除该用户的缓存数据？
-                for(var key in localStorage){
-                    if(key.indexOf(uniqueKey)>-1){
-                        if(key != USER_LIST_KEY && key != CURRENT_USER_KEY){
-                            localStorage.removeItem(key);
-                        }
+	$("#account-list option:selected").remove();
+    var userList = getUserList(true);
+    var new_list = [];
+    var delete_user = {};
+    for(var i in userList){
+    	var user = userList[i];
+        if(user.uniqueKey.toLowerCase() == uniqueKey.toLowerCase()){
+        	delete_user = user;
+            //TODO: 删除该用户的缓存数据？
+            for(var key in localStorage){
+                if(key.indexOf(uniqueKey)>-1){
+                    if(key != USER_LIST_KEY && key != CURRENT_USER_KEY){
+                        localStorage.removeItem(key);
                     }
                 }
-                var c_user = getUser();
-                if(c_user && c_user.uniqueKey.toLowerCase() == uniqueKey.toLowerCase()){
-                    var b_view = getBackgroundView();
-                    if(b_view){
-                        b_view.setUser('');
-                        b_view.onChangeUser();
-                    }
-                }
-                break;
             }
+            var c_user = getUser();
+            if(c_user && c_user.uniqueKey.toLowerCase() == uniqueKey.toLowerCase()){
+                var b_view = getBackgroundView();
+                if(b_view){
+                    b_view.setUser('');
+                    b_view.onChangeUser();
+                }
+            }
+        } else {
+        	new_list.push(user);
         }
-        disabledUserEditBtns();
-        _showMsg('成功删除账号"' + u_name + '"！');
     }
+    saveUserList(new_list);
+    disabledUserEditBtns();
+    _showMsg('成功删除账号 (' + T_NAMES[delete_user.blogType] + ')' + delete_user.screen_name + '！');
 };
 
 //停、启用用户账号
 function toggleStopAccount(uniqueKey, is_stop){
     if(!uniqueKey){ return null; }
     var userList = getUserList(true);
-    if(!userList || !userList[uniqueKey]){
-        return null;
-    }
-    
-    userList[uniqueKey].disabled = (is_stop == undefined) ? (!userList[uniqueKey].disabled) : is_stop;
-    saveUserList(userList);
-    var c_user = getUser();
-    if(c_user && c_user.uniqueKey.toLowerCase() == uniqueKey.toLowerCase()){
-        var b_view = getBackgroundView();
-        if(b_view){
-            b_view.setUser('');
-            b_view.onChangeUser();
+    var user = null;
+    $.each(userList, function(i, item){
+    	if(item.uniqueKey == uniqueKey){
+    		user = item;
+    		return false;
+    	}
+    });
+    if(user){
+    	user.disabled = (is_stop == undefined) ? (!user.disabled) : is_stop;
+        saveUserList(userList);
+        var c_user = getUser();
+        if(c_user && c_user.uniqueKey.toLowerCase() == uniqueKey.toLowerCase()){
+            var b_view = getBackgroundView();
+            if(b_view){
+                b_view.setUser('');
+                b_view.onChangeUser();
+            }
         }
     }
-    return userList[uniqueKey];
+    return user;
 };
 
 function saveAll(){
@@ -614,53 +649,50 @@ function saveWidthAndHeight(){
 
 //刷新账号信息
 function refreshAccountInfo(){
-    var stat = {};
-    stat.len = 0;
-    stat.errorCount = 0;
-    stat.successCount = 0;
-    var userList = getUserList(true);
-    if(userList){
-        $("#refresh-account").attr("disabled", true);
-        var temp_userList = {};
-        for(var key in userList){
-            stat.len++;
-        }
-        var user;
-        for(var key in userList){
-            user = userList[key];
-            refreshAccountWarp(temp_userList, user, stat);//由于闭包会造成变量共享问题，所以写多一个包装函数。
-        }
+    var stat = {errorCount: 0, successCount: 0};
+    // 获取排序信息
+    stat.userList = getUserList(true);
+    $("#refresh-account").attr("disabled", true);
+    for(var i in stat.userList){
+        refreshAccountWarp(stat.userList[i], stat);//由于闭包会造成变量共享问题，所以写多一个包装函数。
     }
 }
 
-function refreshAccountWarp(userList, r_user, stat){
-    var user = r_user;
-    tapi.verify_credentials(user,function(data, textStatus, errorCode){
+function refreshAccountWarp(user, stat){
+    tapi.verify_credentials(user, function(data, textStatus, errorCode){
+    	user.blogType = user.blogType || 'tsina'; //兼容单微博版
+        user.authType = user.authType || 'baseauth'; //兼容单微博版
+        var blogName = T_NAMES[user.blogType];
         if(errorCode){
             if(errorCode==400){
-                _showMsg('刷新“' + user.screen_name + '”的信息失败，原因：用户名或者密码不正确，请修改。');
-            }else{
-                _showMsg('刷新“' + user.screen_name + '”的信息失败，原因：出现未知错误。');
+                _showMsg('刷新(' + blogName + ')' + user.screen_name + ' 的信息失败，原因：用户名或者密码不正确，请修改。');
+            } else {
+                _showMsg('刷新(' + blogName + + ')' + user.screen_name + ' 的信息失败，原因：出现未知错误。errorCode: ' + errorCode);
             }
-            userList[user.uniqueKey] = user;
+//            userList[user.uniqueKey] = user;
             stat.errorCount++;
-        }else{
-            user.blogType = user.blogType || 'tsina'; //兼容单微博版
-            user.authType = user.authType || 'baseauth'; //兼容单微博版
-            data = $.extend({},user, data); //合并，以data的数据为准
-            data.uniqueKey = data.blogType + '_' + data.id;
-            userList[data.uniqueKey] = data;
+        } else {
+            $.extend(user, data); //合并，以data的数据为准
+            user.uniqueKey = data.blogType + '_' + data.id;
+//            userList[data.uniqueKey] = data;
             stat.successCount++;
-            _showMsg('成功刷新“' + user.screen_name + '”的信息，');
+            _showMsg('成功刷新(' + blogName + ')' + user.screen_name + ' 的信息');
         }
-        if((stat.errorCount + stat.successCount) == stat.len){
-            saveUserList(userList);
+        if((stat.errorCount + stat.successCount) == stat.userList.length){
+        	// 全部刷新完，更新
+            saveUserList(stat.userList);
             var c_user = getUser();
             if(c_user){
                 if(!c_user.uniqueKey){ //兼容单微博版本
                     c_user.uniqueKey = (c_user.blogType||'tsina') + '_' + c_user.id;
                 }
-                c_user = userList[c_user.uniqueKey.toLowerCase()];
+                $.each(stat.userList, function(index, item){
+                	if(c_user.uniqueKey.toLowerCase() == item.uniqueKey){
+                		c_user = item;
+                		return false;
+                	}
+                });
+//                c_user = userList[c_user.uniqueKey.toLowerCase()];
                 setUser(c_user);
             }
             _showMsg('刷新用户信息完成。成功' + stat.successCount + '个，失败' + stat.errorCount + '个。');
