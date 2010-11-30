@@ -1,5 +1,7 @@
 // @author qleelulu@gmail.com
 
+var FAWAVE_BASE_URL = chrome.extension.getURL("");
+
 /* 在页面上显示新信息 */
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     if(request.method){
@@ -12,7 +14,11 @@ var methodManager = {
         if(request.msgs && request.msgs.length>0){
             var msg_wrap = $("#fa_wave_msg_wrap");
             if(msg_wrap.length < 1){
-                msg_wrap = $('<div id="fa_wave_msg_wrap"><a href="javascript:void(0)" class="close_fawave_remind">关闭</a><div class="fa_wave_list"></div></div>').appendTo('body');
+                msg_wrap = $('<div id="fa_wave_msg_wrap">\
+                                <div class="fawave_btns clearFix">\
+	                                <a class="fawave_but fawave_logo"><img src="' + chrome.extension.getURL("icons/icon48.png") + '" />信息提示</a>\
+	                                <a href="javascript:void(0)" class="close_fawave_remind fawave_but fr">关闭</a>\
+                                </div><div class="fa_wave_list"></div></div>').appendTo('body');
                 msg_wrap.find('.close_fawave_remind').click(function(){ close_fawave_remind(); });
                 msg_wrap.hover(function(){
                     $("#fa_wave_msg_wrap .fa_wave_list > div").stop(true).css('opacity', '1.0');
@@ -184,7 +190,7 @@ var QUICK_SEND_TEMPLATE = ' \
                     <span class="fawave-wordCount">140</span>\
                     <textarea id="fawaveTxtContentInp" style="width:100%;" rows="5" ></textarea>\
                 </div>\
-                <div class="fawaveInfoMsg"></div>\
+                <ul id="fawave_accountsForSend"></ul>\
                 <div class="fawaveSubmitWarp">\
                     <button id="btnFawaveQuickSend" class="btn-positive" title="Ctrl + 回车 发送">\
                         <img src="/images/tick.png" alt="">发微\
@@ -194,18 +200,21 @@ var QUICK_SEND_TEMPLATE = ' \
                     </button>\
                     <span class="fawaveQuickSendTip"></span>\
                 </div>\
+            <!-- \
                 <span class="fawaveUserInfo">\
                     <span></span>\
                     <a target="_blank"><img src="" /></a><img src="" class="blogType" />\
                 </span>\
+            -->\
             </div> \
+            <div class="fawaveInfoMsg"></div>\
         </div>\
     </div>';
 
 QUICK_SEND_TEMPLATE = QUICK_SEND_TEMPLATE.replace('/images/tick.png', chrome.extension.getURL("/images/tick.png"))
                                          .replace('/images/cross.png', chrome.extension.getURL("/images/cross.png"));
 
-var QUICK_SEND_HOT_KEYS = '', QUICK_SEND_HOT_KEYS_COUNT = 0, PRESSED_KEY = [], CURRENT_USER = '';
+var QUICK_SEND_HOT_KEYS = '', QUICK_SEND_HOT_KEYS_COUNT = 0, PRESSED_KEY = [], CURRENT_USER = '', USER_LIST = '';
 
 // 微博字数
 String.prototype.len = function(){
@@ -216,8 +225,14 @@ function fawaveCountInputText(){
     $("#fawaveSendMsgWrap .fawave-wordCount").html(140 - $("#fawaveTxtContentInp").val().len());
 };
 
-function showFawaveAlertMsg(msg){
-    $("#fawaveSendMsgWrap .fawaveInfoMsg").html(msg);
+function showFawaveSendMsg(msg){
+    $('<div class="fawaveMessageInfo">' + msg + '</div>')
+        .appendTo('#fawaveSendMsgWrap .fawaveInfoMsg')
+        .fadeIn('slow')
+        .animate({opacity: 1.0}, 5000)
+        .fadeOut('slow', function() {
+          $(this).remove();
+        });
 };
 
 function fawaveInitTemplate(){
@@ -225,22 +240,17 @@ function fawaveInitTemplate(){
 
     $('body').append(QUICK_SEND_TEMPLATE);
 
-    if(CURRENT_USER){
-        var f_u_info = $("#fawaveSendMsgWrap .fawaveUserInfo");
-        f_u_info.find('span').html(CURRENT_USER.screen_name)
-            .end().find('a').attr('href', CURRENT_USER.t_url)
-            .end().find('a img').attr('src', CURRENT_USER.profile_image_url)
-        	.end().find('img.blogType').attr('src', chrome.extension.getURL('images/blogs/' + CURRENT_USER.blogType + '_16.png'));
-    }
+    //initSelectSendAccounts();
+
     $("#fawaveSendMsgWrap .fawavemodal-close").click(function(){
-        showFawaveAlertMsg('');
+        //showFawaveAlertMsg('');
         $("#fawaveSendMsgWrap").hide();
     });
 
     $("#fawaveSendMsgWrap .btn-negative").click(function(){
         $("#fawaveTxtContentInp").val('');
         $("#fawave-share-page-chk").attr("checked", false);
-        showFawaveAlertMsg('');
+        //showFawaveAlertMsg('');
         $("#fawaveSendMsgWrap").hide();
     });
 
@@ -250,11 +260,7 @@ function fawaveInitTemplate(){
 
     $("#fawaveTxtContentInp").keydown(function(event){
         if(event.ctrlKey && event.keyCode==13){
-            if(c){
-                sendFawaveMsg();
-            }else{
-                showFawaveAlertMsg('请输入要发送的内容');
-            }
+            sendFawaveMsg();
             return false;
         }
     });
@@ -272,7 +278,59 @@ function fawaveInitTemplate(){
             sendFawaveMsg();
         }, false);
     }
-}
+};
+
+// 初始化用户选择视图, is_upload === true 代表是上传
+function initSelectSendAccounts(is_upload){
+    if(!USER_LIST || !CURRENT_USER){ return; }
+    var afs = $("#fawave_accountsForSend");
+    if(afs.data('inited')){
+        return;
+    }
+    var userList = USER_LIST; // userList 的类型是 {} 而不是 []
+    var userLength = 0;
+    for(var k in userList){ 
+        userLength++;
+        if(userLength > 1){
+            break; //我只想看看是否有多个用户而已，为什么为什么要这么麻烦
+        }
+    }
+    if(userLength < 2){ return; } //多个用户才显示
+    var li_tp = '<li class="{{sel}}" uniqueKey="{{uniqueKey}}" >' +
+                   '<img src="{{profile_image_url}}" />' +
+                   '{{screen_name}}' +
+                   '<img src="{{fawave_base_url}}images/blogs/{{blogType}}_16.png" class="blogType" />' +
+               '</li>';
+    var li = [];
+    var c_user = CURRENT_USER;
+    for(var i in userList){
+        user = userList[i];
+        user.fawave_base_url = FAWAVE_BASE_URL;
+        if(is_upload === true && tapi.get_config(user).support_upload === false) {
+        	continue;
+        }
+        if(user.uniqueKey == c_user.uniqueKey){
+            user.sel = 'sel';
+        }else{
+            user.sel = '';
+        }
+        li.push(fawaveFormatText(li_tp, user));
+    }
+    afs.html('TO: ' + li.join(''));
+    afs.data('inited', 'true');
+    afs.find('li').click(function(){ toggleSelectSendAccount(this); });
+};
+
+function toggleSelectSendAccount(ele){
+    var _t = $(ele);
+    if(_t.hasClass('sel')){
+        if($("#fawave_accountsForSend .sel").length > 1){
+            _t.removeClass('sel');
+        }
+    }else{
+        _t.addClass('sel');
+    }
+};
 
 function fawaveToggleLooking(ele){
     chrome.extension.sendRequest({method:'getLookingTemplate'}, function(response){
@@ -293,20 +351,65 @@ function fawaveToggleLooking(ele){
 function sendFawaveMsg(){
     var msg = $.trim($("#fawaveTxtContentInp").val());
     if(!msg){
-        showFawaveAlertMsg('请输入内容');
+        showFawaveSendMsg('请输入内容');
         return;
     }
+    var users = [], selLi = $("#fawave_accountsForSend .sel");
+    if(selLi.length){
+        selLi.each(function(){
+            var uniqueKey = $(this).attr('uniqueKey');
+            var _user = USER_LIST[uniqueKey];
+            if(_user){
+                users.push(_user);
+            }
+        });
+    }else if(!$("#fawave_accountsForSend li").length){
+        users.push(CURRENT_USER);
+    }else{
+        showFawaveSendMsg('请选择要发送的账号');
+        return;
+    }
+    var stat = {};
+    stat.userCount = users.length;
+    stat.sendedCount = 0;
+    stat.successCount = 0;
     $("#fawaveSendMsgWrap input, #fawaveSendMsgWrap button, #fawaveSendMsgWrap textarea").attr('disabled', true);
-    chrome.extension.sendRequest({method:'publicQuickSendMsg', sendMsg:msg}, function(response){
-        $("#fawaveSendMsgWrap input, #fawaveSendMsgWrap button, #fawaveSendMsgWrap textarea").removeAttr('disabled');
+    for(var i in users){
+        _sendFawaveMsgWrap(msg, users[i], stat, selLi);
+    }
+};
+
+function _sendFawaveMsgWrap(msg, user, stat, selLi){
+    chrome.extension.sendRequest({method:'publicQuickSendMsg', user:user, sendMsg:msg}, function(response){
+        stat.sendedCount++;
         var msg = response.msg;
         if(msg && msg.id){
-            $("#fawaveSendMsgWrap .btn-negative").click();
+            stat.successCount++;
+            $("#fawave_accountsForSend li[uniquekey=" + user.uniqueKey +"]").removeClass('sel');
         }else if(msg && msg.error){
-            showFawaveAlertMsg('error: ' + msg.error);
-        }else{
-            showFawaveAlertMsg('发送出错');
+            showFawaveSendMsg('error: ' + msg.error);
         }
+        else{
+            showFawaveSendMsg(user.screen_name + ' 发送出错.');
+        }
+        if(stat.successCount >= stat.userCount){//全部发送成功
+            selLi.addClass('sel');
+            $("#fawaveSendMsgWrap .btn-negative").click();
+        }
+        if(stat.sendedCount >= stat.userCount){//全部发送完成
+            selLi = null;
+            $("#fawaveSendMsgWrap input, #fawaveSendMsgWrap button, #fawaveSendMsgWrap textarea").removeAttr('disabled');
+            if(stat.successCount > 0){ //有发送成功的
+                //setTimeout(callCheckNewMsg, 1000);
+                chrome.extension.sendRequest({method:'notifyCheckNewMsg'}, function(response){});
+                
+                if(stat.userCount > 1){ //多个用户的
+                    showFawaveSendMsg(stat.successCount + '发送成功，' + (stat.userCount - stat.successCount) + '失败。');
+                }
+            }
+        }
+        user = null;
+        stat = null;
     });
 };
 
@@ -316,6 +419,7 @@ $(function(){
         QUICK_SEND_HOT_KEYS = response.hotkeys;
         QUICK_SEND_HOT_KEYS_COUNT = QUICK_SEND_HOT_KEYS.split(',').length;
 
+        USER_LIST = response.userList;
         CURRENT_USER = response.c_user;
     });
 
@@ -330,18 +434,11 @@ $(function(){
             fawaveInitTemplate();
             var fsw = $("#fawaveSendMsgWrap");
             if(fsw.css('display')=='none'){
-                //更新用户头像，避免用错帐号发送信息
+                //更新用户列表，避免切换用户或者修改用户列表
                 chrome.extension.sendRequest({method:'getQuickSendInitInfos'}, function(response){
-                    if(CURRENT_USER.profile_image_url != response.c_user.profile_image_url){
-                        CURRENT_USER = response.c_user;
-                        if(CURRENT_USER){
-                        	var f_u_info = $("#fawaveSendMsgWrap .fawaveUserInfo");
-                            f_u_info.find('span').html(CURRENT_USER.screen_name)
-                                .end().find('a').attr('href', CURRENT_USER.t_url)
-                                .end().find('a img').attr('src', CURRENT_USER.profile_image_url)
-                            	.end().find('img.blogType').attr('src', chrome.extension.getURL('images/blogs/' + CURRENT_USER.blogType + '_16.png'));
-                        }
-                    }
+                    CURRENT_USER = response.c_user;
+                    USER_LIST = response.userList;
+                    initSelectSendAccounts();
                 });
                 fsw.show();
                 //注意下面三句的顺序，不能乱
@@ -349,7 +446,7 @@ $(function(){
                 $("#fawaveTxtContentInp").focus();
                 if(sText){ $("#fawaveTxtContentInp").val(sText); }
             }else{
-                showFawaveAlertMsg('');
+                //showFawaveSendMsg('');
                 fsw.hide();
             }
         }

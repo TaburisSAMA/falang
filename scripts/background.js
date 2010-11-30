@@ -468,11 +468,12 @@ r_method_manager = {
     getQuickSendInitInfos: function(request, sender, sendResponse){
         var hotkeys = getQuickSendHotKey();
         var c_user = getUser();
-        sendResponse({hotkeys: hotkeys, c_user:c_user});
+        var userList = getUserList();
+        sendResponse({hotkeys: hotkeys, c_user:c_user, userList:userList});
     },
     publicQuickSendMsg: function(request, sender, sendResponse){
         var msg = request.sendMsg;
-        var user = getUser();
+        var user = request.user;
         var data = {status: msg, user:user};
         tapi.update(data, function(sinaMsg, textStatus){
             if(sinaMsg.id){
@@ -480,7 +481,10 @@ r_method_manager = {
             }
             sendResponse({msg:sinaMsg, textStatus:textStatus});
         });
-    }
+    },
+    notifyCheckNewMsg: function(request, sender, sendResponse){
+        setTimeout(checkNewMsg, 1000);
+    },
 };
 
 
