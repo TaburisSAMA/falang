@@ -123,7 +123,8 @@ function initTabs(){
             checkShowGototop();
             return;
         }else if(c_t =='followers'){
-            getFansList('followers');
+        	showFollowers();
+            //getFansList('followers');
             checkShowGototop();
             return;
         } else if(c_t == 'favorites') {
@@ -417,13 +418,14 @@ function changeUser(uniqueKey){
             }
         }
         if(cur_t) { // 需要刷新一下数据
-        	if(cur_t == 'followers') {
-        		// 粉丝tab，直接执行onclick事件
-        		$('#fans_tab span.active').attr('onclick')();
-        	} else {
-        		//getSinaTimeline(cur_t, true);
-                $("#tl_tabs li.active").click();
-        	}
+        	$("#tl_tabs li.active").click();
+//        	if(cur_t == 'followers') {
+//        		// 粉丝tab，直接执行onclick事件
+//        		$('#fans_tab span.active').click();
+//        	} else {
+//        		//getSinaTimeline(cur_t, true);
+//                $("#tl_tabs li.active").click();
+//        	}
         }
     }
 };
@@ -579,63 +581,121 @@ function resetScrollTop(t){
 };
 //====>>>>>>>>>>>>>>>>>>>>>>
 
+// 显示粉丝列表
+function showFollowers(to_t, screen_name, user_id) {
+	//添加当前激活的状态
+    $t = $('#tl_tabs .tab-followers');
+    $t.siblings().removeClass('active').end().addClass('active');
+    //切换tab
+    $('.list_p').hide();
+    $($t.attr('href')).show();
+    window.currentTab = $t.attr('href');
+    
+	to_t = to_t || $("#fans_tab .active").attr('t');
+	if(screen_name) {
+		$('#followers_timeline').attr('screen_name', screen_name);
+	} else {
+		$('#followers_timeline').removeAttr('screen_name');
+	}
+	if(user_id) {
+		$('#followers_timeline').attr('user_id', user_id);
+	} else {
+		$('#followers_timeline').removeAttr('user_id');
+	}
+	$("#fans_tab span").unbind('click').click(function() {
+		_getFansList($(this).attr('t'));
+	}).each(function() {
+		var $this = $(this);
+		$this.removeAttr('loading');
+		$this.removeAttr('cursor'); // 删除游标
+		if($this.attr('t') == to_t) {
+			$this.click();
+		}
+	});
+	var html_cache = get_current_user_cache(FANS_HTML_CACHE);
+	for(var k in html_cache) {
+		delete html_cache[k];
+	}
+};
+
 /*
 * 粉丝列表
 */
 var NEXT_CURSOR = {};
 var FANS_HTML_CACHE = {};
 //获取用户的粉丝列表
-function getFansList(t, cursor){
+function _getFansList(to_t, read_more){
+	to_t = to_t || $("#fans_tab .active").attr('t');
 	var c_user = getUser();
     if(!c_user){
         return;
     }
-    var list = $("#followers_timeline .list");
-    var old_t = $("#fans_tab .active").attr('t');
+    var $followers_timeline = $('#followers_timeline');
+    var screen_name = $followers_timeline.attr('screen_name') || c_user.screen_name;
+    var user_id = $followers_timeline.attr('user_id');
+    if(screen_name == c_user.screen_name) {
+    	user_id = c_user.id;
+    }
+    var params = {user:c_user, count:PAGE_SIZE, screen_name: screen_name};
+    if(user_id) {
+    	params.user_id = user_id;
+    }
+    var $list = $("#followers_timeline .list");
+    var $active_t = $("#fans_tab .active");
+    var active_t = $active_t.attr('t');
+    var $to_t = $("#fans_tab .tab_" + to_t);
+    var cursor = $to_t.attr('cursor') || -1;
     // 各微博自己cache
     var html_cache = get_current_user_cache(FANS_HTML_CACHE);
-    if(old_t != t) {
-    	html_cache[old_t] = list.html();
+    if($to_t.attr('loading') !== undefined) {
+    	return;
     }
-    if(!cursor){ //点击tab的时候，而不是分页获取
-        if(!$("#fans_tab .tab_" + t).hasClass('active')){
-            $("#fans_tab span").removeClass('active');
-            $("#fans_tab .tab_" + t).addClass('active');
-        }
-        if(html_cache[t]){ //如果已经获取过，直接显示。
-            list.html(html_cache[t]);
-            return;
-        }else{
-        	html_cache[t] = '';
-            list.html('');
-        }
+    if(!read_more) { // 点击tab
+    	if(active_t != to_t) { // 切换
+    		html_cache[active_t] = $list.html();
+    		$("#fans_tab span").removeClass('active');
+	    	$to_t.addClass('active');
+	    	if(html_cache[to_t]) {
+	    		$list.html(html_cache[to_t]);
+	    		return;
+	    	}
+	    } else if(cursor != -1) { // 点击当前tab
+	    	return;
+	    }
+	    $list.html('');
     }
-    cursor = cursor || -1;
+
+    params.cursor = cursor;
+    hideReadMore(to_t);
     showLoading();
-    hideReadMore(t);
-    var params = {user_id:c_user.id, cursor:cursor, user:c_user, count:PAGE_SIZE};
-    tapi[t](params, function(users, textStatus, statuCode){
-        if(textStatus != 'error' && users && !users.error){
-        	if(users.next_cursor != undefined) {
-        		var cursor_cache = get_current_user_cache(NEXT_CURSOR);
-            	cursor_cache[t] = users.next_cursor;
-        	}
-            users = users.users;
+    $to_t.attr('loading', true);
+    tapi[to_t](params, function(data, textStatus, statuCode){
+    	// 如果用户已经切换，则不处理
+    	var now_user = getUser();
+    	if(now_user.uniqueKey != c_user.uniqueKey) {
+    		return;
+    	}
+        if(textStatus != 'error' && data && !data.error){
+            var users = data.users;
             if(users) {
             	var html = '';
                 for(var i in users){
-                    html += bildMsgLi(users[i], t); //TODO: 待优化
+                    html += bildMsgLi(users[i], to_t); //TODO: 待优化
                 }
-                if(t == $("#fans_tab .active").attr('t')) {
+                if(to_t == $("#fans_tab .active").attr('t')) {
                 	// 还是当前页
-                	list.append(html);
+                	$list.append(html);
                 }
-                html_cache[t] += html;
-                if(users.length > 0){
-                    showReadMore(t);
-                }
+                html_cache[to_t] += html;
+                if(data.next_cursor) {
+	        		$to_t.attr('cursor', data.next_cursor);
+	        		if(users.length > 0){
+	                    showReadMore(to_t);
+	                }
+	        	}
             }
         }
+        $to_t.removeAttr('loading');
     });
 };
 
@@ -982,10 +1042,7 @@ function setScrollTotop(){
 };
 
 function readMoreFans(){
-    var t = $("#fans_tab .active").attr('t');
-    var _cache = get_current_user_cache(NEXT_CURSOR);
-    var cursor = _cache[t];
-    getFansList(t, cursor);
+    _getFansList(null, true);
 };
 
 function readMore(t){

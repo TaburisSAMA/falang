@@ -980,10 +980,17 @@ $.extend(DiguAPI, {
 			// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
 			args.data.page = args.data.cursor == -1 ? 1 : args.data.cursor;
 			delete args.data.cursor;
-			if(!args.data.page) {
+			if(!args.data.page){
 				args.data.page = 1;
 			}
+			if(args.data.user_id){
+				args.data.friendUserId = args.data.user_id;
+			}
+			if(args.data.screen_name){
+				args.data.friendUsername = args.data.screen_name;
+			}
 			delete args.data.user_id;
+			delete args.data.screen_name;
 		} else if(args.url == this.config.new_message) {
 			// id => receiveUserId , text => content , message=0: 必须 0 表示悄悄话 1 表示戳一下
 			args.data.content = args.data.text;
@@ -1039,7 +1046,7 @@ $.extend(DiguAPI, {
 		// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
 		// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
 		if(args.url == this.config.followers || args.url == this.config.friends) {
-			data = {users: data, next_cursor: args.data.page + 1, previous_cursor: args.data.page};
+			data = {users: data, next_cursor: Number(args.data.page) + 1, previous_cursor: args.data.page};
 			if(data.users.length == 0) {
 				data.next_cursor = 0;
 			}
