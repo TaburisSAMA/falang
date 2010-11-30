@@ -1130,11 +1130,11 @@ function sendMsg(msg){
     stat.sendedCount = 0;
     stat.successCount = 0;
     for(var i in users){
-        _sendMsgWraper(msg, users[i], stat);
+        _sendMsgWraper(msg, users[i], stat, selLi);
     }
 };
 
-function _sendMsgWraper(msg, user, stat){
+function _sendMsgWraper(msg, user, stat, selLi){
     var data = {};
     data['status'] = msg; //放到这里重置一下，否则会被编码两次
     data['user'] = user;
@@ -1148,10 +1148,12 @@ function _sendMsgWraper(msg, user, stat){
         }
         if(stat.successCount >= stat.userCount){//全部发送成功
             hideMsgInput();
+            selLi.addClass('sel');
             $("#txtContent").val('');
             showMsg('发送成功！');
         }
         if(stat.sendedCount >= stat.userCount){//全部发送完成
+            selLi = null;
             $("#btnSend").removeAttr('disabled');
             $("#txtContent").removeAttr('disabled');
             if(stat.successCount > 0){ //有发送成功的
