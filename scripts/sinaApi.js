@@ -853,6 +853,8 @@ $.extend(TSohuAPI, {
 	    repost: '/statuses/transmit/{{id}}',
 	    friendships_create:   '/friendship/create/{{id}}',
         friendships_destroy:  '/friendship/destroy/{{id}}',
+        friends: '/statuses/friends/{{user_id}}',
+        followers: '/statuses/followers/{{user_id}}',
 	    mentions: '/statuses/mentions_timeline',
 	    comments: '/statuses/comments/{{id}}',
 	    reply: '/statuses/comment',
@@ -868,6 +870,21 @@ $.extend(TSohuAPI, {
 			// method => delete
 			args.type = 'delete';
 		}
+	},
+	
+    format_result: function(data, play_load, args) {
+		if($.isArray(data)) {
+	    	for(var i in data) {
+	    		data[i] = this.format_result_item(data[i], play_load, args);
+	    	}
+	    } else {
+	    	data = this.format_result_item(data, play_load, args);
+	    }
+	    if(args.url == this.config.friends || args.url == this.config.followers){
+	    	data.next_cursor = data.cursor_id;
+	    	delete data.cursor_id;
+	    }
+		return data;
 	},
 	
 	format_result_item: function(data, play_load, args) {
