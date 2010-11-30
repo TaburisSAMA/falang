@@ -318,7 +318,7 @@
 						<?js if(user.friends_count != undefined){ ?>
 						<p>关注: <span><a href="javascript:showFollowers('friends', '#{user.screen_name}', '#{user.id}');">#{user.friends_count}</a></span>个　
 							粉丝: <span><a href="javascript:showFollowers('followers', '#{user.screen_name}', '#{user.id}');">#{user.followers_count}</a></span>个</p>
-						<p>微博: <span>#{user.statuses_count}</span>条</p>
+						<p>微博: <span><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');">#{user.statuses_count}</a></span>条</p>
 						<?js } ?>
 					</div>
 				</div>
@@ -350,7 +350,7 @@
 	                <?js if(user.friends_count != undefined){ ?>
 					<p>关注: <span><a href="javascript:showFollowers('friends', '#{user.screen_name}', '#{user.id}');">#{user.friends_count}</a></span>个　
 						粉丝: <span><a href="javascript:showFollowers('followers', '#{user.screen_name}', '#{user.id}');">#{user.followers_count}</a></span>个　
-						微博: <span>#{user.statuses_count}</span>条</p>
+						微博: <span><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');">#{user.statuses_count}</a></span>条</p>
 					<?js } ?>
 					<?js if(user.url && user.url != 'http://1'){ ?>
 					<p>博客：<a href="#{user.url}">#{user.url}</a></p>
@@ -386,7 +386,7 @@
                     <?js if(user.friends_count != undefined){ ?>
 					<p>关注: <span><a href="javascript:showFollowers('friends', '#{user.screen_name}', '#{user.id}');">#{user.friends_count}</a></span>个　
 						粉丝: <span><a href="javascript:showFollowers('followers', '#{user.screen_name}', '#{user.id}');">#{user.followers_count}</a></span>个　
-						微博: <span>#{user.statuses_count}</span>条</p>
+						微博: <span><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');">#{user.statuses_count}</a></span>条</p>
 					<?js } ?>
 					<?js if(user.url && user.url != 'http://1'){ ?>
 					<p>博客：<a href="#{user.url}">#{user.url}</a></p>

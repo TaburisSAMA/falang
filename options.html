@@ -44,16 +44,20 @@
 		<div class="info">用户、密码保存在本地。在公共电脑上使用时请慎重。</div>
 		<table>
 			<tr>
+			    <td>
+			        <button id="up-account" direction="up" disabled="disabled">向上</button><br/>
+			        <button id="down-account" direction="down" disabled="disabled">向下</button>
+			    </td>
 				<td><select id="account-list" size="6" style="width:250px; height:150px;"></select></td>
 				<td>
 					<button id="refresh-account"><img src="images/refresh.png" />更新用户信息</button>
 					<span class="jTip" jTitle="为什么要更新？　" jWidth="320">?<span class="c">为了快速启动，用户信息会缓存在本地，如果你修改了用户头像或者其他用户信息，需要手动更新一下。
 						</span></span><br/>
 					<button id="show-new-account"><img src="images/add.png" />添加新用户</button><br/>
-					<button id="stop-account" disabled="true"><img src="images/exclamation.png" />停/启用</button>
+					<button id="stop-account" disabled="disabled"><img src="images/exclamation.png" />停/启用</button>
 					<span class="jTip" jTitle="为什么要停用？　" jWidth="320">?<span class="c">当你暂时不想查看某一账号的时候，你可以将该账号暂时停用，你以后可以重新启用</span></span><br/>
-					<button id="show-edit-account" disabled="true"><img src="images/user_edit.png" />编辑用户</button><br/>
-					<button id="del-account" disabled="true"><img src="images/delete.png" />删除用户</button>
+					<button id="show-edit-account" disabled="disabled"><img src="images/user_edit.png" />编辑用户</button><br/>
+					<button id="del-account" disabled="disabled"><img src="images/delete.png" />删除用户</button>
 				</td>
 			</tr>
 		</table>
