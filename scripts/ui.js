@@ -157,8 +157,9 @@ function bildMsgLi(sinaMsg, t, c_user){
                         tType: t,
                         getUserCountsInfo: getUserCountsInfo,
                         buildTipboxUserInfo: buildTipboxUserInfo,
-                        processMsg: processMsg,
+                        processMsg: tapi.processMsg,
                         user: user,
+                        account: c_user,
                         tweet: sinaMsg,
                         btn: crlBtn
                        };
@@ -246,7 +247,7 @@ function buildComment(comment, status_id, status_user_screen_name){
     	comment_user_id: comment.user.id
     });
     var tp = '<li>' 
-            + processMsg('@'
+            + tapi.processMsg(c_user, '@'
                         + comment.user.screen_name
                         + (comment.user.verified ? '<img title="新浪认证" src="/images/verified.gif" />':'')
                         + ': ' + HTMLEnCode(comment.text), true) 
@@ -268,6 +269,7 @@ function getUserCountsInfo(user){
 /**
  * 处理内容
  */
+ /*
 var processMsg = function (str, notEncode) {
     if(!str){ return ''; }
     if(!notEncode){
@@ -322,3 +324,4 @@ function replaceEmotional(m, g1){
 	}
     return m;
 };
+*/

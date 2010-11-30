@@ -1,5 +1,7 @@
 // @author qleelulu@gmail.com
 
+$('embed').attr('wmode', 'transparent'); //flash over the div
+
 var FAWAVE_BASE_URL = chrome.extension.getURL("");
 
 /* 在页面上显示新信息 */

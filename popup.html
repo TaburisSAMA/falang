@@ -215,7 +215,7 @@
 					</div>
 					<div class="msg">
 						<div class="tweet">
-							#{processMsg(tweet.text)}
+							#{processMsg(account, tweet.text)}
 							<?js if(tweet.thumbnail_pic){ ?>
 							<div>
 								<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.bmiddle_pic}" original="#{tweet.original_pic}" onmousedown="rOpenPic(event, this)" title="右键点击打开原图" >
@@ -274,7 +274,7 @@
 										#{ btn.rtAddFavoritesMsgBtn + btn.rtReplyBtn + btn.rtRepostBtn + btn.rtRepostCounts + btn.rtCommentBtn + btn.rtCommentCounts}
 									</span>
 								</div>
-								#{processMsg(tweet.retweeted_status.text)}
+								#{processMsg(account, tweet.retweeted_status.text)}
 								<?js if(tweet.retweeted_status.thumbnail_pic){ ?>
 								<div>
 									<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.retweeted_status.bmiddle_pic}" title="右键点击打开原图" original="#{tweet.retweeted_status.original_pic}" onmousedown="rOpenPic(event, this)" >

@@ -60,6 +60,61 @@ var sinaApi = {
         detailUrl:        '/jump?aid=detail&twId=',
         searchUrl:        '/search/'
     },
+
+    /**
+     * 处理内容
+     */
+    processMsg: function (str, notEncode) {
+        if(!str){ return ''; }
+        if(!notEncode){
+            str = HTMLEnCode(str);
+        }
+
+        var re = new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&\\-/#=;:!\\+]+)(?:\\](.+)\\[/url\\]|)', 'ig');
+        str = str.replace(re, this._replaceUrl);
+        str = str.replace(/^@([\w\-\u4e00-\u9fa5|\_]+)/g, ' <a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$1" title="左键查看微薄，右键打开主页">@$1</a>');
+        str = str.replace(/([^\w#])@([\w\-\u4e00-\u9fa5|\_]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ this.config.user_home_url +'$2" title="左键查看微薄，右键打开主页">@$2</a>');
+        
+        str = this.processSearch(str);
+       
+        str = this.processEmotional(str);
+        
+        return str;
+    },
+    processSearch: function (str) {
+        str = str.replace(/#([^#]+)#/g, '<a target="_blank" href="'+ this.config.search_url +'$1" title="Search #$1">#$1#</a>');
+        return str;
+    },
+    processEmotional: function(str){
+        str = str.replace(/\[([\u4e00-\u9fff,\uff1f,\w]{1,4})\]/g, this._replaceEmotional);
+        return str;
+    },
+    _replaceUrl: function(m, g1, g2){
+        var _url = g1;
+        if(g1.indexOf('http') != 0){
+            _url = 'http://' + g1;
+        }
+        return '<a target="_blank" href="{{url}}" title="{{title}}">{{value}}</a>'.format({
+            url: _url, title: g1, value: g2||g1
+        });
+    },
+    _replaceEmotional: function(m, g1){
+        var tpl = '<img title="{{title}}" src="{{src}}" />';
+        if(g1) {
+            if(emotionalDict[g1]){
+                var src = emotionalDict[g1];
+                if(src.indexOf('http') != 0){
+                    src = '/images/faces/' + src + '.gif';
+                }
+                return tpl.format({title: m, src: src});
+            }
+            var other = TSINA_API_EMOTIONS[g1] || TSINA_FACES[g1];
+            if(other) {
+                return tpl.format({title: m, src: TSINA_FACE_URL_PRE + other});
+            }
+        }
+        return m;
+    },
     
 
 	// 设置认证头
@@ -948,6 +1003,7 @@ $.extend(DiguAPI, {
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.minicloud.com.cn',
+        search_url: 'http://digu.com/search/',
 		source: 'fawave', 
 	    source2: 'fawave',
 	    
@@ -967,6 +1023,25 @@ $.extend(DiguAPI, {
         comment:              '/statuses/update',
         reply:                '/statuses/update'
 	}),
+
+    processSearch: function (str) {
+        str = str.replace(/(^|&lt;|a-zA-Z_0-9|\s)(#|$)([\w\u4e00-\u9fa5|\_]*|$)/g, ' <a title="Search $2$3" href="' + this.config.search_url + '%23$3" target="_blank">$2$3</a>');
+        //str = str.replace(/[^\w]#([\w\u4e00-\u9fa5|\_]+)/g, ' <a target="_blank" href="'+ this.config.search_url +'%23$1" title="Search #$1">#$1</a>');
+        return str;
+    },
+    processEmotional: function(str){
+        str = str.replace(/\[:(\d{2})\]|\{([\u4e00-\u9fa5,\uff1f]{2,})\}/g, this._replaceEmotional);
+        return str;
+    },
+    _replaceEmotional: function(m, g, g2){
+        if(g2 && DIGU_EMOTIONS[g2]){
+            return '<img src="http://images.digu.com/web_res_v1/emotion/' + DIGU_EMOTIONS[g2] + '.gif" />';
+        }else if(g && (g>0) && (g<33)){
+            return '<img src="http://images.digu.com/web_res_v1/emotion/' + g + '.gif" />';
+        }else{
+            return m;
+        }
+    },
 
     rate_limit_status: function(data, callback){
         callback({error:'not support'});
@@ -1561,6 +1636,7 @@ $.extend(TwitterAPI, {
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.twitter.com',
+        search_url: 'http://twitter.com/search?q=',
 		source: 'fawave', 
         oauth_key: 'i1aAkHo2GkZRWbUOQe8zA',
         oauth_secret: 'MCskw4dW5dhWAYKGl3laRVTLzT8jTonOIOpmzEY',
@@ -1572,6 +1648,15 @@ $.extend(TwitterAPI, {
 	    repost: '/statuses/update',
         friends_timeline: '/statuses/home_timeline'
 	}),
+       
+    processSearch: function (str) {
+        str = str.replace(/(^|&lt;|a-zA-Z_0-9|\s)(#|$)([\w\u4e00-\u9fa5|\_]*|$)/g,' <a class="tag" title="$3" href="http://twitter.com/search?q=%23$3" target="_blank">$2$3</a>');
+        //str = str.replace(/[^\w]#([\w\u4e00-\u9fa5|\_]+)/g, ' <a target="_blank" href="'+ this.config.search_url +'%23$1" title="Search #$1">#$1</a>');
+        return str;
+    },
+    processEmotional: function(str){
+        return str;
+    },
 	
 	// 无需urlencode
 	url_encode: function(text) {
@@ -1659,7 +1744,11 @@ var tapi = {
 		return T_APIS[(data.user ? data.user.blogType : data.blogType) || 'tsina'];
 	},
 	
-	get_config: function(user) {
+	processMsg: function(user, str, notEncode) {
+		return tapi.api_dispatch(user).processMsg(str, notEncode);
+	},
+
+    get_config: function(user) {
 		return this.api_dispatch(user).config;
 	},
 	
