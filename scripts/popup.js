@@ -1678,6 +1678,15 @@ fawave.face = {
     }
 };
 
+function rOpenPic(event, ele){
+    if(event.button == 2){ //右键点击直接打开原图
+        var url = $.trim($(ele).attr('original'));
+        if(url){
+            chrome.tabs.create({url:url, selected:isNewTabSelected});
+        }
+    }
+};
+
 function _showLoading(){
     $("#loading").show();
 };

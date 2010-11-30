@@ -151,7 +151,8 @@
 		<div id="ye_dialog_body" >
 			<div class="replyDialog">
 				<textarea class="uTextarea" id="replyTextarea"></textarea><br/>
-				<span id="replyInputCount" class="conTinge">(还可以输入140字)</span><a href="javascript:void(0);" onclick="fawave.face.show(this, 'replyTextarea');" title="点击添加表情"><img src="images/face.gif" />表情</a>
+				<a href="javascript:void(0);" onclick="fawave.face.show(this, 'replyTextarea');" title="点击添加表情"><img src="images/face.gif" />表情</a>
+				<span id="replyInputCount" class="conTinge">(还可以输入140字)</span>
 				<p>
 					<input type="checkbox" id="chk_sendOneMore" /><label for="chk_sendOneMore" id="txt_sendOneMore"></label><br/>
 					<input type="checkbox" id="chk_sendOneMore2" /><label for="chk_sendOneMore2" id="txt_sendOneMore2"></label>
@@ -216,7 +217,7 @@
 							#{processMsg(tweet.text)}
 							<?js if(tweet.thumbnail_pic){ ?>
 							<div>
-								<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.bmiddle_pic}" original="#{tweet.original_pic}" >
+								<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.bmiddle_pic}" original="#{tweet.original_pic}" onmousedown="rOpenPic(event, this)" title="右键点击打开原图" >
 									<img class="imgicon pic" src="#{tweet.thumbnail_pic}" />
 								</a>
 							</div>
@@ -275,7 +276,7 @@
 								#{processMsg(tweet.retweeted_status.text)}
 								<?js if(tweet.retweeted_status.thumbnail_pic){ ?>
 								<div>
-									<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.retweeted_status.bmiddle_pic}" original="#{tweet.retweeted_status.original_pic}" >
+									<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.retweeted_status.bmiddle_pic}" title="右键点击打开原图" original="#{tweet.retweeted_status.original_pic}" onmousedown="rOpenPic(event, this)" >
 									<img class="imgicon pic" src="#{tweet.retweeted_status.thumbnail_pic}" /></a>
 								</div>
 								<?js } ?>
