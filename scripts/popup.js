@@ -464,7 +464,7 @@ function initSelectSendAccounts(is_upload){
         }
         li.push(li_tp.format(user));
     }
-    afs.html('TO: ' + li.join(''));
+    afs.html('TO(<a class="all" href="javascript:" onclick="toggleSelectAllSendAccount()">全</a>): ' + li.join(''));
     afs.data('inited', 'true');
 };
 function toggleSelectSendAccount(ele){
@@ -475,6 +475,15 @@ function toggleSelectSendAccount(ele){
         }
     }else{
         _t.addClass('sel');
+    }
+};
+function toggleSelectAllSendAccount(){
+    if($("#accountsForSend .sel").length == $("#accountsForSend li").length){ //已全选
+        $("#accountsForSend li").removeClass('sel');
+        var c_user = getUser();
+        $("#accountsForSend li[uniqueKey=" + c_user.uniqueKey +"]").addClass('sel');
+    }else{
+        $("#accountsForSend li").addClass('sel');
     }
 };
 // <<-- 多用户 END

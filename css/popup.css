@@ -82,8 +82,8 @@ textarea:focus{outline: none;}
 #header .write.active{
 	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#ccc), color-stop(1, #fff));
 }
-#header .quickUpImg{position:absolute; right:120px; top:0; height:12px; color:#555;}
-#header .quickUpImg img{vertical-align:middle;}
+#header .quickUpImg{position:absolute; right:120px; top:0; height:12px; color:#555; display:inline-block; padding:1px 0px;}
+#header .quickUpImg img{vertical-align:bottom;}
 #header .write b{
 	border-color: #666 rgba(255,255,255,.1) rgba(255,255,255,.1);
 	border-style: solid;
@@ -152,6 +152,7 @@ textarea:focus{outline: none;}
 
 /* 用户发送列表选择 */
 #accountsForSend { }
+#accountsForSend .all{color:green;font-weight:bold;}
 #accountsForSend li{
 	-webkit-transition: all 0.8s ease;
 	cursor:pointer;
@@ -456,6 +457,7 @@ div.mainContent{word-wrap: break-word;}
 .userinfo_detail p, .fans p{margin:3px 0;}
 .userinfo_detail .follow, .fans .follow{
 	float:right;
+	margin:0 2px;
 	background: white;
 	border: 1px solid #408CD9;
 	color: #06C;
