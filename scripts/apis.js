@@ -2,8 +2,6 @@
 * @author qleelulu@gmail.com
 */
 
-var result_format = '.json';
-
 var sinaApi = {
 	
 	config: {

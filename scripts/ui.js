@@ -307,15 +307,18 @@ function replaceUrl(m, g1, g2){
 
 function replaceEmotional(m, g1){
 	var tpl = '<img title="{{title}}" src="{{src}}" />';
-    if(g1 && emotionalDict[g1]){
-        var src = emotionalDict[g1];
-        if(src.indexOf('http') != 0){
-            src = '/images/faces/' + src + '.gif';
-        }
-        return tpl.format({title: m, src: src});
-    }
-    if(g1 && TSINA_FACES[g1]) {
-    	return tpl.format({title: m, src: TSINA_FACE_URL_PRE + TSINA_FACES[g1]});
+	if(g1) {
+		if(emotionalDict[g1]){
+	        var src = emotionalDict[g1];
+	        if(src.indexOf('http') != 0){
+	            src = '/images/faces/' + src + '.gif';
+	        }
+	        return tpl.format({title: m, src: src});
+	    }
+	    var other = TSINA_API_EMOTIONS[g1] || TSINA_FACES[g1];
+	    if(other) {
+	    	return tpl.format({title: m, src: TSINA_FACE_URL_PRE + other});
+		}
 	}
     return m;
 };
