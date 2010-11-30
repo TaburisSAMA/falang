@@ -367,7 +367,7 @@
 					<div class="userName"><a  href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" 
 					rhref="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
 					</a>　
-					<?js if(tType =='friends'){ ?>
+					<?js if(user.unfollow === undefined && tType =='friends'){ ?>
 					<a class="follow" href="javascript:" onclick="f_destroy(#{user.id}, this)">取消关注</a>
 					<?js }else{ ?>
 					<a class="follow" href="javascript:" onclick="f_create(#{user.id}, this)"><span class="plus">+</span>加关注</a>

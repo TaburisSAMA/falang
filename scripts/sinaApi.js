@@ -861,6 +861,10 @@ $.extend(TSohuAPI, {
 	    user_timeline: '/statuses/user_timeline/{{id}}'
 	}),
 	
+	reset_count: function(data, callback) {
+		callback();
+	},
+	
 	before_sendRequest: function(args) {
 		if(args.url == this.config.new_message) {
 			// id => user
@@ -969,6 +973,10 @@ $.extend(DiguAPI, {
     rate_limit_status: function(data, callback){
         callback({error:'not support'});
     },
+    
+    reset_count: function(data, callback) {
+		callback();
+	},
 	
 	counts: function(data, callback) {
 		callback();
@@ -1148,6 +1156,10 @@ $.extend(ZuosaAPI, {
 		callback();
 	},
 	
+	reset_count: function(data, callback) {
+		callback();
+	},
+	
 	counts: function(data, callback) {
 		callback();
 	},
@@ -1303,6 +1315,10 @@ $.extend(LeiHouAPI, {
 		callback();
 	},
 	
+	reset_count: function(data, callback) {
+		callback();
+	},
+	
 	counts: function(data, callback) {
 		callback();
 	},
@@ -1440,6 +1456,10 @@ $.extend(Follow5API, {
 //		callback();
 //	},
 	
+	reset_count: function(data, callback) {
+		callback();
+	},
+	
 	counts: function(data, callback) {
 		callback();
 	},
@@ -1561,6 +1581,10 @@ $.extend(TwitterAPI, {
 	},
 	
 	comments_timeline: function(data, callback) {
+		callback();
+	},
+	
+	reset_count: function(data, callback) {
 		callback();
 	},
 	

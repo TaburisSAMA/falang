@@ -631,10 +631,13 @@ function _getFansList(to_t, read_more){
         return;
     }
     var $followers_timeline = $('#followers_timeline');
-    var screen_name = $followers_timeline.attr('screen_name') || c_user.screen_name;
+    var screen_name = $followers_timeline.attr('screen_name');
     var user_id = $followers_timeline.attr('user_id');
-    if(screen_name == c_user.screen_name) {
+    var get_c_user_fans = false;
+    if(screen_name === undefined) {
+    	screen_name = c_user.screen_name;
     	user_id = c_user.id;
+    	get_c_user_fans = true;
     }
     var params = {user:c_user, count:PAGE_SIZE, screen_name: screen_name};
     if(user_id) {
@@ -680,6 +683,9 @@ function _getFansList(to_t, read_more){
             if(users) {
             	var html = '';
                 for(var i in users){
+                	if(!get_c_user_fans) {
+                		users[i].unfollow = true;
+                	}
                     html += bildMsgLi(users[i], to_t); //TODO: 待优化
                 }
                 if(to_t == $("#fans_tab .active").attr('t')) {
