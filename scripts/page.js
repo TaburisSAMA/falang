@@ -36,13 +36,14 @@ var methodManager = {
             var msg_list_wrap = msg_wrap.find('.fa_wave_list');
             var len = request.msgs.length>5 ? 5 : request.msgs.length;
             var showCount = 0;//已经提示的信息数
+            var user = request.user;
             var _msg_user = null;
             for(var i=0; i<request.msgs.length; i++){
                 _msg_user = request.msgs[i].user || request.msgs[i].sender;
-                if(_msg_user.id != request.userId){
+                if(_msg_user.id != user.id){
                     showCount += 1;
                     if(showCount == 1){msg_wrap.show();}//有可显示的信息，就显示
-                    $(builFawaveTip(request.msgs[i]))
+                    $(builFawaveTip(request.msgs[i], user))
                         .appendTo(msg_list_wrap)
                         .fadeIn('slow')
                         .animate({opacity: 1.0}, 8000)
@@ -61,8 +62,8 @@ var methodManager = {
         }
     }
 };
-
-function builFawaveTip(msg){
+//@account: 当前微博所属的账号
+function builFawaveTip(msg, account){
     var user = msg.user || msg.sender;
     var picHtml = '', rtHtml = '';
     if(msg.thumbnail_pic){
@@ -70,7 +71,7 @@ function builFawaveTip(msg){
     }
     if(msg.retweeted_status){
         rtHtml =  '<div class="retweeted"><span class="username">' + msg.retweeted_status.user.screen_name + ': </span>'
-                + processMsg(msg.retweeted_status.text);
+                + processMsg(msg.retweeted_status.text, account);
         if(msg.retweeted_status.thumbnail_pic){
             rtHtml += '<div><a target="_blank" href="'+msg.retweeted_status.original_pic+'"> <img class="imgicon pic" src="' + msg.retweeted_status.thumbnail_pic + '" /> </a> </div>';
         }
@@ -79,11 +80,12 @@ function builFawaveTip(msg){
     var tp =  '<div class="msgRemind">'
             + '  <div class="usericon">'
             + '	   <img src="' + user.profile_image_url.replace('24x24', '48x48') + '" />'
+            + '	   <img src="' + chrome.extension.getURL("images/blogs/"+account.blogType+"_16.png") + '" class="blogType" />'
             + '  </div>'
             + '  <div class="maincontent">'
             + '    <div class="msg">'
             + '       <span class="username">' + user.screen_name + ': </span>'
-            +         processMsg(msg.text) + picHtml 
+            +         processMsg(msg.text, account) + picHtml 
             + '    </div>'
             +      rtHtml
             + '  </div>'
@@ -99,17 +101,17 @@ function close_fawave_remind(){
 /**
  * 处理内容
  */
-var processMsg = function (str, notEncode) {
+var processMsg = function (str, user, notEncode) {
     if(!str){ return ''; }
     if(!notEncode){
         str = HTMLEnCode(str);
     }
-    var domain_sina = 'http://t.sina.com.cn';
+    var config = tapi.get_config(user);
     var re = new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&\-/#=;:!\\+]+)(?:\\](.+)\\[/url\\]|)', 'ig');
     str = str.replace(re, replaceUrl);
-    str = str.replace(/^@([\w\-\u4e00-\u9fa5|\_]+)/g, ' <a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ domain_sina +'/n/$1" title="左键查看微薄，右键打开主页">@$1</a>');
-    str = str.replace(/([^\w#])@([\w\-\u4e00-\u9fa5|\_]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ domain_sina +'/n/$2" title="左键查看微薄，右键打开主页">@$2</a>');
-    str = str.replace(/#([^#]+)#/g, '<a target="_blank" href="'+ domain_sina +'/k/$1" title="Search #$1">#$1#</a>');
+    str = str.replace(/^@([\w\-\u4e00-\u9fa5|\_]+)/g, ' <a target="_blank" href="'+ config.user_home_url +'$1" >@$1</a>');
+    str = str.replace(/([^\w#])@([\w\-\u4e00-\u9fa5|\_]+)/g, '$1<a target="_blank"  href="'+ config.user_home_url +'$2" >@$2</a>');
+    str = str.replace(/#([^#]+)#/g, '<a target="_blank" href="'+ config.search_url +'$1" title="Search #$1">#$1#</a>');
     
     //str = str.replace(/\[([\u4e00-\u9fff,\uff1f]{1,4})\]/g, replaceEmotional);
     
@@ -200,12 +202,10 @@ var QUICK_SEND_TEMPLATE = ' \
                     </button>\
                     <span class="fawaveQuickSendTip"></span>\
                 </div>\
-            <!-- \
                 <span class="fawaveUserInfo">\
                     <span></span>\
                     <a target="_blank"><img src="" /></a><img src="" class="blogType" />\
                 </span>\
-            -->\
             </div> \
             <div class="fawaveInfoMsg"></div>\
         </div>\
@@ -295,7 +295,16 @@ function initSelectSendAccounts(is_upload){
             break; //我只想看看是否有多个用户而已，为什么为什么要这么麻烦
         }
     }
-    if(userLength < 2){ return; } //多个用户才显示
+    if(userLength < 2){
+        if(CURRENT_USER){
+            var f_u_info = $("#fawaveSendMsgWrap .fawaveUserInfo").show();
+            f_u_info.find('span').html(CURRENT_USER.screen_name)
+                .end().find('a').attr('href', CURRENT_USER.t_url)
+                .end().find('a img').attr('src', CURRENT_USER.profile_image_url)
+                .end().find('img.blogType').attr('src', chrome.extension.getURL('images/blogs/' + CURRENT_USER.blogType + '_16.png'));
+        }
+        return;
+    } //多个用户才显示
     var li_tp = '<li class="{{sel}}" uniqueKey="{{uniqueKey}}" >' +
                    '<img src="{{profile_image_url}}" />' +
                    '{{screen_name}}' +

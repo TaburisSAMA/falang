@@ -437,6 +437,7 @@ div.mainContent{word-wrap: break-word;}
 	padding:2px;
 	/*margin-right: 8px;*/
 }
+.tipbox .user_head img, .userinfo_detail .user_head img, .fans .user_head img{width:48px; height:48px;}
 .tipbox .user_info img{border:none; -webkit-box-shadow: none;}
 .tipbox .user_info, 
 .userinfo_detail .user_info, 
