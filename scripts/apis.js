@@ -78,8 +78,13 @@ var sinaApi = {
         str = this.processSearch(str);
        
         str = this.processEmotional(str);
+
+        str = str.replace( /([\uE001-\uE537])/gi, this.getIphoneEmoji );
         
         return str;
+    },
+    getIphoneEmoji: function(str){
+        return "<span class=\"iphoneEmoji "+ str.charCodeAt(0).toString(16).toUpperCase()+"\"></span>"
     },
     processSearch: function (str) {
         str = str.replace(/#([^#]+)#/g, '<a target="_blank" href="'+ this.config.search_url +'$1" title="Search #$1">#$1#</a>');
