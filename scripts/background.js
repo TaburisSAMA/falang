@@ -155,7 +155,7 @@ function checkTimeline(t, p, user_uniqueKey){
                 }
                 var current_user = getUser();
                 if(popupView){
-                    if(!popupView.addTimelineMsgs(tweets[_key].slice(0, sinaMsgs.length), t, user_uniqueKey)){
+                    if(!popupView.addTimelineMsgs(sinaMsgs, t, user_uniqueKey)){
                         setUnreadTimelineCount(_unreadCount, t, user_uniqueKey);
                         popupView.updateDockUserUnreadCount(user_uniqueKey);
                     }else{
