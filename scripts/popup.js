@@ -2,7 +2,7 @@
 
 var fawave = {};
 function getTimelineOffset(t){
-    return $("#" + t + "_timeline ul.list li").length;
+    return $("#" + t + "_timeline ul.list > li").length;
     //return timeline_offset[t] || PAGE_SIZE;
 };
 
