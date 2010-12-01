@@ -379,9 +379,9 @@ function onChangeUser(){
     if(c_user){
         window.c_user = c_user;
     }
-    for(var i in T_LIST[c_user.blogType]){
-        setUnreadTimelineCount(0, T_LIST[[c_user.blogType]][i]);
-    }
+    $.each(T_LIST[c_user.blogType], function(i, value){
+    	setUnreadTimelineCount(0, value);
+    });
     //checkNewMsg();
     //itv = setInterval(checkNewMsg, getRefreshTime());
 };

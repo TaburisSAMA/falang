@@ -403,12 +403,12 @@ function changeUser(uniqueKey){
         $("#accountListDock").find('.current').removeClass('current')
             .end().find('.'+to_user.uniqueKey).addClass('current');
         addUnreadCountToTabs();
-        for(var i in T_LIST[to_user.blogType]){
-            getSinaTimeline(T_LIST[to_user.blogType][i], true);
-            if(cur_t == T_LIST[to_user.blogType][i]) {
-            	cur_t = null; // 不用处理了
-            }
-        }
+//        for(var i in T_LIST[to_user.blogType]){
+//            getSinaTimeline(T_LIST[to_user.blogType][i], true);
+//            if(cur_t == T_LIST[to_user.blogType][i]) {
+//            	cur_t = null; // 不用处理了
+//            }
+//        }
         if(cur_t) { // 需要刷新一下数据
         	$("#tl_tabs li.active").click();
         }

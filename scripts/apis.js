@@ -37,6 +37,7 @@ var sinaApi = {
         update:               '/statuses/update',
         upload:               '/statuses/upload',
         repost:               '/statuses/repost',
+        repost_timeline:      '/statuses/repost_timeline',
         comment:              '/statuses/comment',
         reply:                '/statuses/reply',
         comment_destroy:      '/statuses/comment_destroy/{{id}}',
@@ -1113,7 +1114,7 @@ $.extend(DiguAPI, {
 				args.data.userIdOrName = args.data.screen_name;
 				delete args.data.screen_name;
 			}
-		} else if(args.url = this.config.verify_credentials) {
+		} else if(args.url == this.config.verify_credentials) {
 			args.data.isAllInfo = true;
 			delete args.data.source;
 		}
@@ -1713,6 +1714,22 @@ $.extend(TwitterAPI, {
 	}
 });
 
+var FanfouAPI = $.extend({}, sinaApi);
+
+$.extend(FanfouAPI, {
+	
+	// 覆盖不同的参数
+	config: $.extend({}, sinaApi.config, {
+		host: 'http://api.fanfou.com',
+		source: 'fawave'
+//		oauth_key: 'fawave',
+//        oauth_secret: 'tYU2lK30IlSRhuX8ouUtEx8Uk2fRf8Yk',
+        
+//        oauth_authorize: '/oauth/authenticate',
+//        friends_timeline: '/statuses/home_timeline'
+	})
+});
+
 var T163API = $.extend({}, sinaApi);
 
 $.extend(T163API, {
@@ -1725,8 +1742,110 @@ $.extend(T163API, {
         oauth_secret: 'tYU2lK30IlSRhuX8ouUtEx8Uk2fRf8Yk',
         
         oauth_authorize: '/oauth/authenticate',
-        friends_timeline: '/statuses/home_timeline',
+        friends_timeline: '/statuses/home_timeline'
 	})
+});
+
+// 人间
+var RenjianAPI = $.extend({}, sinaApi);
+
+$.extend(RenjianAPI, {
+	
+	// 覆盖不同的参数
+	config: $.extend({}, sinaApi.config, {
+		host: 'http://api.renjian.com/v2',
+		source: 'fawave', 
+//		repost_pre: 'ZT',
+	    
+	    upload: '/statuses/create',
+	    repost: '/statuses/create'
+	}),
+	
+	// 无需urlencode
+	url_encode: function(text) {
+		return text;
+	},
+	
+	comments_timeline: function(data, callback) {
+		callback();
+	},
+	
+	reset_count: function(data, callback) {
+		callback();
+	},
+	
+	counts: function(data, callback) {
+		callback();
+	},
+	
+	/* status_type	类型，PICTURE/LINK/MUSIC
+	 * picture	上传文件，需是multipart
+	 */
+    format_upload_params: function(user, data, pic) {
+    	data.text = data.status;
+    	delete data.status;
+    	data.status_type = 'PICTURE';
+    	pic.keyname = 'picture';
+    },
+	
+	before_sendRequest: function(args) {
+		if(args.url == this.config.update) {
+			// status => text
+			args.data.text = args.data.status;
+			delete args.data.status;
+		}
+    },
+	
+	format_result_item: function(data, play_load, args) {
+//		if(play_load == 'status' && data.id) {
+//			if(data.mms_img_pre) {
+//				data.thumbnail_pic = data.mms_img_pre;
+//				data.bmiddle_pic = data.mms_img;
+//				data.original_pic = data.bmiddle_pic;
+//				delete data.mms_img_pre;
+//				delete data.mms_img;
+//			}
+//			var tpl = 'http://zuosa.com/Status/';
+//			if(data.in_reply_to_status_id) {
+//				data.retweeted_status = {
+//					id: data.in_reply_to_status_id,
+//					user: {
+//						id: data.in_reply_to_user_id,
+//						screen_name: data.in_reply_to_screen_name,
+//						name: data.in_reply_to_screen_name
+//					}
+//				};
+//				// 查看相关对话的url
+//				data.related_dialogue_url = 'http://zuosa.com/reply?eid=' + data.in_reply_to_status_id;
+//				this.format_result_item(data.retweeted_status.user, 'user', args);
+//				data.retweeted_status.t_url = tpl + data.retweeted_status.id;
+//			}
+//			data.t_url = tpl + data.id;
+//			this.format_result_item(data.user, 'user', args);
+//		} else if(play_load == 'user' && data && data.id) {
+//			data.t_url = 'http://zuosa.com/' + (data.screen_name || data.name);
+//			if(data.profile_image_url) {
+//				data.profile_image_url = data.profile_image_url.replace('/normal/', '/middle/');
+//			}
+//			if(data.homeprovince) {
+//				data.province = data.homeprovince;
+//				data.city = data.province;
+//				delete data.homeprovince;
+//			} else if(data.location) {
+//				var province_city = data.location.split('.');
+//				data.province = province_city[0];
+//				data.city = province_city[1];
+//			}
+//		} 
+//		else if(play_load == 'comment') {
+//			this.format_result_item(data.user, 'user', args);
+//		} else if(play_load == 'message') {
+//			this.format_result_item(data.sender, 'user', args);
+//			data.sender.id = data.sender.screen_name;
+//			this.format_result_item(data.recipient, 'user', args);
+//		}
+//		return data;
+	}
 });
 
 var T_APIS = {
@@ -1737,6 +1856,8 @@ var T_APIS = {
 	'leihou': LeiHouAPI,
 	'follow5': Follow5API,
 	't163': T163API,
+	'fanfou': FanfouAPI,
+	'renjian': RenjianAPI,
 	'twitter': TwitterAPI // fxxx gxfxw first.
 };
 
