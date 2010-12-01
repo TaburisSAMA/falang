@@ -1015,6 +1015,7 @@ $.extend(DiguAPI, {
 	    
 	    support_comment: false,
 	    support_repost: false,
+	    support_max_id: false,
 	    repost_pre: '转载:',
 	    
 	    verify_credentials:   '/account/verify',
