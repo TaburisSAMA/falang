@@ -795,7 +795,7 @@ var sinaApi = {
         	args.data.comment = this.url_encode(args.data.comment);
         }
         // 请求前调用
-        this.before_sendRequest(args);
+        this.before_sendRequest(args, user);
         // 设置认证头部
         this.apply_auth(url, args, user);
         var $this = this;
@@ -1761,10 +1761,11 @@ $.extend(RenjianAPI, {
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.renjian.com/v2',
 		source: 'fawave', 
-//		repost_pre: 'ZT',
 	    
 	    upload: '/statuses/create',
-	    repost: '/statuses/create'
+	    repost: '/statuses/create',
+	    friends_timeline: '/statuses/friends_timeline',
+	    direct_messages: '/direct_messages/receive'
 	}),
 	
 	// 无需urlencode
@@ -1798,63 +1799,48 @@ $.extend(RenjianAPI, {
     	pic.keyname = 'picture';
     },
 	
-	before_sendRequest: function(args) {
+	before_sendRequest: function(args, user) {
 		if(args.url == this.config.update) {
 			// status => text
 			args.data.text = args.data.status;
 			delete args.data.status;
+		} else if(args.url == this.config.friends_timeline){
+			args.data.id = user.id;
 		}
     },
 	
 	format_result_item: function(data, play_load, args) {
-//		if(play_load == 'status' && data.id) {
-//			if(data.mms_img_pre) {
-//				data.thumbnail_pic = data.mms_img_pre;
-//				data.bmiddle_pic = data.mms_img;
-//				data.original_pic = data.bmiddle_pic;
-//				delete data.mms_img_pre;
-//				delete data.mms_img;
-//			}
-//			var tpl = 'http://zuosa.com/Status/';
-//			if(data.in_reply_to_status_id) {
-//				data.retweeted_status = {
-//					id: data.in_reply_to_status_id,
-//					user: {
-//						id: data.in_reply_to_user_id,
-//						screen_name: data.in_reply_to_screen_name,
-//						name: data.in_reply_to_screen_name
-//					}
-//				};
-//				// 查看相关对话的url
-//				data.related_dialogue_url = 'http://zuosa.com/reply?eid=' + data.in_reply_to_status_id;
-//				this.format_result_item(data.retweeted_status.user, 'user', args);
-//				data.retweeted_status.t_url = tpl + data.retweeted_status.id;
-//			}
-//			data.t_url = tpl + data.id;
-//			this.format_result_item(data.user, 'user', args);
-//		} else if(play_load == 'user' && data && data.id) {
-//			data.t_url = 'http://zuosa.com/' + (data.screen_name || data.name);
-//			if(data.profile_image_url) {
-//				data.profile_image_url = data.profile_image_url.replace('/normal/', '/middle/');
-//			}
-//			if(data.homeprovince) {
-//				data.province = data.homeprovince;
-//				data.city = data.province;
-//				delete data.homeprovince;
-//			} else if(data.location) {
-//				var province_city = data.location.split('.');
-//				data.province = province_city[0];
-//				data.city = province_city[1];
-//			}
-//		} 
-//		else if(play_load == 'comment') {
-//			this.format_result_item(data.user, 'user', args);
-//		} else if(play_load == 'message') {
-//			this.format_result_item(data.sender, 'user', args);
-//			data.sender.id = data.sender.screen_name;
-//			this.format_result_item(data.recipient, 'user', args);
-//		}
-//		return data;
+		if(play_load == 'status' && data.id) {
+			if(data.attachment && data.attachment.type == 'PICTURE'){
+				data.thumbnail_pic = data.attachment.thumbnail;
+				data.bmiddle_pic = data.attachment.url;
+				data.original_pic = data.bmiddle_pic;
+				delete data.attachment;
+			}
+			var tpl = 'http://renjian.com/c/';
+			if(data.replyed_status) {
+				data.retweeted_status = data.replyed_status;
+				delete data.replyed_status;
+				this.format_result_item(data.retweeted_status.user, 'user', args);
+				data.retweeted_status.t_url = tpl + data.retweeted_status.id;
+			}
+			data.t_url = tpl + data.id;
+			this.format_result_item(data.user, 'user', args);
+		} else if(play_load == 'user' && data && data.id) {
+			data.friends_count = data.following_count;
+			delete data.following_count;
+			data.t_url = 'http://renjian.com/' + data.id;
+			if(data.profile_image_url) {
+				data.profile_image_url = data.profile_image_url.replace('120x120', '48x48');
+			}
+		} 
+		else if(play_load == 'comment') {
+			this.format_result_item(data.user, 'user', args);
+		} else if(play_load == 'message') {
+			this.format_result_item(data.sender, 'user', args);
+			this.format_result_item(data.recipient, 'user', args);
+		}
+		return data;
 	}
 });
 
