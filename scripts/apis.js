@@ -1779,6 +1779,10 @@ $.extend(RenjianAPI, {
 		callback();
 	},
 	
+	verify_credentials: function(user, callbackFn, data){
+        this.user_show({id: user.userName}, callbackFn);
+	},
+	
 	/* status_type	类型，PICTURE/LINK/MUSIC
 	 * picture	上传文件，需是multipart
 	 */

@@ -10,6 +10,7 @@ var SUPPORT_AUTH_TYPES = {
 	'zuosa': ['baseauth'],
 	'follow5': ['baseauth'],
 	'leihou': ['baseauth'],
+	'renjian': ['baseauth'],
 	'twitter': ['oauth', 'xauth', 'baseauth']
 };
 

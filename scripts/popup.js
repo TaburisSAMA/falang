@@ -107,8 +107,7 @@ function initTabs(){
             return;
         };
         //添加当前激活的状态
-        t.siblings().removeClass('active').end()
-                .addClass('active');
+        t.siblings().removeClass('active').end().addClass('active');
         //切换tab前先保护滚动条位置
         var old_t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
         saveScrollTop(old_t);
@@ -134,11 +133,12 @@ function initTabs(){
         }
         if(!c_ul.find('ul.list').html()){
             getSinaTimeline(c_t);
-        } else if(c_t =='user_timeline'){ //用户自己的微薄，不定期自己获取更新，所以要通知后台去取一下
-            showLoading();
-            var b_view = getBackgroundView();
-            b_view.checkTimeline(c_t);
         }
+//        else if(c_t =='user_timeline'){ //用户自己的微薄，不定期自己获取更新，所以要通知后台去取一下
+//            showLoading();
+//            var b_view = getBackgroundView();
+//            b_view.checkTimeline(c_t);
+//        }
         resetScrollTop(c_t); //复位到上次滚动条的位置
         removeUnreadTimelineCount(c_t);
         t.find(".unreadCount").html('');
