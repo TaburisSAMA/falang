@@ -1,19 +1,10 @@
 // @author qleelulu@gmail.com
 
 var fawave = {};
-var timeline_offset = {};
 function getTimelineOffset(t){
-    return timeline_offset[t] || PAGE_SIZE;
+    return $("#" + t + "_timeline ul.list li").length;
+    //return timeline_offset[t] || PAGE_SIZE;
 };
-function setTimelineOffset(t, offset){
-    var n = getTimelineOffset(t);
-    timeline_offset[t] = n + offset;
-};
-function resetTimelineOffset(t){
-    timeline_offset[t] = PAGE_SIZE;
-};
-//TODO: 检查分页复位情况，貌似不对！
-//var friendsTimeline_offset = replys_offset = messages_offset = PAGE_SIZE;
 
 function initOnLoad(){
     setTimeout(init, 100); //为了打开的时候不会感觉太卡
@@ -376,7 +367,6 @@ function changeUser(uniqueKey){
         showHeaderUserInfo(to_user);
         var b_view = getBackgroundView();
         b_view.onChangeUser();
-        friendsTimeline_offset = replys_offset = messages_offset = PAGE_SIZE;//复位分页
     	// 获取当前的tab
         var activeLi = $("#tl_tabs li.active");
     	var cur_t = activeLi.attr('href').replace(/_timeline$/, '').substring(1);
@@ -823,12 +813,12 @@ function getSinaTimeline(t, notCheckNew){
     if(b_view && b_view.tweets[_key] != undefined && b_view.tweets[_key].length>0){
         var tweetsAll = b_view.tweets[_key];
         var msgs = tweetsAll.slice(0, PAGE_SIZE);
-//        var html = '';
+        var html = '';
         var ids = [];
         for(var i in msgs){
-//            html += bildMsgLi(msgs[i], t); //TODO: 待优化
             var msg = msgs[i];
-        	_ul.append(bildMsgLi(msg, t));
+            html += bildMsgLi(msgs[i], t);
+        	//_ul.append(bildMsgLi(msg, t)); //TODO: 待优化
             ids.push(msg.id);
             if(msg.retweeted_status){
                 ids.push(msg.retweeted_status.id);
@@ -842,6 +832,7 @@ function getSinaTimeline(t, notCheckNew){
                 }
             }
         }
+        _ul.append(html);
         if(ids.length>0){
             if(ids.length > 100){
                 var ids2 = ids.slice(0, 99);
@@ -1095,12 +1086,13 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
 };
 
 function addPageMsgs(msgs, t, append){
-    setTimelineOffset(t, msgs.length);
+    //setTimelineOffset(t, msgs.length);
     var ids = [];
-    var _ul = $("#" + t + "_timeline ul.list");
+    var _ul = $("#" + t + "_timeline ul.list"), html = '';
     var method = append ? 'append' : 'prepend';
     for(var i in msgs){
-    	_ul[method](bildMsgLi(msgs[i], t));
+    	//_ul[method](bildMsgLi(msgs[i], t));
+        html += bildMsgLi(msgs[i], t);
         ids.push(msgs[i].id);
         if(msgs[i].retweeted_status){
             ids.push(msgs[i].retweeted_status.id);
@@ -1114,6 +1106,7 @@ function addPageMsgs(msgs, t, append){
             }
         }
     }
+    _ul[method](html);
     if(ids.length>0){
         if(ids.length > 100){
             var ids2 = ids.slice(0, 99);

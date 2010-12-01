@@ -23,17 +23,12 @@ function getMaxMsgId(t, user_uniqueKey){
     if(!user_uniqueKey){
         user_uniqueKey = getUser().uniqueKey;
     }
-    var _key = user_uniqueKey + t + '_max_msg_id';
-    return MAX_MSG_ID[_key];
+    var _key = user_uniqueKey + t + '_tweets';
+    var _t_tweets = tweets[_key];
+    var _last_id = (_t_tweets && _t_tweets.length) ? (_t_tweets[_t_tweets.length-1].id - 1) : null;
+    return _last_id;
 };
 
-function setMaxMsgId(t, id, user_uniqueKey){
-    if(!user_uniqueKey){
-        user_uniqueKey = getUser().uniqueKey;
-    }
-    var _key = user_uniqueKey + t + '_max_msg_id';
-    MAX_MSG_ID[_key] = Number(id)-1;
-};
 
 function getLastPage(t, user_uniqueKey){
     if(!user_uniqueKey){
@@ -176,25 +171,22 @@ function checkTimeline(t, p, user_uniqueKey){
                 if(_last_id){
                     setLastMsgId(_last_id, t, user_uniqueKey);
                 }
-                if(_max_id && !getMaxMsgId(t, user_uniqueKey)){
-                    setMaxMsgId(t, _max_id, user_uniqueKey);
-                }
             }
         } else {
             setUnreadTimelineCount(0, t, user_uniqueKey);
         }
         //window.checking[t] = false;
         setDoChecking(user_uniqueKey, t, 'checking', false);
-        if(isFirstTime){//如果是第一次,则获取以前的微薄
-            if(!tweets[_key] || tweets[_key].length < PAGE_SIZE){
+        if(isFirstTime){//如果是第一次(启动插件时),则获取以前的微薄
+            if(!tweets[_key] || tweets[_key].length < PAGE_SIZE){ //如果第一次(启动插件时)获取的新信息少于分页大小，则加载一页以前的微薄，做缓冲
                 getTimelinePage(user_uniqueKey, t);
             }else if(popupView){
                 popupView.showReadMore(t);
-                popupView.setTimelineOffset(t, sinaMsgs.length);
+                //popupView.setTimelineOffset(t, sinaMsgs.length);
             }
         } else if(popupView && sinaMsgs && sinaMsgs.length >= PAGE_SIZE){
             popupView.showReadMore(t);
-            popupView.setTimelineOffset(t, sinaMsgs.length);
+            //popupView.setTimelineOffset(t, sinaMsgs.length);
         }
         hideLoading();
     });
@@ -292,19 +284,16 @@ function getTimelinePage(user_uniqueKey, t, p){
                 }
             }
 
-            if(_max_id){
-                setMaxMsgId(t, _max_id, user_uniqueKey);
-            }
             if(!support_max_id) {
 	            setLastPage(t, page, user_uniqueKey);
             }
         } else {
             var current_user = getUser();
+            //防止获取分页内容后已经切换了用户
             if(current_user.uniqueKey == c_user.uniqueKey){ //TODO:更详细逻辑有待改进
                 var popupView = getPopupView();
                 if(popupView){
                     popupView.hideReadMore(t);
-                    popupView.hideLoading();
                 }
             }
             if(!support_max_id) { // 到底了
@@ -376,9 +365,9 @@ function onChangeUser(){
     if(c_user){
         window.c_user = c_user;
     }
-    $.each(T_LIST[c_user.blogType], function(i, value){
-    	setUnreadTimelineCount(0, value);
-    });
+    //$.each(T_LIST[c_user.blogType], function(i, value){
+    //	setUnreadTimelineCount(0, value);
+    //});
     //checkNewMsg();
     //itv = setInterval(checkNewMsg, getRefreshTime());
 };
