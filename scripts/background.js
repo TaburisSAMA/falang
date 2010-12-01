@@ -263,7 +263,7 @@ function getTimelinePage(user_uniqueKey, t, p){
                 sinaMsgs[i].readed = true;
             }
             // 判断第一个是否最大id，如果是，则删除，twitter很强大，id大到js无法计算
-            if(params.max_id && String(params.max_id) == String(sinaMsgs[0].id)){
+            if(tweets.length > 0 && String(tweets[tweets.length-1].id) == String(sinaMsgs[0].id)){
             	sinaMsgs.splice(0, 1);
             }
             tweets[_key] = tweets[_key].concat(sinaMsgs);
