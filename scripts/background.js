@@ -118,7 +118,6 @@ function checkTimeline(t, p, user_uniqueKey){
     	}
         var isFirstTime = false;
         var _last_id = '';
-        var _max_id = '';
         //TODO: 这里不确定会不会有闭包造成的c_user变量覆盖问题，待测试
         if(!c_user){
             //window.checking[t] = false;
@@ -139,11 +138,15 @@ function checkTimeline(t, p, user_uniqueKey){
         if(sinaMsgs && sinaMsgs.length > 0){
             _last_id = sinaMsgs[0].id;
             var has_news = true;
-            if(params.since_id && Number(_last_id) == Number(params.since_id)){
+            if(params.since_id && String(_last_id) == String(params.since_id)){
             	has_news = false;
             }
             if(has_news) {
-            	_max_id = sinaMsgs[sinaMsgs.length-1].id;
+            	// 判断新微博列表的最后一个的id是否等于缓存最新的一个，如果是，则删除
+            	var index = sinaMsgs.length - 1;
+            	if(tweets[_key].length > 0 && String(sinaMsgs[index].id) == String(tweets[_key][0].id)){
+            		sinaMsgs.splice(index, 1);
+            	}
                 tweets[_key] = sinaMsgs.concat(tweets[_key]);
                 
                 var _unreadCount = 0, _msg_user = null;
