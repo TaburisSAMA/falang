@@ -414,7 +414,7 @@ function refreshAccountWarp(user, stat){
             stat.errorCount++;
         } else {
             $.extend(user, data); //合并，以data的数据为准
-            user.uniqueKey = data.blogType + '_' + data.id;
+            user.uniqueKey = user.blogType + '_' + user.id;
             stat.successCount++;
         }
         if((stat.errorCount + stat.successCount) == stat.userList.length){

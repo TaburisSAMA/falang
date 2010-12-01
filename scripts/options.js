@@ -673,7 +673,8 @@ function refreshAccountWarp(user, stat){
             stat.errorCount++;
         } else {
             $.extend(user, data); //合并，以data的数据为准
-            user.uniqueKey = data.blogType + '_' + data.id;
+            user.uniqueKey = user.blogType + '_' + user.id;
+//            stat.userList[i] = user;
 //            userList[data.uniqueKey] = data;
             stat.successCount++;
             _showMsg('成功刷新(' + blogName + ')' + user.screen_name + ' 的信息');
