@@ -10,7 +10,7 @@ body #fa_wave_msg_wrap{
    right:0;
    font-size:12px;
    padding:0;
-   margin:0;
+   margin:0 2px 0 0;
 }
 body #fa_wave_msg_wrap *, body #fawaveSendMsgWrap *{
   /*font-family: "微软雅黑", "雅黑", "Arial", "sans-serif";*/
@@ -90,7 +90,7 @@ body #fa_wave_msg_wrap .msgRemind{
 	border-style:solid;
 	border-color:#ddd #ddd #eee #ddd;
 	-webkit-border-radius:6px;
-	-webkit-box-shadow:0 1px 1px #bbb;
+	-webkit-box-shadow:0 1px 5px #888;
 }
 body #fa_wave_msg_wrap .msgRemind .usericon{
 	float: left;

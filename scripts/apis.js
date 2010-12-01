@@ -106,7 +106,7 @@ var sinaApi = {
     },
     _replaceEmotional: function(m, g1){
         var tpl = '<img title="{{title}}" src="{{src}}" />';
-        if(g1) {
+        if(window.emotionalDict && g1) {
             if(emotionalDict[g1]){
                 var src = emotionalDict[g1];
                 if(src.indexOf('http') != 0){
@@ -1009,6 +1009,7 @@ $.extend(DiguAPI, {
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.minicloud.com.cn',
+        user_home_url: 'http://digu.com/',
         search_url: 'http://digu.com/search/',
 		source: 'fawave', 
 	    source2: 'fawave',
@@ -1041,7 +1042,7 @@ $.extend(DiguAPI, {
         return str;
     },
     _replaceEmotional: function(m, g, g2){
-        if(g2 && DIGU_EMOTIONS[g2]){
+        if(g2 && window.DIGU_EMOTIONS && DIGU_EMOTIONS[g2]){
             return '<img src="http://images.digu.com/web_res_v1/emotion/' + DIGU_EMOTIONS[g2] + '.gif" />';
         }else if(g && (g>0) && (g<33)){
             return '<img src="http://images.digu.com/web_res_v1/emotion/' + g + '.gif" />';
@@ -1216,6 +1217,7 @@ $.extend(ZuosaAPI, {
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.zuosa.com',
+        user_home_url: 'http://zuosa.com/',
 		source: 'fawave', 
 		repost_pre: 'ZT',
 	    
@@ -1368,6 +1370,7 @@ $.extend(LeiHouAPI, {
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://leihou.com',
+        user_home_url: 'http://leihou.com/',
 		source: 'fawave', 
 		repost_pre: 'RT',
 	    
@@ -1502,6 +1505,7 @@ $.extend(Follow5API, {
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.follow5.com/api',
+        user_home_url: 'http://follow5.com',
 		source: '34140E56A31887F770053C2AF6D7B2AC', // 需要申请
 		repost_pre: '转发:',
 	    
@@ -1643,6 +1647,7 @@ $.extend(TwitterAPI, {
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.twitter.com',
+        user_home_url: 'http://twitter.com/',
         search_url: 'http://twitter.com/search?q=',
 		source: 'fawave', 
         oauth_key: 'i1aAkHo2GkZRWbUOQe8zA',

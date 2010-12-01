@@ -43,7 +43,11 @@ var methodManager = {
                 if(_msg_user.id != user.id){
                     showCount += 1;
                     if(showCount == 1){msg_wrap.show();}//有可显示的信息，就显示
-                    $(builFawaveTip(request.msgs[i], user))
+                    $(builFawaveTip(request.msgs[i], user)).find('a').each(function(){
+                            if($(this).attr('rhref')){
+                                $(this).attr('href', $(this).attr('rhref'));
+                            }
+                        }).end()
                         .appendTo(msg_list_wrap)
                         .fadeIn('slow')
                         .animate({opacity: 1.0}, 8000)
@@ -71,7 +75,7 @@ function builFawaveTip(msg, account){
     }
     if(msg.retweeted_status){
         rtHtml =  '<div class="retweeted"><span class="username">' + msg.retweeted_status.user.screen_name + ': </span>'
-                + tapi.processMsg(account, msg.retweeted_status.text, account);
+                + tapi.processMsg(account, msg.retweeted_status.text);
         if(msg.retweeted_status.thumbnail_pic){
             rtHtml += '<div><a target="_blank" href="'+msg.retweeted_status.original_pic+'"> <img class="imgicon pic" src="' + msg.retweeted_status.thumbnail_pic + '" /> </a> </div>';
         }
@@ -85,7 +89,7 @@ function builFawaveTip(msg, account){
             + '  <div class="maincontent">'
             + '    <div class="msg">'
             + '       <span class="username">' + user.screen_name + ': </span>'
-            +         tapi.processMsg(account, msg.text, account) + picHtml 
+            +         tapi.processMsg(account, msg.text) + picHtml 
             + '    </div>'
             +      rtHtml
             + '  </div>'
@@ -149,6 +153,10 @@ function fawaveFormatText(msg, values, filter) {
     return msg.replace(pattern, function(match, key) {
         return jQuery.isFunction(filter) ? filter((values[key] || eval('(values.' +key+')')), key) : (values[key] || eval('(values.' +key+')')); //values[key];
     });	
+};
+// 让所有字符串拥有模板格式化
+String.prototype.format = function(data) {
+	return fawaveFormatText(this, data);
 };
 /* 在页面上显示新信息 end */
 
