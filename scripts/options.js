@@ -131,6 +131,11 @@ $(function(){
     	});
     	saveUserList(new_list);
     });
+
+    //检查url中有没 #user_set 之类的，有就定位到指定tab
+    if(window.location.hash){
+        $("#navigation li[target_id=" + window.location.hash + "] a").click();
+    }
 });
 
 function disabledUserEditBtns(){
@@ -551,8 +556,8 @@ function toggleStopAccount(uniqueKey, is_stop){
     });
     if(user){
     	user.disabled = (is_stop == undefined) ? (!user.disabled) : is_stop;
-        saveUserList(userList);
         var c_user = getUser();
+        saveUserList(userList);
         if(c_user && c_user.uniqueKey.toLowerCase() == uniqueKey.toLowerCase()){
             var b_view = getBackgroundView();
             if(b_view){

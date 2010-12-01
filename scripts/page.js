@@ -71,7 +71,7 @@ function builFawaveTip(msg, account){
     }
     if(msg.retweeted_status){
         rtHtml =  '<div class="retweeted"><span class="username">' + msg.retweeted_status.user.screen_name + ': </span>'
-                + processMsg(msg.retweeted_status.text, account);
+                + tapi.processMsg(account, msg.retweeted_status.text, account);
         if(msg.retweeted_status.thumbnail_pic){
             rtHtml += '<div><a target="_blank" href="'+msg.retweeted_status.original_pic+'"> <img class="imgicon pic" src="' + msg.retweeted_status.thumbnail_pic + '" /> </a> </div>';
         }
@@ -85,7 +85,7 @@ function builFawaveTip(msg, account){
             + '  <div class="maincontent">'
             + '    <div class="msg">'
             + '       <span class="username">' + user.screen_name + ': </span>'
-            +         processMsg(msg.text, account) + picHtml 
+            +         tapi.processMsg(account, msg.text, account) + picHtml 
             + '    </div>'
             +      rtHtml
             + '  </div>'
@@ -98,39 +98,12 @@ function close_fawave_remind(){
     $("#fa_wave_msg_wrap").hide();
 };
 
-/**
- * 处理内容
- */
-var processMsg = function (str, user, notEncode) {
-    if(!str){ return ''; }
-    if(!notEncode){
-        str = HTMLEnCode(str);
-    }
-    var config = tapi.get_config(user);
-    var re = new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&\-/#=;:!\\+]+)(?:\\](.+)\\[/url\\]|)', 'ig');
-    str = str.replace(re, replaceUrl);
-    str = str.replace(/^@([\w\-\u4e00-\u9fa5|\_]+)/g, ' <a target="_blank" href="'+ config.user_home_url +'$1" >@$1</a>');
-    str = str.replace(/([^\w#])@([\w\-\u4e00-\u9fa5|\_]+)/g, '$1<a target="_blank"  href="'+ config.user_home_url +'$2" >@$2</a>');
-    str = str.replace(/#([^#]+)#/g, '<a target="_blank" href="'+ config.search_url +'$1" title="Search #$1">#$1#</a>');
-    
-    //str = str.replace(/\[([\u4e00-\u9fff,\uff1f]{1,4})\]/g, replaceEmotional);
-    
-    return str;
-};
-
 // HTML 编码
 function HTMLEnCode(str){
     if(!str){ return ''; }
     str = str.replace(/</ig, '&lt;');
     str = str.replace(/>/ig, '&gt;');
     return str;
-};
-
-function replaceUrl(m, g1, g2){
-    if(g1.indexOf('http') != 0){
-        g1 = 'http://' + g1;
-    }
-    return '<a target="_blank" href="' + g1 + '" title="' + g1 + '">' + (g2||g1) + '</a>';
 };
 
 /*

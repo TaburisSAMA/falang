@@ -115,7 +115,7 @@ function getUser(){
     if(c_user && c_user.uniqueKey){
         window.c_user = c_user;
     }else{
-        var userList = localStorage.getObject(USER_LIST_KEY);
+        var userList = getUserList();
         if(userList){
             for(var key in userList){
                 c_user = userList[key];

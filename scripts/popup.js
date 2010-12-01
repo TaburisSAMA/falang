@@ -34,7 +34,7 @@ var isNewTabSelected = window.is_new_win_popup ? true : false; //如果是弹出
 function init(){
     var c_user = getUser();
     if(!c_user){
-        chrome.tabs.create({url: 'options.html'});
+        chrome.tabs.create({url: 'options.html#user_set'});
         return;
     }else if(!c_user.uniqueKey){
         chrome.tabs.create({url: 'options.html#no_uniqueKey'});
