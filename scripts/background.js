@@ -249,10 +249,8 @@ function getTimelinePage(user_uniqueKey, t, p){
     		return;
     	}
         if(sinaMsgs && sinaMsgs.length > 0){
-            var _max_id = '';
             //TODO: 这里不确定会不会有闭包造成的c_user变量覆盖问题，待测试
             if(!c_user){
-                //window.paging[t] = false;
                 setDoChecking(user_uniqueKey, t, 'paging', false);
                 return;
             }
@@ -264,8 +262,11 @@ function getTimelinePage(user_uniqueKey, t, p){
             for(var i in sinaMsgs){
                 sinaMsgs[i].readed = true;
             }
+            // 判断第一个是否最大id，如果是，则删除，twitter很强大，id大到js无法计算
+            if(params.max_id && String(params.max_id) == String(sinaMsgs[0].id)){
+            	sinaMsgs.splice(0, 1);
+            }
             tweets[_key] = tweets[_key].concat(sinaMsgs);
-            _max_id = sinaMsgs[sinaMsgs.length-1].id;
 
 //            log('finish getTimelinePage ' + user_uniqueKey + ' ' + t + ': ' + sinaMsgs.length 
 //            		+ ' page:' + params.page + ' max_id:' + params.max_id);
@@ -300,9 +301,7 @@ function getTimelinePage(user_uniqueKey, t, p){
 	            setLastPage(t, 0, user_uniqueKey);
             }
         }
-
         hideLoading();
-        //window.paging[t] = false;
         setDoChecking(user_uniqueKey, t, 'paging', false);
     });
 };
