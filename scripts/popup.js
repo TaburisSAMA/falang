@@ -1080,7 +1080,7 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
         }
         return false;
     }else{
-    	addPageMsgs(msgs.reverse(), t, false);
+    	addPageMsgs(msgs, t, false);
     }
     return true;
 };
