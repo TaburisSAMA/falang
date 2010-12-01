@@ -396,7 +396,7 @@ function getTheme(){
             return t;
         }
     }
-    return 'default';
+    return 'pip_io';
 };
 
 function setTheme(theme){
