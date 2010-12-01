@@ -357,9 +357,6 @@ function showNewMsg(msgs, t, user){
 
 function checkNewMsg(){
     try{
-        //checkTimeline('friends_timeline');
-        //checkTimeline('mentions');
-        //checkTimeline('direct_messages');
         var userList = getUserList();
         for(var j in userList){
             var user = userList[j];
@@ -475,7 +472,7 @@ r_method_manager = {
     },
     notifyCheckNewMsg: function(request, sender, sendResponse){
         setTimeout(checkNewMsg, 1000);
-    },
+    }
 };
 
 
