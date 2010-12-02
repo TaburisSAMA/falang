@@ -714,10 +714,10 @@ function getDictLength(d) {
 // 如果是append
 // 判断最后一个等于最大id的，将它和它前面的删除，twitter很强大，id大到js无法计算
 function filterDatasByMaxId(datas, max_id, append){
-    if(max_id){
+    if(max_id && datas && datas.length > 0){
     	var found = false;
     	var index = 0;
-    	while(max_id == String(datas[index].id)){
+    	while(datas[index] && max_id == String(datas[index].id)){
     		index++;
     		found = true;
     	}

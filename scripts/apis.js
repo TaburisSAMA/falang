@@ -21,6 +21,7 @@ var sinaApi = {
 		// 是否支持max_id 分页
 		support_max_id: true,
 		support_destroy_msg: true, //是否支持删除私信
+		support_sent_direct_messages: true, //是否支持自己发送的私信
         
 		// api
         public_timeline:      '/statuses/public_timeline',
@@ -45,6 +46,7 @@ var sinaApi = {
         destroy:              '/statuses/destroy/{{id}}',
         destroy_msg:          '/direct_messages/destroy/{{id}}',
         direct_messages:      '/direct_messages', 
+        sent_direct_messages: '/direct_messages/sent', 
         new_message:          '/direct_messages/new',
         verify_credentials:   '/account/verify_credentials',
         rate_limit_status:    '/account/rate_limit_status',
@@ -410,6 +412,36 @@ var sinaApi = {
             data: data
         };
         this._sendRequest(params, callbackFn);
+//        // 是否支持获取自己发送的私信
+//        if(this.config.support_sent_direct_messages){
+//        	var sent_params = {
+//        		url: this.config.sent_direct_messages,
+//                type: 'get',
+//                play_load: 'message',
+//                data: data
+//            };
+//        	var me = this;
+//            me._sendRequest(params, function(datas, textStatus, error_code){
+//            	var results = datas;
+//            	if(!error_code){ // 获取发送的私信
+//            		me._sendRequest(sent_params, function(sent_datas, textStatus, error_code){
+//            			if(!error_code){
+//            				results = results.concat(sent_datas).sort(function(i, j){
+//            					if(i.id < j.id){
+//            						return 1;
+//            					}
+//            					return -1;
+//            				});
+//            			}
+//            			callbackFn(results, 'success', null);
+//            		});
+//            	} else {
+//            		callbackFn(results, textStatus, error_code);
+//            	}
+//            });
+//        } else {
+//        	this._sendRequest(params, callbackFn);
+//        }
 	},
 
 	// id
@@ -785,7 +817,7 @@ var sinaApi = {
 	    });
         if(!user){
             showMsg('用户未指定');
-            callbackFn({}, 'error', '400');
+            callbackFn({}, 'error', 400);
             return;
         }
         if(args.data.status){
@@ -824,20 +856,28 @@ var sinaApi = {
                         data = JSON.parse(data);
                     }
                     catch(err){
-                        data = {error:callmethod + ' 服务器返回结果错误，本地解析错误。' + err, error_code:500};
-                        textStatus = 'error';
+                    	if(data.indexOf('{"wrong":"no data"}') > -1){
+                    		data = [];
+                    	} else {
+                        	var old_data = data;
+                            data = {error:callmethod + ' 服务器返回结果错误，本地解析错误。' + err, error_code:500};
+                            textStatus = 'error';
+                    	}
                     }
             	}
                 var error_code = null;
                 if(data){
-                    if(data.error || data.error_code){
-                        showMsg(callmethod + ' error: ' + (data.error || data.wrong) + ', error_code: ' + data.error_code);
-                        error_code = data.error_code || error_code;
+                	error_code = data.error_code || data.code;
+                    if(data.error || error_code){
+                        showMsg(callmethod + ' error: ' + (data.error || data.wrong) 
+                        + ', error_code: ' + error_code);
                     } else {
                         //成功再去格式化结果
                     	data = $this.format_result(data, play_load, args);
                     }
-                }else{error_code = 400;}
+                } else {
+                	error_code = 400;
+                }
                 callbackFn(data, textStatus, error_code);
                 hideLoading();
             },
@@ -1017,6 +1057,7 @@ $.extend(DiguAPI, {
 	    support_comment: false,
 	    support_repost: false,
 	    support_max_id: false,
+	    support_sent_direct_messages: false,
 	    repost_pre: '转载:',
 	    
 	    verify_credentials:   '/account/verify',

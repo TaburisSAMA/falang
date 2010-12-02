@@ -1099,16 +1099,18 @@ function addPageMsgs(msgs, t, append){
     for(var i in msgs){
     	//_ul[method](bildMsgLi(msgs[i], t));
         html += bildMsgLi(msgs[i], t);
-        ids.push(msgs[i].id);
-        if(msgs[i].retweeted_status){
-            ids.push(msgs[i].retweeted_status.id);
-            if(msgs[i].retweeted_status.retweeted_status) {
-            	ids.push(msgs[i].retweeted_status.retweeted_status.id);
-            }
-        }else if(msgs[i].status){
-            ids.push(msgs[i].status.id);
-            if(msgs[i].status.retweeted_status) {
-            	ids.push(msgs[i].status.retweeted_status.id);
+        if(t != 'direct_messages'){
+        	ids.push(msgs[i].id);
+            if(msgs[i].retweeted_status){
+                ids.push(msgs[i].retweeted_status.id);
+                if(msgs[i].retweeted_status.retweeted_status) {
+                	ids.push(msgs[i].retweeted_status.retweeted_status.id);
+                }
+            }else if(msgs[i].status){ // 评论
+                ids.push(msgs[i].status.id);
+                if(msgs[i].status.retweeted_status) {
+                	ids.push(msgs[i].status.retweeted_status.id);
+                }
             }
         }
     }
