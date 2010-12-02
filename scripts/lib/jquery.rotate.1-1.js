@@ -33,6 +33,8 @@ jQuery.fn.rotate = function(angle,whence) {
 			canvas.oImage = p.oImage;
 		}
 
+        canvas.onclick = function(){ $(document).trigger('close.facebox'); };
+
 		canvas.style.width = canvas.width = Math.abs(costheta*canvas.oImage.width) + Math.abs(sintheta*canvas.oImage.height);
 		canvas.style.height = canvas.height = Math.abs(costheta*canvas.oImage.height) + Math.abs(sintheta*canvas.oImage.width);
 

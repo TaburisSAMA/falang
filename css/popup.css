@@ -333,7 +333,7 @@ div.mainContent{word-wrap: break-word;}
 	padding-left:10px;
 }
 
-#facebox_overlay, .cur_min{cursor:url(../images/small.cur), auto;}
+#facebox_overlay, #facebox canvas, .cur_min{cursor:url(../images/small.cur), auto;}
 
 /*>>>> reply start <<<<*/
 #ye_dialog_window {
