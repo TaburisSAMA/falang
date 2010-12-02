@@ -347,7 +347,7 @@ function sendFawaveMsg(){
             var uniqueKey = $(this).attr('uniqueKey');
             $.each(USER_LIST, function(i, item){
             	if(item.uniqueKey == uniqueKey){
-            		users.push(_user);
+            		users.push(item);
             		return false;
             	}
             });

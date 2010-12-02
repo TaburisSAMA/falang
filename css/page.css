@@ -20,6 +20,7 @@ body #fa_wave_msg_wrap *, body #fawaveSendMsgWrap *{
   padding:0;
   font-weight:normal;
   float:none;
+  width:auto;
 }
 body #fa_wave_msg_wrap a:link,
 body #fa_wave_msg_wrap a:active,
