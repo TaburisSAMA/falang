@@ -859,7 +859,7 @@ var sinaApi = {
                     	if(data.indexOf('{"wrong":"no data"}') > -1){
                     		data = [];
                     	} else {
-                        	var old_data = data;
+//                        	var old_data = data;
                             data = {error:callmethod + ' 服务器返回结果错误，本地解析错误。' + err, error_code:500};
                             textStatus = 'error';
                     	}
