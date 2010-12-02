@@ -288,7 +288,7 @@ function syncUnreadCountToSinaPage(t, user_uniqueKey){
             break;
     }
     if(tl_type){
-        sinaApi.reset_count({'user':c_user, 'type':tl_type}, function(users, textStatus, statuCode){
+        tapi.reset_count({'user':c_user, 'type':tl_type}, function(users, textStatus, statuCode){
             //TODO: reset success
         });
     }
