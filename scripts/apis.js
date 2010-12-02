@@ -412,7 +412,7 @@ var sinaApi = {
             data: data
         };
         this._sendRequest(params, callbackFn);
-//        // 是否支持获取自己发送的私信
+        // 是否支持获取自己发送的私信
 //        if(this.config.support_sent_direct_messages){
 //        	var sent_params = {
 //        		url: this.config.sent_direct_messages,
@@ -421,7 +421,7 @@ var sinaApi = {
 //                data: data
 //            };
 //        	var me = this;
-//            me._sendRequest(params, function(datas, textStatus, error_code){
+//        	var callback = function(datas, textStatus, error_code){
 //            	var results = datas;
 //            	if(!error_code){ // 获取发送的私信
 //            		me._sendRequest(sent_params, function(sent_datas, textStatus, error_code){
@@ -438,7 +438,8 @@ var sinaApi = {
 //            	} else {
 //            		callbackFn(results, textStatus, error_code);
 //            	}
-//            });
+//            };
+//        	this._sendRequest(params, callback);
 //        } else {
 //        	this._sendRequest(params, callbackFn);
 //        }
@@ -856,7 +857,7 @@ var sinaApi = {
                         data = JSON.parse(data);
                     }
                     catch(err){
-                    	if(data.indexOf('{"wrong":"no data"}') > -1){
+                    	if(data.indexOf('{"wrong":"no data"}') > -1 || data == ''){
                     		data = [];
                     	} else {
 //                        	var old_data = data;
