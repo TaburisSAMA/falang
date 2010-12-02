@@ -11,15 +11,18 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 
 var methodManager = {
     showNewMsgInPage: function(request, sender, sendResponse){
+        if(window.fawave_not_alert){ return; }
         if(request.msgs && request.msgs.length>0){
             var msg_wrap = $("#fa_wave_msg_wrap");
             if(msg_wrap.length < 1){
                 msg_wrap = $('<div id="fa_wave_msg_wrap">\
                                 <div class="fawave_btns clearFix">\
 	                                <a class="fawave_but fawave_logo"><img src="' + chrome.extension.getURL("icons/icon48.png") + '" />信息提示</a>\
-	                                <a href="javascript:void(0)" class="close_fawave_remind fawave_but fr">关闭</a>\
+	                                <a href="javascript:void(0)" class="fawave_not_alert fawave_but">本页不再提示</a>\
+                                    <a href="javascript:void(0)" class="close_fawave_remind fawave_but fr">关闭</a>\
                                 </div><div class="fa_wave_list"></div></div>').appendTo('body');
                 msg_wrap.find('.close_fawave_remind').click(function(){ close_fawave_remind(); });
+                msg_wrap.find('.fawave_not_alert').click(function(){ window.fawave_not_alert = true; close_fawave_remind(); });
                 msg_wrap.hover(function(){
                     $("#fa_wave_msg_wrap .fa_wave_list > div").stop(true).css('opacity', '1.0');
                 }, function(){
