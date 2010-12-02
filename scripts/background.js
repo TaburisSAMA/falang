@@ -142,13 +142,10 @@ function checkTimeline(t, p, user_uniqueKey){
             	has_news = false;
             }
             if(has_news) {
-            	// 判断新微博列表的最后一个的id是否等于缓存最新的一个，如果是，则删除
-            	var index = sinaMsgs.length - 1;
-            	if(tweets[_key].length > 0 && String(sinaMsgs[index].id) == String(tweets[_key][0].id)){
-            		sinaMsgs.splice(index, 1);
+            	if(tweets[_key].length > 0){
+            		sinaMsgs = filterDatasByMaxId(sinaMsgs, String(tweets[_key][0].id), false);
             	}
                 tweets[_key] = sinaMsgs.concat(tweets[_key]);
-                
                 var _unreadCount = 0, _msg_user = null;
                 for(var i in sinaMsgs){
                     _msg_user = sinaMsgs[i].user || sinaMsgs[i].sender;
@@ -265,11 +262,9 @@ function getTimelinePage(user_uniqueKey, t, p){
             for(var i in sinaMsgs){
                 sinaMsgs[i].readed = true;
             }
-            // 判断第一个是否最大id，如果是，则删除，twitter很强大，id大到js无法计算
+            // 判断最后一个等于最大id的，将它和它前面的删除，twitter很强大，id大到js无法计算
             var max_id = getMaxMsgId(t, user_uniqueKey);
-            if(max_id > 0 && String(max_id) == String(sinaMsgs[0].id)){
-            	sinaMsgs.splice(0, 1);
-            }
+            sinaMsgs = filterDatasByMaxId(sinaMsgs, max_id, true);
             tweets[_key] = tweets[_key].concat(sinaMsgs);
 
 //            log('finish getTimelinePage ' + user_uniqueKey + ' ' + t + ': ' + sinaMsgs.length 

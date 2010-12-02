@@ -707,3 +707,27 @@ function getDictLength(d) {
 	}
 	return length;
 };
+
+// 根据maxid删除重复的数据
+// 如果是prepend
+// 判断最后一个等于最大id的，将它和它后面的删除
+// 如果是append
+// 判断最后一个等于最大id的，将它和它前面的删除，twitter很强大，id大到js无法计算
+function filterDatasByMaxId(datas, max_id, append){
+    if(max_id){
+    	var found = false;
+    	var index = 0;
+    	while(max_id == String(datas[index].id)){
+    		index++;
+    		found = true;
+    	}
+    	if(found){
+    		if(append){
+    			datas = datas.slice(index);
+    		} else {
+    			datas = datas.slice(0, index);
+    		}
+    	}
+    }
+    return datas;
+}

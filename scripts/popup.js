@@ -1085,11 +1085,17 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
     return true;
 };
 
+// 添加分页数据，并且自动删除重复的数据，返回删除重复的数据集
 function addPageMsgs(msgs, t, append){
-    //setTimelineOffset(t, msgs.length);
+	if(!msgs || msgs.length == 0){
+		return;
+	}
     var ids = [];
     var _ul = $("#" + t + "_timeline ul.list"), html = '';
     var method = append ? 'append' : 'prepend';
+    var direct = append ? 'last' : 'first';
+    var max_id = $("#" + t + "_timeline ul.list li.tweetItem:" + direct).attr('did');
+    msgs = filterDatasByMaxId(msgs, max_id, append);
     for(var i in msgs){
     	//_ul[method](bildMsgLi(msgs[i], t));
         html += bildMsgLi(msgs[i], t);
@@ -1115,6 +1121,7 @@ function addPageMsgs(msgs, t, append){
         }
         showCounts(t, ids.join(','));
     }
+    return msgs;
 };
 
 //发送 @回复
