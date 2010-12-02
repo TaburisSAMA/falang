@@ -15,7 +15,7 @@ var SUPPORT_AUTH_TYPES = {
 };
 
 var AUTH_TYPE_NAME = {
-    'baseauth': 'Base Auth',
+    'baseauth': 'Basic Auth',
     'oauth': 'oAuth(更安全)',
     'xauth': 'xAuth(oAuth的简化)'
 };

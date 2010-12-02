@@ -16,9 +16,6 @@
 </head>
 
 <body>
-<a href="http://t.sina.com.cn/falang" target="_blank" style="position:absolute;right:0;top:0;z-index: 5;">
-	<img src="images/follow-me.png" border="0" title="跟随发微" />
-</a>
 <div>
 	<div class="logo">
 		<h1>FaWave - 发微</h1>
@@ -64,7 +61,7 @@
 
 		<div id="new-account" style="display:none;">
 			<ul>
-				<li>新浪微博的API，由于cookie信息会干扰Basic Authentcation的认证，而我至今未找到解决办法，所以在添加或者编辑用户信息的时候，为了确保你可以正确设置你的账号信息，请你先<b><a href="http://t.sina.com.cn/logout.php?backurl=/" target="_blank">退出新浪微博</a></b></li>
+				<li>新浪微博的API，由于cookie信息会干扰认证，而我至今未找到解决办法，所以在添加或者编辑用户信息的时候，为了确保你可以正确设置你的账号信息，设置新浪微博的账号时，请你先<b><a href="http://t.sina.com.cn/logout.php?backurl=/" target="_blank">退出新浪微博</a></b></li>
 				<li>
 					<label for="account-blogType">微　　博：</label>
 					<select id="account-blogType" onchange="onSelBlogTypeChange()">
@@ -85,8 +82,10 @@
 					<label for="account-authType">验证类型：</label>
 					<select id="account-authType">
 					</select>
-					<span class="jTip" jTitle="验证类型说明:　">?
-						<span class="c">TODO:待补充</span>
+					<span class="jTip" jTitle="验证类型说明:　" jWidth="310">?
+						<span class="c"><span class="note">Basic Auth</span>:便捷，不过用户和密码保存在本地。<br/>
+						<span class="note">oAuth</span>:到授权网站上登陆，更安全，推荐。(本地只保存获取到的授权码) <br/>
+						<span class="note">xAuth</span>:oAuth的简化方式，直接输入用户密码验证，不过用户密码不保存在本地。</span>
 					</span>
 				</li>
 				<li class="account-oauth">
@@ -130,6 +129,9 @@
 						<option value="20">每20分钟</option>
 						<option value="30">每30分钟</option>
 					</select>
+				</span>
+				<span class="jTip" jTitle="间隔越短越好吗？:　" jWidth="310">?
+					<span class="c">使用“<span class="note">搜狐</span>”账号的童鞋注意：暂时搜狐的API请求限制很小，所以建议搜狐账号的童鞋将刷新频率设置为2分钟或以上，否则超过限制会出错。至于各帐号具体的API请求频率限制可以到“<span class="note">高级设置</span>”里面查看。</span>
 				</span>
 			</p>
 		</li>
@@ -268,17 +270,27 @@
 	</ul>
 	<!-- 关于与感谢 -->
 	<div id="about_me" class="set_wrap" style="display:none;">
-		<br/><br/>
 		
-		<b>作者：</b><a target="_blank" href="http://t.sina.com.cn/qleelulu" >@QLeelulu</a>，有什么建议和问题可以直接@我或者私信我
+		<b>作者(Net4 Team)：</b>
+		<div class="clearFix">
+			<span class="author clearFix">
+				<img src="http://tp4.sinaimg.cn/1644902943/50/1279883084/1"/>
+				<a target="_blank" href="http://t.sina.com.cn/qleelulu" >@QLeelulu</a><br/>
+				博客:<a target="_blank" href="http://qleelulu.cnblogs.com" >QLeelulu在博客园</a>
+			</span>
+			<span class="author clearFix">
+				<img src="http://tp1.sinaimg.cn/1640328892/50/1288939760/1"/>
+				<a target="_blank" href="http://t.sina.com.cn/imk2" >@Python发烧友</a><br/>
+				博客:<a target="_blank" href="http://fengmk2.cnblogs.com/" >Python发烧友在博客园</a>
+			</span>
+		</div>
 		<!-- <div><a target="_blank" href="http://t.sina.com.cn/qleelulu" ><img style="padding:3px;border:solid 1px #ccc;" src="http://tp4.sinaimg.cn/1644902943/50/1279883084/1" /></a></div> -->
 		<br/><br/>
-		<b>官方微博：</b><a target="_blank" href="http://t.sina.com.cn/falang" >@FaWave</a>
-		<br /><br />
-		<b>感谢以下朋友的贡献：</b>
-		<ul>
-			<li><a target="_blank" href="http://t.sina.com.cn/pat1982">@鸽子</a>: 帮忙做了右上角到围脖跟随我的图片</li>
-		</ul>
+		<b>官方微博：</b>
+		<span class="author clearFix">
+			<img src="http://tp3.sinaimg.cn/1710476902/50/1291270067/1"/>
+			<a target="_blank" href="http://t.sina.com.cn/falang" >@FaWave</a><br/>
+		</span>
 	</div>
 </div>
 <br>

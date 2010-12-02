@@ -5,6 +5,8 @@ ol, ul {
 	margin:0.5em 0 0 15px;
 	padding:0;
 }
+a{text-decoration:none;}
+a:hover{text-decoration: underline;}
 li{list-style-type:none;}
 h3{
 	background-color:#E5ECF9;
@@ -14,6 +16,8 @@ h3{
 	padding:2px;
 }
 p{margin: 0;}
+.clearFix{ display:block;}
+.clearFix:after {content:"."; display:block;visibility:hidden;height:0;clear:both;}
 
 label.title{color:#AB5603; font-weight:bold;}
 
@@ -126,6 +130,16 @@ ul#navigation li.selected{
 
 .set_wrap{padding: 20px 10px; min-height:200px;}
 .set_wrap li{margin:5px 0;}
+
+.author{margin-bottom:20px;}
+.author *{font-size:14px; line-height:23px; }
+.author a{color:green;}
+.author img{
+	float:left;
+	border:1px solid #eee;
+	padding:2px;
+	margin-right: 10px;
+}
 
 /* ---------->>> jtip <<<---------------------------------------------------------------*/
 #JT_arrow_left{
