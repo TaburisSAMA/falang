@@ -5,12 +5,20 @@
 
 import os
 
+old_size, min_size = 0, 0
 for name in os.listdir('scripts'):
     if name == 'options.js':
         continue
     if name.endswith('.js'):
         source = 'scripts/%s' % name
+        old = os.path.getsize(source)
+        old_size += old
         to = source + '.min'
         os.system('jsmin < %s > %s' % (source, to))
         os.remove(source)
         os.rename(to, source)
+        min = os.path.getsize(source)
+        min_size += min
+        print '%s %s => %s, %s small' % (source, old, min, old - min)
+        
+print '\r\nChange size %s to %s, %s small' % (old_size, min_size, (old_size - min_size))
