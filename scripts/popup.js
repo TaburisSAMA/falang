@@ -1482,11 +1482,13 @@ function doRT(ele){//RT
     var data = $(ele).closest('li').find('.msgObjJson').text();
     data = JSON.parse(data);
     var t = $("#txtContent");
-    t.focus();
+    showMsgInput();
+    t.val('').blur();
     var _msg_user = data.user || data.sender;
     var repost_pre = tapi.get_config(getUser()).repost_pre;
     t.val(repost_pre + ' ' + '@' + _msg_user.screen_name + ' ' + data.text);
-    showMsgInput();
+    t.focus(); //光标在头部
+    
 };
 
 function doDelTweet(tweetId, ele){//删除自己的微博

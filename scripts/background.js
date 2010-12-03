@@ -328,6 +328,7 @@ function showNewMsg(msgs, t, user){
     if(getAlertMode()=='dnd'){ return; } //免打扰模式
     if(isShowInPage(t)){
         chrome.tabs.getSelected(null, function(tab) {
+            if(!tab){ return; }
             chrome.tabs.sendRequest(tab.id, {method:'showNewMsgInPage', msgs: msgs, t:t, user:user}, function handler(response) {
             });
         });
