@@ -117,8 +117,9 @@ function _uploadWrap(user, data, pic, stat, selLi){
                 _hideLoading();
                 if(stat.successCount > 0){ //有发送成功的
                     setTimeout(callCheckNewMsg, 1000);
-                    if(stat.userCount > 1){ //多个用户的
-                        _showMsg(stat.successCount + '发送成功，' + (stat.userCount - stat.successCount) + '失败。');
+                    var failCount = stat.userCount - stat.successCount;
+                    if(stat.userCount > 1 && failCount > 0){ //多个用户的
+                        _showMsg(stat.successCount + '发送成功，' + failCount + '失败。');
                     }
                 }
             }

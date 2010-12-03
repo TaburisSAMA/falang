@@ -629,6 +629,7 @@ function _getFansList(to_t, read_more){
     var active_t = $active_t.attr('t');
     var $to_t = $("#fans_tab .tab_" + to_t);
     var cursor = $to_t.attr('cursor') || -1;
+    
     // 各微博自己cache
     var html_cache = get_current_user_cache(FANS_HTML_CACHE);
     if($to_t.attr('loading') !== undefined) {
@@ -648,20 +649,27 @@ function _getFansList(to_t, read_more){
 	    }
 	    $list.html('');
     }
-
+	if(String(cursor) == '0'){
+    	return;
+    }
     params.cursor = cursor;
     hideReadMore(to_t);
     showLoading();
     $to_t.attr('loading', true);
     tapi[to_t](params, function(data, textStatus, statuCode){
     	// 如果用户已经切换，则不处理
+    	showReadMore(to_t);
     	var now_user = getUser();
     	if(now_user.uniqueKey != c_user.uniqueKey) {
     		return;
     	}
         if(textStatus != 'error' && data && !data.error){
             var users = data.users;
-            if(users) {
+            var next_cursor = data.next_cursor;
+            if(users && users.length > 0) {
+            	// 过滤最大id
+//            	var max_id = $("#" + t + "_timeline ul.list li.tweetItem:" + direct).attr('did');
+//    			msgs = filterDatasByMaxId(msgs, max_id, append);
             	var html = '';
                 for(var i in users){
                 	if(!get_c_user_fans) {
@@ -674,13 +682,11 @@ function _getFansList(to_t, read_more){
                 	$list.append(html);
                 }
                 html_cache[to_t] += html;
-                if(data.next_cursor) {
-	        		$to_t.attr('cursor', data.next_cursor);
-	        		if(users.length > 0){
-	                    showReadMore(to_t);
-	                }
-	        	}
             }
+            // 设置游标，控制翻页
+            if(next_cursor !== undefined) {
+        		$to_t.attr('cursor', next_cursor);
+        	}
         }
         $to_t.removeAttr('loading');
     });
@@ -1216,8 +1222,9 @@ function _sendMsgWraper(msg, user, stat, selLi){
             $("#txtContent").removeAttr('disabled');
             if(stat.successCount > 0){ //有发送成功的
                 setTimeout(callCheckNewMsg, 1000);
-                if(stat.userCount > 1){ //多个用户的
-                    showMsg(stat.successCount + '发送成功，' + (stat.userCount - stat.successCount) + '失败。');
+                var failCount = stat.userCount - stat.successCount;
+                if(stat.userCount > 1 && failCount > 0){ //多个用户，并且有发送失败才显示
+                    showMsg(stat.successCount + '发送成功，' + failCount + '失败。');
                 }
             }
         }

@@ -63,7 +63,6 @@ var T_NAMES = {
 	'twitter': 'Twitter',
 	'renjian': '人间网',
 	'leihou': '雷猴'
-	
 };
 
 
