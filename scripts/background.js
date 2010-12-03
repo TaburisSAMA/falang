@@ -115,7 +115,10 @@ function checkTimeline(t, p, user_uniqueKey){
         }
     }
     showLoading();
-//	log('start checkTimeline ' + user_uniqueKey + ' ' + t + ' last_id: ' + last_id);
+//    if(t == 'friends_timeline'){
+//    	log('start checkTimeline ' + user_uniqueKey + ' ' + t + ' last_id: ' + last_id);
+//    }
+	
     tapi[t](params, function(sinaMsgs, textStatus){
     	if(!sinaMsgs) {
     		hideLoading();
@@ -132,7 +135,6 @@ function checkTimeline(t, p, user_uniqueKey){
             tweets[_key] = [];
             isFirstTime = true;//如果不存在，则为第一次获取微博
         }
-//        log('finish checkTimeline ' + user_uniqueKey + ' ' + m + ': ' + (sinaMsgs ? sinaMsgs.length : 0));
         if(sinaMsgs.length > 0){
         	if(tweets[_key].length > 0){
         		sinaMsgs = filterDatasByMaxId(sinaMsgs, String(tweets[_key][0].id), false);
@@ -181,6 +183,9 @@ function checkTimeline(t, p, user_uniqueKey){
             popupView.showReadMore(t);
         }
         hideLoading();
+//        if(t == 'friends_timeline'){
+//        	log('finish checkTimeline ' + user_uniqueKey + ' ' + t + ': ' + sinaMsgs.length + ' max_id: ' + getMaxMsgId(t, user_uniqueKey));
+//        }
     });
 };
 
@@ -232,9 +237,11 @@ function getTimelinePage(user_uniqueKey, t, p){
     setDoChecking(user_uniqueKey, t, 'paging', true);
     
     showLoading();
-
-//    log('start getTimelinePage ' + user_uniqueKey + ' ' + t 
-//    	+ ' page:' + params.page + ' max_id:' + params.max_id);
+//	if(t == 'friends_timeline'){
+//		log('start getTimelinePage ' + user_uniqueKey + ' ' + t 
+//    		+ ' page:' + params.page + ' max_id:' + params.max_id);
+//	}
+    
     tapi[t](params, function(sinaMsgs, textStatus){
     	if(sinaMsgs == null || textStatus == 'error') {
     		hideLoading();
@@ -250,17 +257,12 @@ function getTimelinePage(user_uniqueKey, t, p){
             if(!tweets[_key]){
                 tweets[_key] = [];
             }
-//            sinaMsgs = sinaMsgs.slice(0, PAGE_SIZE);
+            var max_id = getMaxMsgId(t, user_uniqueKey);
+            sinaMsgs = filterDatasByMaxId(sinaMsgs, max_id, true);
             for(var i in sinaMsgs){
                 sinaMsgs[i].readed = true;
             }
-            // 判断最后一个等于最大id的，将它和它前面的删除，twitter很强大，id大到js无法计算
-            var max_id = getMaxMsgId(t, user_uniqueKey);
-            sinaMsgs = filterDatasByMaxId(sinaMsgs, max_id, true);
             tweets[_key] = tweets[_key].concat(sinaMsgs);
-
-//            log('finish getTimelinePage ' + user_uniqueKey + ' ' + t + ': ' + sinaMsgs.length 
-//            		+ ' page:' + params.page + ' max_id:' + params.max_id);
             
             var current_user = getUser();
             //防止获取分页内容后已经切换了用户
@@ -294,6 +296,10 @@ function getTimelinePage(user_uniqueKey, t, p){
         }
         hideLoading();
         setDoChecking(user_uniqueKey, t, 'paging', false);
+//        if(t == 'friends_timeline'){
+//        	log('finish getTimelinePage ' + user_uniqueKey + ' ' + t + ': ' + sinaMsgs.length 
+//        		+ ' page:' + params.page + ' max_id:' + params.max_id + ' new maxid: ' + getMaxMsgId(t, user_uniqueKey));
+//        }
     });
 };
 

@@ -1148,7 +1148,7 @@ function sendReplyMsg(msg){
             setTimeout(callCheckNewMsg, 1000);
             showMsg(userName + ' 成功！');
         }else if(sinaMsg.error){
-            showMsg('error: ' + sinaMsg.error);
+//            showMsg('error: ' + sinaMsg.error);
         }
         btn.removeAttr('disabled');
         txt.removeAttr('disabled');
@@ -1200,7 +1200,7 @@ function _sendMsgWraper(msg, user, stat, selLi){
             stat.successCount++;
             $("#accountsForSend li[uniquekey=" + user.uniqueKey +"]").removeClass('sel');
         }else if(sinaMsg.error){
-            showMsg('error: ' + sinaMsg.error);
+//            showMsg('error: ' + sinaMsg.error);
         }
         if(stat.successCount >= stat.userCount){//全部发送成功
             hideMsgInput();
@@ -1241,7 +1241,7 @@ function sendWhisper(msg){
             //setTimeout(callCheckNewMsg, 1000);
             showMsg('发送成功！');
         } else if (sinaMsg.error){
-            showMsg('error: ' + sinaMsg.error);
+//            showMsg('error: ' + sinaMsg.error);
         }
         btn.removeAttr('disabled');
         txt.removeAttr('disabled');
@@ -1265,7 +1265,7 @@ function sendRepost(msg, repostTweetId, notSendMord){
             setTimeout(callCheckNewMsg, 1000);
             showMsg('转发成功！');
         }else if(sinaMsg.error){
-            showMsg('error: ' + sinaMsg.error);
+//            showMsg('error: ' + sinaMsg.error);
         }
         btn.removeAttr('disabled');
         txt.removeAttr('disabled');
@@ -1306,7 +1306,7 @@ function sendComment(msg, commentTweetId, notSendMord){
             //setTimeout(callCheckNewMsg, 1000);
             showMsg('发送评论成功！');
         }else if(sinaMsg.error){
-            showMsg('error: ' + sinaMsg.error);
+//            showMsg('error: ' + sinaMsg.error);
         }
         btn.removeAttr('disabled');
         txt.removeAttr('disabled');

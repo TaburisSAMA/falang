@@ -789,6 +789,13 @@ var sinaApi = {
 		
 	},
 	
+	format_error: function(error, error_code) {
+		if(this.config.ErrorCodes){
+			error = this.config.ErrorCodes[error] || error;
+		}
+		return error;
+	},
+	
     _sendRequest: function(params, callbackFn) {
     	var args = {type: 'get', play_load: 'status', headers: {}};
     	$.extend(args, params);
@@ -849,8 +856,7 @@ var sinaApi = {
         		for(var key in args.headers) {
         			req.setRequestHeader(key, args.headers[key]);
         		}
-//                req.setRequestHeader('Authorization', make_base_auth_header(user.userName, user.password));
-            },
+        	},
             success: function (data, textStatus) {
             	if(play_load != 'string') {
             		try{
@@ -861,7 +867,7 @@ var sinaApi = {
                     		data = [];
                     	} else {
 //                        	var old_data = data;
-                            data = {error:callmethod + ' 服务器返回结果错误，本地解析错误。' + err, error_code:500};
+                            data = {error: callmethod + ' 服务器返回结果错误，本地解析错误。' + err, error_code:500};
                             textStatus = 'error';
                     	}
                     }
@@ -870,8 +876,12 @@ var sinaApi = {
                 if(data){
                 	error_code = data.error_code || data.code;
                     if(data.error || error_code){
-                        showMsg(callmethod + ' error: ' + (data.error || data.wrong) 
-                        + ', error_code: ' + error_code);
+                    	textStatus = $this.format_error(data.error || data.wrong, error_code);
+                    	var error_msg = callmethod + ' error: ' + textStatus;
+                    	if(error_code){
+                    		error_msg += ', error_code: ' + error_code;
+                    	}
+                        showMsg(error_msg);
                     } else {
                         //成功再去格式化结果
                     	data = $this.format_result(data, play_load, args);
@@ -1071,7 +1081,45 @@ $.extend(DiguAPI, {
         upload: 			  '/statuses/update',
         repost:               '/statuses/update',
         comment:              '/statuses/update',
-        reply:                '/statuses/update'
+        reply:                '/statuses/update',
+        
+        ErrorCodes: {
+        	'-1': '服务器错误',
+			'0': '未知原因',
+			'1': '用户名或者密码为空',
+			'2': '用户名或者密码错误',
+			'3': '访问的URL不正确',
+			'4': 'id指定的记录信息不存在。',
+			'5': '重复发送',
+			'6': '包含敏感非法关键字，禁止发表',
+			'7': '包含敏感信息进入后台审核',
+			'8': '认证帐号被关小黑屋，被禁言，不能够发表信息了。',
+			'9': '表示发送悄悄话失败',
+			'10': '没有操作权限（比如删除只能删除自己发的，或者自己收藏的，或者自己收到的信息）',
+			'11': '指定的用户不存在',
+			'12': '注册的用户已经存在',
+			'13': '表单值是空值，或者没有合法的颜色值，没有修改。修改失败。',
+			'14': '上传文件异常，请检查是否符合要求',
+			'15': '更新用户信息失败。',
+			'16': '删除失败，删除收藏夹分类时，分类的名字是必须的。',
+			'17': '删除失败，删除收藏夹分类时,分类不存在',
+			'18': '传递过来的参数为空或者异常',
+			'19': '重复收藏',
+			'20': '只能给跟随自己的人发送信息',
+			'21': '用户名、昵称或者密码不合法，用户名、昵称或者密码必须是4-12位，只支持字母、数字、下划线',
+			'22': '两次输入的秘密不正确',
+			'23': 'Email格式不正确。',
+			'24': '这个的帐号已被占用',
+			'25': '发送太频繁，帐号暂时被封',
+			'26': '服务器繁忙或者你访问的频率太高，超出了规定的限制',
+			'27': '对不起，你的ip被官方封掉了，请联系我们的工作人员，进行相关处理',
+			'28': '对不起，用户昵称中包含非法关键字。',
+			'9': '对不起，所在地包含非法关键字。',
+			'30': '对不起，个人兴趣包含非法关键字。',
+			'31': '对不起，签名（个人简介）包含非法关键字。',
+			'32': '对不起，昵称已经被占用',
+			'33': 'Http请求方法不正确'
+        }
 	}),
 
     processSearch: function (str) {
