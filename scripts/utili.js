@@ -722,14 +722,11 @@ function filterDatasByMaxId(datas, max_id, append){
     		found = true;
     	}
     	if(found){
-    		if(datas.length == 1){
-    			datas = [];
+    		if(append){
+    			datas = datas.slice(index);
     		} else {
-    			if(append){
-	    			datas = datas.slice(index);
-	    		} else {
-	    			datas = datas.slice(0, index);
-	    		}
+    			index--;
+    			datas = datas.slice(0, index);
     		}
     	}
     }
