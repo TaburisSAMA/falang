@@ -66,8 +66,8 @@ var sinaApi = {
         ErrorCodes: {
         	"40025:Error: repeated weibo text!": "重复发送",
         	"40031:Error: target weibo does not exist!": "不存在的微博ID",
-        	"40015:Error: not your own comment!": "评论ID不在登录用户的comments_by_me列表中"
-        	
+        	"40015:Error: not your own comment!": "评论ID不在登录用户的comments_by_me列表中",
+        	"40303:Error: already followed": "已跟随"
         }
     },
 
@@ -982,7 +982,11 @@ $.extend(TSohuAPI, {
 	    mentions: '/statuses/mentions_timeline',
 	    comments: '/statuses/comments/{{id}}',
 	    reply: '/statuses/comment',
-	    user_timeline: '/statuses/user_timeline/{{id}}'
+	    user_timeline: '/statuses/user_timeline/{{id}}',
+	    
+	    ErrorCodes: {
+        	"Reached max access time per hour.": "已达到请求数上限"
+        }
 	}),
 	
 	reset_count: function(data, callback) {
