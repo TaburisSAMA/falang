@@ -64,7 +64,10 @@ var sinaApi = {
         searchUrl:        '/search/',
         
         ErrorCodes: {
-        	'40025:Error: repeated weibo text!': '重复发送'
+        	"40025:Error: repeated weibo text!": "重复发送",
+        	"40031:Error: target weibo does not exist!": "不存在的微博ID",
+        	"40015:Error: not your own comment!": "评论ID不在登录用户的comments_by_me列表中"
+        	
         }
     },
 
