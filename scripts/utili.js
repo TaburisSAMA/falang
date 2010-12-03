@@ -717,25 +717,21 @@ function getDictLength(d) {
 function filterDatasByMaxId(datas, max_id, append){
     if(max_id && datas && datas.length > 0){
     	max_id = String(max_id);
-    	var found = false;
-    	var index = 0;
-    	while(datas[index]){
-    		if(max_id == String(datas[index].id)){
-    			found = true;
+    	var found_index = null;
+    	$.each(datas, function(i, item){
+    		if(max_id == String(item.id)){
+    			found_index = i;
+    			return false;
     		}
-    		index++;
-    		if(found){
-    			break;
-    		}
-    	}
-    	if(found){
+    	});
+    	if(found_index !== null){
     		if(append){
-    			// id等于最大id的数据位于index-1，所以获取index开始往后的数据
-    			datas = datas.slice(index);
+    			// id等于最大id的数据位于found_index，所以获取found_index+1开始往后的数据
+    			datas = datas.slice(found_index+1);
     		} else {
-    			// 如果不是append的，id等于最大id的数据位于index-1，
-    			// 不包含(index-1)这位置的那条记录及它以后的数据
-    			datas = datas.slice(0, index-1);
+    			// 如果不是append的，id等于最大id的数据位于found_index，
+    			// 只需要从开始到found_index(不包含结束边界)
+    			datas = datas.slice(0, found_index);
     		}
     	}
     }
