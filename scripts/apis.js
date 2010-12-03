@@ -1860,6 +1860,11 @@ $.extend(FanfouAPI, {
 			// id => user
 			args.data.user = args.data.id;
 			delete args.data.id;
+		} else if(args.url == this.config.update){
+			if(args.data.sina_id){
+				args.data.in_reply_to_status_id = args.data.sina_id;
+				delete args.data.sina_id;
+			}
 		}
     },
 	
@@ -1875,13 +1880,16 @@ $.extend(FanfouAPI, {
 			data.t_url = tpl.format(data);
 			this.format_result_item(data.user, 'user', args);
 			// 'photo': {u'largeurl': u'http://photo.fanfou.com/n0/00/as/vd_161837.jpg', 
-			// u'imageurl': u'http://photo.fanfou.com/m0/00/as/vd_161837.jpg', 
+			// u'imageurl': u'http://photo.fanfou.com/m0/00/as/vd_161837.jpg', // 太小了
 			// u'thumburl': u'http://photo.fanfou.com/t0/00/as/vd_161837.jpg'},
    			if(data.photo){
    				data.thumbnail_pic = data.photo.thumburl;
-				data.bmiddle_pic = data.photo.imageurl;
+				data.bmiddle_pic = data.photo.largeurl;
 				data.original_pic = data.photo.largeurl;
 				delete data.photo;
+   			}
+   			if(data.in_reply_to_status_id){
+   				data.related_dialogue_url = 'http://fanfou.com/statuses/' + data.in_reply_to_status_id + '?fr=viewreply';
    			}
 		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = 'http://fanfou.com/' + (data.id || data.screen_name);
