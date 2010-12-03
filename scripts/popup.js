@@ -753,6 +753,8 @@ function getUserTimeline(screen_name, user_id, read_more){
             showReadMore(m);
             if(!read_more) {
             	var user = sinaMsgs[0].user || sinaMsgs[0].sender;
+            	// 是否当前用户
+            	user.is_me = String(c_user.id) == String(user.id)
                 var userinfo_html = buildUserInfo(user);
                 $("#user_timeline_timeline ul.list").prepend(userinfo_html);
                 resetScrollTop(m);
