@@ -719,9 +719,14 @@ function filterDatasByMaxId(datas, max_id, append){
     	max_id = String(max_id);
     	var found = false;
     	var index = 0;
-    	while(datas[index] && max_id == String(datas[index].id)){
+    	while(datas[index]){
+    		if(max_id == String(datas[index].id)){
+    			found = true;
+    		}
     		index++;
-    		found = true;
+    		if(found){
+    			break;
+    		}
     	}
     	if(found){
     		if(append){
