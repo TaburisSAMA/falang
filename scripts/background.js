@@ -25,7 +25,13 @@ function getMaxMsgId(t, user_uniqueKey){
     }
     var _key = user_uniqueKey + t + '_tweets';
     var _t_tweets = tweets[_key];
-    var _last_id = (_t_tweets && _t_tweets.length) ? (_t_tweets[_t_tweets.length-1].id - 1) : null;
+    var _last_id = null;
+    if(_t_tweets && _t_tweets.length){
+    	var _last_id = _t_tweets[_t_tweets.length-1].id;
+    	if(typeof(_last_id) === 'number'){
+    		_last_id--;
+    	}
+    }
     return _last_id;
 };
 
@@ -109,7 +115,7 @@ function checkTimeline(t, p, user_uniqueKey){
         }
     }
     showLoading();
-//	log('start checkTimeline ' + user_uniqueKey + ' ' + t);
+//	log('start checkTimeline ' + user_uniqueKey + ' ' + t + ' last_id: ' + last_id);
     tapi[t](params, function(sinaMsgs, textStatus){
     	if(!sinaMsgs) {
     		hideLoading();

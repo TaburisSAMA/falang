@@ -1771,7 +1771,7 @@ $.extend(FanfouAPI, {
 		repost_pre: '转',
 	    support_comment: false,
 	    support_repost: false,
-	    support_upload: false
+	    upload: '/photos/upload'
 	}),
 	
 	// 无需urlencode
@@ -1787,11 +1787,26 @@ $.extend(FanfouAPI, {
 		callback();
 	},
 	
+	/* photo（必须）- 照片文件。和<input type="file" name="photo" />效果一样
+	 * */
+	format_upload_params: function(user, data, pic) {
+    	pic.keyname = 'photo';
+    },
+	
 	format_result_item: function(data, play_load, args) {
 		if(play_load == 'status' && data.id) {
 			var tpl = 'http://fanfou.com/statuses/{{id}}';
 			data.t_url = tpl.format(data);
 			this.format_result_item(data.user, 'user', args);
+			// 'photo': {u'largeurl': u'http://photo.fanfou.com/n0/00/as/vd_161837.jpg', 
+			// u'imageurl': u'http://photo.fanfou.com/m0/00/as/vd_161837.jpg', 
+			// u'thumburl': u'http://photo.fanfou.com/t0/00/as/vd_161837.jpg'},
+   			if(data.photo){
+   				data.thumbnail_pic = data.photo.thumburl;
+				data.bmiddle_pic = data.photo.imageurl;
+				data.original_pic = data.photo.largeurl;
+				delete data.photo;
+   			}
 		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = 'http://fanfou.com/' + (data.id || data.screen_name);
 		}
