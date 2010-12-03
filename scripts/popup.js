@@ -272,19 +272,19 @@ function initIamDoing(){
             var loc_url = tab.url;
             if(loc_url){
                 var title = tab.title;
-                if(isAutoShortUrl() && loc_url.replace(/^https?:\/\//i, '').length > getAutoShortUrlWordCount()){
+                if(Settings.get().isSharedUrlAutoShort && loc_url.replace(/^https?:\/\//i, '').length > Settings.get().sharedUrlAutoShortWordCount){
                     s8Api.shorten({longUrl: loc_url}, function(data){
                         if(data && data.shortUrl){
                             loc_url = data.shortUrl;
                         }
-                        $("#txtContent").val( formatText(getLookingTemplate(), {title:(title||''), url:loc_url}) );
+                        $("#txtContent").val( formatText(Settings.get().lookingTemplate, {title:(title||''), url:loc_url}) );
                         showMsgInput();
                     },function(xhr, textStatus, errorThrown){
-                        $("#txtContent").val( formatText(getLookingTemplate(), {title:(title||''), url:loc_url}) );
+                        $("#txtContent").val( formatText(Settings.get().lookingTemplate, {title:(title||''), url:loc_url}) );
                         showMsgInput();
                     });
                 }else{
-                    $("#txtContent").val( formatText(getLookingTemplate(), {title:(title||''), url:loc_url}) );
+                    $("#txtContent").val( formatText(Settings.get().lookingTemplate, {title:(title||''), url:loc_url}) );
                     showMsgInput();
                 }
             }else{
@@ -1669,10 +1669,10 @@ function openPopupInNewWin(){
         getNewWinPopupView().focus();
         return;
     } */
-    var WH = getWidthAndHeight();
-    var l = (window.screen.availWidth-WH[0])/2;
+    var W = Settings.get().popupWidth, H = Settings.get().popupHeight;
+    var l = (window.screen.availWidth-W)/2;
     window.theViewName = 'not_popup';
-    getBackgroundView().new_win_popup.window = window.open('popup.html?is_new_win=true', 'FaWave', 'left=' + l + ',top=30,width=' + WH[0] + ',height=' + (WH[1]+10) + ',menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
+    getBackgroundView().new_win_popup.window = window.open('popup.html?is_new_win=true', 'FaWave', 'left=' + l + ',top=30,width=' + W + ',height=' + (H+10) + ',menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
 };
 
 //====>>>>

@@ -1,5 +1,9 @@
 // @author qleelulu@gmail.com
 
+window._settings = Settings.init(); //载入设置
+
+Settings.get = function(){ return window._settings; }; //重写get，直接返回，不用再获取background view
+
 var itv; //Interval
 var tweets = {}, 
     new_win_popup = Object(),
@@ -332,7 +336,7 @@ function setDoChecking(user_uniqueKey, t, c_t, v){
 //@user: 当前用户
 function showNewMsg(msgs, t, user){
     if(getAlertMode()=='dnd'){ return; } //免打扰模式
-    if(isShowInPage(t)){
+    if(Settings.get().isShowInPage[t]){
         chrome.tabs.getSelected(null, function(tab) {
             if(!tab){ return; }
             chrome.tabs.sendRequest(tab.id, {method:'showNewMsgInPage', msgs: msgs, t:t, user:user}, function handler(response) {
@@ -436,11 +440,11 @@ r_method_manager = {
         sendResponse({farewell: "goodbye"});
     },
     getLookingTemplate: function(request, sender, sendResponse){
-        var _l_tp = getLookingTemplate();
+        var _l_tp = Settings.get().lookingTemplate;
         sendResponse({lookingTemplate: _l_tp});
     },
     getQuickSendInitInfos: function(request, sender, sendResponse){
-        var hotkeys = getQuickSendHotKey();
+        var hotkeys = Settings.get().quickSendHotKey;
         var c_user = getUser();
         var userList = getUserList();
         sendResponse({hotkeys: hotkeys, c_user:c_user, userList:userList});

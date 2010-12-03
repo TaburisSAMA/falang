@@ -34,15 +34,15 @@
 	<style id="styleCustom" ></style>
 	<style id="styleCustomResize" ></style>
 	<script>
-		var THEME = getTheme();
+		var THEME = Settings.get().theme;
 		$("#cssTheme").attr('href', '/themes/' + THEME + '/css/theme.css');
 
-		var WH = getWidthAndHeight();
-		var wh_css = 'body{font-family:"'+ getFont() +'";font-size:'+ getFontSize() +'px;}'
-				   + '#wrapper{width:'+ WH[0] +'px;}'
-				   + '#txtContent{width:'+ (WH[0]-2) +'px;}'
-				   + '.warp{width:' + WH[0] + 'px;} .list_warp{height:' + (WH[1]-61) + 'px;}'
-				   + '#facebox img, #facebox canvas{max-width:'+ (WH[0]-50) +'px;}';
+		var W = Settings.get().popupWidth, H = Settings.get().popupHeight;
+		var wh_css = 'body{font-family:"'+ Settings.get().font +'";font-size:'+ Settings.get().fontSite +'px;}'
+				   + '#wrapper{width:'+ W +'px;}'
+				   + '#txtContent{width:'+ (W-2) +'px;}'
+				   + '.warp{width:' + W + 'px;} .list_warp{height:' + (H-61) + 'px;}'
+				   + '#facebox img, #facebox canvas{max-width:'+ (W-50) +'px;}';
 		$("#styleCustom").html(wh_css);
 	</script>
  </head>

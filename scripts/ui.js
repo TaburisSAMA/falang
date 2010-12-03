@@ -167,7 +167,7 @@ function bildMsgLi(sinaMsg, t, c_user){
         if(t == 'friends' || t == 'followers'){
             tp = TEMPLATE_FANS;
         }
-        var theme = getTheme();
+        var theme = Settings.get().theme;
         var need_rt_rt = sinaMsg.retweeted_status && sinaMsg.retweeted_status.retweeted_status;
         var rt_rt_tpl = null;
         if(need_rt_rt) {

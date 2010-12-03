@@ -5,6 +5,8 @@ var COMMENT_PAGE_SIZE = 8;
 
 var SINA = 'idi_sina';
 
+var SETTINGS_KEY = 'fawave_SETTINGS_KEY';
+
 var UNSEND_TWEET_KEY = 'idi_UNSEND_TWEET_KEY';//未发送的tweet，保存下次显示
 
 var FRIENDS_TIMELINE_KEY = 'idi_friends_timeline';
@@ -13,34 +15,18 @@ var MESSAGES_KEY = 'idi_messages';
 
 var USER_LIST_KEY = 'idi_userlist';
 var CURRENT_USER_KEY = 'idi_current_user';
-var REFRESH_TIME_KEY = 'idi_REFRESH_TIME_KEY';
 
 var LAST_MSG_ID = 'idi_last_msg_id';
 
-var LOCAL_STORAGE_NUM_KEY = 'idi_LOCAL_STORAGE_NUM_KEY';
 var LOCAL_STORAGE_NEW_TWEET_LIST_KEY = 'idi_LOCAL_STORAGE_NEW_TWEET_LIST_KEY';
 var LOCAL_STORAGE_TWEET_LIST_HTML_KEY = 'idi_LOCAL_STORAGE_TWEET_LIST_HTML_KEY';
 
 var UNREAD_TIMELINE_COUNT_KEY = 'idi_UNREAD_TIMELINE_COUNT_KEY';
 
-var AUTO_SHORT_URL = 'idi_SHORT_URL';//是否缩短URL
-var AUTO_SHORT_URL_WORD_COUNT = 'idi_SHORT_URL_WORD_COUNT'; //URL长度超过多少自动缩短
-
-var SET_BADGE_TEXT = 'idi_SET_BADGE_TEXT'; //设置未读信息提示
-var IS_SHOW_IN_PAGE = 'idi_IS_SHOW_IN_PAGE_'; //新消息是否在页面提示
 var IS_SYNC_TO_PAGE_KEY = 'idi_IS_SYNC_TO_PAGE_KEY'; //已读消息是否和新浪微博页面同步
 
-var THEME_KEY = 'idi_THEME_KEY'; //主题样式的KEY
 var THEME_LIST = {'default':'default', 'simple':'simple', 'pip_io':'pip_io'}; //主题列表
 
-var FONT_KEY = 'idi_FONT_KEY'; //字体样式的KEY
-var FONT_SIZE_KEY = 'idi_FONT_SIZE_KEY'; //字体大小的KEY
-
-var WIDTH_AND_HEIGHT_KEY = 'idi_WIDTH_AND_HEIGHT_KEY'; //宽高
-var DEFAULT_WIDTH_AND_HEIGHT = [480, 520]; //默认宽高
-
-var TP_LOOKING_KEY = 'idi_TP_LOOKING_KEY'; //我正在看的模板key
-var QUICK_SEND_HOT_KEY_KEY = 'idi_QUICK_SEND_HOT_KEY_KEY'; //快速发送热键key
 var ALERT_MODE_KEY = 'idi_ALERT_MODE_KEY'; //信息提醒模式key
 
 //['friends_timeline','mentions','comments_timeline','comments_by_me','direct_messages','favorites']
@@ -96,14 +82,65 @@ function hideLoading(){
     }
 };
 
-///获取在本地保存的信息数
-function getCacheCount(){
-    var count = localStorage.getObject(LOCAL_STORAGE_NUM_KEY);
-    if(!count){
-        count = 200;//默认值
+//设置选项
+var Settings = {
+    defaults: {
+        globalRefreshTime:{ //全局的刷新间隔时间
+            friends_timeline: 90,
+            mentions: 120,
+            comments_timeline: 120,
+            direct_messages: 120
+        },
+        isSetBadgeText:{ //是否提醒未读信息数
+            friends_timeline: true,
+            mentions: true,
+            comments_timeline: true,
+            direct_messages: true
+        },
+        isShowInPage:{ //是否在页面上提示新信息
+            friends_timeline: true,
+            mentions: true,
+            comments_timeline: true,
+            direct_messages: true
+        },
+        isSyncReadedToSina: false, //已读消息是否和新浪微博页面同步
+        isSharedUrlAutoShort: false, //分享正在看的网址时是否自动缩短
+        sharedUrlAutoShortWordCount: 15, //超过多少个字则自动缩短URL
+        quickSendHotKey: '113', //快速发送微博的快捷键。默认 F2。保存的格式为： 33,34,35 用逗号分隔的keycode
+
+        font: '微软雅黑', //字体
+        fontSite: 12, //字体大小
+        popupWidth: 480, //弹出窗大小
+        popupHeight: 520, 
+        theme: 'pip_io', //主题样式
+
+        lookingTemplate: '我正在看: {{title}} {{url}} '
+    },
+    init: function(){ //只在background载入的时候调用一次并给 _settings 赋值就可以
+        var _sets = localStorage.getObject(SETTINGS_KEY);
+        _sets = _sets || {};
+        _sets = $.extend({}, this.defaults, _sets);
+
+        if(!THEME_LIST[_sets.theme]){
+            _sets.theme = this.defaults.theme;
+        }
+
+        return _sets;
+    },
+    get: function(){
+        var bg = getBackgroundView();
+        //不用判断，已确保init会在background载入的时候调用
+        //if(!bg._settings){
+        //    bg._settings = this.init();
+        //}
+        return bg._settings;
+    },
+    save: function(){
+        var _sets = this.get();
+        localStorage.setObject(SETTINGS_KEY, _sets);
     }
-    return count;
 };
+
 
 function formatScreenName(user) {
 	return '[' + T_NAMES[user.blogType] + ']' + user.screen_name || user.name;
@@ -201,7 +238,7 @@ function setUnreadTimelineCount(count, t, user_uniqueKey){
     if(!user_uniqueKey){
         user_uniqueKey = getUser().uniqueKey;
     }
-    var setBadgeText = isSetBadgeText(t, user_uniqueKey);
+    var setBadgeText = Settings.get().isSetBadgeText[t];
     count += getUnreadTimelineCount(t, user_uniqueKey);
     localStorage.setObject(user_uniqueKey + t + UNREAD_TIMELINE_COUNT_KEY, count);
     if(getAlertMode()=='dnd'){ //免打扰模式
@@ -213,7 +250,7 @@ function setUnreadTimelineCount(count, t, user_uniqueKey){
             for(var j in userList){
                 var user = userList[j];
                 for(var i in T_LIST[user.blogType]){
-                    if(isSetBadgeText(T_LIST[user.blogType][i], user.uniqueKey)){
+                    if(Settings.get().isSetBadgeText[ T_LIST[user.blogType][i] ]){
                         total += getUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
                     }
                 }
@@ -234,7 +271,7 @@ function removeUnreadTimelineCount(t, user_uniqueKey){
         user_uniqueKey = getUser().uniqueKey;
     }
     localStorage.setObject(user_uniqueKey + t + UNREAD_TIMELINE_COUNT_KEY, 0);
-    if(getIsSyncUnread(user_uniqueKey)){ //如果同步未读数
+    if(Settings.get().isSyncReadedToSina){ //如果同步未读数
         syncUnreadCountToSinaPage(t, user_uniqueKey);
     }
     if(getAlertMode()=='dnd'){ //免打扰模式
@@ -245,7 +282,7 @@ function removeUnreadTimelineCount(t, user_uniqueKey){
         for(var j in userList){
             var user = userList[j];
             for(var i in T_LIST[user.blogType]){
-                if(isSetBadgeText(T_LIST[user.blogType][i], user.uniqueKey)){
+                if(Settings.get().isSetBadgeText[T_LIST[user.blogType][i]]){
                     total += getUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
                 }
             }
@@ -350,139 +387,6 @@ function getLastMsgId(t, user_uniqueKey){
 
 //<<<<<<<<<<<<<<<<=========
 
-//====>>>>>>>>>>>
-function isAutoShortUrl(){
-    var asu = localStorage.getObject(AUTO_SHORT_URL);
-    if(!asu || asu == 0){
-        return false;
-    }
-    return true;
-}
-
-function getAutoShortUrlWordCount(){
-    var c = localStorage.getObject(AUTO_SHORT_URL_WORD_COUNT);
-    if(c && c>1){
-        return c;
-    }
-    return 15; //默认值
-}
-//<<<<<<<<<<<====
-
-//-- 未读提示 --
-function isSetBadgeText(t){
-    return localStorage.getObject(t + SET_BADGE_TEXT) === 0 ? false : true;
-};
-
-function setSetBadgeText(t, v){
-    return localStorage.setObject(t + SET_BADGE_TEXT, v);
-};
-//<<--
-
-//-- 在页面提示新消息 --
-function isShowInPage(t){
-    return localStorage.getObject(t + IS_SHOW_IN_PAGE) === 0 ? false : true;
-};
-
-function setShowInPage(t, v){
-    return localStorage.setObject(t + IS_SHOW_IN_PAGE, v);
-};
-//<<--
-
-//-- 主题 --
-function getTheme(){
-    var t = localStorage.getObject(THEME_KEY);
-    if(t){
-        if(THEME_LIST[t]){
-            return t;
-        }
-    }
-    return 'pip_io';
-};
-
-function setTheme(theme){
-    localStorage.setObject(THEME_KEY, theme);
-};
-//<<--
-
-//-- 我正在看模板 --
-function getLookingTemplate(){
-    var t = localStorage.getObject(TP_LOOKING_KEY);
-    return t || '我正在看: {{title}} {{url}} ';
-};
-
-function setLookingTemplate(tp){
-    localStorage.setObject(TP_LOOKING_KEY, tp);
-};
-//<<--
-
-//-- 快捷发送热键 --
-//保存的格式为： 33,34,35 用逗号分隔的keycode
-function getQuickSendHotKey(){
-    var keys = localStorage.getObject(QUICK_SEND_HOT_KEY_KEY);
-    return keys || '113'; //默认 F2
-};
-
-function setQuickSendHotKey(keys){
-    localStorage.setObject(QUICK_SEND_HOT_KEY_KEY, keys);
-};
-//<<--
-
-//-- 字体 --
-function getFont(){
-    var t = localStorage.getObject(FONT_KEY);
-    return t || '微软雅黑';
-};
-
-function setFont(font){
-    localStorage.setObject(FONT_KEY, font);
-};
-
-function getFontSize(){
-    var t = localStorage.getObject(FONT_SIZE_KEY);
-    return t || '12';
-};
-
-function setFontSize(fontSize){
-    localStorage.setObject(FONT_SIZE_KEY, fontSize);
-};
-//<<--
-
-//-- 未读提示同步 --
-function getIsSyncUnread(){
-    var t = localStorage.getObject(IS_SYNC_TO_PAGE_KEY);
-    return t || 0;
-};
-
-function setIsSyncUnread(is_sync){
-    localStorage.setObject(IS_SYNC_TO_PAGE_KEY, is_sync);
-};
-//<<--
-
-//-- 宽高设置 --
-function getWidthAndHeight(){
-    var wh = localStorage.getObject(WIDTH_AND_HEIGHT_KEY);
-    return wh || DEFAULT_WIDTH_AND_HEIGHT;
-};
-
-function setWidthAndHeight(width, height){
-    width = Number(width);
-    height = Number(height);
-    if(isNaN(width) || width<350){
-        width = DEFAULT_WIDTH_AND_HEIGHT[0];
-    }
-    if(isNaN(height) || height<350){
-        height = DEFAULT_WIDTH_AND_HEIGHT[1];
-    }
-    var wh = [width, height];
-    localStorage.setObject(WIDTH_AND_HEIGHT_KEY, wh);
-    return wh;
-};
-//<<--
-
-function setThteme(v){
-    return localStorage.setObject(THEME_KEY, v);
-};
-//<<--
 
 //-- 信息提示模式 (alert or dnd ) --
 function getAlertMode(){
@@ -496,7 +400,7 @@ function setAlertMode(mode){
 //<<--
 
 function getRefreshTime(){
-    var t = localStorage.getObject(REFRESH_TIME_KEY);
+    var t = false;
     if(t){
         t = Number(t);
         if(isNaN(t)){

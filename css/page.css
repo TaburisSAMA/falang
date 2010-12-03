@@ -1,7 +1,7 @@
-body #fa_wave_msg_wrap .clearFix{ display:block;}
-body #fa_wave_msg_wrap .clearFix:after {content:"."; display:block;visibility:hidden;height:0;clear:both;}
-body #fa_wave_msg_wrap .fr{float:right;}
-body #fa_wave_msg_wrap .fl{float:left;}
+body #fa_wave_msg_wrap .fawave_clearFix{ display:block;}
+body #fa_wave_msg_wrap .fawave_clearFix:after {content:"."; display:block;visibility:hidden;height:0;clear:both;}
+body #fa_wave_msg_wrap .fawave_fr{float:right;}
+body #fa_wave_msg_wrap .fawave_fl{float:left;}
 
 body #fa_wave_msg_wrap{
    position:fixed;

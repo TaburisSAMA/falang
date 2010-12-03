@@ -181,30 +181,54 @@ function showAccountList(){
 }
 
 function init(){
-    var t = localStorage.getObject(REFRESH_TIME_KEY);
-    if(t){
-        $("#selRefreshTime").val(t);
+    var settings = Settings.get();
+
+    //初始化全局信息刷新时间
+    for(var i in T_LIST.all){
+        $("#gRefreshTime_" + T_LIST.all[i]).val(settings.globalRefreshTime[T_LIST.all[i]]);
     }
-    var num = localStorage.getObject(LOCAL_STORAGE_NUM_KEY);
-    if(num){
-        $("#selLocalStorageNum").val(num);
-    }
-    if(!isAutoShortUrl()){
+
+    if(!settings.isSharedUrlAutoShort){
         $("#autoShortUrl").attr("checked", false);
     }
-    var asuwc = getAutoShortUrlWordCount();
-    $("#autoShortUrlCount").val(asuwc);
 
-    //初始化是否同步未读提示
-    $("#unread_sync_to_page").attr("checked", getIsSyncUnread());
+    $("#autoShortUrlCount").val(settings.sharedUrlAutoShortWordCount);
 
-    $("#tp_looking").val(getLookingTemplate()); //我正在看模板
+    //初始化是否同步未读提示到新浪微博
+    $("#unread_sync_to_page").attr("checked", settings.isSyncReadedToSina);
 
-    initSetBadgeText();
-    initShowInPage();
-    initTheme();
-    initWidthAndHeight();
-    initFont();
+    $("#tp_looking").val(settings.lookingTemplate); //我正在看模板
+
+    //初始化设置未读提示信息
+    for(var i in T_LIST.all){
+        $("#set_badge_" + T_LIST.all[i]).attr("checked", settings.isSetBadgeText[T_LIST.all[i]]);
+    }
+
+    //初始化设置新消息是否在页面显示
+    for(var i in T_LIST.all){
+        $("#set_show_in_page_" + T_LIST.all[i]).attr("checked", settings.isShowInPage[T_LIST.all[i]]);
+    }
+
+    //初始化主题选择
+    var theme = settings.theme;
+    if(theme){
+        $("#selTheme").val(theme);
+        $("#themePreview").attr("src", '/themes/'+ theme +'/theme.png');
+    }
+    $("#selTheme").change(function(){
+        $("#themePreview").attr("src", '/themes/'+ $(this).val() +'/theme.png');
+    });
+
+    //初始化字体选择
+    $("#selFont").val(settings.font);
+    $("#selFontSize").val(settings.fontSite);
+
+
+    //初始化宽高
+    var w = settings.popupWidth, h = settings.popupHeight;
+    $("#set_main_width").val(w);
+    $("#set_main_height").val(h);
+
     initQuickSendHotKey();
 
     initJtip();
@@ -238,57 +262,12 @@ function initJtip(){
     }, function(){
         $("#JT").css({opacity:0, visibility:'hidden'});
     });
-}
-//初始化设置未读提示信息
-function initSetBadgeText(){
-    for(var i in T_LIST.all){
-        $("#set_badge_" + T_LIST.all[i]).attr("checked", isSetBadgeText(T_LIST.all[i]));
-    }
-};
-
-//初始化设置新消息是否在页面显示
-function initShowInPage(){
-    for(var i in T_LIST.all){
-        $("#set_show_in_page_" + T_LIST.all[i]).attr("checked", isShowInPage(T_LIST.all[i]));
-    }
-};
-
-//初始化主题选择
-function initTheme(){
-    var theme = getTheme();
-    if(theme){
-        $("#selTheme").val(theme);
-        $("#themePreview").attr("src", '/themes/'+ theme +'/theme.png');
-    }
-    $("#selTheme").change(function(){
-        $("#themePreview").attr("src", '/themes/'+ $(this).val() +'/theme.png');
-    });
-};
-
-//初始化字体选择
-function initFont(){
-    var font = getFont();
-    if(font){
-        $("#selFont").val(font);
-    }
-
-    var fontSize = getFontSize();
-    if(fontSize){
-        $("#selFontSize").val(fontSize);
-    }
-};
-
-//初始化宽高
-function initWidthAndHeight(){
-    var wh = getWidthAndHeight();
-    $("#set_main_width").val(wh[0]);
-    $("#set_main_height").val(wh[1]);
 };
 
 //初始化快速发送热键
 var TEMP_SET_KEYS = [];
 function initQuickSendHotKey(){
-    var keys = getQuickSendHotKey();
+    var keys = Settings.get().quickSendHotKey;
     keys = keys.split(',');
     var key_maps = '';
     for(var i in keys){
@@ -571,88 +550,89 @@ function toggleStopAccount(uniqueKey, is_stop){
 };
 
 function saveAll(){
-    var t = $("#selRefreshTime").val(); //刷新频率
-    if(t){
-        localStorage.setObject(REFRESH_TIME_KEY, t);
-        var b_view = getBackgroundView();
-        if(b_view){
-            b_view.refreshInterval();
+    var settings = Settings.get();
+
+    //保存全局信息刷新时间间隔
+    var gr = null, grv = null;
+    for(var i in T_LIST.all){
+        gr = $("#gRefreshTime_" + T_LIST.all[i]);
+        grv = Number(gr.val());
+        if(isNaN(grv)){
+            grv = Settings.defaults.globalRefreshTime[T_LIST.all[i]];
+        }else if(grv < 30){ //最低30秒
+            grv = 30;
         }
+        settings.globalRefreshTime[T_LIST.all[i]] = grv;
+        gr.val(grv);
     }
-    var num = $("#selLocalStorageNum").val();
-    if(num){
-        localStorage.setObject(LOCAL_STORAGE_NUM_KEY, num);
+    var b_view = getBackgroundView();
+    if(b_view){
+        b_view.refreshInterval(); //TODO: 需要确认
     }
 
+
     var asu = ($("#autoShortUrl").attr("checked")== true);
-    if(asu){
-        localStorage.setObject(AUTO_SHORT_URL, 1);
-    }else{
-        localStorage.setObject(AUTO_SHORT_URL, 0);
-    }
+    settings.isSharedUrlAutoShort = asu;
     var asuwc = $("#autoShortUrlCount").val(); //自动缩短网址
     asuwc = Number(asuwc);
     if(!isNaN(asuwc) && asuwc>0){
-        localStorage.setObject(AUTO_SHORT_URL_WORD_COUNT, asuwc);
+        settings.sharedUrlAutoShortWordCount = asuwc;
     }else{
-        localStorage.setObject(AUTO_SHORT_URL_WORD_COUNT, 15);
+        settings.sharedUrlAutoShortWordCount = Settings.defaults.sharedUrlAutoShortWordCount;
     }
 
-    setIsSyncUnread($("#unread_sync_to_page").attr("checked") ? 1 : 0);
+    settings.isSyncReadedToSina = $("#unread_sync_to_page").attr("checked") ? true : false;
 
-    setLookingTemplate($("#tp_looking").val()); //我正在看模板
+    settings.lookingTemplate = $("#tp_looking").val(); //我正在看模板
 
     if($("#set_quick_send_key_inp").val()){
-        setQuickSendHotKey($("#set_quick_send_key").val()); //快速发送微博快捷键
+        settings.quickSendHotKey = $("#set_quick_send_key").val(); //快速发送微博快捷键
     }
 
-    saveSetBadgeText();
-    saveSetShowInPage();
-    saveTheme();
-    saveWidthAndHeight();
-    saveFont();
+    //保存未读提示
+    $("#set_badge_wrap :checkbox").each(function(){
+        var $this = $(this);
+        settings.isSetBadgeText[$this.attr('id').replace('set_badge_','')] = ($this.attr("checked") ? true : false);
+    });
+
+    //保存是否在页面提示新消息
+    $("#set_show_in_page_wrap :checkbox").each(function(){
+        var $this = $(this);
+        settings.isShowInPage[$this.attr('id').replace('set_show_in_page_','')] = ($this.attr("checked") ? true : false);
+    });
+
+    //保存主题
+    var theme = $("#selTheme").val();
+    settings.theme =  theme;
+
+    //保存宽高
+    var w = $("#set_main_width").val();
+    var h = $("#set_main_height").val();
+    w = Number(w);
+    h = Number(h);
+    if(isNaN(w) || w < 350){
+        w = 350;
+    }
+    if(isNaN(h) || h < 350){
+        h = 350;
+    }
+    settings.popupWidth = w;
+    settings.popupHeight = h;
+    $("#set_main_width").val(w);
+    $("#set_main_height").val(h);
+
+    //保存字体
+    var font = $("#selFont").val();
+    settings.font =  font;
+    var fontSize = $("#selFontSize").val();
+    settings.fontSite = fontSize;
+
+    Settings.save();
 
     _showMsg('保存成功！');
 };
 
-//保存未读提示
-function saveSetBadgeText(){
-    $("#set_badge_wrap :checkbox").each(function(){
-        var $this = $(this);
-        setSetBadgeText($this.attr('id').replace('set_badge_',''), ($this.attr("checked") ? 1 : 0));
-    });
-};
 
-//保存是否在页面提示新消息
-function saveSetShowInPage(){
-    $("#set_show_in_page_wrap :checkbox").each(function(){
-        var $this = $(this);
-        setShowInPage($this.attr('id').replace('set_show_in_page_',''), ($this.attr("checked") ? 1 : 0));
-    });
-};
-
-//保存主题
-function saveTheme(){
-    var theme = $("#selTheme").val();
-    setTheme(theme);
-};
-
-//保存字体
-function saveFont(){
-    var font = $("#selFont").val();
-    setFont(font);
-    var fontSize = $("#selFontSize").val();
-    setFontSize(fontSize);
-};
-
-//保存宽高
-function saveWidthAndHeight(){
-    var w = $("#set_main_width").val();
-    var h = $("#set_main_height").val();
-    var wh = setWidthAndHeight(w, h);
-    $("#set_main_width").val(wh[0]);
-    $("#set_main_height").val(wh[1]);
-};
 
 //刷新账号信息
 function refreshAccountInfo(){

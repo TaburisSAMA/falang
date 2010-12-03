@@ -131,6 +131,8 @@ ul#navigation li.selected{
 .set_wrap{padding: 20px 10px; min-height:200px;}
 .set_wrap li{margin:5px 0;}
 
+.inpRefTime{width:35px;}
+
 .author{margin-bottom:20px;}
 .author *{font-size:14px; line-height:23px; }
 .author a{color:green;}
