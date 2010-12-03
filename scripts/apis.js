@@ -985,7 +985,9 @@ $.extend(TSohuAPI, {
 	    user_timeline: '/statuses/user_timeline/{{id}}',
 	    
 	    ErrorCodes: {
-        	"Reached max access time per hour.": "已达到请求数上限"
+        	"Reached max access time per hour.": "已达到请求数上限",
+        	"Could not follow user: id is already on your list": "已跟随",
+        	"You are not friends with the specified user": "你没有跟随他"
         }
 	}),
 	
