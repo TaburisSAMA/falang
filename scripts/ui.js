@@ -17,22 +17,22 @@ function bildMsgLi(sinaMsg, t, c_user){
      	var support_comment = config.support_comment;
      	var support_favorites = config.support_favorites;
         var crlBtn = {
-                delTweetBtn: '<a class="deltweet" href="javascript:void(0);" onclick="doDelTweet(' + sinaMsg.id + ', this);" title="点击删除微博">删</a>',
-                replyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');" title="进行@回复">@</a>',
+                delTweetBtn: '<a class="deltweet" href="javascript:void(0);" onclick="doDelTweet(\'' + sinaMsg.id + '\', this);" title="点击删除微博">删</a>',
+                replyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\');" title="进行@回复">@</a>',
                 rtBtn: '<a class="rtweet" href="javascript:void(0);" onclick="doRT(this);" title="Twitter式转发">RT</a>',
-                repostBtn: '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + user.screen_name + '\',' + sinaMsg.id + ',\'' + (sinaMsg.retweeted_status ? sinaMsg.retweeted_status.user.screen_name : '') + '\',' + (sinaMsg.retweeted_status ? sinaMsg.retweeted_status.id : '0') + ');" title="转发这条微博">转</a>',
+                repostBtn: '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\',\'' + (sinaMsg.retweeted_status ? sinaMsg.retweeted_status.user.screen_name : '') + '\',' + (sinaMsg.retweeted_status ? sinaMsg.retweeted_status.id : '0') + ');" title="转发这条微博">转</a>',
                 repostCounts: '<span class="repostCounts">(-)</span>',
                 rtRepostCounts: '<span class="repostCounts">(-)</span>',
                 rtrtRepostCounts: '<span class="repostCounts">(-)</span>',
-                commentBtn: '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');" title="点击添加评论">评</a>',
+                commentBtn: '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\');" title="点击添加评论">评</a>',
                 commentCounts: '<span class="commentCounts">(-)</span>',
                 rtCommentCounts: '<span class="commentCounts">(-)</span>',
                 rtrtCommentCounts: '<span class="commentCounts">(-)</span>',
-                delCommentBtn: '<a class="delcommenttweet" href="javascript:void(0);" onclick="javascript:doDelComment(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');" title="点击删除评论">删</a>',
+                delCommentBtn: '<a class="delcommenttweet" href="javascript:void(0);" onclick="javascript:doDelComment(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\');" title="点击删除评论">删</a>',
                 new_msgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="doNewMessage(this,\'' + user.screen_name + '\',\'' + user.id + '\');" title="发送私信">私</a>',
-                delDirectMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="delDirectMsg(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');" title="点击删除私信">删</a>',
-                addFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>',
-                delFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="delFavorites(this,\'' + user.screen_name + '\',' + sinaMsg.id + ');" title="点击取消收藏"><img width="11px" src="/images/favorites.gif"/></a>',
+                delDirectMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="delDirectMsg(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\');" title="点击删除私信">删</a>',
+                addFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>',
+                delFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="delFavorites(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\');" title="点击取消收藏"><img width="11px" src="/images/favorites.gif"/></a>',
                 rtRepostBtn: '',
                 rtCommentBtn: '',
                 rtReplyBtn: '',
@@ -46,18 +46,18 @@ function bildMsgLi(sinaMsg, t, c_user){
 
         var rt_status = sinaMsg.retweeted_status || sinaMsg.status;
         if(rt_status && rt_status.user){
-            crlBtn.rtRepostBtn = '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + rt_status.user.screen_name + '\',' + rt_status.id + ');" title="转发这条微博">转</a>';
-            crlBtn.rtCommentBtn = '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + rt_status.user.screen_name + '\',' + rt_status.id + ');" title="点击添加评论">评</a>';
-            crlBtn.rtReplyBtn = '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + rt_status.user.screen_name + '\',' + rt_status.id + ');" title="进行@回复">@</a>';
-            crlBtn.rtAddFavoritesMsgBtn = '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'' + rt_status.user.screen_name + '\',' + rt_status.id + ');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>';
+            crlBtn.rtRepostBtn = '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + rt_status.user.screen_name + '\',\'' + rt_status.id + '\');" title="转发这条微博">转</a>';
+            crlBtn.rtCommentBtn = '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + rt_status.user.screen_name + '\',\'' + rt_status.id + '\');" title="点击添加评论">评</a>';
+            crlBtn.rtReplyBtn = '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + rt_status.user.screen_name + '\',\'' + rt_status.id + '\');" title="进行@回复">@</a>';
+            crlBtn.rtAddFavoritesMsgBtn = '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'' + rt_status.user.screen_name + '\',\'' + rt_status.id + '\');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>';
             if(rt_status.retweeted_status && rt_status.retweeted_status.user) {
             	//log(rt_status);
             	var rtrt_screen_name = rt_status.retweeted_status.user.screen_name;
             	var rtrt_id = rt_status.retweeted_status.id;
-            	crlBtn.rtrtRepostBtn = '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + rtrt_screen_name + '\',' + rtrt_id + ');" title="转发这条微博">转</a>';
-                crlBtn.rtrtCommentBtn = '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + rtrt_screen_name + '\',' + rtrt_id + ');" title="点击添加评论">评</a>';
-                crlBtn.rtrtReplyBtn = '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + rtrt_screen_name + '\',' + rtrt_id + ');" title="进行@回复">@</a>';
-                crlBtn.rtrtAddFavoritesMsgBtn = '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'' + rtrt_screen_name + '\',' + rtrt_id + ');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>';
+            	crlBtn.rtrtRepostBtn = '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + rtrt_screen_name + '\',\'' + rtrt_id + '\');" title="转发这条微博">转</a>';
+                crlBtn.rtrtCommentBtn = '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + rtrt_screen_name + '\',\'' + rtrt_id + '\');" title="点击添加评论">评</a>';
+                crlBtn.rtrtReplyBtn = '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + rtrt_screen_name + '\',\'' + rtrt_id + '\');" title="进行@回复">@</a>';
+                crlBtn.rtrtAddFavoritesMsgBtn = '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'' + rtrt_screen_name + '\',\'' + rtrt_id + '\');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>';
                 
             }
         }
@@ -115,7 +115,7 @@ function bildMsgLi(sinaMsg, t, c_user){
             case 'comments_timeline':
                 crlBtn.repostBtn = crlBtn.repostCounts = crlBtn.commentCounts = crlBtn.delTweetBtn = crlBtn.delDirectMsgBtn = crlBtn.addFavoritesMsgBtn = crlBtn.delFavoritesMsgBtn = '';
                 crlBtn.commentBtn = '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + 
-                	sinaMsg.status.user.screen_name + '\',' + sinaMsg.status.id + ',\'' + user.screen_name + '\', ' + user.id + ', ' + sinaMsg.id + ');" title="点击回复评论">回复</a>';
+                	sinaMsg.status.user.screen_name + '\',' + sinaMsg.status.id + ',\'' + user.screen_name + '\', ' + user.id + ',\'' + sinaMsg.id + '\');" title="点击回复评论">回复</a>';
                 if(c_user.id == user.id){
                     crlBtn.new_msgBtn = '';
                 }else{

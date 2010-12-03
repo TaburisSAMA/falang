@@ -50,11 +50,12 @@ var T_LIST = {
 	'digu': ['friends_timeline','mentions', 'direct_messages']
 };
 T_LIST.tsina = T_LIST.tsohu = T_LIST.all;
-T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.digu;
+T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.digu;
 
 var T_NAMES = {
 	'tsina': '新浪微博',
 	'digu': '嘀咕',
+	'fanfou': '饭否',
 	'tsohu': '搜狐微博',
 //	't163': '网易微博',
 	'zuosa': '做啥',

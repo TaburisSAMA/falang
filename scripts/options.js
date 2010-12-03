@@ -6,6 +6,7 @@ var SUPPORT_AUTH_TYPES = {
 	'tsina': ['oauth', 'baseauth'],
 	'tsohu': ['oauth', 'baseauth'],
 	't163': ['oauth'],
+	'fanfou': ['baseauth'],
 	'digu': ['baseauth'],
 	'zuosa': ['baseauth'],
 	'follow5': ['baseauth'],

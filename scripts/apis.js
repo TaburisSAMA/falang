@@ -1768,14 +1768,33 @@ $.extend(FanfouAPI, {
 	
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
-		host: 'http://api.fanfou.com',
-		source: 'fawave'
-//		oauth_key: 'fawave',
-//        oauth_secret: 'tYU2lK30IlSRhuX8ouUtEx8Uk2fRf8Yk',
+		host: 'http://api2.fanfou.com',
+		source: 'fawave',
+		repost_pre: '转',
+	    support_comment: false,
+	    support_repost: false,
+	    support_upload: false
         
 //        oauth_authorize: '/oauth/authenticate',
 //        friends_timeline: '/statuses/home_timeline'
-	})
+	}),
+	
+	// 无需urlencode
+	url_encode: function(text) {
+		return text;
+	},
+	
+	reset_count: function(data, callback) {
+		callback();
+	},
+	
+	counts: function(data, callback) {
+		callback();
+	},
+	
+	comments_timeline: function(data, callback) {
+		callback();
+	}
 });
 
 var T163API = $.extend({}, sinaApi);
