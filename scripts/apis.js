@@ -1923,10 +1923,17 @@ $.extend(RenjianAPI, {
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.renjian.com/v2',
 		source: 'fawave', 
+		support_comment: false,
+		support_repost: false,
 	    
+		favorites: '/statuses/likes',
+        favorites_create: '/statuses/like/{{id}}',
+        favorites_destroy: '/statuses/unlike/{{id}}',
 	    upload: '/statuses/create',
 	    repost: '/statuses/create',
 	    friends_timeline: '/statuses/friends_timeline',
+	    friends: '/statuses/followings/{{user_id}}',
+	    followers: '/statuses/followers/{{user_id}}',
 	    direct_messages: '/direct_messages/receive'
 	}),
 	
@@ -1966,13 +1973,47 @@ $.extend(RenjianAPI, {
 			// status => text
 			args.data.text = args.data.status;
 			delete args.data.status;
+			if(args.data.sina_id){
+				args.data.in_reply_to_status_id = args.data.sina_id;
+				delete args.data.sina_id;
+			}
 		} else if(args.url == this.config.friends_timeline){
 			args.data.id = user.id;
+		} else if(args.url == this.config.friends || args.url == this.config.followers) {
+			// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
+			// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
+			args.data.page = args.data.cursor == -1 ? 1 : args.data.cursor;
+			delete args.data.cursor;
+			if(!args.data.page){
+				args.data.page = 1;
+			}
 		}
     },
+    
+    format_result: function(data, play_load, args) {
+		if($.isArray(data)) {
+	    	for(var i in data) {
+	    		data[i] = this.format_result_item(data[i], play_load, args);
+	    	}
+	    } else {
+	    	data = this.format_result_item(data, play_load, args);
+	    }
+		// 若是follwers api，则需要封装成cursor接口
+		// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
+		// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
+		if(args.url == this.config.followers || args.url == this.config.friends) {
+			data = {users: data, next_cursor: Number(args.data.page) + 1, previous_cursor: args.data.page};
+			if(data.users.length == 0) {
+				data.next_cursor = 0;
+			}
+		}
+		return data;
+	},
 	
 	format_result_item: function(data, play_load, args) {
 		if(play_load == 'status' && data.id) {
+			data.favorited = data.liked;
+			delete data.liked;
 			if(data.attachment && data.attachment.type == 'PICTURE'){
 				data.thumbnail_pic = data.attachment.thumbnail;
 				data.bmiddle_pic = data.attachment.url;
@@ -1983,8 +2024,7 @@ $.extend(RenjianAPI, {
 			if(data.replyed_status) {
 				data.retweeted_status = data.replyed_status;
 				delete data.replyed_status;
-				this.format_result_item(data.retweeted_status.user, 'user', args);
-				data.retweeted_status.t_url = tpl + data.retweeted_status.id;
+				this.format_result_item(data.retweeted_status, 'status', args);
 			}
 			data.t_url = tpl + data.id;
 			this.format_result_item(data.user, 'user', args);
@@ -1995,6 +2035,7 @@ $.extend(RenjianAPI, {
 			if(data.profile_image_url) {
 				data.profile_image_url = data.profile_image_url.replace('120x120', '48x48');
 			}
+			data.name = data.name || data.screen_name;
 		} 
 		else if(play_load == 'comment') {
 			this.format_result_item(data.user, 'user', args);

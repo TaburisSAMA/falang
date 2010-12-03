@@ -61,7 +61,7 @@ var T_NAMES = {
 	'zuosa': '做啥',
 //	'follow5': 'Follow5',
 	'twitter': 'Twitter',
-//	'renjian': '人间网',
+	'renjian': '人间网',
 	'leihou': '雷猴'
 	
 };
