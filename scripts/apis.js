@@ -1748,15 +1748,13 @@ $.extend(TwitterAPI, {
 		if(play_load == 'status' && data.id) {
 			var tpl = 'http://twitter.com/{{user.screen_name}}/status/{{id}}';
 			data.t_url = tpl.format(data);
+			this.format_result_item(data.user, 'user', args);
 			if(data.retweeted_status) {
 				data.retweeted_status.t_url = tpl.format(data.retweeted_status);
+				this.format_result_item(data.retweeted_status.user, 'user', args);
 			}
 		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = 'http://twitter.com/' + (data.screen_name || data.id);
-//			if(data.profile_image_url) {
-//			}
-//			if(data.location) {
-//			}
 		}
 		return data;
 	}
@@ -1774,9 +1772,6 @@ $.extend(FanfouAPI, {
 	    support_comment: false,
 	    support_repost: false,
 	    support_upload: false
-        
-//        oauth_authorize: '/oauth/authenticate',
-//        friends_timeline: '/statuses/home_timeline'
 	}),
 	
 	// 无需urlencode
@@ -1792,8 +1787,15 @@ $.extend(FanfouAPI, {
 		callback();
 	},
 	
-	comments_timeline: function(data, callback) {
-		callback();
+	format_result_item: function(data, play_load, args) {
+		if(play_load == 'status' && data.id) {
+			var tpl = 'http://fanfou.com/statuses/{{id}}';
+			data.t_url = tpl.format(data);
+			this.format_result_item(data.user, 'user', args);
+		} else if(play_load == 'user' && data && data.id) {
+			data.t_url = 'http://fanfou.com/' + (data.id || data.screen_name);
+		}
+		return data;
 	}
 });
 
