@@ -723,10 +723,12 @@ function filterDatasByMaxId(datas, max_id, append){
     	}
     	if(found){
     		if(append){
+    			// id等于最大id的数据位于index-1，所以获取index开始往后的数据
     			datas = datas.slice(index);
     		} else {
-    			index--;
-    			datas = datas.slice(0, index);
+    			// 如果不是append的，id等于最大id的数据位于index-1，
+    			// 不包含(index-1)这位置的那条记录及它以后的数据
+    			datas = datas.slice(0, index-1);
     		}
     	}
     }
