@@ -1855,6 +1855,14 @@ $.extend(FanfouAPI, {
 		callback();
 	},
 	
+	before_sendRequest: function(args, user) {
+		if(args.url == this.config.new_message) {
+			// id => user
+			args.data.user = args.data.id;
+			delete args.data.id;
+		}
+    },
+	
 	/* photo（必须）- 照片文件。和<input type="file" name="photo" />效果一样
 	 * */
 	format_upload_params: function(user, data, pic) {
