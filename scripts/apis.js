@@ -61,7 +61,11 @@ var sinaApi = {
         oauth_access_token:   '/oauth/access_token',
 
         detailUrl:        '/jump?aid=detail&twId=',
-        searchUrl:        '/search/'
+        searchUrl:        '/search/',
+        
+        ErrorCodes: {
+        	'40025:Error: repeated weibo text!': '重复发送'
+        }
     },
 
     /**
@@ -866,7 +870,6 @@ var sinaApi = {
                     	if(data.indexOf('{"wrong":"no data"}') > -1 || data == ''){
                     		data = [];
                     	} else {
-//                        	var old_data = data;
                             data = {error: callmethod + ' 服务器返回结果错误，本地解析错误。' + err, error_code:500};
                             textStatus = 'error';
                     	}
@@ -878,7 +881,7 @@ var sinaApi = {
                     if(data.error || error_code){
                     	textStatus = $this.format_error(data.error || data.wrong, error_code);
                     	var error_msg = callmethod + ' error: ' + textStatus;
-                    	if(error_code){
+                    	if(!textStatus && error_code){ // 错误为空，才显示错误代码
                     		error_msg += ', error_code: ' + error_code;
                     	}
                         showMsg(error_msg);
@@ -907,7 +910,15 @@ var sinaApi = {
                             catch(err){
                                 r = null;
                             }
-                            if(r){showMsg(callmethod + ' error_code:' + r.error_code + ', error:' + r.error);}
+                            if(r){
+                            	var error_code = r.error_code || r.code;
+                            	r.error = $this.format_error(r.error || r.wrong, error_code);
+		                    	var error_msg = callmethod + ' error: ' + r.error;
+		                    	if(!r.error && error_code){ // 错误为空，才显示错误代码
+		                    		error_msg += ', error_code: ' + error_code;
+		                    	}
+		                    	showMsg(error_msg);
+                            }
                         }
                     }
                 }catch(err){
@@ -916,7 +927,7 @@ var sinaApi = {
                 if(!r){
                     textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';
                     errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
-                    r = {error:callmethod + ' error: ' + textStatus + errorThrown + 'statuCode: ' + status};
+                    r = {error:callmethod + ' error: ' + textStatus + errorThrown + ' statuCode: ' + status};
                     showMsg(r.error);
                 }
                 callbackFn(r||{}, 'error', status); //不管什么状态，都返回 error
