@@ -204,7 +204,7 @@
 					<span class="arrow_r"></span>
 					<div class="userName">
 						<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" rhref="#{user.t_url}" title="#{getUserCountsInfo(user)}">
-							#{user.screen_name}<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
+							#{user.screen_name}<?js if(user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
 						</a>
 						<span class="edit">
 							<?js if(tweet.related_dialogue_url){ ?>
@@ -240,7 +240,14 @@
 						<br />
 					</div>
 					<?js if(tweet.created_at){ ?>
-					<div class="msgInfo"><a href="#{tweet.t_url}" target="_blank">#{new Date(tweet.created_at).format("yyyy-MM-dd hh:mm:ss")}</a> 通过 #{tweet.source||'网站'}</div>
+					<div class="msgInfo">
+					   <?js if(tweet.t_url){ ?>
+					   <a href="#{tweet.t_url}" target="_blank">#{new Date(tweet.created_at).format("yyyy-MM-dd hh:mm:ss")}</a> 
+					   <?js } else { ?>
+					   #{new Date(tweet.created_at).format("yyyy-MM-dd hh:mm:ss")}
+					        通过 #{tweet.source||'网站'}
+					   <?js } ?>
+					</div>
 					<?js } ?>
 				</div>
 			  </div> <!-- end .li_wrap -->
@@ -265,7 +272,7 @@
 										<a target="_blank" 
 											href="javascript:getUserTimeline('#{tweet.retweeted_status.user.screen_name}', '#{tweet.retweeted_status.user.id}');" 
 											rhref="#{tweet.retweeted_status.user.t_url}" >
-											@#{tweet.retweeted_status.user.screen_name}<?js if(tweet.retweeted_status.user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
+											@#{tweet.retweeted_status.user.screen_name}<?js if(tweet.retweeted_status.user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
 										</a>
 										#{buildTipboxUserInfo(tweet.retweeted_status.user)}
 									</span>
@@ -283,7 +290,14 @@
 								<?js } ?>
 								<!-- {{retweeted_retweeted_status_in}} -->
 								<?js if(tweet.retweeted_status.created_at){ ?>
-								<div class="msgInfo"><a href="#{tweet.retweeted_status.t_url}" target="_blank">#{new Date(tweet.retweeted_status.created_at).format("yyyy-MM-dd hh:mm:ss")}</a>  通过 #{tweet.retweeted_status.source||'网站'}</div>
+								<div class="msgInfo">
+									<?js if(tweet.retweeted_status.t_url){ ?>
+									<a href="#{tweet.retweeted_status.t_url}" target="_blank">#{new Date(tweet.retweeted_status.created_at).format("yyyy-MM-dd hh:mm:ss")}</a>
+									<?js } else { ?>
+									#{new Date(tweet.retweeted_status.created_at).format("yyyy-MM-dd hh:mm:ss")}
+									<?js } ?>
+									通过 #{tweet.retweeted_status.source||'网站'}
+								</div>
 								<?js } ?>
 								<div class="comments">
 									<p style="text-align:right;"><a href="javascript:void(0);" onclick="showComments(this, #{tweet.retweeted_status.id});">隐藏评论</a></p>
@@ -306,7 +320,7 @@
 					<div class="user_info">
 						<p><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" 
 							rhref="#{user.t_url}">#{user.screen_name}
-							<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
+							<?js if(user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
 						</a></p>
 						<p>
 							<img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 
@@ -334,7 +348,7 @@
 			<div class="userinfo_detail">
 				<div class="user_head"><img src="#{user.profile_image_url}" /></div>
 				<div class="user_info">
-					<div class="userName"><a href="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
+					<div class="userName"><a href="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
 					</a>
 					<?js if(!user.is_me){ ?>
 					<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">私</a>
@@ -370,7 +384,7 @@
 				<div class="user_head"><img src="#{user.profile_image_url}" /></div>
 				<div class="user_info">
 					<div class="userName"><a  href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" 
-					rhref="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="新浪认证" src="/images/verified.gif" /><?js } ?>
+					rhref="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
 					</a>
 					<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">私</a>
 					<?js if(user.unfollow === undefined && tType =='friends'){ ?>

@@ -773,8 +773,7 @@ var sinaApi = {
 			this.format_result_item(data.user, 'user', args);
 			var tpl = this.config.host + '/{{user.id}}/statuses/{{id}}';
 			if(data.retweeted_status) {
-				this.format_result_item(data.retweeted_status.user, 'user', args);
-				data.retweeted_status.t_url = tpl.format(data.retweeted_status);
+				this.format_result_item(data.retweeted_status, 'status', args);
 			}
 			// 设置status的t_url
 			data.t_url = tpl.format(data);
@@ -783,6 +782,7 @@ var sinaApi = {
 			this.format_result_item(data.recipient, 'user', args);
 		} else if(play_load == 'comment') {
 			this.format_result_item(data.user, 'user', args);
+			this.format_result_item(data.status, 'status', args);
 		} 
 		return data;
 	},
