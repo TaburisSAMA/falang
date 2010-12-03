@@ -63,7 +63,7 @@ function bildMsgLi(sinaMsg, t, c_user){
         }
         // 不支持评论
         if(!support_comment) {
-        	crlBtn.commentBtn = crlBtn.commentCounts = '';
+        	crlBtn.commentBtn = crlBtn.commentCounts = crlBtn.rtCommentCounts = crlBtn.rtCommentBtn = '';
         }
         // 不支持收藏
         if(!support_favorites) {
@@ -71,7 +71,7 @@ function bildMsgLi(sinaMsg, t, c_user){
         }
         // 不支持repost(转发)
         if(!config.support_repost) {
-        	crlBtn.repostCounts = crlBtn.rtRepostCounts = crlBtn.repostBtn = '';
+        	crlBtn.repostCounts = crlBtn.rtRepostCounts = crlBtn.repostBtn = crlBtn.rtRepostBtn = '';
         }
         // 不支持删除私信
         if(!config.support_destroy_msg) {
