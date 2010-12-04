@@ -83,7 +83,7 @@ $(function(){
     $("#show-edit-account").click(function(){
         var uniqueKey = $("#account-list").val();
         $("#edit-account-key").val(uniqueKey);
-        $("#edit-account-info").show().find('h3').html($(this).text()).end().find('.ainfo').html($("#account-list").text());
+        $("#edit-account-info").show().find('h3').html($(this).text()).end().find('.ainfo').html($("#account-list :selected").text());
         showEditAccount(uniqueKey);
     });
 
@@ -115,7 +115,7 @@ $(function(){
         calculateUserRefreshTimeHits(user);
 
         $("#new-account").hide();
-        $("#edit-account-info").show().find('h3').html($(this).text()).end().find('.ainfo').html($("#account-list").text());
+        $("#edit-account-info").show().find('h3').html($(this).text()).end().find('.ainfo').html($("#account-list :selected").text());
         $("#user-custom-wrap").show();
     });
 
