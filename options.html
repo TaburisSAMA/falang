@@ -36,9 +36,8 @@
 	</ul>
 	<!-- 用户设置 START -->
 	<div id="user_set" class="set_wrap" style="display:none;">
-		<br/><br/>
+		<br/>
 		<div class="alert" id="needRefresh" style="display:none;">你看到这个是因为你的账户信息需要刷新FaWave才能继续使用，请点击“更新用户信息”进行刷新用户信息。</div>
-		<div class="info">用户、密码保存在本地。在公共电脑上使用时请慎重。</div>
 		<table>
 			<tr>
 			    <td>
@@ -60,6 +59,10 @@
 			</tr>
 		</table>
 
+		<div id="edit-account-info" style="display:none;">
+			<h3></h3>
+			<label class="title">当前编辑用户：</label><span class="ainfo"></span>
+		</div>
 		<div id="new-account" style="display:none;">
 			<ul>
 				<li>新浪微博的API，由于cookie信息会干扰认证，而我至今未找到解决办法，所以在添加或者编辑用户信息的时候，为了确保你可以正确设置你的账号信息，设置新浪微博的账号时，请你先<b><a href="http://t.sina.com.cn/logout.php?backurl=/" target="_blank">退出新浪微博</a></b></li>
@@ -116,16 +119,16 @@
 				<li>
 					<p>
 						<label class="title">获取信息间隔时间：</label>
-						<span>当前设置产生的每小时请求数: <span id="userRefreshTimeHits"></span>请求/每小时</span><br/>
-						　　　　　　　　　　
+						<span>当前设置产生的每小时请求数: <span id="userRefreshTimeHits"></span>请求/每小时</span>
+						&nbsp;<a href="api_rate_limit.html" target="_blank">查看API请求数限制状态</a><br/>
+						　　　　　　　　
+						<span class="jTip" jTitle="这里又要设置？:　" jWidth="310">?<span class="c">这里的刷新频率设置会覆盖“<span class="note">基本设置</span>”里面的“获取信息间隔时间”的设置，你可以在这里为特定的账户设置特定的刷新时间间隔，而不影响其他账号使用全局设置。 </span></span>
 						<span id="userRefreshTimeWrap">
 							首页<span></span>:<input type="text" id="userRefreshTime_friends_timeline" class="inpRefTime" />秒, 
 							@我<span></span>:<input type="text" id="userRefreshTime_mentions" class="inpRefTime" />秒, 
 							<span>评论<span></span>:<input type="text" id="userRefreshTime_comments_timeline" class="inpRefTime" />秒, </span>
 							私信<span></span>:<input type="text" id="userRefreshTime_direct_messages" class="inpRefTime" />秒
 						</span>
-						<span class="jTip" jTitle="间隔越短越好吗？:　" jWidth="310">?<span class="c">使用“<span class="note">搜狐</span>”账号的童鞋注意：暂时搜狐的API请求限制很小，所以建议搜狐账号的童鞋将刷新频率设置为2分钟或以上，否则超过限制会出错。至于各帐号具体的API请求频率限制可以到“<span class="note">高级设置</span>”里面查看。</span></span>
-						
 						<br/>　　　　　　　　　　(注:括号内数字为当前全局设置值，填“0”表示使用全局设置)
 					</p>
 				</li>
@@ -172,18 +175,9 @@
 					评论:<input type="text" id="gRefreshTime_comments_timeline" class="inpRefTime" />秒, 
 					私信:<input type="text" id="gRefreshTime_direct_messages" class="inpRefTime" />秒
 				</span>
-				<span class="jTip" jTitle="间隔越短越好吗？:　" jWidth="310">?
-					<span class="c">使用“<span class="note">搜狐</span>”账号的童鞋注意：暂时搜狐的API请求限制很小，所以建议搜狐账号的童鞋将刷新频率设置为2分钟或以上，否则超过限制会出错。至于各帐号具体的API请求频率限制可以到“<span class="note">高级设置</span>”里面查看。</span>
-				</span>
+				<span class="jTip" jTitle="间隔越短越好吗？:　" jWidth="310">?<span class="c">这里的刷新时间间隔是全局设置，如果你需要对特定的账号进行特定的设置，可以到“<span class="note">账号设置</span>”里面进行“自定信息提示”设置。例如新浪最高可以30秒刷新一次，而Twitter每小时的API请求是150次，所以30秒刷新一次Twitter肯定会超过限制，超过限制则会出错。所以Twitter的账号可以到“<span class="note">账号设置</span>”里面进行自定义的设置。至于各帐号具体的API请求频率限制可以点击“<span class="note">查看API请求数限制状态</span>”查看。</span></span>
+				&nbsp;<a href="api_rate_limit.html" target="_blank">查看API请求数限制状态</a>
 			</p>
-		</li>
-		<li>
-			<label class="title">是否自动缩短URL：</label>
-			<span>
-				<input type="checkbox" name="autoShortUrl" value="1" checked="checked" id="autoShortUrl"><label for="autoShortUrl">自动缩短</label>, 
-				<label for="autoShortUrlCount">URL超过多少个字符自动缩短:</label><input type="text" id="autoShortUrlCount" value="15" />
-				<span>(短址服务由<a target="_blank" href="http://s8.hk">缩吧</a>提供)</span>
-			</span>
 		</li>
 		<li>
 			<p id="set_badge_wrap"><label class="title">　　　　未读提示：</label>
@@ -197,15 +191,6 @@
 			</p>
 		</li>
 		<li>
-			<label class="title">　　　　同步设置：</label>
-			<span>
-				<input type="checkbox" id="unread_sync_to_page" value="1" /><label for="unread_sync_to_page">同时将新浪微博页面的未读提示置零</label>
-			</span>
-			<span class="jTip" jTitle="未读信息提示同步:　">?
-				<span class="c"><span class="note">暂时只支持新浪微博</span>。如果已经通过FaWave(发微)看过的信息，<br/>则同时将新浪微博的页面提示数置零<br/><br/><img src="/images/setting/page_unread_tip.png" /></span>
-			</span>
-		</li>
-		<li>
 			<p id="set_show_in_page_wrap"><label class="title">新消息在页面提示：</label>
 				<input type="checkbox" id="set_show_in_page_friends_timeline" value="1" /><label for="set_show_in_page_friends_timeline">最新微博</label>
 				<input type="checkbox" id="set_show_in_page_mentions" value="1" /><label for="set_show_in_page_mentions">@我的</label>
@@ -215,6 +200,15 @@
 					<span class="c"><img src="/images/setting/show_in_page.png" /></span>
 				</span>
 			</p>
+		</li>
+		<li>
+			<label class="title">　　　　同步设置：</label>
+			<span>
+				<input type="checkbox" id="unread_sync_to_page" value="1" /><label for="unread_sync_to_page">同时将新浪微博页面的未读提示置零</label>
+			</span>
+			<span class="jTip" jTitle="未读信息提示同步:　">?
+				<span class="c"><span class="note">暂时只支持新浪微博</span>。如果已经通过FaWave(发微)看过的信息，<br/>则同时将新浪微博的页面提示数置零<br/><br/><img src="/images/setting/page_unread_tip.png" /></span>
+			</span>
 		</li>
 		<li>
 			<p>
@@ -306,8 +300,13 @@
 					<img src="/images/setting/looking.png" /></span>
 			</span>
 		</li>
-		<li><br/>
-			<a href="api_rate_limit.html" target="_blank">查看API请求数限制状态</a>
+		<li>
+			<label class="title">是否自动缩短URL：</label>
+			<span>
+				<input type="checkbox" name="autoShortUrl" value="1" checked="checked" id="autoShortUrl"><label for="autoShortUrl">自动缩短</label>, 
+				<label for="autoShortUrlCount">URL超过多少个字符自动缩短:</label><input type="text" id="autoShortUrlCount" value="15" />
+				<span>(短址服务由<a target="_blank" href="http://s8.hk">缩吧</a>提供)</span>
+			</span>
 		</li>
 	</ul>
 	<!-- 关于与感谢 -->

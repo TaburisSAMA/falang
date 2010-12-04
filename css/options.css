@@ -32,6 +32,7 @@ label.title{color:#AB5603; font-weight:bold;}
 }
 
 #userRefreshTimeHits{ color:green; }
+#edit-account-info .ainfo{ color:green; font-weight:bold; }
 
 #themePreview{
 	-webkit-box-shadow: #AAA 0px 0px 8px;

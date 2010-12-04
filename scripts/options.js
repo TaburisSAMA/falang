@@ -38,12 +38,13 @@ $(function(){
         $("#account-pwd").val('');
         $("#edit-account-key").val('');
         onSelBlogTypeChange();
+        $("#edit-account-info").hide();
         $("#new-account").show();
         $("#user-custom-wrap").hide();
     });
 
     $("#cancel-save-account, #cancel-save-user-custom").click(function(){
-        $("#new-account, #user-custom-wrap").hide();
+        $("#new-account, #user-custom-wrap, #edit-account-info").hide();
     });
 
     $("#save-account").click(function(){
@@ -82,6 +83,7 @@ $(function(){
     $("#show-edit-account").click(function(){
         var uniqueKey = $("#account-list").val();
         $("#edit-account-key").val(uniqueKey);
+        $("#edit-account-info").show().find('h3').html($(this).text()).end().find('.ainfo').html($("#account-list").text());
         showEditAccount(uniqueKey);
     });
 
@@ -113,6 +115,7 @@ $(function(){
         calculateUserRefreshTimeHits(user);
 
         $("#new-account").hide();
+        $("#edit-account-info").show().find('h3').html($(this).text()).end().find('.ainfo').html($("#account-list").text());
         $("#user-custom-wrap").show();
     });
 
@@ -134,6 +137,7 @@ $(function(){
                 user.refreshTime[T_LIST.all[i]] = refTime;
                 refTimeInp.val(refTime);
             }
+
             var userList = getUserList(true);
             // 删除旧数据，替换新的
             var found = false;
@@ -145,7 +149,14 @@ $(function(){
             	}
             });
             saveUserList(userList);
-            _showMsg('保存成功');
+
+            if(found){
+                _showMsg('保存成功');
+                var b_view = getBackgroundView();
+                if(b_view){
+                    b_view.RefreshManager.restart();
+                }
+            }
         }else{
             _showMsg('保存失败：未指定编辑的用户');
         }
