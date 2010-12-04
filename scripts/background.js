@@ -365,7 +365,7 @@ var RefreshManager = {
     },
     stop: function(){
         for(var i in this.itv){
-            clearInterval(this.itv);
+            clearInterval(this.itv[i]);
         }
     },
     restart: function(){
