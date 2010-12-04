@@ -122,7 +122,7 @@
 						<span>当前设置产生的每小时请求数: <span id="userRefreshTimeHits"></span>请求/每小时</span>
 						&nbsp;<a href="api_rate_limit.html" target="_blank">查看API请求数限制状态</a><br/>
 						　　　　　　　　
-						<span class="jTip" jTitle="这里又要设置？:　" jWidth="310">?<span class="c">这里的刷新频率设置会覆盖“<span class="note">基本设置</span>”里面的“获取信息间隔时间”的设置，你可以在这里为特定的账户设置特定的刷新时间间隔，而不影响其他账号使用全局设置。 </span></span>
+						<span class="jTip" jTitle="这里又要设置？:　" jWidth="310">?<span class="c">这里的刷新频率设置会覆盖“<span class="note">基本设置</span>”里面的“获取信息间隔时间”的设置，你可以在这里为特定的账户设置特定的刷新时间间隔，而不影响其他账号使用全局设置。最低可以设置的值为<span class="note">30秒</span></span></span>
 						<span id="userRefreshTimeWrap">
 							首页<span></span>:<input type="text" id="userRefreshTime_friends_timeline" class="inpRefTime" />秒, 
 							@我<span></span>:<input type="text" id="userRefreshTime_mentions" class="inpRefTime" />秒, 
@@ -169,14 +169,15 @@
 		<li>
 			<p>
 				<label class="title">获取信息间隔时间：</label>
-				<span>
+				<span id="gRefreshTimeWrap">
 					首页:<input type="text" id="gRefreshTime_friends_timeline" class="inpRefTime" />秒, 
 					@我:<input type="text" id="gRefreshTime_mentions" class="inpRefTime" />秒, 
 					评论:<input type="text" id="gRefreshTime_comments_timeline" class="inpRefTime" />秒, 
 					私信:<input type="text" id="gRefreshTime_direct_messages" class="inpRefTime" />秒
 				</span>
-				<span class="jTip" jTitle="间隔越短越好吗？:　" jWidth="310">?<span class="c">这里的刷新时间间隔是全局设置，如果你需要对特定的账号进行特定的设置，可以到“<span class="note">账号设置</span>”里面进行“自定信息提示”设置。例如新浪最高可以30秒刷新一次，而Twitter每小时的API请求是150次，所以30秒刷新一次Twitter肯定会超过限制，超过限制则会出错。所以Twitter的账号可以到“<span class="note">账号设置</span>”里面进行自定义的设置。至于各帐号具体的API请求频率限制可以点击“<span class="note">查看API请求数限制状态</span>”查看。</span></span>
+				<span class="jTip" jTitle="间隔越短越好吗？:　" jWidth="310">?<span class="c">这里的刷新时间间隔是全局设置，如果你需要对特定的账号进行特定的设置，可以到“<span class="note">账号设置</span>”里面进行“自定信息提示”设置。例如新浪最高可以30秒刷新一次，而Twitter每小时的API请求是150次，所以30秒刷新一次Twitter肯定会超过限制，超过限制则会出错。所以Twitter的账号可以到“<span class="note">账号设置</span>”里面进行自定义的设置。至于各帐号具体的API请求频率限制可以点击“<span class="note">查看API请求数限制状态</span>”查看。最低可以设置的值为<span class="note">30秒</span></span></span>
 				&nbsp;<a href="api_rate_limit.html" target="_blank">查看API请求数限制状态</a>
+				<br/>　　　　　　　　　　(当前设置的刷新间隔每小时产生的请求次数为：<span id="gRefreshTimeHits"></span>请求/每小时)
 			</p>
 		</li>
 		<li>

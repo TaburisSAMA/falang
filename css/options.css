@@ -31,7 +31,7 @@ label.title{color:#AB5603; font-weight:bold;}
 	border-top: 1px dashed #D5B163;
 }
 
-#userRefreshTimeHits{ color:green; }
+#gRefreshTimeHits, #userRefreshTimeHits{ color:#BA2636; }
 #edit-account-info .ainfo{ color:green; font-weight:bold; }
 
 #themePreview{

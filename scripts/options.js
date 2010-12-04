@@ -169,6 +169,10 @@ $(function(){
         calculateUserRefreshTimeHits(user);
     });
 
+    $("#gRefreshTimeWrap input").change(function(){
+        calculateGlobalRefreshTimeHits();
+    });
+
     $("#cleanLocalStorage").click(function(){
         if(confirm('你确定要清空本地缓存数据吗？')){
             cleanLocalStorageData();
@@ -222,6 +226,24 @@ $(function(){
     }
 });
 
+//统计全局的刷新间隔设置产生的请求次数
+function calculateGlobalRefreshTimeHits(){
+    var total = 0, refTime = 0, refTimeInp = null, timelimes = T_LIST.all;
+    for(var i in timelimes){
+        refTimeInp = $("#gRefreshTime_" + timelimes[i]);
+        refTime = Number(refTimeInp.val());
+        if(isNaN(refTime)){
+            refTime = Settings.defaults.globalRefreshTime[timelimes[i]];
+        }else if(refTime<30){
+            refTime = 30;
+        }
+        refTimeInp.val(refTime);
+        total += Math.round(60*60/refTime);
+    }
+    $("#gRefreshTimeHits").html(total);
+};
+
+//统计用户自定义的刷新间隔设置产生的请求次数
 function calculateUserRefreshTimeHits(user){
     var total = 0, refTime = 0, refTimeInp = null, timelimes = T_LIST[user.blogType];
     for(var i in timelimes){
@@ -289,6 +311,7 @@ function init(){
     for(var i in T_LIST.all){
         $("#gRefreshTime_" + T_LIST.all[i]).val(settings.globalRefreshTime[T_LIST.all[i]]);
     }
+    calculateGlobalRefreshTimeHits();
 
     if(!settings.isSharedUrlAutoShort){
         $("#autoShortUrl").attr("checked", false);
