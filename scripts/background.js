@@ -247,57 +247,32 @@ function getTimelinePage(user_uniqueKey, t, p){
 //	}
     
     tapi[t](params, function(sinaMsgs, textStatus){
-    	if(sinaMsgs == null || textStatus == 'error') {
-    		hideLoading();
-    		return;
-    	}
-        if(sinaMsgs && sinaMsgs.length > 0){
-            //TODO: 这里不确定会不会有闭包造成的c_user变量覆盖问题，待测试
-            if(!c_user){
-                setDoChecking(user_uniqueKey, t, 'paging', false);
-                return;
-            }
-            var _key = user_uniqueKey + t + '_tweets';
-            if(!tweets[_key]){
-                tweets[_key] = [];
-            }
-            var max_id = getMaxMsgId(t, user_uniqueKey);
-            sinaMsgs = filterDatasByMaxId(sinaMsgs, max_id, true);
-            for(var i in sinaMsgs){
-                sinaMsgs[i].readed = true;
-            }
-            tweets[_key] = tweets[_key].concat(sinaMsgs);
-            
-            var current_user = getUser();
-            //防止获取分页内容后已经切换了用户
-            if(current_user.uniqueKey == c_user.uniqueKey){ //TODO:更详细逻辑有待改进
-                var popupView = getPopupView();
-                if(popupView){
-                    popupView.addPageMsgs(sinaMsgs, t, true);
-                    if(sinaMsgs.length >= (PAGE_SIZE/2)){
-                        popupView.showReadMore(t);
-                    }else{
-                        popupView.hideReadMore(t);
-                    }
+    	if($.isArray(sinaMsgs) && textStatus != 'error') {
+    		if(sinaMsgs.length > 0){
+                //TODO: 这里不确定会不会有闭包造成的c_user变量覆盖问题，待测试
+                if(!c_user){
+                    setDoChecking(user_uniqueKey, t, 'paging', false);
+                    return;
                 }
+                var _key = user_uniqueKey + t + '_tweets';
+                if(!tweets[_key]){
+                    tweets[_key] = [];
+                }
+                var max_id = getMaxMsgId(t, user_uniqueKey);
+                sinaMsgs = filterDatasByMaxId(sinaMsgs, max_id, true);
+                for(var i in sinaMsgs){
+                    sinaMsgs[i].readed = true;
+                }
+                tweets[_key] = tweets[_key].concat(sinaMsgs);
+            } else {
+            	page = 0;
             }
-
             if(!support_max_id) {
-	            setLastPage(t, page, user_uniqueKey);
+                setLastPage(t, page, user_uniqueKey);
             }
-        } else {
-            var current_user = getUser();
-            //防止获取分页内容后已经切换了用户
-            if(current_user.uniqueKey == c_user.uniqueKey){ //TODO:更详细逻辑有待改进
-                var popupView = getPopupView();
-                if(popupView){
-                    popupView.hideReadMore(t);
-                }
-            }
-            if(!support_max_id) { // 到底了
-	            setLastPage(t, 0, user_uniqueKey);
-            }
-        }
+    	}
+        // 设置翻页和填充新数据到ui列表的后面显示
+        _showReadMore(t, user_uniqueKey, sinaMsgs);
         hideLoading();
         setDoChecking(user_uniqueKey, t, 'paging', false);
 //        if(t == 'friends_timeline'){
@@ -305,6 +280,28 @@ function getTimelinePage(user_uniqueKey, t, p){
 //        		+ ' page:' + params.page + ' max_id:' + params.max_id + ' new maxid: ' + getMaxMsgId(t, user_uniqueKey));
 //        }
     });
+};
+
+// 设置可以继续翻页
+// 如果datas是数组类型，则根据长度是否大于页数的一半判断是否可以继续翻页
+function _showReadMore(t, user_uniqueKey, datas) {
+	var current_user = getUser();
+    //防止获取分页内容后已经切换了用户
+    if(current_user.uniqueKey == user_uniqueKey) { //TODO:更详细逻辑有待改进
+        var popupView = getPopupView();
+        if(popupView) {
+        	if($.isArray(datas)) {
+        		popupView.addPageMsgs(datas, t, true);
+                if(datas.length >= (PAGE_SIZE / 2)) {
+                    popupView.showReadMore(t);
+                } else {
+                    popupView.hideReadMore(t);
+                }
+        	} else { // 获取数据异常
+        		popupView.showReadMore(t);
+        	}
+        }
+    }
 };
 
 //检查是否正在获取

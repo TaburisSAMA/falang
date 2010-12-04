@@ -882,7 +882,7 @@ var sinaApi = {
                 if(data){
                 	error_code = data.error_code || data.code;
                     if(data.error || error_code){
-                    	textStatus = $this.format_error(data.error || data.wrong, error_code);
+                    	textStatus = $this.format_error(data.error || data.wrong || data.message, error_code);
                     	var error_msg = callmethod + ' error: ' + textStatus;
                     	if(!textStatus && error_code){ // 错误为空，才显示错误代码
                     		error_msg += ', error_code: ' + error_code;
@@ -915,7 +915,7 @@ var sinaApi = {
                             }
                             if(r){
                             	var error_code = r.error_code || r.code;
-                            	r.error = $this.format_error(r.error || r.wrong, error_code);
+                            	r.error = $this.format_error(r.error || r.wrong || r.message, error_code);
 		                    	var error_msg = callmethod + ' error: ' + r.error;
 		                    	if(!r.error && error_code){ // 错误为空，才显示错误代码
 		                    		error_msg += ', error_code: ' + error_code;
