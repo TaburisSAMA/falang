@@ -436,9 +436,7 @@ function initSelectSendAccounts(is_upload){
 function toggleSelectSendAccount(ele){
     var _t = $(ele);
     if(_t.hasClass('sel')){
-        if($("#accountsForSend .sel").length > 1){
-            _t.removeClass('sel');
-        }
+        _t.removeClass('sel');
     }else{
         _t.addClass('sel');
     }

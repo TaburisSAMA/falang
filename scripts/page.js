@@ -191,7 +191,7 @@ var QUICK_SEND_TEMPLATE = ' \
                 </span>\
             </div> \
             <div class="fawaveInfoMsg"></div>\
-            <iframe scr="about:blank" style="position:absolute;z-index:-1;top:0;left:0;height:100%;" width="420" frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="yes"></iframe>\
+            <iframe scr="about:blank" style="position:absolute;z-index:-1;top:0;left:0;height:100%;width:100%;" width="420" frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="no" allowtransparency="yes"></iframe>\
         </div>\
     </div>';
 
@@ -310,9 +310,7 @@ function initSelectSendAccounts(is_upload){
 function toggleSelectSendAccount(ele){
     var _t = $(ele);
     if(_t.hasClass('sel')){
-        if($("#fawave_accountsForSend .sel").length > 1){
-            _t.removeClass('sel');
-        }
+        _t.removeClass('sel');
     }else{
         _t.addClass('sel');
     }
