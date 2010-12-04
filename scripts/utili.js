@@ -650,3 +650,32 @@ function filterDatasByMaxId(datas, max_id, append){
     }
     return datas;
 }
+
+// 缓存数据存储器
+//var TweetStorage = {
+//		_get_pre: function(t, unique_key){
+//			return unique_key + '_' + t;
+//	},
+//	
+//	getItems: function(ids, t, unique_key) {
+//		var pre = this._get_pre(t, unique_key);
+//		return $.map(ids, function(id){
+//			var key = pre + '_' + id;
+//			return localStorage.getObject(key);
+//		});
+//	},
+//	
+//	setItems: function(items, t, unique_key) {
+//		var pre = this._get_pre(t, unique_key);
+//		return $.map(items, function(item){
+//			var key = pre + '_' + item.id;
+//			localStorage.setObject(key, item);
+//			return item.id;
+//		});
+//	},
+//	
+//	removeItem: function(id, t, unique_key) {
+//		var key = this._get_pre(t, unique_key)+ '_' + id;
+//		return localStorage.removeItem(key);
+//	}
+//};

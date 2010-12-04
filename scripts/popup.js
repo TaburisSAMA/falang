@@ -816,9 +816,11 @@ function getSinaTimeline(t, notCheckNew){
     var c_user = getUser();
     var b_view = getBackgroundView();
     var _key = c_user.uniqueKey + t + '_tweets';
-    if(b_view && b_view.tweets[_key] != undefined && b_view.tweets[_key].length>0){
+    if(b_view && b_view.tweets[_key] && b_view.tweets[_key].length>0){
         var tweetsAll = b_view.tweets[_key];
         var msgs = tweetsAll.slice(0, PAGE_SIZE);
+//        var msg_ids = tweetsAll.slice(0, PAGE_SIZE);
+//        var msgs = TweetStorage.getItems(msg_ids, t, c_user.uniqueKey);
         var html = '';
         var ids = [];
         for(var i in msgs){
@@ -843,10 +845,10 @@ function getSinaTimeline(t, notCheckNew){
             if(ids.length > 100){
                 var ids2 = ids.slice(0, 99);
                 ids = ids.slice(99, ids.length);
-                showCounts(t, ids2.join(','));
+                showCounts(t, ids2);
             }
             if(ids.length > 0) {
-            	showCounts(t, ids.join(','));
+            	showCounts(t, ids);
             }
         }
         if(tweetsAll.length >= (PAGE_SIZE/2)){
@@ -866,7 +868,10 @@ function getSinaTimeline(t, notCheckNew){
 
 //显示评论数和回复数
 function showCounts(t, ids){
-    //if(window.currentTab != '#'+t+'_timeline'){return;}
+	if(!ids || ids.length <= 0){
+		return;
+	}
+	ids = ids.join(',');
     if(['direct_messages'].indexOf(t) >= 0){return;}
 
     showLoading();
@@ -1050,6 +1055,8 @@ function readMore(t){
     if(!cache || getTimelineOffset(t) >= cache.length){
         _b_view.getTimelinePage(c_user.uniqueKey, t);
     }else{
+//        var msg_ids = cache.slice(getTimelineOffset(t), getTimelineOffset(t) + PAGE_SIZE);
+//        var msgs = TweetStorage.getItems(msg_ids, t, c_user.uniqueKey);
         var msgs = cache.slice(getTimelineOffset(t), getTimelineOffset(t) + PAGE_SIZE);
         addPageMsgs(msgs, t, true);
         showReadMore(t);
@@ -1125,9 +1132,9 @@ function addPageMsgs(msgs, t, append){
         if(ids.length > 100){
             var ids2 = ids.slice(0, 99);
             ids = ids.slice(99, ids.length);
-            showCounts(t, ids2.join(','));
+            showCounts(t, ids2);
         }
-        showCounts(t, ids.join(','));
+        showCounts(t, ids);
     }
     return msgs;
 };
@@ -1496,26 +1503,32 @@ function doRT(ele){//RT
     
 };
 
+function _delCache(id, t, unique_key) {
+	var cache_key = unique_key + t + '_tweets';
+    var b_view = getBackgroundView();
+    if(b_view && b_view.tweets[cache_key]){
+        var cache = b_view.tweets[cache_key];
+        id = String(id);
+        for(var i in cache){
+//        	if(String(cache[i]) == id){
+            if(String(cache[i].id) == id){
+                cache.splice(i, 1);
+//                TweetStorage.removeItem(id);
+                break;
+            }
+        }
+    }
+};
+
 function doDelTweet(tweetId, ele){//删除自己的微博
     if(!tweetId){return;}
     showLoading();
     var user = getUser();
+    var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
     tapi.destroy({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
-            $(ele).closest('li').remove();
-            var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
-            var c_user = getUser();
-            var cacheKey = c_user.uniqueKey + t + '_tweets';
-            var b_view = getBackgroundView();
-            if(b_view && b_view.tweets[cacheKey]){
-                var cache = b_view.tweets[cacheKey];
-                for(var i in cache){
-                    if(cache[i].id == tweetId){
-                        cache.splice(i, 1);
-                        break;
-                    }
-                }
-            }
+        	$(ele).closest('li').remove();
+            _delCache(tweetId, t, user.uniqueKey);
             showMsg('删除成功');
         }else{
             showMsg('删除失败');
@@ -1528,20 +1541,8 @@ function doDelComment(ele, screen_name, tweetId){//删除评论
     var user = getUser();
     tapi.comment_destroy({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
-            $(ele).closest('li').remove();
-            var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
-            var c_user = getUser();
-            var cacheKey = c_user.uniqueKey + t + '_tweets';
-            var b_view = getBackgroundView();
-            if(b_view && b_view.tweets[cacheKey]){
-                var cache = b_view.tweets[cacheKey];
-                for(var i in cache){
-                    if(cache[i].id == tweetId){
-                        cache.splice(i, 1);
-                        break;
-                    }
-                }
-            }
+        	$(ele).closest('li').remove();
+            _delCache(tweetId, t, user.uniqueKey);
             showMsg('删除成功');
         }else{
             showMsg('删除失败');
@@ -1554,20 +1555,8 @@ function delDirectMsg(ele, screen_name, tweetId){//删除私信
     var user = getUser();
     tapi.destroy_msg({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
-            $(ele).closest('li').remove();
-            var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
-            var c_user = getUser();
-            var cacheKey = c_user.uniqueKey + t + '_tweets';
-            var b_view = getBackgroundView();
-            if(b_view && b_view.tweets[cacheKey]){
-                var cache = b_view.tweets[cacheKey];
-                for(var i in cache){
-                    if(cache[i].id == tweetId){
-                        cache.splice(i, 1);
-                        break;
-                    }
-                }
-            }
+        	$(ele).closest('li').remove();
+            _delCache(tweetId, t, user.uniqueKey);
             showMsg('删除成功');
         }else{
             showMsg('删除失败');
@@ -1581,18 +1570,21 @@ function addFavorites(ele, screen_name, tweetId){//添加收藏
     var _aHtml = _a[0].outerHTML;
     _a.hide();
     var user = getUser();
+    var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
     tapi.favorites_create({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
             _a.after(_aHtml.replace('addFavorites','delFavorites')
                             .replace('favorites_2.gif','favorites.gif')
                             .replace('点击收藏','点击取消收藏'));
             _a.remove();
-            var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
-            var c_user = getUser();
-            var cacheKey = c_user.uniqueKey + t + '_tweets';
+//            var item = TweetStorage.getItems([tweetId], t, user.uniqueKey)[0];
+//            item.favorited = True;
+//            TweetStorage.setItems([item], t, user.uniqueKey);
+            var cacheKey = user.uniqueKey + t + '_tweets';
             var b_view = getBackgroundView();
             if(b_view && b_view.tweets[cacheKey]){
                 var cache = b_view.tweets[cacheKey];
+                tweetId = String(tweetId);
                 for(var i in cache){
                     if(cache[i].id == tweetId){
                         cache[i].favorited = true;
@@ -1614,13 +1606,16 @@ function delFavorites(ele, screen_name, tweetId){//删除收藏
     var _aHtml = _a[0].outerHTML;
     _a.hide();
     var user = getUser();
+    var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
     tapi.favorites_destroy({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
             _a.after(_aHtml.replace('delFavorites','addFavorites')
                             .replace('favorites.gif','favorites_2.gif')
                             .replace('点击取消收藏','点击收藏'));
             _a.remove();
-            var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
+//            var item = TweetStorage.getItems([tweetId], t, user.uniqueKey)[0];
+//            item.favorited = True;
+//            TweetStorage.setItems([item], t, user.uniqueKey);
             var c_user = getUser();
             var cacheKey = c_user.uniqueKey + t + '_tweets';
             var b_view = getBackgroundView();

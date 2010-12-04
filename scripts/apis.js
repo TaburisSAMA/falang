@@ -1946,6 +1946,10 @@ $.extend(RenjianAPI, {
 		callback();
 	},
 	
+	rate_limit_status: function(data, callback){
+        callback({error:'not support'});
+    },
+	
 	reset_count: function(data, callback) {
 		callback();
 	},

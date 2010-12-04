@@ -31,6 +31,7 @@ function getMaxMsgId(t, user_uniqueKey){
     var _last_id = null;
     if(_t_tweets && _t_tweets.length){
     	var _last_id = _t_tweets[_t_tweets.length-1].id;
+//    	var _last_id = _t_tweets[_t_tweets.length-1];
     	if(typeof(_last_id) === 'number'){
     		_last_id--;
     	}
@@ -141,12 +142,15 @@ function checkTimeline(t, p, user_uniqueKey){
         if(sinaMsgs.length > 0){
         	if(tweets[_key].length > 0){
         		sinaMsgs = filterDatasByMaxId(sinaMsgs, String(tweets[_key][0].id), false);
+//        		sinaMsgs = filterDatasByMaxId(sinaMsgs, String(tweets[_key][0]), false);
         	}
         }
         var current_user = getUser();
         var popupView = getPopupView();
         if(sinaMsgs.length > 0){
             setLastMsgId(sinaMsgs[0].id, t, user_uniqueKey);
+//            var ids = TweetStorage.setItems(sinaMsgs, t, user_uniqueKey);
+//            tweets[_key] = ids.concat(tweets[_key]);
             tweets[_key] = sinaMsgs.concat(tweets[_key]);
             var _unreadCount = 0, _msg_user = null;
             for(var i in sinaMsgs){
@@ -262,6 +266,8 @@ function getTimelinePage(user_uniqueKey, t, p){
                 for(var i in sinaMsgs){
                     sinaMsgs[i].readed = true;
                 }
+//                var ids = TweetStorage.setItems(sinaMsgs, t, user_uniqueKey);
+//                tweets[_key] = tweets[_key].concat(ids);
                 tweets[_key] = tweets[_key].concat(sinaMsgs);
             } else {
             	page = 0;
