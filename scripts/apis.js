@@ -1162,7 +1162,7 @@ $.extend(DiguAPI, {
     },
 
     rate_limit_status: function(data, callback){
-        callback({error:'not support'});
+        callback({error:'没有提供接口'});
     },
     
     reset_count: function(data, callback) {
@@ -1501,7 +1501,7 @@ $.extend(LeiHouAPI, {
 	},
 
     rate_limit_status: function(data, callback){
-        callback({error:'not support'});
+        callback({error:'没有提供接口'});
     },
 	
 	comments_timeline: function(data, callback) {
@@ -1643,7 +1643,7 @@ $.extend(Follow5API, {
 	},
 
     rate_limit_status: function(data, callback){
-        callback({error:'not support'});
+        callback({error:'没有提供接口'});
     },
 	
 //	comments_timeline: function(data, callback) {
@@ -1947,7 +1947,7 @@ $.extend(RenjianAPI, {
 	},
 	
 	rate_limit_status: function(data, callback){
-        callback({error:'not support'});
+        callback({error:'没有提供接口'});
     },
 	
 	reset_count: function(data, callback) {

@@ -52,7 +52,7 @@
 					$("#user_"+user.uniqueKey + " td:eq(2)").html(data.remaining_hits + '/' + data.hourly_limit);
 					$("#user_"+user.uniqueKey + " td:eq(3)").html(new Date(data.reset_time).format("yyyy-MM-dd hh:mm:ss"));
 				}else{
-					$("#user_"+user.uniqueKey + " td:eq(2)").html('<span class="error">请求出错： ' + data.error + '</span>');
+					$("#user_"+user.uniqueKey + " td:eq(2)").html('<span class="error">' + data.error + '</span>');
 				}
 			});
 		}
