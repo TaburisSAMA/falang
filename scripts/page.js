@@ -388,7 +388,6 @@ function _sendFawaveMsgWrap(msg, user, stat, selLi){
             selLi = null;
             $("#fawaveSendMsgWrap input, #fawaveSendMsgWrap button, #fawaveSendMsgWrap textarea").removeAttr('disabled');
             if(stat.successCount > 0){ //有发送成功的
-                //setTimeout(callCheckNewMsg, 1000);
                 chrome.extension.sendRequest({method:'notifyCheckNewMsg'}, function(response){});
                 
                 if(stat.userCount > 1){ //多个用户的

@@ -80,8 +80,6 @@ function init(){
     addUnreadCountToTabs();
     initIamDoing();
 
-    //callCheckNewMsg();
-
     initScrollPaging();
 
     $(window).unload(function(){ initOnUnload(); }); 
@@ -1153,7 +1151,7 @@ function sendReplyMsg(msg){
         if(sinaMsg.id){
             hideReplyInput();
             txt.val('');
-            setTimeout(callCheckNewMsg, 1000);
+            setTimeout(callCheckNewMsg, 1000, 'friends_timeline');
             showMsg(userName + ' 成功！');
         }else if(sinaMsg.error){
 //            showMsg('error: ' + sinaMsg.error);
@@ -1221,7 +1219,7 @@ function _sendMsgWraper(msg, user, stat, selLi){
             $("#btnSend").removeAttr('disabled');
             $("#txtContent").removeAttr('disabled');
             if(stat.successCount > 0){ //有发送成功的
-                setTimeout(callCheckNewMsg, 1000);
+                setTimeout(callCheckNewMsg, 1000, 'friends_timeline');
                 var failCount = stat.userCount - stat.successCount;
                 if(stat.userCount > 1 && failCount > 0){ //多个用户，并且有发送失败才显示
                     showMsg(stat.successCount + '发送成功，' + failCount + '失败。');
@@ -1247,7 +1245,6 @@ function sendWhisper(msg){
         if(sinaMsg.id){
             hideReplyInput();
             txt.val('');
-            //setTimeout(callCheckNewMsg, 1000);
             showMsg('发送成功！');
         } else if (sinaMsg.error){
 //            showMsg('error: ' + sinaMsg.error);
@@ -1271,7 +1268,7 @@ function sendRepost(msg, repostTweetId, notSendMord){
         if(sinaMsg.id){
             hideReplyInput();
             txt.val('');
-            setTimeout(callCheckNewMsg, 1000);
+            setTimeout(callCheckNewMsg, 1000, 'friends_timeline');
             showMsg('转发成功！');
         }else if(sinaMsg.error){
 //            showMsg('error: ' + sinaMsg.error);
@@ -1312,7 +1309,6 @@ function sendComment(msg, commentTweetId, notSendMord){
         if(sinaMsg.id){
             hideReplyInput();
             txt.val('');
-            //setTimeout(callCheckNewMsg, 1000);
             showMsg('发送评论成功！');
         }else if(sinaMsg.error){
 //            showMsg('error: ' + sinaMsg.error);
@@ -1328,10 +1324,10 @@ function sendComment(msg, commentTweetId, notSendMord){
     }
 };
 
-function callCheckNewMsg(){
+function callCheckNewMsg(t, uniqueKey){
     var b_view = getBackgroundView();
     if(b_view){
-        b_view.checkNewMsg();
+        b_view.checkNewMsg(t, uniqueKey);
     }
 }
 

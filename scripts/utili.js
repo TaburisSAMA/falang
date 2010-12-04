@@ -138,6 +138,15 @@ var Settings = {
     save: function(){
         var _sets = this.get();
         localStorage.setObject(SETTINGS_KEY, _sets);
+    },
+    /*
+    * 获取刷新间隔时间
+    */
+    getRefreshTime: function(user, t){
+        if(user && user.refreshTime && user.refreshTime[t]){
+            return user.refreshTime[t];
+        }
+        return this.get().globalRefreshTime[t];
     }
 };
 
@@ -192,9 +201,10 @@ function saveUserList(userlist){
     localStorage.setObject(USER_LIST_KEY, userlist);
 };
 //根据uniqueKey获取用户
-function getUserByUniqueKey(uniqueKey){
+//@includeDisabled: 如果为true，则会获取停用的用户，否则只会获取启用的用户
+function getUserByUniqueKey(uniqueKey, includeDisabled){
     if(!uniqueKey){return null;}
-    var userList = getUserList();
+    var userList = getUserList(includeDisabled);
     for(var i in userList){
     	if(userList[i].uniqueKey == uniqueKey){
     		return userList[i];

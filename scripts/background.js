@@ -4,7 +4,6 @@ window._settings = Settings.init(); //载入设置
 
 Settings.get = function(){ return window._settings; }; //重写get，直接返回，不用再获取background view
 
-var itv; //Interval
 var tweets = {}, 
     new_win_popup = Object(),
     MAX_MSG_ID = {},
@@ -342,42 +341,60 @@ function showNewMsg(msgs, t, user){
     }
 };
 
-function checkNewMsg(){
-    try{
-        var userList = getUserList();
-        for(var j in userList){
-            var user = userList[j];
-            for(var i in T_LIST[user.blogType]){
-                checkTimeline(T_LIST[user.blogType][i], null, user.uniqueKey);
+var RefreshManager = {
+    itv: {},
+    /*
+    * 启动定时器
+    * @getFirst: 如果为true， 则先发送一次请求，再启动定时器.
+    */
+    start: function(getFirst){
+        //try{
+            var userList = getUserList(), refTime = 90;
+            for(var j in userList){
+                var user = userList[j];
+                for(var i in T_LIST[user.blogType]){
+                    var uniqueKey = user.uniqueKey, t = T_LIST[user.blogType][i];
+                    refTime = Settings.getRefreshTime(user, t);
+                    if(getFirst){ checkTimeline(t, null, uniqueKey); }
+                    this.itv[uniqueKey+t] = setInterval(checkTimeline, 1000*refTime, t, null, uniqueKey);
+                }
             }
+        //}catch(err){
+
+        //}
+    },
+    stop: function(){
+        for(var i in this.itv){
+            clearInterval(this.itv);
         }
+    },
+    restart: function(){
+        this.stop();
+        this.start();
+    }
+};
+
+setUnreadTimelineCount(0, 'friends_timeline'); //设置提示信息（上次关闭前未读）
+
+RefreshManager.start(true);
+
+
+
+function checkNewMsg(t, uniqueKey){
+    try{
+        checkTimeline(t, null, uniqueKey);
     }catch(err){
 
     }
 }
 
 function onChangeUser(){
-    //clearInterval(itv);
     window.c_user = null;
     var c_user = getUser();
     if(c_user){
         window.c_user = c_user;
     }
-    //$.each(T_LIST[c_user.blogType], function(i, value){
-    //	setUnreadTimelineCount(0, value);
-    //});
-    //checkNewMsg();
-    //itv = setInterval(checkNewMsg, getRefreshTime());
 };
-
-function refreshInterval(){
-    clearInterval(itv);
-    itv = setInterval(checkNewMsg, getRefreshTime());
-};
-
-checkNewMsg();
-itv = setInterval(checkNewMsg, getRefreshTime());
-
 
 //刷新账号信息
 function refreshAccountInfo(){
@@ -452,13 +469,13 @@ r_method_manager = {
         var data = {status: msg, user:user};
         tapi.update(data, function(sinaMsg, textStatus){
             if(sinaMsg.id){
-                setTimeout(checkNewMsg, 1000);
+                setTimeout(checkNewMsg, 1000, 'friends_timeline');
             }
             sendResponse({msg:sinaMsg, textStatus:textStatus});
         });
     },
     notifyCheckNewMsg: function(request, sender, sendResponse){
-        setTimeout(checkNewMsg, 1000);
+        setTimeout(checkNewMsg, 1000, 'friends_timeline');
     }
 };
 

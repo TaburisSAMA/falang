@@ -39,10 +39,11 @@ $(function(){
         $("#edit-account-key").val('');
         onSelBlogTypeChange();
         $("#new-account").show();
+        $("#user-custom-wrap").hide();
     });
 
-    $("#cancel-save-account").click(function(){
-        $("#new-account").hide();
+    $("#cancel-save-account, #cancel-save-user-custom").click(function(){
+        $("#new-account, #user-custom-wrap").hide();
     });
 
     $("#save-account").click(function(){
@@ -58,9 +59,7 @@ $(function(){
 
     $("#account-list").change(function(){
         if($(this).val()){
-            $("#show-edit-account").removeAttr('disabled');
-            $("#del-account").removeAttr('disabled');
-            $("#stop-account").removeAttr('disabled');
+            $("#show-edit-account, #del-account, #stop-account, #show-edit-user-custom").removeAttr('disabled');
             $('#up-account, #down-account').removeAttr('disabled');
         }
     });
@@ -84,6 +83,79 @@ $(function(){
         var uniqueKey = $("#account-list").val();
         $("#edit-account-key").val(uniqueKey);
         showEditAccount(uniqueKey);
+    });
+
+    //用户信息提示自定义
+    $("#show-edit-user-custom").click(function(){
+        var uniqueKey = $("#account-list").val();
+        $("#edit-account-key").val(uniqueKey);
+        var user = getUserByUniqueKey(uniqueKey, true);
+
+        if(tapi.get_config(user).support_comment){
+            $("#userRefreshTime_comments_timeline").parent().show();
+        }else{
+            $("#userRefreshTime_comments_timeline").val('0').parent().hide();
+        }
+
+        //绑定用户自定刷新时间
+        var refTime = 0, refTimeInp = null, timelimes = T_LIST[user.blogType];
+        for(var i in timelimes){
+            refTimeInp = $("#userRefreshTime_" + timelimes[i]);
+            refTimeInp.prev('span:eq(0)').html('('+ Settings.get().globalRefreshTime[timelimes[i]] +')');
+            if(user.refreshTime && user.refreshTime[timelimes[i]]){
+                refTime = user.refreshTime[timelimes[i]];
+            }else{
+                refTime = 0;
+            }
+            refTimeInp.val(refTime);
+        }
+
+        calculateUserRefreshTimeHits(user);
+
+        $("#new-account").hide();
+        $("#user-custom-wrap").show();
+    });
+
+    //保存用户信息提示自定义设置
+    $("#save-user-custom").click(function(){
+        var uniqueKey = $("#edit-account-key").val();
+        var user = getUserByUniqueKey(uniqueKey, true);
+        if(user){
+            user.refreshTime = user.refreshTime || {};
+            var refTime = 0, refTimeInp = null;
+            for(var i in T_LIST.all){
+                refTimeInp = $("#userRefreshTime_" + T_LIST.all[i]);
+                refTime = Number(refTimeInp.val());
+                if(isNaN(refTime)){
+                    refTime = 0;
+                }else if(refTime!==0 && refTime<30){
+                    refTime = 30;
+                }
+                user.refreshTime[T_LIST.all[i]] = refTime;
+                refTimeInp.val(refTime);
+            }
+            var userList = getUserList(true);
+            // 删除旧数据，替换新的
+            var found = false;
+            $.each(userList, function(i, item){
+            	if(item.uniqueKey == uniqueKey){
+            		userList[i] = user;
+            		found = true;
+            		return false;
+            	}
+            });
+            saveUserList(userList);
+            _showMsg('保存成功');
+        }else{
+            _showMsg('保存失败：未指定编辑的用户');
+        }
+        $("#cancel-save-user-custom").click();
+    });
+
+    $("#userRefreshTimeWrap input").change(function(){
+        var uniqueKey = $("#edit-account-key").val();
+        var user = getUserByUniqueKey(uniqueKey, true);
+        calculateUserRefreshTimeHits(user);
     });
 
     $("#cleanLocalStorage").click(function(){
@@ -139,8 +211,27 @@ $(function(){
     }
 });
 
+function calculateUserRefreshTimeHits(user){
+    var total = 0, refTime = 0, refTimeInp = null, timelimes = T_LIST[user.blogType];
+    for(var i in timelimes){
+        refTimeInp = $("#userRefreshTime_" + timelimes[i]);
+        refTime = Number(refTimeInp.val());
+        if(isNaN(refTime)){
+            refTime = 0;
+        }else if(refTime!==0 && refTime<30){
+            refTime = 30;
+        }
+        refTimeInp.val(refTime);
+        if(refTime==0){
+            refTime = Settings.get().globalRefreshTime[timelimes[i]];
+        }
+        total += Math.round(60*60/refTime);
+    }
+    $("#userRefreshTimeHits").html(total);
+};
+
 function disabledUserEditBtns(){
-    $("#show-edit-account, #del-account, #stop-account").attr('disabled', true);
+    $("#show-edit-account, #del-account, #stop-account, #show-edit-user-custom").attr('disabled', true);
 };
 
 function showAccountList(){
@@ -468,7 +559,6 @@ function showSupportAuthTypes(blogType, authType){
 
 function showEditAccount(uniqueKey){
     if(uniqueKey){
-        var option = $("#account-list option:selected");
         var userList = getUserList(true);
         var user = null;
         $.each(userList, function(index, item) {
@@ -478,6 +568,7 @@ function showEditAccount(uniqueKey){
         	}
         });
         if(user){
+            $("#user-custom-wrap").hide();
             $("#new-account").show();
             $("#account-blogType").val(user.blogType);
             showSupportAuthTypes(user.blogType, user.authType);
@@ -567,7 +658,7 @@ function saveAll(){
     }
     var b_view = getBackgroundView();
     if(b_view){
-        b_view.refreshInterval(); //TODO: 需要确认
+        b_view.RefreshManager.restart(); //TODO: 需要确认
     }
 
 
@@ -707,6 +798,6 @@ function cleanLocalStorageData(){
         b_view.MAX_MSG_ID = {};
         b_view.checking={};
         b_view.paging={};
-        b_view.refreshInterval();
+        b_view.RefreshManager.restart();
     }
 }
