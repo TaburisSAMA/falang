@@ -1461,7 +1461,8 @@ function doComment(ele, userName, tweetId, replyUserName, replyUserId, cid){//�
     $('#commentCommentId').val(cid||'');
     $('#ye_dialog_title').html('评论@' + userName + ' 的信息');
     $('#ye_dialog_window').show();
-    var _txt = replyUserName ? ('回复 @'+replyUserName+':') : '';
+//    var _txt = replyUserName ? ('回复 @'+replyUserName+':') : '';
+    var _txt = '';
 
     $('#chk_sendOneMore').attr("checked", false).val(tweetId).show();
     $('#txt_sendOneMore').text('同时发一条微博').show();
