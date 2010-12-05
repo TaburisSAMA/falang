@@ -993,7 +993,8 @@ $.extend(TSohuAPI, {
 	    ErrorCodes: {
         	"Reached max access time per hour.": "已达到请求数上限",
         	"Could not follow user: id is already on your list": "已跟随",
-        	"You are not friends with the specified user": "你没有跟随他"
+        	"You are not friends with the specified user": "你没有跟随他",
+        	"can't send direct message to user who is not your follower!": "不能发私信给没有跟随你的人"
         }
 	}),
 	
@@ -2060,6 +2061,47 @@ $.extend(RenjianAPI, {
 			this.format_result_item(data.recipient, 'user', args);
 		}
 		return data;
+	}
+});
+
+// 豆瓣
+var DoubanAPI = $.extend({}, sinaApi);
+/*
+ * 豆瓣 API 通过HTTP Status Code来说明 API 请求是否成功 下面的表格中展示了可能的HTTP Status Code以及其含义
+
+状态码	含义
+200 OK	请求成功
+201 CREATED	创建成功
+202 ACCEPTED	更新成功
+400 BAD REQUEST	请求的地址不存在或者包含不支持的参数
+401 UNAUTHORIZED	未授权
+403 FORBIDDEN	被禁止访问
+404 NOT FOUND	请求的资源不存在
+500 INTERNAL SERVER ERROR	内部错误
+
+ */
+$.extend(DoubanAPI, {
+	config: $.extend({}, sinaApi.config, {
+		host: 'http://api.douban.com',
+		source: '05e787211a7ff69311b695634f7fe3b9', 
+		oauth_key: '05e787211a7ff69311b695634f7fe3b9',
+        oauth_secret: 'a29252a52eaa835d',
+        result_format: '', // 豆瓣由alt参数确定返回值格式
+        
+		support_comment: false,
+		support_repost: false
+	}),
+	
+	/*
+	 * start-index	 返回多个元素时，起始元素的下标	 下标从1开始
+	 * max-results	 返回多个entry时，每页最多的结果数	 除非特别说明，
+	 * max-results的最大值为50，参数值超过50返回50个结果
+	 */
+	before_sendRequest: function(args) {
+		args.data.alt = 'json'
+		// args.data.source => args.data.apikey
+		args.data.apikey = args.data.source;
+		delete args.data.source;
 	}
 });
 
