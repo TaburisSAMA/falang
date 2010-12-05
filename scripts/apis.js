@@ -94,7 +94,7 @@ var sinaApi = {
         return str;
     },
     getIphoneEmoji: function(str){
-        return "<span class=\"iphoneEmoji "+ str.charCodeAt(0).toString(16).toUpperCase()+"\"></span>"
+        return "<span class=\"iphoneEmoji "+ str.charCodeAt(0).toString(16).toUpperCase()+"\"></span>";
     },
     processSearch: function (str) {
         str = str.replace(/#([^#]+)#/g, '<a target="_blank" href="'+ this.config.search_url +'$1" title="Search #$1">#$1#</a>');
@@ -174,14 +174,14 @@ var sinaApi = {
 			// 签名参数
 		    OAuth.SignatureMethod.sign(message, accessor);
 		    // 获取认证头部
-		    args.headers['Authorization'] = OAuth.getAuthorizationHeader('', message.parameters);
+		    args.headers['Authorization'] = OAuth.getAuthorizationHeader(this.config.oauth_realm, message.parameters);
 		}
 	},
 	
     // 获取认证url
     get_authorization_url: function(user, callbackFn) {
     	if(user.authType == 'oauth') {
-    		var login_url = this.config.host + this.config.oauth_authorize + '?oauth_token=';
+    		var login_url = (this.config.oauth_host || this.config.host) + this.config.oauth_authorize + '?oauth_token=';
     		this.get_request_token(user, function(token, text_status, error_code) {
     			if(token) {
     				user.oauth_token_key = token.oauth_token;
@@ -205,6 +205,7 @@ var sinaApi = {
 	            type: 'get',
 	            user: user,
 	            play_load: 'string',
+	            apiHost: this.config.oauth_host,
 	            need_source: false
 	        };
     		this._sendRequest(params, function(token_str, text_status, error_code) {
@@ -233,6 +234,7 @@ var sinaApi = {
 	            user: user,
 	            play_load: 'string',
 	            data: {'oauth_verifier': user.oauth_pin},
+	            apiHost: this.config.oauth_host,
 	            need_source: false
 	        };
     		this._sendRequest(params, function(token_str, text_status, error_code) {
@@ -825,8 +827,8 @@ var sinaApi = {
     	}
     	var user = args.user || args.data.user || localStorage.getObject(CURRENT_USER_KEY);
         if(args.data && args.data.user) delete args.data.user;
-        
-    	var api = user.apiProxy || this.config.host;
+
+    	var api = user.apiProxy || args.apiHost || this.config.host;
     	var url = api + args.url.format(args.data);
     	if(args.play_load != 'string') {
     		url += this.config.result_format;
@@ -2066,6 +2068,8 @@ $.extend(RenjianAPI, {
 	}
 });
 
+//var DoubanOAuth = OAuth.setProperties({}, OAuth);
+
 // 豆瓣
 var DoubanAPI = $.extend({}, sinaApi);
 /*
@@ -2091,7 +2095,15 @@ $.extend(DoubanAPI, {
         result_format: '', // 豆瓣由alt参数确定返回值格式
         
 		support_comment: false,
-		support_repost: false
+		support_repost: false,
+		
+		oauth_host: 'http://www.douban.com',
+		oauth_authorize: 	  '/service/auth/authorize',
+        oauth_request_token:  '/service/auth/request_token',
+        oauth_access_token:   '/service/auth/access_token',
+        // douban需要 oauth_realm
+        oauth_realm: '',
+		verify_credentials: '/people/@me'
 	}),
 	
 	/*
@@ -2100,10 +2112,12 @@ $.extend(DoubanAPI, {
 	 * max-results的最大值为50，参数值超过50返回50个结果
 	 */
 	before_sendRequest: function(args) {
-		args.data.alt = 'json'
-		// args.data.source => args.data.apikey
-		args.data.apikey = args.data.source;
-		delete args.data.source;
+		if(args.url != this.config.oauth_request_token && args.url != this.config.oauth_access_token) {
+			//args.data.alt = 'json';
+			// args.data.source => args.data.apikey
+			//args.data.apikey = args.data.source;
+			delete args.data.source;
+		}
 	}
 });
 
@@ -2117,6 +2131,7 @@ var T_APIS = {
 	't163': T163API,
 	'fanfou': FanfouAPI,
 	'renjian': RenjianAPI,
+	'douban': DoubanAPI,
 	'twitter': TwitterAPI // fxxx gxfxw first.
 };
 
