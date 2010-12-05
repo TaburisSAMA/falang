@@ -1781,6 +1781,7 @@ $.extend(TwitterAPI, {
 	    support_upload: false,
 	    
 	    repost: '/statuses/update',
+        favorites_create: '/favorites/create/{{id}}',
         friends_timeline: '/statuses/home_timeline'
 	}),
        
@@ -1809,6 +1810,7 @@ $.extend(TwitterAPI, {
 	counts: function(data, callback) {
 		callback();
 	},
+    
 	
 	before_sendRequest: function(args) {
 		if(args.url == this.config.repost) {
