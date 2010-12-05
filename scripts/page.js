@@ -85,7 +85,7 @@ function builFawaveTip(msg, account){
     }
     var tp =  '<div class="msgRemind">'
             + '  <div class="usericon">'
-            + '	   <img src="' + user.profile_image_url.replace('24x24', '48x48') + '" />'
+            + '	   <img src="' + user.profile_image_url.replace('24x24', '48x48') + '" class="face" />'
             + '	   <img src="' + chrome.extension.getURL("images/blogs/"+account.blogType+"_16.png") + '" class="blogType" />'
             + '  </div>'
             + '  <div class="maincontent">'

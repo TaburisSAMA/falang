@@ -100,6 +100,10 @@ body #fa_wave_msg_wrap .msgRemind .usericon{
 	padding:0;
 	position:relative;
 }
+body #fa_wave_msg_wrap .msgRemind .usericon .face{
+	width:48px;
+	height:48px;
+}
 body #fa_wave_msg_wrap .msgRemind .usericon .blogType{
 	opacity: 0.9;
     right: -1px;
@@ -140,7 +144,7 @@ body #fawaveSendMsgWrap .fawave-model-container .btn-negative:hover{background-c
 body #fawaveSendMsgWrap .fawave-model-container .btn-positive,
 	body #fawaveSendMsgWrap .fawave-model-container .btn-negative{ padding:5px 8px; font-weight:bold;border: 1px solid #ccc; cursor:pointer; background-color:whiteSmoke; -webkit-box-shadow:1px 1px 1px #eee;}
 body #fawaveSendMsgWrap .fawave-model-container .btn-positive img,
-	body #fawaveSendMsgWrap .fawave-model-container .btn-negative img{vertical-align: top; border:none; padding:0; margin:0;}
+	body #fawaveSendMsgWrap .fawave-model-container .btn-negative img{vertical-align: top; border:none; padding:0; margin:0; display:inline;}
 body #fawaveSendMsgWrap .fawave-model-container .fawave-wordCount{float:right;}
 body #fawaveSendMsgWrap .fawave-model-container .fawaveSubmitWarp{margin-top:8px;}
 body #fawaveSendMsgWrap .fawave-model-container .fawaveUserInfo{bottom:2px; position:absolute; right:10px; display:none;}
@@ -189,6 +193,7 @@ body #fawaveSendMsgWrap #fawave_accountsForSend li img{
 	width:16px;
 	height:16px;
 	vertical-align:top;
+	display: inline;
 }
 body #fawaveSendMsgWrap #fawave_accountsForSend li img.blogType{
 	width:13px;
