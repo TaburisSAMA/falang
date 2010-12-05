@@ -464,12 +464,10 @@ function _verify_credentials(user) {
             }
         } else {
         	var userList = getUserList(true);
-            var temp_uniqueKey = $("#edit-account-key").val();
-            
-//            delete userList[temp_uniqueKey];
             $.extend(user, data);
             user.uniqueKey = user.blogType + '_' + user.id;
             user.screen_name = user.screen_name || user.name;
+            var temp_uniqueKey = $("#edit-account-key").val() || user.uniqueKey;
             // 删除旧数据，替换新的
             var found = false;
             $.each(userList, function(i, item){
