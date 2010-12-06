@@ -12,16 +12,6 @@ var tweets = {},
 window.checking={}; //正在检查是否有最新微博
 window.paging={}; //正在获取分页微博
 
-//点击的时候，主题选择
-//chrome.browserAction.onClicked.addListener(function(tab) {
-//    chrome.browserAction.setPopup({popup: 'themes/' + THEME + '/popup.html'});
-//});
-
-//function setTheme(theme){
-//    THEME = theme;
-//    localStorage.setObject('popup_theme', theme);
-//};
-
 function getMaxMsgId(t, user_uniqueKey){
     if(!user_uniqueKey){
         user_uniqueKey = getUser().uniqueKey;
@@ -174,9 +164,12 @@ function checkTimeline(t, p, user_uniqueKey){
                     	popupView.updateDockUserUnreadCount(user_uniqueKey);
                     }
                 }
-            } else { //在页面显示新消息
+            } else { //在页面显示新消息，桌面提示
                 setUnreadTimelineCount(_unreadCount, t, user_uniqueKey);
-                showNewMsg(sinaMsgs, t, c_user); 
+                showNewMsg(sinaMsgs, t, c_user);
+                if(_unreadCount > 0){
+                    NotificationsManager.show(c_user, t);
+                }
             }
     	}
     	setDoChecking(user_uniqueKey, t, 'checking', false);
@@ -344,6 +337,78 @@ function showNewMsg(msgs, t, user){
             chrome.tabs.sendRequest(tab.id, {method:'showNewMsgInPage', msgs: msgs, t:t, user:user}, function handler(response) {
             });
         });
+    }
+};
+
+//桌面信息提醒
+var NotificationsManager = {
+    tp: '<script> uniqueKey = "{{user.uniqueKey}}"; Timeout = {{timeout}};</script>\
+        <div class="item">\
+            <div class="usericon"><img src="{{user.profile_image_url}}" class="face"/><img src="images/blogs/{{user.blogType}}_16.png" class="blogType"/></div>\
+            <div class="info"><span class="username">{{user.screen_name}}</span><br/>\
+                <span class="unreads">\
+                    <span id="unr_friends_timeline"><span>{{unreads.friends_timeline}}</span>新</span> &nbsp;&nbsp; <span id="unr_mentions"><span>{{unreads.mentions}}</span>@</span> <br/>\
+                    <span id="unr_comments_timeline"><span>{{unreads.comments_timeline}}</span>评</span> &nbsp;&nbsp; <span id="unr_direct_messages"><span>{{unreads.direct_messages}}</span>私</span> \
+                </span>\
+            </div>\
+        </div>\
+        <script> removeHighlight(); TIME_LINE = "{{t}}"; highlightTimeline();</script>',
+    
+    cache: {}, //存放要显示的账号
+    isEnabled: function(t){
+        return getAlertMode()!='dnd' && Settings.get().isDesktopNotifications[t];
+    },
+    /*
+    * 先检查cache中有account有没存在，如果存在，则说明正在创建Notifications窗口
+    * 如果不存在，则缓存，并创建Notifications窗口。
+    * 这样是为了避免Notifications窗口还在创建中，这时chrome.extension.getViews({type:"notification"})还不能获取到该窗口，则会造成重复创建
+    */
+    show: function(account, t){
+        if(!this.isEnabled(t)){ return; }
+        
+        if(this.cache[account.uniqueKey]){
+            this.cache[account.uniqueKey].timelines.push(t);
+            return;
+        } //如果缓存的还没显示
+
+        var _nf = false;
+        var nfViews = chrome.extension.getViews({type:"notification"});
+        for(var i in nfViews){
+            if(nfViews[i].uniqueKey == account.uniqueKey){ //如果已经存在，则直接更新内容
+                
+                var unreads = {};
+                unreads['friends_timeline'] = getUnreadTimelineCount('friends_timeline', account.uniqueKey);
+                unreads['mentions'] = getUnreadTimelineCount('mentions', account.uniqueKey);
+                unreads['comments_timeline'] = getUnreadTimelineCount('comments_timeline', account.uniqueKey);
+                unreads['direct_messages'] = getUnreadTimelineCount('direct_messages', account.uniqueKey);
+
+                nfViews[i].updateInfo(t, unreads);
+                _nf = true;
+            }
+        }
+
+        if(!_nf){ //如果还没存在，则通知创建
+            account.timelines = [t];
+            this.cache[account.uniqueKey] = account;
+            var ntf = webkitNotifications.createHTMLNotification('/destop_alert.html'+'#'+account.uniqueKey);
+            ntf.show();
+        }
+    },
+    //Notifications窗口创建完后，调用该方法获取信息
+    getShowHtml: function(uniqueKey){
+        var account = this.cache[uniqueKey];
+
+        var unreads = {};
+        unreads['friends_timeline'] = getUnreadTimelineCount('friends_timeline', account.uniqueKey);
+        unreads['mentions'] = getUnreadTimelineCount('mentions', account.uniqueKey);
+        unreads['comments_timeline'] = getUnreadTimelineCount('comments_timeline', account.uniqueKey);
+        unreads['direct_messages'] = getUnreadTimelineCount('direct_messages', account.uniqueKey);
+
+        account.unreads = unreads;
+        var timeout = Settings.get().desktopNotificationsTimeout;
+        var data = this.tp.format({user:account, unreads:unreads, t:account.timelines.join(','), timeout:timeout});
+        delete this.cache[uniqueKey];
+        return data;
     }
 };
 

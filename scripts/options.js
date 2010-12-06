@@ -334,6 +334,17 @@ function init(){
         $("#set_show_in_page_" + T_LIST.all[i]).attr("checked", settings.isShowInPage[T_LIST.all[i]]);
     }
 
+    //初始化是否声音提示
+    for(var i in T_LIST.all){
+        $("#sound_alert_" + T_LIST.all[i]).attr("checked", settings.isEnabledSound[T_LIST.all[i]]);
+    }
+
+    //初始化是否桌面显示
+    for(var i in T_LIST.all){
+        $("#destop_alert_" + T_LIST.all[i]).attr("checked", settings.isDesktopNotifications[T_LIST.all[i]]);
+    }
+    $("#inpDesktopNotificationsTimeout").val(settings.desktopNotificationsTimeout);
+
     //初始化主题选择
     var theme = settings.theme;
     if(theme){
@@ -723,6 +734,24 @@ function saveAll(){
         var $this = $(this);
         settings.isShowInPage[$this.attr('id').replace('set_show_in_page_','')] = ($this.attr("checked") ? true : false);
     });
+
+    //初始化是否声音提示
+    $("#set_sound_alert_wrap :checkbox").each(function(){
+        var $this = $(this);
+        settings.isEnabledSound[$this.attr('id').replace('sound_alert_','')] = ($this.attr("checked") ? true : false);
+    });
+
+    //初始化是否桌面显示
+    $("#set_destop_alert_wrap :checkbox").each(function(){
+        var $this = $(this);
+        settings.isDesktopNotifications[$this.attr('id').replace('destop_alert_','')] = ($this.attr("checked") ? true : false);
+    });
+    var nfTimeout = $("#inpDesktopNotificationsTimeout").val();
+    nfTimeout = Number(nfTimeout);
+    if(isNaN(nfTimeout) || nfTimeout < 3){
+        nfTimeout = 3;
+    }
+    settings.desktopNotificationsTimeout = nfTimeout;
 
     //保存主题
     var theme = $("#selTheme").val();

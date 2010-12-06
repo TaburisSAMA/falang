@@ -103,6 +103,19 @@ var Settings = {
             comments_timeline: true,
             direct_messages: true
         },
+        isEnabledSound:{ //是否开启播放声音提示新信息
+            friends_timeline: false,
+            mentions: false,
+            comments_timeline: false,
+            direct_messages: false
+        },
+        isDesktopNotifications:{ //是否在桌面提示新信息
+            friends_timeline: false,
+            mentions: false,
+            comments_timeline: false,
+            direct_messages: false
+        },
+        desktopNotificationsTimeout: 5, //桌面提示的延迟关闭时间
         isSyncReadedToSina: false, //已读消息是否和新浪微博页面同步
         isSharedUrlAutoShort: false, //分享正在看的网址时是否自动缩短
         sharedUrlAutoShortWordCount: 15, //超过多少个字则自动缩短URL

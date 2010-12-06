@@ -192,14 +192,36 @@
 			</p>
 		</li>
 		<li>
-			<p id="set_show_in_page_wrap"><label class="title">新消息在页面提示：</label>
-				<input type="checkbox" id="set_show_in_page_friends_timeline" value="1" /><label for="set_show_in_page_friends_timeline">最新微博</label>
-				<input type="checkbox" id="set_show_in_page_mentions" value="1" /><label for="set_show_in_page_mentions">@我的</label>
-				<input type="checkbox" id="set_show_in_page_comments_timeline" value="1" /><label for="set_show_in_page_comments_timeline">评论</label>
-				<input type="checkbox" id="set_show_in_page_direct_messages" value="1" /><label for="set_show_in_page_direct_messages">私信</label>
+			<p id="set_show_in_page_wrap"><label class="title">在浏览的网页提示：</label>
+				<input type="checkbox" id="set_show_in_page_friends_timeline" /><label for="set_show_in_page_friends_timeline">最新微博</label>
+				<input type="checkbox" id="set_show_in_page_mentions" /><label for="set_show_in_page_mentions">@我的</label>
+				<input type="checkbox" id="set_show_in_page_comments_timeline" /><label for="set_show_in_page_comments_timeline">评论</label>
+				<input type="checkbox" id="set_show_in_page_direct_messages" /><label for="set_show_in_page_direct_messages">私信</label>
 				<span class="jTip" jTitle="在你正在看的网页上提示新信息，5秒钟后自动隐藏:　">?
 					<span class="c"><img src="/images/setting/show_in_page.png" /></span>
 				</span>
+			</p>
+		</li>
+		<li>
+			<p id="set_sound_alert_wrap"><label class="title">　　　　声音提示：</label>
+				<input type="checkbox" id="sound_alert_friends_timeline" /><label for="sound_alert_friends_timeline">最新微博</label>
+				<input type="checkbox" id="sound_alert_mentions" /><label for="sound_alert_mentions">@我的</label>
+				<input type="checkbox" id="sound_alert_comments_timeline" /><label for="sound_alert_comments_timeline">评论</label>
+				<input type="checkbox" id="sound_alert_direct_messages" /><label for="sound_alert_direct_messages">私信</label>
+				<span class="jTip" jTitle="声音提示:　">?
+					<span class="c">有新微博的时候播放声音提醒</span>
+				</span>
+			</p>
+		</li>
+		<li>
+			<p id="set_destop_alert_wrap"><label class="title">　　　　桌面提示：</label>
+				<input type="checkbox" id="destop_alert_friends_timeline" /><label for="destop_alert_friends_timeline">最新微博</label>
+				<input type="checkbox" id="destop_alert_mentions" /><label for="destop_alert_mentions">@我的</label>
+				<input type="checkbox" id="destop_alert_comments_timeline" /><label for="destop_alert_comments_timeline">评论</label>
+				<input type="checkbox" id="destop_alert_direct_messages" /><label for="destop_alert_direct_messages">私信</label>
+				<span class="jTip" jTitle="桌面提示:　">?<span class="c">有新微博的时候在桌面提示未读信息数</span></span>
+
+				<label for="inpDesktopNotificationsTimeout">自动关闭延时：</label><input type="text" id="inpDesktopNotificationsTimeout" class="inpRefTime" />秒
 			</p>
 		</li>
 		<li>
