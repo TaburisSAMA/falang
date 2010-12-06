@@ -169,6 +169,7 @@ function checkTimeline(t, p, user_uniqueKey){
                 showNewMsg(sinaMsgs, t, c_user);
                 if(_unreadCount > 0){
                     NotificationsManager.show(c_user, t);
+                    playSound(t);
                 }
             }
     	}
@@ -337,6 +338,17 @@ function showNewMsg(msgs, t, user){
             chrome.tabs.sendRequest(tab.id, {method:'showNewMsgInPage', msgs: msgs, t:t, user:user}, function handler(response) {
             });
         });
+    }
+};
+
+//播放声音提醒
+var AlertaAudioFile = new Audio();
+function playSound(t){
+    if(Settings.get().isEnabledSound[t]){
+        if(!AlertaAudioFile.src){
+            AlertaAudioFile.src = Settings.get().soundSrc;
+        };
+        AlertaAudioFile.play();
     }
 };
 

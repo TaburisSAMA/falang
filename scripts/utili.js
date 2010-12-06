@@ -109,6 +109,7 @@ var Settings = {
             comments_timeline: false,
             direct_messages: false
         },
+        soundSrc: '/sound/d.mp3',
         isDesktopNotifications:{ //是否在桌面提示新信息
             friends_timeline: false,
             mentions: false,

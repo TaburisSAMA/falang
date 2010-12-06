@@ -338,6 +338,7 @@ function init(){
     for(var i in T_LIST.all){
         $("#sound_alert_" + T_LIST.all[i]).attr("checked", settings.isEnabledSound[T_LIST.all[i]]);
     }
+    $("#inpSoundFile").val(settings.soundSrc);
 
     //初始化是否桌面显示
     for(var i in T_LIST.all){
@@ -735,11 +736,17 @@ function saveAll(){
         settings.isShowInPage[$this.attr('id').replace('set_show_in_page_','')] = ($this.attr("checked") ? true : false);
     });
 
-    //初始化是否声音提示
+    //保存是否声音提示
     $("#set_sound_alert_wrap :checkbox").each(function(){
         var $this = $(this);
         settings.isEnabledSound[$this.attr('id').replace('sound_alert_','')] = ($this.attr("checked") ? true : false);
     });
+    var _soundFile = $.trim($("#inpSoundFile").val());
+    if(_soundFile){
+        settings.soundSrc = _soundFile;
+        var bg = getBackgroundView();
+        bg.AlertaAudioFile.src = _soundFile;
+    }
 
     //初始化是否桌面显示
     $("#set_destop_alert_wrap :checkbox").each(function(){
