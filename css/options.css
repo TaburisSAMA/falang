@@ -31,6 +31,8 @@ label.title{color:#AB5603; font-weight:bold;}
 	border-top: 1px dashed #D5B163;
 }
 
+#facebox{right:auto;left:20px;}
+
 #gRefreshTimeHits, #userRefreshTimeHits{ color:#BA2636; }
 #edit-account-info .ainfo{ color:green; font-weight:bold; }
 

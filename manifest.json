@@ -14,7 +14,7 @@
   "options_page": "options.html",
   "content_scripts": [
     {
-      "matches": ["http://*/*"],
+      "matches": ["<all_urls>"],
       "css": ["css/page.css"],
       "js": ["scripts/lib/jquery-1.4.js", "scripts/apis.js", "scripts/page.js"]
     }
