@@ -58,6 +58,7 @@ var sinaApi = {
         
         oauth_authorize: 	  '/oauth/authorize',
         oauth_request_token:  '/oauth/request_token',
+        oauth_callback: 'oob',
         oauth_access_token:   '/oauth/access_token',
 
         detailUrl:        '/jump?aid=detail&twId=',
@@ -178,18 +179,26 @@ var sinaApi = {
 		}
 	},
 	
+	format_authorization_url: function(params) {
+		var login_url = (this.config.oauth_host || this.config.host) + this.config.oauth_authorize;
+		return OAuth.addToURL(login_url, params);
+	},
+	
     // 获取认证url
     get_authorization_url: function(user, callbackFn) {
     	if(user.authType == 'oauth') {
-    		var login_url = (this.config.oauth_host || this.config.host) + this.config.oauth_authorize + '?oauth_token=';
+    		var login_url = null;
+    		var me = this;
     		this.get_request_token(user, function(token, text_status, error_code) {
     			if(token) {
     				user.oauth_token_key = token.oauth_token;
         			user.oauth_token_secret = token.oauth_token_secret;
         			// 返回登录url给用户登录
-        			login_url += user.oauth_token_key;
-    			} else {
-    				login_url = null;
+        			var params = {oauth_token: user.oauth_token_key};
+        			if(me.config.oauth_callback) {
+            			params.oauth_callback = me.config.oauth_callback;
+            		}
+        			login_url = me.format_authorization_url(params);
     			}
     			callbackFn(login_url, text_status, error_code);
     		});
@@ -206,8 +215,15 @@ var sinaApi = {
 	            user: user,
 	            play_load: 'string',
 	            apiHost: this.config.oauth_host,
+	            data: {},
 	            need_source: false
 	        };
+    		if(this.config.oauth_callback) {
+    			params.data.oauth_callback = this.config.oauth_callback;
+    		}
+    		if(this.config.oauth_request_params){
+    			$.extend(params.data, this.config.oauth_request_params);
+    		}
     		this._sendRequest(params, function(token_str, text_status, error_code) {
     			var token = null;
     			if(text_status != 'error') {
@@ -826,9 +842,22 @@ var sinaApi = {
             return;
     	}
     	var user = args.user || args.data.user || localStorage.getObject(CURRENT_USER_KEY);
+    	if(!user){
+            showMsg('用户未指定');
+            callbackFn({}, 'error', 400);
+            return;
+        }
         if(args.data && args.data.user) delete args.data.user;
-
-    	var api = user.apiProxy || args.apiHost || this.config.host;
+        
+        if(args.data.status){
+        	args.data.status = this.url_encode(args.data.status);
+        }
+        if(args.data.comment){
+        	args.data.comment = this.url_encode(args.data.comment);
+        }
+        // 请求前调用
+        this.before_sendRequest(args, user);
+        var api = user.apiProxy || args.apiHost || this.config.host;
     	var url = api + args.url.format(args.data);
     	if(args.play_load != 'string') {
     		url += this.config.result_format;
@@ -838,19 +867,7 @@ var sinaApi = {
 	    args.url.replace(pattern, function(match, key) {
 	    	delete args.data[key];
 	    });
-        if(!user){
-            showMsg('用户未指定');
-            callbackFn({}, 'error', 400);
-            return;
-        }
-        if(args.data.status){
-        	args.data.status = this.url_encode(args.data.status);
-        }
-        if(args.data.comment){
-        	args.data.comment = this.url_encode(args.data.comment);
-        }
-        // 请求前调用
-        this.before_sendRequest(args, user);
+	    
         // 设置认证头部
         this.apply_auth(url, args, user);
         var $this = this;
@@ -2068,7 +2085,101 @@ $.extend(RenjianAPI, {
 	}
 });
 
-//var DoubanOAuth = OAuth.setProperties({}, OAuth);
+var BuzzAPI = $.extend({}, sinaApi);
+$.extend(BuzzAPI, {
+	config: $.extend({}, sinaApi.config, {
+		host: 'https://www.googleapis.com/buzz/v1',
+		source: 'net4team.net',
+		oauth_key: 'net4team.net',
+		oauth_secret: 'y+6SWcLVshQvogadDzXtSra+',
+        result_format: '', // 由alt参数确定返回值格式
+        
+		support_comment: false,
+		support_repost: false,
+		
+		oauth_host: 'https://www.google.com',
+		oauth_authorize: 	  '/accounts/OAuthAuthorizeToken',
+        oauth_request_token:  '/accounts/OAuthGetRequestToken',
+        oauth_request_params: {
+        	scope: 'https://www.googleapis.com/auth/buzz'
+        },
+        oauth_access_token:   '/accounts/OAuthGetAccessToken',
+        
+        friends_timeline: '/activities/@me/@consumption',
+        user_timeline: '/activities/{{id}}/@self',
+		verify_credentials: '/people/@me/@self'
+	}),
+	
+	before_sendRequest: function(args, user) {
+		if(args.url != this.config.oauth_request_token && args.url != this.config.oauth_access_token) {
+			args.data.alt = 'json';
+			delete args.data.source;
+			delete args.data.screen_name;
+			if(args.data.count) {
+				args.data['max-results'] = args.data.count;
+				delete args.data.count;
+			}
+			if(args.url == this.config.user_timeline) {
+				if(args.data.id == user.id) {
+					args.data.id = '@me';
+				}
+			}
+		}
+	},
+	
+	format_result: function(data, play_load, args) {
+		if(data.data) {
+			data = data.data;
+			if(data.items) {
+				data = data.items;
+			}
+		}
+		if($.isArray(data)) {
+	    	for(var i in data) {
+	    		data[i] = this.format_result_item(data[i], play_load, args);
+	    	}
+	    } else {
+	    	data = this.format_result_item(data, play_load, args);
+	    }
+		// 若是follwers api，则需要封装成cursor接口
+		// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
+		// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
+		if(args.url == this.config.followers || args.url == this.config.friends) {
+			data = {users: data, next_cursor: Number(args.data.page) + 1, previous_cursor: args.data.page};
+			if(data.users.length == 0) {
+				data.next_cursor = 0;
+			}
+		}
+		return data;
+	},
+	
+	format_result_item: function(data, play_load, args) {
+		if(play_load == 'user' && data.id) {
+			data.screen_name = data.displayName || data.name;
+			data.t_url = data.profileUrl;
+			data.profile_image_url = data.thumbnailUrl;
+			data.description = data.aboutMe;
+			delete data.aboutMe;
+			delete data.thumbnailUrl;
+			delete data.displayName;
+			delete data.profileUrl;
+		} else if(play_load == 'status') {
+//			data.text = data.object.content;
+			data.text = data.title;
+			data.source = data.source.title;
+			data.created_at = data.published;
+			delete data.published;
+			delete data.object;
+			delete data.title;
+			data.t_url = data.links.alternate[0].href;
+			delete data.links;
+			data.user = this.format_result_item(data.actor, 'user', args);
+			delete data.actor;
+		}
+		return data;
+	}
+
+});
 
 // 豆瓣
 var DoubanAPI = $.extend({}, sinaApi);
@@ -2102,7 +2213,7 @@ $.extend(DoubanAPI, {
         oauth_request_token:  '/service/auth/request_token',
         oauth_access_token:   '/service/auth/access_token',
         // douban需要 oauth_realm
-        oauth_realm: '',
+        oauth_realm: 'fawave',
 		verify_credentials: '/people/@me'
 	}),
 	
@@ -2132,6 +2243,7 @@ var T_APIS = {
 	'fanfou': FanfouAPI,
 	'renjian': RenjianAPI,
 	'douban': DoubanAPI,
+	'buzz': BuzzAPI,
 	'twitter': TwitterAPI // fxxx gxfxw first.
 };
 

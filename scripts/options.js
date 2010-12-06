@@ -12,7 +12,9 @@ var SUPPORT_AUTH_TYPES = {
 	'follow5': ['baseauth'],
 	'leihou': ['baseauth'],
 	'renjian': ['baseauth'],
-	'twitter': ['oauth', 'xauth', 'baseauth']
+	'twitter': ['oauth', 'xauth', 'baseauth'],
+	'douban': ['oauth'],
+	'buzz': ['oauth']
 };
 
 var AUTH_TYPE_NAME = {

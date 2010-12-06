@@ -36,7 +36,7 @@ var T_LIST = {
 	'digu': ['friends_timeline','mentions', 'direct_messages']
 };
 T_LIST.tsina = T_LIST.tsohu = T_LIST.all;
-T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.digu;
+T_LIST.buzz = T_LIST.douban = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.digu;
 
 var T_NAMES = {
 	'tsina': '新浪微博',
@@ -48,6 +48,8 @@ var T_NAMES = {
 //	'follow5': 'Follow5',
 	'twitter': 'Twitter',
 	'renjian': '人间网',
+//	'douban': '豆瓣',
+//	'buzz': 'Google Buzz',
 	'leihou': '雷猴'
 };
 
@@ -618,7 +620,7 @@ function decodeForm(form) {
         if (equals < 0) {
             d[nvp] = null;
         } else {
-        	d[nvp.substring(0, equals)] = nvp.substring(equals + 1);
+        	d[nvp.substring(0, equals)] = decodeURIComponent(nvp.substring(equals + 1));
         }
     }
     return d;
