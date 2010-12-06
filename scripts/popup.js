@@ -756,7 +756,7 @@ function getUserTimeline(screen_name, user_id, read_more){
             if(!read_more) {
             	var user = sinaMsgs[0].user || sinaMsgs[0].sender;
             	// 是否当前用户
-            	user.is_me = String(c_user.id) == String(user.id)
+            	user.is_me = String(c_user.id) == String(user.id);
                 var userinfo_html = buildUserInfo(user);
                 $("#user_timeline_timeline ul.list").prepend(userinfo_html);
                 resetScrollTop(m);
@@ -1369,6 +1369,9 @@ function toogleMsgInput(ele){
 function hideReplyInput(){
     fawave.face.hide();
     $("#ye_dialog_window").hide();
+    // 清空旧数据
+    $('#ye_dialog_window input[type="hidden"]').val('');
+    $('#ye_dialog_window input[type="checkbox"]').val('');
 };
 
 function resizeFawave(w, h){
@@ -1420,7 +1423,7 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
     	$('#chk_sendOneMore').attr("checked", false).val(tweetId).show();
         $('#txt_sendOneMore').text('同时给 @' + userName + ' 评论').show();
     } else { // 不支持repost，则屏蔽
-    	$('#chk_sendOneMore').attr("checked", false).val(tweetId).hide();
+    	$('#chk_sendOneMore').attr("checked", false).val('').hide();
         $('#txt_sendOneMore').text('').hide();
     }
     if(config.support_comment && rtUserName && reTweetId){
