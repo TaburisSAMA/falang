@@ -113,7 +113,11 @@ function checkTimeline(t, p, user_uniqueKey){
 //    	log('start checkTimeline ' + user_uniqueKey + ' ' + t + ' last_id: ' + last_id);
 //    }
 	
-    tapi[t](params, function(sinaMsgs, textStatus){
+    tapi[t](params, function(data, textStatus){
+    	var sinaMsgs = data;
+    	if(data.items) {
+    		sinaMsgs = data.items;
+    	}
     	if(!sinaMsgs) {
     		hideLoading();
     		return;

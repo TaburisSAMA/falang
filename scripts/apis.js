@@ -21,7 +21,9 @@ var sinaApi = {
 		// 是否支持max_id 分页
 		support_max_id: true,
 		support_destroy_msg: true, //是否支持删除私信
+		support_direct_messages: true, 
 		support_sent_direct_messages: true, //是否支持自己发送的私信
+		support_mentions: true, 
         
 		// api
         public_timeline:      '/statuses/public_timeline',
@@ -868,14 +870,14 @@ var sinaApi = {
 	    args.url.replace(pattern, function(match, key) {
 	    	delete args.data[key];
 	    });
-	    
         // 设置认证头部
         this.apply_auth(url, args, user);
-        var $this = this;
         var play_load = args.play_load; // 返回的是什么类型的数据格式
         delete args.play_load;
-        
         var callmethod = user.uniqueKey + ':' + args.url;
+        var request_data = args.content || args.data;
+        var processData = !args.content;
+        var contentType = args.contentType || 'application/x-www-form-urlencoded';
         $.ajax({
             url: url,
 //            username: user.userName,
@@ -883,8 +885,11 @@ var sinaApi = {
 //            cache: false, // chrome不会出现ie本地cache的问题, 若url参数带有_=xxxxx，digu无法获取完整的用户信息
             timeout: 60*1000, //一分钟超时
             type: args.type,
-            data: args.data,
+            data: request_data,
+            contentType: contentType,
+            processData: processData,
             dataType: 'text',
+            context: this,
             beforeSend: function(req) {
         		for(var key in args.headers) {
         			req.setRequestHeader(key, args.headers[key]);
@@ -909,7 +914,7 @@ var sinaApi = {
                 	error_code = data.error_code || data.code;
                     data.error = data.errors || data.error;
                     if(data.error || error_code){
-                    	textStatus = $this.format_error(data.error || data.wrong || data.message, error_code);
+                    	textStatus = this.format_error(data.error || data.wrong || data.message, error_code);
                     	var error_msg = callmethod + ' error: ' + textStatus;
                     	if(!textStatus && error_code){ // 错误为空，才显示错误代码
                     		error_msg += ', error_code: ' + error_code;
@@ -917,7 +922,7 @@ var sinaApi = {
                         showMsg(error_msg);
                     } else {
                         //成功再去格式化结果
-                    	data = $this.format_result(data, play_load, args);
+                    	data = this.format_result(data, play_load, args);
                     }
                 } else {
                 	error_code = 400;
@@ -942,7 +947,7 @@ var sinaApi = {
                             }
                             if(r){
                             	var error_code = r.error_code || r.code;
-                            	r.error = $this.format_error(r.error || r.wrong || r.message, error_code);
+                            	r.error = this.format_error(r.error || r.wrong || r.message, error_code);
 		                    	var error_msg = callmethod + ' error: ' + r.error;
 		                    	if(!r.error && error_code){ // 错误为空，才显示错误代码
 		                    		error_msg += ', error_code: ' + error_code;
@@ -2104,13 +2109,21 @@ var BuzzAPI = $.extend({}, sinaApi);
 $.extend(BuzzAPI, {
 	config: $.extend({}, sinaApi.config, {
 		host: 'https://www.googleapis.com/buzz/v1',
-		source: 'net4team.net',
+		source: 'AIzaSyAu4vq6sYO3WuKxP2G64fYg6T1LdIDu3pk', // https://code.google.com/apis/console/#project:828316891836:apis_keys
 		oauth_key: 'net4team.net',
 		oauth_secret: 'y+6SWcLVshQvogadDzXtSra+',
         result_format: '', // 由alt参数确定返回值格式
         
+        support_comment: true, // 判断是否支持评论
+		support_upload: false, // 是否支持上传图片
+		support_repost: false, // 是否支持新浪形式转载
 		support_comment: false,
 		support_repost: false,
+		support_cursor_only: true,  // 只支持游标方式翻页
+		support_mentions: false,
+		support_direct_messages: false,
+		support_upload: false,
+		repost_pre: 'RT ',
 		
 		oauth_host: 'https://www.google.com',
 		oauth_authorize: 	  '/accounts/OAuthAuthorizeToken',
@@ -2119,52 +2132,96 @@ $.extend(BuzzAPI, {
         	scope: 'https://www.googleapis.com/auth/buzz'
         },
         oauth_access_token:   '/accounts/OAuthGetAccessToken',
-        
+        oauth_realm: '',
         friends_timeline: '/activities/@me/@consumption',
         user_timeline: '/activities/{{id}}/@self',
+        followers: '/people/{{user_id}}/@groups/@followers',
+        friends: '/people/{{user_id}}/@groups/@following',
+        favorites: '/activities/@me/@liked',
+        favorites_create: '/activities/@me/@liked/{{id}}?key={{key}}&alt={{alt}}',
+        favorites_destroy: '/activities/@me/@liked/{{id}}_delete',
+        favorites_destroy_real: '/activities/@me/@liked/{{id}}?key={{key}}&alt={{alt}}',
+//        PUT  /activities/userId/@liked/{{id}}
+//        DELETE /activities/userId/@liked/{{id}}
+        update: '/activities/@me/@self?key={{key}}&alt={{alt}}',
+        destroy: '/activities/@me/@self/{{id}}?key={{key}}&alt={{alt}}',
 		verify_credentials: '/people/@me/@self'
 	}),
 	
+	url_encode: function(text) {
+		return text;
+	},
+	
+	reset_count: function(data, callback) {
+		callback();
+	},
+	
+	counts: function(data, callback) {
+		callback();
+	},
+	
+	format_authorization_url: function(params) {
+		var login_url = 'https://www.google.com/buzz/api/auth/OAuthAuthorizeToken';
+		params.domain = this.config.oauth_key;
+		params.iconUrl = 'http://falang.googlecode.com/svn/trunk/icons/icon48.png';
+		$.extend(params, this.config.oauth_request_params);
+		return OAuth.addToURL(login_url, params);
+	},
+	
 	before_sendRequest: function(args, user) {
-		if(args.url != this.config.oauth_request_token && args.url != this.config.oauth_access_token) {
-			args.data.alt = 'json';
-			delete args.data.source;
-			delete args.data.screen_name;
-			if(args.data.count) {
-				args.data['max-results'] = args.data.count;
-				delete args.data.count;
-			}
-			if(args.url == this.config.user_timeline) {
-				if(args.data.id == user.id) {
-					args.data.id = '@me';
-				}
-			}
+		if(args.url == this.config.oauth_request_token || args.url == this.config.oauth_access_token) {
+			return;
+		}
+		args.data.alt = 'json';
+		// google fawave 应用统计用的key
+		args.data.key = args.data.source;
+		delete args.data.source;
+		delete args.data.screen_name;
+		// 分页记录大小
+		if(args.data.count) {
+			args.data['max-results'] = args.data.count;
+			delete args.data.count;
+		}
+		// 游标分页
+		if(args.data.cursor) {
+			args.data.c = args.data.cursor;
+			delete args.data.cursor;
+		}
+		if(args.url == this.config.favorites_create) {
+			args.type = 'PUT';
+		} else if(args.url == this.config.favorites_destroy) {
+			args.type = 'DELETE';
+			args.url = this.config.favorites_destroy_real;
+		} else if(args.url == this.config.update) {
+			delete args.data.sina_id;
+			args.content = JSON.stringify({data: {object: {type: 'note', content: args.data.status}}});
+			args.contentType = 'application/json';
+			delete args.data.status;
+		} else if(args.url == this.config.destroy) {
+			args.type = 'DELETE';
 		}
 	},
 	
 	format_result: function(data, play_load, args) {
 		if(data.data) {
 			data = data.data;
-			if(data.items) {
-				data = data.items;
-			}
 		}
-		if($.isArray(data)) {
-	    	for(var i in data) {
-	    		data[i] = this.format_result_item(data[i], play_load, args);
+		var items = data.items || data.entry || data;
+		if($.isArray(items)) {
+	    	for(var i in items) {
+	    		items[i] = this.format_result_item(items[i], play_load, args);
 	    	}
+	    	if(data.links && data.links.next) {
+	    		var next = data.links.next[0].href;
+	    		var params = decodeForm(next);
+	    		if(params.c) {
+	    			data.next_cursor = params.c;
+	    		}
+	    	}
+	    	data.items = items;
 	    } else {
 	    	data = this.format_result_item(data, play_load, args);
 	    }
-		// 若是follwers api，则需要封装成cursor接口
-		// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
-		// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
-		if(args.url == this.config.followers || args.url == this.config.friends) {
-			data = {users: data, next_cursor: Number(args.data.page) + 1, previous_cursor: args.data.page};
-			if(data.users.length == 0) {
-				data.next_cursor = 0;
-			}
-		}
 		return data;
 	},
 	
@@ -2174,21 +2231,47 @@ $.extend(BuzzAPI, {
 			data.t_url = data.profileUrl;
 			data.profile_image_url = data.thumbnailUrl;
 			data.description = data.aboutMe;
+//			data.friends_count = '';
+//			data.followers_count = '';
+//			data.statuses_count = '';
 			delete data.aboutMe;
 			delete data.thumbnailUrl;
 			delete data.displayName;
 			delete data.profileUrl;
 		} else if(play_load == 'status') {
 //			data.text = data.object.content;
+			var attachments = data.object.attachments;
+			if(attachments && attachments[0].type == 'photo') {
+				data.thumbnail_pic = attachments[0].links.preview[0].href;
+				data.bmiddle_pic = attachments[0].links.enclosure[0].href;
+				data.original_pic = data.bmiddle_pic;
+			}
 			data.text = data.title;
+			if(data.crosspostSource) {
+				data.text += ' ' + data.crosspostSource.substring(data.crosspostSource.indexOf('http://'));
+			}
+			if(data.text == '-' && attachments && attachments[0].type == 'article') {
+				data.text = attachments[0].title + ' -- ' + attachments[0].content;
+				if(attachments[0].links.alternate) {
+					data.text += ' ' + attachments[0].links.alternate[0].href;
+				}
+			}
 			data.source = data.source.title;
+			if(data.source == 'net4team.net') {
+				data.source = '<a href="https://chrome.google.com/extensions/detail/aicelmgbddfgmpieedjiggifabdpcnln" target="_blank">FaWave</a>';
+			}
 			data.created_at = data.published;
+			data.t_url = data.links.alternate[0].href;
+			
+			data.user = this.format_result_item(data.actor, 'user', args);
+			if(args.url == this.config.favorites) {
+				data.favorited = true;
+			}
+			delete data.crosspostSource;
 			delete data.published;
 			delete data.object;
 			delete data.title;
-			data.t_url = data.links.alternate[0].href;
 			delete data.links;
-			data.user = this.format_result_item(data.actor, 'user', args);
 			delete data.actor;
 		}
 		return data;
@@ -2229,6 +2312,7 @@ $.extend(DoubanAPI, {
         oauth_access_token:   '/service/auth/access_token',
         // douban需要 oauth_realm
         oauth_realm: 'fawave',
+        oauth_callback: null,
 		verify_credentials: '/people/@me'
 	}),
 	

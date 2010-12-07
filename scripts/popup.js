@@ -302,7 +302,11 @@ function checkSupportedTabs(user){
     	support_comment: ['#tl_tabs .tab-comments_timeline, #comments_timeline_timeline', // 需要隐藏的
     	                  '#tl_tabs .tab-comments_timeline'], // 需要显示的
     	support_favorites: ['#tl_tabs .tab-favorites, #favorites_timeline',
-    	                    '#tl_tabs .tab-favorites']
+    	                    '#tl_tabs .tab-favorites'],
+    	support_direct_messages: ['#tl_tabs .tab-direct_messages, #direct_messages_timeline',
+    	                    '#tl_tabs .tab-direct_messages'],
+    	support_mentions: ['#tl_tabs .tab-mentions, #mentions_timeline',
+    	                    '#tl_tabs .tab-mentions']
     };
     for(var key in checks) {
     	if(!config[key]){
@@ -660,7 +664,7 @@ function _getFansList(to_t, read_more){
     		return;
     	}
         if(textStatus != 'error' && data && !data.error){
-            var users = data.users;
+            var users = data.users || data.items;
             var next_cursor = data.next_cursor;
             if(users && users.length > 0) {
             	// 过滤最大id
@@ -688,7 +692,8 @@ function _getFansList(to_t, read_more){
     });
 };
 
-//查看用户的微薄
+// 查看用户的微薄
+// 支持max_id、page、cursor 3种形式的分页
 function getUserTimeline(screen_name, user_id, read_more){
     var c_user = getUser();
     if(!c_user){
@@ -696,6 +701,7 @@ function getUserTimeline(screen_name, user_id, read_more){
     }
     var t = $("#tl_tabs .tab-user_timeline");
     var max_id = null;
+    var cursor = null;
     var page = 1;
     // 直接点击tab，获取当前用户的
     if(screen_name == undefined) {
@@ -703,28 +709,46 @@ function getUserTimeline(screen_name, user_id, read_more){
     	user_id = c_user.id;
     } else if(read_more) {
     	max_id = t.attr('max_id');
-        page = Number(t.attr('page') || 1);
+        page = String(t.attr('page') || 1);
+        cursor = t.attr('cursor');
     }
     var params = {count: PAGE_SIZE, screen_name: screen_name, user: c_user};
     if(user_id) {
     	params.id = user_id;
     }
-    var support_max_id = tapi.get_config(c_user).support_max_id;
-    if(support_max_id) {
-    	if(max_id) {
-    		params.max_id = max_id;
-    	}
+    var config = tapi.get_config(c_user);
+    var support_cursor_only = config.support_cursor_only; // 只支持游标方式翻页
+    if(!support_cursor_only) {
+    	var support_max_id = config.support_max_id;
+	    if(support_max_id) {
+	    	if(max_id) {
+	    		params.max_id = max_id;
+	    	}
+	    } else {
+	    	params.page = page;
+	    }
     } else {
-    	params.page = page;
+    	if(cursor == '-1') {
+    		return;
+    	}
+    	if(cursor) {
+    		params.cursor = cursor;
+    	}
     }
     showLoading();
     var m = 'user_timeline';
     hideReadMore(m);
-    tapi[m](params, function(sinaMsgs, textStatus){
+    tapi[m](params, function(data, textStatus){
     	// 如果用户已经切换，则不处理
     	var now_user = getUser();
     	if(now_user.uniqueKey != c_user.uniqueKey) {
     		return;
+    	}
+    	var sinaMsgs = data;
+    	if(support_cursor_only) {
+    		sinaMsgs = data.items;
+    		cursor = data.next_cursor || -1;
+    		t.attr('cursor', cursor);
     	}
         if(sinaMsgs && sinaMsgs.length > 0){
         	if(window.currentTab != "#user_timeline_timeline") {
@@ -745,7 +769,7 @@ function getUserTimeline(screen_name, user_id, read_more){
             	$("#user_timeline_timeline ul.list").html('');
             }
             addPageMsgs(sinaMsgs, m, true);
-            max_id = Number(sinaMsgs[sinaMsgs.length - 1].id) - 1;
+            max_id = String(sinaMsgs[sinaMsgs.length - 1].id) - 1;
             page += 1;
             // 保存数据，用于翻页
             t.attr('max_id', max_id);
@@ -775,29 +799,52 @@ function getFavorites(is_click){
         return;
     }
     var list = $("#favorites_timeline .list");
+    var t = $("#tl_tabs .tab-favorites_timeline");
+    var cursor = list.attr('cursor');
+    var page = list.attr('page');
     var t = 'favorites';
     var user_cache = get_current_user_cache();
-    var page = user_cache[t + '_page'];
-    if(page == undefined || is_click == true) { // 点击
+    var config = tapi.get_config(c_user);
+    var support_cursor_only = config.support_cursor_only; // 只支持游标方式翻页
+    if(!is_click) {
+    	is_click = support_cursor_only ? !cursor : !page;
+    }
+    if(is_click) { // 点击或第一次加载
+    	page = 1;
     	if(user_cache[t]) {
     		list.html(user_cache[t]);
     		return;
     	} else {
     		list.html('');
-    		page = 1;
+    	}
+    }
+    var params = {user: c_user, count: PAGE_SIZE};
+    var support_cursor_only = config.support_cursor_only; // 只支持游标方式翻页
+    if(!is_click) {
+    	if(support_cursor_only) {
+    		if(cursor == '-1') {
+    			return;
+    		}
+    		params.cursor = cursor;
+    	} else {
+    		params.page = page;
     	}
     }
     showLoading();
     hideReadMore(t);
-    var params = {page: page, user: c_user, count: PAGE_SIZE};
-    tapi[t](params, function(status, textStatus, statuCode){
-        if(textStatus != 'error' && status && !status.error){
+    tapi[t](params, function(data, textStatus, statuCode){
+    	if(c_user.uniqueKey != getUser().uniqueKey) {
+    		return;
+    	}
+        if(textStatus != 'error' && data && !data.error){
+        	var status = data.items;
+        	list.attr('cursor', data.next_cursor || -1);
+        	list.attr('page', Number(page) + 1);
+        	status = addPageMsgs(status, t, true);
 	        if(status.length > 0){
-	        	addPageMsgs(status, t, true);
 	            showReadMore(t);
-	            user_cache[t + '_page'] = page + 1;
 	            user_cache[t] = list.html();
-	        }else{
+	        } else {
 	            hideReadMore(t);
 	        }
         } else {
@@ -1099,7 +1146,7 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
 // 添加分页数据，并且自动删除重复的数据，返回删除重复的数据集
 function addPageMsgs(msgs, t, append){
 	if(!msgs || msgs.length == 0){
-		return;
+		return [];
 	}
     var ids = [];
     var _ul = $("#" + t + "_timeline ul.list"), html = '';

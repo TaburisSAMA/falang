@@ -33,10 +33,11 @@ var ALERT_MODE_KEY = 'idi_ALERT_MODE_KEY'; //信息提醒模式key
 //需要不停检查更新的timeline的分类列表
 var T_LIST = {
 	'all': ['friends_timeline','mentions','comments_timeline','direct_messages'],
-	'digu': ['friends_timeline','mentions', 'direct_messages']
+	'digu': ['friends_timeline','mentions', 'direct_messages'],
+	'buzz': ['friends_timeline']
 };
 T_LIST.tsina = T_LIST.tsohu = T_LIST.all;
-T_LIST.buzz = T_LIST.douban = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.digu;
+T_LIST.douban = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.digu;
 
 var T_NAMES = {
 	'tsina': '新浪微博',
@@ -48,8 +49,8 @@ var T_NAMES = {
 //	'follow5': 'Follow5',
 	'twitter': 'Twitter',
 	'renjian': '人间网',
-//	'douban': '豆瓣',
-//	'buzz': 'Google Buzz',
+	'douban': '豆瓣',
+	'buzz': 'Google Buzz',
 	'leihou': '雷猴'
 };
 
@@ -608,7 +609,12 @@ String.prototype.len = function(){
 
 // 将字符串参数变成dict参数
 // form: oauth_token_secret=a26e895ca88d3ddbb5ec4d9d1780964b&oauth_token=b7cbcc0dc5056509a6b85967639924df
+// 支持完整url
 function decodeForm(form) {
+	var index = form.indexOf('?');
+	if(index > -1) {
+		form = form.substring(index+1);
+	}
     var d = {};
     var nvps = form.split('&');
     for (var n = 0; n < nvps.length; ++n) {

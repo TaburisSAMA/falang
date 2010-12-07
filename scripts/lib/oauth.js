@@ -388,9 +388,9 @@ OAuth.setProperties(OAuth.SignatureMethod, // class members
             }
         }
         var path = uri.path;
-        if (!path) {
-            path = "/"; // conforms to RFC 2616 section 3.2.2
-        }
+//        if (!path) {
+//            path = "/"; // conforms to RFC 2616 section 3.2.2
+//        }
         // we know that there is no query and no fragment here.
         return scheme + "://" + authority + path;
     }

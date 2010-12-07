@@ -79,7 +79,12 @@ function bildMsgLi(sinaMsg, t, c_user){
         if(!config.support_destroy_msg) {
         	crlBtn.delDirectMsgBtn = '';
         }
-
+		// 不支持私信
+        if(!config.support_direct_messages) {
+        	crlBtn.delDirectMsgBtn = '';
+        	crlBtn.new_msgBtn = '';
+        }
+        
         if(c_user.blogType == 'digu' ){
             crlBtn.replyBtn = crlBtn.replyBtn.replace('>@<', '>回复<');
         }
