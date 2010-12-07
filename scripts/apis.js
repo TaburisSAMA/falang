@@ -81,7 +81,7 @@ var sinaApi = {
      */
     processMsg: function (str, notEncode) {
         if(!str){ return ''; }
-        if(!this.need_processMsg) { // 无需处理
+        if(!this.config.need_processMsg) { // 无需处理
         	return str;
         }
         if(!notEncode){
@@ -2246,7 +2246,7 @@ $.extend(BuzzAPI, {
 	},
 	
 	format_result_item: function(data, play_load, args) {
-		if(play_load == 'user' && data.id) {
+		if(play_load == 'user' && data && data.id) {
 			data.screen_name = data.displayName || data.name;
 			data.t_url = data.profileUrl;
 			data.profile_image_url = data.thumbnailUrl;
@@ -2265,9 +2265,10 @@ $.extend(BuzzAPI, {
 				data.retweeted_status = this.format_result_item(data.object, 'status', args);
 			} else {
 				data.text = data.object ? data.object.content : data.content;
-				if(data.crosspostSource) {
-					data.text += ' ' + data.crosspostSource.substring(data.crosspostSource.indexOf('http://'));
-				}
+//				if(data.crosspostSource) {
+//					var url = data.crosspostSource.substring(data.crosspostSource.indexOf('http://'));
+//					data.text += ' <a href="' + url + '">' + url + '</a>';
+//				}
 				var attachments = data.object ? data.object.attachments : data.attachments;
 				if(attachments && attachments[0].type == 'photo') {
 					data.thumbnail_pic = attachments[0].links.preview[0].href;
@@ -2288,7 +2289,8 @@ $.extend(BuzzAPI, {
 				}
 			}
 			data.created_at = data.published;
-			data.t_url = data.links.alternate[0].href;
+			var link = data.links.alternate || data.links.self;
+			data.t_url = link[0].href;
 			
 			data.user = this.format_result_item(data.actor, 'user', args);
 			if(args.url == this.config.favorites) {
