@@ -630,8 +630,9 @@ var sinaApi = {
 	            }
 	            var error_code = null;
 	            if(data){
-                    data.error = data.errors || data.error;
-	                if(data.error || data.error_code){
+                    var error = data.errors || data.error;
+	                if(error || data.error_code){
+	                	data.error = error;
 	                    _showMsg('error: ' + data.error + ', error_code: ' + data.error_code);
 	                    error_code = data.error_code || error_code;
 	                }
@@ -912,8 +913,9 @@ var sinaApi = {
                 var error_code = null;
                 if(data){
                 	error_code = data.error_code || data.code;
-                    data.error = data.errors || data.error;
-                    if(data.error || error_code){
+                    var error = data.errors || data.error;
+                    if(error || error_code){
+                    	data.error = error;
                     	textStatus = this.format_error(data.error || data.wrong || data.message, error_code);
                     	var error_msg = callmethod + ' error: ' + textStatus;
                     	if(!textStatus && error_code){ // 错误为空，才显示错误代码
