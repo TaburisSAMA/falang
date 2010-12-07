@@ -318,6 +318,9 @@ function init(){
     if(!settings.isSharedUrlAutoShort){
         $("#autoShortUrl").attr("checked", false);
     }
+    
+    //平滑滚动
+    $("#isSmoothScroller").attr("checked", settings.isSmoothScroller);
 
     $("#autoShortUrlCount").val(settings.sharedUrlAutoShortWordCount);
 
@@ -717,6 +720,9 @@ function saveAll(){
     }else{
         settings.sharedUrlAutoShortWordCount = Settings.defaults.sharedUrlAutoShortWordCount;
     }
+
+    //平滑滚动
+    settings.isSmoothScroller = $("#isSmoothScroller").attr("checked") ? true : false;
 
     settings.isSyncReadedToSina = $("#unread_sync_to_page").attr("checked") ? true : false;
 

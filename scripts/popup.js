@@ -1833,7 +1833,7 @@ var SmoothScroller = {
         this.c_t = window.currentTab;
         this.list_warp = $(this.c_t + ' .list_warp');
         this.list_warp_height = this.list_warp.height(); //算好放缓存，免得每次都要算
-        var hasDo = Math.ceil(Tween.Cubic.easeOut(this.status.t-1, this.status.b, this.status.c, this.status.d)) - this.status.b;
+        var hasDo = Math.ceil(Tween.Quad.easeOut(this.status.t-1, this.status.b, this.status.c, this.status.d)) - this.status.b;
         this.status.c = -e.wheelDelta + this.status.c - hasDo;
         this.status.t = 0;
         this.status.b = this.list_warp.scrollTop();
@@ -1841,7 +1841,7 @@ var SmoothScroller = {
     },
     run: function(){
         var _t = SmoothScroller;
-        var _top = Math.ceil(Tween.Cubic.easeOut(_t.status.t, _t.status.b, _t.status.c, _t.status.d));
+        var _top = Math.ceil(Tween.Quad.easeOut(_t.status.t, _t.status.b, _t.status.c, _t.status.d));
         _t.list_warp.scrollTop( _top );
         var h = $(_t.c_t + ' .list').height();
         h = h - _t.list_warp_height;

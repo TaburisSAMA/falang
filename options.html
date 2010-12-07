@@ -312,7 +312,13 @@
 	</ul>
 	<!-- 高级设置 -->
 	<ul id="advanced_set" class="set_wrap" style="display:none;">
-		<li><label class="title">我正在看模板: </label>
+		<li>
+			<label class="title">是否启用平滑滚动：</label>
+			<span>
+				<input type="checkbox" id="isSmoothScroller"><label for="isSmoothScroller">启用</label>
+			</span>
+		</li>
+		<li><label class="title">　　我正在看模板: </label>
 			<input type="text" id="tp_looking" value="我正在看: {{title}} {{url}} " style="width:200px;" />
 			<span class="jTip" jTitle="可用参数与说明:　" jWidth="320">?
 				<span class="c">当你使用“我正在看”的功能的时候，会根据该模板生成最终内容。<br/>
