@@ -1062,7 +1062,7 @@ function scrollPaging(){
 };
 
 function initScrollPaging(){
-    $(".list_warp").scroll(function(){
+    $(".list_warp").scroll(function(e){
         scrollPaging();
         checkShowGototop();
     });
@@ -1812,6 +1812,53 @@ function rOpenPic(event, ele){
         }
     }
 };
+
+//平滑滚动
+/*
+ t: current time（当前时间）；
+ b: beginning value（初始值）；
+ c: change in value（变化量）；
+ d: duration（持续时间）。
+*/
+var SmoothScroller = {
+    T: '', //setTimeout引用
+    c_t: '', //当前tab
+    list_warp: '',
+    list_warp_height: 0, //当前的列表窗口高度
+    status:{t:0, b:0, c:0, d:15},
+    start: function(e){
+        if(e.wheelDelta == 0){ return; }
+        clearTimeout(this.T);
+        e.preventDefault();
+        this.c_t = window.currentTab;
+        this.list_warp = $(this.c_t + ' .list_warp');
+        this.list_warp_height = this.list_warp.height(); //算好放缓存，免得每次都要算
+        var hasDo = Math.ceil(Tween.Cubic.easeOut(this.status.t-1, this.status.b, this.status.c, this.status.d)) - this.status.b;
+        this.status.c = -e.wheelDelta + this.status.c - hasDo;
+        this.status.t = 0;
+        this.status.b = this.list_warp.scrollTop();
+        this.run();
+    },
+    run: function(){
+        var _t = SmoothScroller;
+        var _top = Math.ceil(Tween.Cubic.easeOut(_t.status.t, _t.status.b, _t.status.c, _t.status.d));
+        _t.list_warp.scrollTop( _top );
+        var h = $(_t.c_t + ' .list').height();
+        h = h - _t.list_warp_height;
+        if(_top >= h){
+            return; //分页？
+        }
+        if(_t.status.t < _t.status.d){ _t.status.t++; setTimeout(_t.run, 10); }
+    }
+};
+
+$(function(){
+    if(Settings.get().isSmoothScroller){
+        $('.list_warp').bind('mousewheel', function(e){
+            SmoothScroller.start(e);
+        });
+    }
+});
 
 function _showLoading(){
     $("#loading").show();
