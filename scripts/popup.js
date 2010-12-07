@@ -744,9 +744,8 @@ function getUserTimeline(screen_name, user_id, read_more){
     	if(now_user.uniqueKey != c_user.uniqueKey) {
     		return;
     	}
-    	var sinaMsgs = data;
+    	var sinaMsgs = data.items || data;
     	if(support_cursor_only) {
-    		sinaMsgs = data.items;
     		cursor = data.next_cursor || -1;
     		t.attr('cursor', cursor);
     	}
@@ -778,7 +777,7 @@ function getUserTimeline(screen_name, user_id, read_more){
             t.attr('user_id', user_id);
             showReadMore(m);
             if(!read_more) {
-            	var user = sinaMsgs[0].user || sinaMsgs[0].sender;
+            	var user = data.user || sinaMsgs[0].user || sinaMsgs[0].sender;
             	// 是否当前用户
             	user.is_me = String(c_user.id) == String(user.id);
                 var userinfo_html = buildUserInfo(user);
@@ -1254,7 +1253,7 @@ function _sendMsgWraper(msg, user, stat, selLi){
     data['user'] = user;
     tapi.update(data, function(sinaMsg, textStatus){
         stat.sendedCount++;
-        if(sinaMsg.id){
+        if(sinaMsg === true || sinaMsg.id){
             stat.successCount++;
             $("#accountsForSend li[uniquekey=" + user.uniqueKey +"]").removeClass('sel');
         }else if(sinaMsg.error){

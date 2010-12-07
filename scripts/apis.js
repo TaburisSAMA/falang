@@ -901,17 +901,21 @@ var sinaApi = {
         			req.setRequestHeader(key, args.headers[key]);
         		}
         	},
-            success: function (data, textStatus) {
+            success: function (data, textStatus, xhr) {
             	if(play_load != 'string') {
             		try{
                         data = JSON.parse(data);
                     }
                     catch(err){
-                    	if(data.indexOf('{"wrong":"no data"}') > -1 || data == ''){
-                    		data = [];
+                    	if(xhr.status == 201 || xhr.statusText == "Created") { // rest成功
+                    		data = data;
                     	} else {
-                            data = {error: callmethod + ' 服务器返回结果错误，本地解析错误。' + err, error_code:500};
-                            textStatus = 'error';
+                    		if(data.indexOf('{"wrong":"no data"}') > -1 || data == '' || data == 'OK'){
+                        		data = [];
+                        	} else {
+                                data = {error: callmethod + ' 服务器返回结果错误，本地解析错误。' + err, error_code:500};
+                                textStatus = 'error';
+                        	}
                     	}
                     }
             	}
@@ -2335,6 +2339,11 @@ $.extend(DoubanAPI, {
         
 		support_comment: false,
 		support_repost: false,
+		support_max_id: false,
+		support_favorites: false,
+		support_mentions: false,
+		support_upload: false,
+		need_processMsg: false,
 		
 		oauth_host: 'http://www.douban.com',
 		oauth_authorize: 	  '/service/auth/authorize',
@@ -2342,9 +2351,20 @@ $.extend(DoubanAPI, {
         oauth_access_token:   '/service/auth/access_token',
         // douban需要 oauth_realm
         oauth_realm: 'fawave',
-        oauth_callback: null,
-		verify_credentials: '/people/@me'
+        friends_timeline: '/people/%40me/miniblog/contacts',
+        user_timeline: '/people/{{id}}/miniblog',
+        update: '/miniblog/saying',
+        destroy: '/miniblog/{{id}}',
+        direct_messages: '/doumail/inbox',
+        friends: '/people/{{user_id}}/contacts',
+        followers: '/people/{{user_id}}/friends',
+        
+		verify_credentials: '/people/%40me'
 	}),
+	
+	counts: function(data, callback) {
+		callback();
+	},
 	
 	/*
 	 * start-index	 返回多个元素时，起始元素的下标	 下标从1开始
@@ -2353,11 +2373,117 @@ $.extend(DoubanAPI, {
 	 */
 	before_sendRequest: function(args) {
 		if(args.url != this.config.oauth_request_token && args.url != this.config.oauth_access_token) {
-			//args.data.alt = 'json';
+			args.data.alt = 'json';
+			if(args.data.count) {
+				args.data['max-results'] = args.data.count;
+				if(args.data.page) {
+					args.data['start-index'] = (Number(args.data.page) - 1) * args.data.count + 1;
+					delete args.data.page;
+				}
+				delete args.data.count;
+			}
+			delete args.data.since_id;
 			// args.data.source => args.data.apikey
-			//args.data.apikey = args.data.source;
+			args.data.apikey = args.data.source;
 			delete args.data.source;
+			if(args.url == this.config.update) {
+				var tpl = '<?xml version="1.0" encoding="UTF-8"?><entry xmlns:ns0="http://www.w3.org/2005/Atom" xmlns:db="http://www.douban.com/xmlns/"><content>{{status}}</content></entry>';
+				args.content = tpl.format(args.data);
+				args.contentType = 'application/atom+xml; charset=utf-8';
+				args.data = {};
+			} else if(args.url == this.config.destroy) {
+				delete args.data.apikey;
+				delete args.data.alt;
+				args.type = 'DELETE';
+			}
 		}
+	},
+	
+	format_result: function(data, play_load, args) {
+		if(args.url == this.config.update || args.url == this.config.destroy) {
+			return true;
+		}
+		var items = data.entry || data;
+		if($.isArray(items)) {
+			if(data.author) {
+				data.user = this.format_result_item(data.author, 'user', args);
+			}
+	    	for(var i in items) {
+	    		items[i] = this.format_result_item(items[i], play_load, args);
+	    		if(!items[i].user) {
+	    			items[i].user = data.user;
+	    		}
+	    	}
+	    	data.items = items;
+	    } else {
+	    	data = this.format_result_item(data, play_load, args);
+	    }
+		return data;
+	},
+	
+	format_result_item: function(data, play_load, args) {
+		if(play_load == 'user' && data) {
+			if(data.link) {
+				var url_index = 1, icon_index = 2;
+				if(data.link.length == 2) {
+					url_index = 0;
+					icon_index = 1;
+				}
+				data.t_url = data.link[url_index]['@href'];
+				data.profile_image_url = data.link[icon_index]['@href'];
+			} else {
+				data.t_url = data.uri['$t'];
+			}
+			if(data['db:uid']) {
+				data.id = data['db:uid']['$t'];
+			} else {
+				data.id = data.t_url.substring(data.t_url.lastIndexOf('/people/') + 8, data.t_url.length - 1);
+			}
+			if(data.content) {
+				data.description = data.content['$t'];
+				delete data.content;
+			}
+			if(data['db:location']) {
+				data.province = data['db:location']['$t'];
+				delete data.location;
+			}
+			data.screen_name = data.title ? data.title['$t'] : data.name['$t'];
+			data.name = data.id;
+			delete data.link;
+			delete data.title;
+		} else if(play_load == 'status') {
+			if(data.author) {
+				data.user = this.format_result_item(data.author, 'user', args);
+			}
+			if(data['db:uid']) {
+				data.id = data['db:uid']['$t'];
+			} else {
+				data.id = data.id['$t'];
+				data.id = data.id.substring(data.id.lastIndexOf('/miniblog/') + 10, data.id.length);
+			}
+			data.text = data.content['$t'];
+			delete data.author;
+			delete data.content;
+		} else if(play_load == 'message') {
+			data.sender = data.user = this.format_result_item(data.author, 'user', args);
+//			data.recipient = this.format_result_item(data.recipient, 'user', args);
+			data.text = data.title['$t'];
+			data.id = data.id['$t'];
+			data.id = data.id.substring(data.id.lastIndexOf('/doumail/') + 10, data.id.length);
+		} else if(play_load == 'comment') {
+			this.format_result_item(data.user, 'user', args);
+			this.format_result_item(data.status, 'status', args);
+		}
+		if(data.published) {
+			data.created_at = data.published['$t'];
+			delete data.published;
+		}
+		return data;
+	},
+	
+	// urlencode，子类覆盖是否需要urlencode处理
+	url_encode: function(text) {
+		return text;
 	}
 });
 

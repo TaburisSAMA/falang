@@ -34,10 +34,11 @@ var ALERT_MODE_KEY = 'idi_ALERT_MODE_KEY'; //信息提醒模式key
 var T_LIST = {
 	'all': ['friends_timeline','mentions','comments_timeline','direct_messages'],
 	'digu': ['friends_timeline','mentions', 'direct_messages'],
-	'buzz': ['friends_timeline']
+	'buzz': ['friends_timeline'],
+	'douban': ['friends_timeline', 'direct_messages']
 };
 T_LIST.tsina = T_LIST.tsohu = T_LIST.all;
-T_LIST.douban = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.digu;
+T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.digu;
 
 var T_NAMES = {
 	'tsina': '新浪微博',
