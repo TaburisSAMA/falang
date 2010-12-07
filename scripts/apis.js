@@ -628,6 +628,7 @@ var sinaApi = {
 	            }
 	            var error_code = null;
 	            if(data){
+                    data.error = data.errors || data.error;
 	                if(data.error || data.error_code){
 	                    _showMsg('error: ' + data.error + ', error_code: ' + data.error_code);
 	                    error_code = data.error_code || error_code;
@@ -906,6 +907,7 @@ var sinaApi = {
                 var error_code = null;
                 if(data){
                 	error_code = data.error_code || data.code;
+                    data.error = data.errors || data.error;
                     if(data.error || error_code){
                     	textStatus = $this.format_error(data.error || data.wrong || data.message, error_code);
                     	var error_msg = callmethod + ' error: ' + textStatus;
@@ -1800,6 +1802,7 @@ $.extend(TwitterAPI, {
 	    support_upload: false,
 	    
 	    repost: '/statuses/update',
+        retweet: '/statuses/retweet/{{id}}',
         favorites_create: '/favorites/create/{{id}}',
         friends_timeline: '/statuses/home_timeline'
 	}),
@@ -1829,6 +1832,17 @@ $.extend(TwitterAPI, {
 	counts: function(data, callback) {
 		callback();
 	},
+
+    retweet: function(data, callbackFn){
+		if(!callbackFn) return;
+        var params = {
+            url: this.config.retweet,
+            type: 'post',
+            play_load: 'status',
+            data: data
+        };
+        this._sendRequest(params, callbackFn);
+	},
     
 	
 	before_sendRequest: function(args) {
@@ -1848,6 +1862,7 @@ $.extend(TwitterAPI, {
 
     format_result_item: function(data, play_load, args) {
 		if(play_load == 'status' && data.id) {
+            data.id = data.id_str || data.id;
 			var tpl = 'http://twitter.com/{{user.screen_name}}/status/{{id}}';
 			data.t_url = tpl.format(data);
 			this.format_result_item(data.user, 'user', args);
@@ -2398,6 +2413,11 @@ var tapi = {
 	// type
 	reset_count: function(data, callbackFn){
 		return this.api_dispatch(data).reset_count(data, callbackFn);
+	},
+    
+    // id
+	retweet: function(data, callbackFn){
+		return this.api_dispatch(data).retweet(data, callbackFn);
 	},
 	
 	// id

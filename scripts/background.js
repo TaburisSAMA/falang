@@ -8,7 +8,7 @@ var tweets = {},
     new_win_popup = Object(),
     MAX_MSG_ID = {},
     LAST_PAGES = {};
-//var THEME = localStorage.getObject('popup_theme') || 'default';
+
 window.checking={}; //正在检查是否有最新微博
 window.paging={}; //正在获取分页微博
 
@@ -344,7 +344,7 @@ function showNewMsg(msgs, t, user){
 //播放声音提醒
 var AlertaAudioFile = new Audio();
 function playSound(t){
-    if(Settings.get().isEnabledSound[t]){
+    if(getAlertMode()!='dnd' && Settings.get().isEnabledSound[t]){
         if(!AlertaAudioFile.src){
             AlertaAudioFile.src = Settings.get().soundSrc;
         };

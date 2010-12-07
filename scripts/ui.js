@@ -19,6 +19,7 @@ function bildMsgLi(sinaMsg, t, c_user){
         var crlBtn = {
                 delTweetBtn: '<a class="deltweet" href="javascript:void(0);" onclick="doDelTweet(\'' + sinaMsg.id + '\', this);" title="点击删除微博">删</a>',
                 replyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\');" title="进行@回复">@</a>',
+                oretweetBtn: '',
                 rtBtn: '<a class="rtweet" href="javascript:void(0);" onclick="doRT(this);" title="Twitter式转发">RT</a>',
                 repostBtn: '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\',\'' + (sinaMsg.retweeted_status ? sinaMsg.retweeted_status.user.screen_name : '') + '\',' + (sinaMsg.retweeted_status ? sinaMsg.retweeted_status.id : '0') + ');" title="转发这条微博">转</a>',
                 repostCounts: '<span class="repostCounts">(-)</span>',
@@ -34,6 +35,7 @@ function bildMsgLi(sinaMsg, t, c_user){
                 addFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>',
                 delFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="delFavorites(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\');" title="点击取消收藏"><img width="11px" src="/images/favorites.gif"/></a>',
                 rtRepostBtn: '',
+                rtOretweetBtn: '',
                 rtCommentBtn: '',
                 rtReplyBtn: '',
                 rtAddFavoritesMsgBtn: '',
@@ -81,6 +83,9 @@ function bildMsgLi(sinaMsg, t, c_user){
         if(c_user.blogType == 'digu' ){
             crlBtn.replyBtn = crlBtn.replyBtn.replace('>@<', '>回复<');
         }
+        else if(c_user.blogType == 'twitter' ){
+            crlBtn.oretweetBtn = '<a class="oretweet ort" href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\');" title="Twitter锐推"></a>';
+        }
 
         switch(t){
             case 'friends_timeline':
@@ -127,7 +132,7 @@ function bildMsgLi(sinaMsg, t, c_user){
                 crlBtn.delDirectMsgBtn = crlBtn.addFavoritesMsgBtn = crlBtn.delFavoritesMsgBtn = '';
                 break;
             case 'direct_messages':
-                crlBtn.repostBtn = crlBtn.repostCounts = crlBtn.commentBtn = crlBtn.commentCounts = crlBtn.delCommentBtn = crlBtn.delTweetBtn = crlBtn.addFavoritesMsgBtn = crlBtn.delFavoritesMsgBtn = '';
+                crlBtn.repostBtn = crlBtn.oretweetBtn = crlBtn.repostCounts = crlBtn.commentBtn = crlBtn.commentCounts = crlBtn.delCommentBtn = crlBtn.delTweetBtn = crlBtn.addFavoritesMsgBtn = crlBtn.delFavoritesMsgBtn = '';
                 crlBtn.new_msgBtn = crlBtn.new_msgBtn.replace('>私<', '>回复<');
                 break;
             case 'user_timeline':

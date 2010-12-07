@@ -1610,7 +1610,7 @@ function delFavorites(ele, screen_name, tweetId){//删除收藏
     var user = getUser();
     var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
     tapi.favorites_destroy({id:tweetId, user:user}, function(data, textStatus){
-        if(textStatus != 'error' && data && !data.error){
+        if(textStatus != 'error' && data && !data.error && data.id){
             _a.after(_aHtml.replace('delFavorites','addFavorites')
                             .replace('favorites.gif','favorites_2.gif')
                             .replace('点击取消收藏','点击收藏'));
@@ -1633,6 +1633,25 @@ function delFavorites(ele, screen_name, tweetId){//删除收藏
             showMsg('成功取消收藏');
         }else{
             showMsg('取消收藏失败');
+            _a.show();
+        }
+    });
+};
+
+function sendOretweet(ele, screen_name, tweetId){//twitter锐推
+    if(!tweetId){return;}
+    showLoading();
+    var _a = $(ele);
+    var _aHtml = _a[0].outerHTML;
+    _a.hide();
+    var user = getUser();
+    var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
+    tapi.retweet({id:tweetId, user:user}, function(data, textStatus){
+        if(textStatus != 'error' && data && !data.error && data.id){
+            _a.removeAttr('onclick').addClass('orted').attr('title', '已成功锐推').show();
+            showMsg('锐推成功');
+        }else{
+            showMsg('锐推失败');
             _a.show();
         }
     });

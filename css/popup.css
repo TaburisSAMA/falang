@@ -312,6 +312,17 @@ div.mainContent{word-wrap: break-word;}
 .unreadCount{color:red;}
 .imgicon{cursor: url(../images/big.cur), auto;}
 
+.list li .edit a.ort{
+	display:inline-block;
+	width:14px; height:10px;
+	text-indent:-999px;
+	overflow:hidden;
+	background:url(../images/ort.gif) no-repeat 0px 0px;
+}
+.list li .edit a.ort:hover, .list li .edit a.orted{
+	background:url(../images/ort.gif) no-repeat -22px 0px;
+}
+
 #msgInfoWarp{
    position:absolute;
    bottom:0;
