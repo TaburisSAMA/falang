@@ -21,7 +21,7 @@ function bildMsgLi(sinaMsg, t, c_user){
                 replyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\');" title="进行@回复">@</a>',
                 oretweetBtn: '',
                 rtBtn: '<a class="rtweet" href="javascript:void(0);" onclick="doRT(this);" title="Twitter式转发">RT</a>',
-                repostBtn: '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\',\'' + (sinaMsg.retweeted_status ? sinaMsg.retweeted_status.user.screen_name : '') + '\',' + (sinaMsg.retweeted_status ? sinaMsg.retweeted_status.id : '0') + ');" title="转发这条微博">转</a>',
+                repostBtn: '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\',\'' + (sinaMsg.retweeted_status ? sinaMsg.retweeted_status.user.screen_name : '') + '\',\'' + (sinaMsg.retweeted_status ? sinaMsg.retweeted_status.id : '0') + '\');" title="转发这条微博">转</a>',
                 repostCounts: '<span class="repostCounts">(-)</span>',
                 rtRepostCounts: '<span class="repostCounts">(-)</span>',
                 rtrtRepostCounts: '<span class="repostCounts">(-)</span>',
@@ -74,6 +74,9 @@ function bildMsgLi(sinaMsg, t, c_user){
         // 不支持repost(转发)
         if(!config.support_repost) {
         	crlBtn.repostCounts = crlBtn.rtRepostCounts = crlBtn.repostBtn = crlBtn.rtRepostBtn = '';
+        }
+        if(!config.support_counts) {
+        	crlBtn.repostCounts = crlBtn.rtRepostCounts = '';
         }
         // 不支持删除私信
         if(!config.support_destroy_msg) {

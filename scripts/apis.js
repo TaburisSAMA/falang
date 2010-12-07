@@ -13,6 +13,7 @@ var sinaApi = {
         oauth_key: '3538199806',
         oauth_secret: '18cf587d60e11e3c160114fd92dd1f2b',
         
+        support_counts: true, // 是否支持批量获取转发和评论数
         support_comment: true, // 判断是否支持评论
 		support_upload: true, // 是否支持上传图片
 		support_repost: true, // 是否支持新浪形式转载
@@ -24,6 +25,7 @@ var sinaApi = {
 		support_direct_messages: true, 
 		support_sent_direct_messages: true, //是否支持自己发送的私信
 		support_mentions: true, 
+		need_processMsg: true, //是否需要处理消息的内容
         
 		// api
         public_timeline:      '/statuses/public_timeline',
@@ -79,6 +81,9 @@ var sinaApi = {
      */
     processMsg: function (str, notEncode) {
         if(!str){ return ''; }
+        if(!this.need_processMsg) { // 无需处理
+        	return str;
+        }
         if(!notEncode){
             str = HTMLEnCode(str);
         }
@@ -2116,15 +2121,14 @@ $.extend(BuzzAPI, {
 		oauth_secret: 'y+6SWcLVshQvogadDzXtSra+',
         result_format: '', // 由alt参数确定返回值格式
         
-        support_comment: true, // 判断是否支持评论
+        support_counts: false,
 		support_upload: false, // 是否支持上传图片
-		support_repost: false, // 是否支持新浪形式转载
 		support_comment: false,
-		support_repost: false,
 		support_cursor_only: true,  // 只支持游标方式翻页
 		support_mentions: false,
 		support_direct_messages: false,
 		support_upload: false,
+		need_processMsg: false,
 		repost_pre: 'RT ',
 		
 		oauth_host: 'https://www.google.com',
@@ -2146,6 +2150,8 @@ $.extend(BuzzAPI, {
 //        PUT  /activities/userId/@liked/{{id}}
 //        DELETE /activities/userId/@liked/{{id}}
         update: '/activities/@me/@self?key={{key}}&alt={{alt}}',
+        repost: '/activities/@me/@self?key={{key}}&alt={{alt}}_repost',
+        repost_real: '/activities/@me/@self?key={{key}}&alt={{alt}}',
         destroy: '/activities/@me/@self/{{id}}?key={{key}}&alt={{alt}}',
 		verify_credentials: '/people/@me/@self'
 	}),
@@ -2201,6 +2207,18 @@ $.extend(BuzzAPI, {
 			delete args.data.status;
 		} else if(args.url == this.config.destroy) {
 			args.type = 'DELETE';
+		} else if(args.url == this.config.repost) {
+			args.content = JSON.stringify({
+				data: {
+					annotation: args.data.status,
+					verbs: ["share"],
+					object: {id: args.data.id}
+				}
+			});
+			args.contentType = 'application/json';
+			args.url = this.config.repost_real;
+			delete args.data.status;
+			delete args.data.id;
 		}
 	},
 	
@@ -2242,25 +2260,32 @@ $.extend(BuzzAPI, {
 			delete data.profileUrl;
 		} else if(play_load == 'status') {
 //			data.text = data.object.content;
-			var attachments = data.object.attachments;
-			if(attachments && attachments[0].type == 'photo') {
-				data.thumbnail_pic = attachments[0].links.preview[0].href;
-				data.bmiddle_pic = attachments[0].links.enclosure[0].href;
-				data.original_pic = data.bmiddle_pic;
-			}
-			data.text = data.title;
-			if(data.crosspostSource) {
-				data.text += ' ' + data.crosspostSource.substring(data.crosspostSource.indexOf('http://'));
-			}
-			if(data.text == '-' && attachments && attachments[0].type == 'article') {
-				data.text = attachments[0].title + ' -- ' + attachments[0].content;
-				if(attachments[0].links.alternate) {
-					data.text += ' ' + attachments[0].links.alternate[0].href;
+			if(data.object && data.object.type == 'activity') { // reshare => repost, 就是相当于新浪的repost
+				data.text = data.annotation;
+				data.retweeted_status = this.format_result_item(data.object, 'status', args);
+			} else {
+				data.text = data.object ? data.object.content : data.content;
+				if(data.crosspostSource) {
+					data.text += ' ' + data.crosspostSource.substring(data.crosspostSource.indexOf('http://'));
+				}
+				var attachments = data.object ? data.object.attachments : data.attachments;
+				if(attachments && attachments[0].type == 'photo') {
+					data.thumbnail_pic = attachments[0].links.preview[0].href;
+					data.bmiddle_pic = attachments[0].links.enclosure[0].href;
+					data.original_pic = data.bmiddle_pic;
+				}
+				if(data.text == '-' && attachments && attachments[0].type == 'article') {
+					data.text = attachments[0].title + ' -- ' + attachments[0].content;
+					if(attachments[0].links.alternate) {
+						data.text += ' ' + attachments[0].links.alternate[0].href;
+					}
 				}
 			}
-			data.source = data.source.title;
-			if(data.source == 'net4team.net') {
-				data.source = '<a href="https://chrome.google.com/extensions/detail/aicelmgbddfgmpieedjiggifabdpcnln" target="_blank">FaWave</a>';
+			if(data.source) {
+				data.source = data.source.title;
+				if(data.source == 'net4team.net') {
+					data.source = '<a href="https://chrome.google.com/extensions/detail/aicelmgbddfgmpieedjiggifabdpcnln" target="_blank">FaWave</a>';
+				}
 			}
 			data.created_at = data.published;
 			data.t_url = data.links.alternate[0].href;
@@ -2269,6 +2294,7 @@ $.extend(BuzzAPI, {
 			if(args.url == this.config.favorites) {
 				data.favorited = true;
 			}
+			delete data.annotation;
 			delete data.crosspostSource;
 			delete data.published;
 			delete data.object;
