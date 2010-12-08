@@ -518,24 +518,26 @@ function initMsgHover(){
 //====>>>>>>>>>>>>>>>>>>>>>>
 
 // 用户关系：跟随、取消跟随
-function f_create(user_id, ele){
-    if(ele){ $(ele).hide(); }
+function f_create(user_id, ele, screen_name){
+	var $ele = $(ele);
+	$ele.hide();
     showLoading();
     var b_view = getBackgroundView();
-    b_view.friendships.create(user_id, function(user_info, textStatus, statuCode){
-        if(textStatus == 'error' || !user_info.id){
-            if(ele){ $(ele).show(); }
+    b_view.friendships.create(user_id, screen_name, function(user_info, textStatus, statuCode){
+        if(!user_info){
+        	$ele.show();
         }
     });
 };
 
-function f_destroy(user_id, ele){
-    if(ele){ $(ele).hide(); }
+function f_destroy(user_id, ele, screen_name){
+	var $ele = $(ele);
+	$ele.hide();
     showLoading();
     var b_view = getBackgroundView();
-    b_view.friendships.destroy(user_id, function(user_info, textStatus, statuCode){
-        if(textStatus == 'error' || !user_info.id){
-            if(ele){ $(ele).show(); }
+    b_view.friendships.destroy(user_id, screen_name, function(user_info, textStatus, statuCode){
+        if(!user_info){
+        	$ele.show();
         }
     });
 };

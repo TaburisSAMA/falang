@@ -48,27 +48,35 @@ function setLastPage(t, page, user_uniqueKey){
 
 //用户跟随放到background view这里处理
 var friendships = {
-    create: function(user_id, callback){ //更随某人
+    create: function(user_id, screen_name, callback){ //更随某人
     	var user = getUser();
         var params = {id:user_id, user:user};
         tapi.friendships_create(params, function(user_info, textStatus, statuCode){
-            if(textStatus != 'error' && user_info.id){
-                showMsg('跟随 "' + user_info.screen_name + '" 成功');
-                if(callback){ callback(user_info, textStatus, statuCode); }
-                return;
+            if(user_info === true || user_info.id){
+            	if(user_info.screen_name) {
+            		screen_name = user_info.screen_name;
+            	}
+                showMsg('跟随 "' + screen_name + '" 成功');
+            } else {
+            	user_info = null;
             }
+            if(callback){ callback(user_info, textStatus, statuCode); }
             hideLoading();
         });
     },
-    destroy: function(user_id, callback){ //取消更随某人
+    destroy: function(user_id, screen_name, callback){ //取消更随某人
     	var user = getUser();
         var params = {id:user_id, user:user};
         tapi.friendships_destroy(params, function(user_info, textStatus, statuCode){
-            if(textStatus != 'error' && user_info.id){
-                showMsg('你已经取消跟随 "' + user_info.screen_name + '"');
-                if(callback){ callback(user_info, textStatus, statuCode); }
-                return;
+        	if(user_info === true || user_info.id){
+            	if(user_info.screen_name) {
+            		screen_name = user_info.screen_name;
+            	}
+                showMsg('你已经取消跟随 "' + screen_name + '"');
+            } else {
+            	user_info = null;
             }
+        	if(callback){ callback(user_info, textStatus, statuCode); }
             hideLoading();
         });
     },

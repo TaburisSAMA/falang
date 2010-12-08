@@ -491,9 +491,11 @@ function initQuickSendHotKey(){
 function _verify_credentials(user) {
 	if(!user) {
 		_showMsg('用户名或者密码不正确，请修改');
+		$('#save-account').removeAttr('disabled');
 		return;
 	}
 	tapi.verify_credentials(user, function(data, textStatus, errorCode){
+		$('#save-account').removeAttr('disabled');
         if(errorCode || textStatus=='error'){
             if(errorCode==400||errorCode==401||errorCode==403){
                 _showMsg('用户名或者密码不正确，请修改');
@@ -578,6 +580,7 @@ function saveAccount(){
     		// 设置request token
     		user.oauth_token_key = request_token_key;
     		user.oauth_token_secret = request_token_secret;
+    		$('#save-account').attr('disabled', true);
     		tapi.get_access_token(user, function(auth_user) {
     			_verify_credentials(auth_user);
     		});

@@ -2172,10 +2172,9 @@ $.extend(BuzzAPI, {
         friends: '/people/{{user_id}}/@groups/@following',
         favorites: '/activities/@me/@liked',
         favorites_create: '/activities/@me/@liked/{{id}}?key={{key}}&alt={{alt}}',
-        favorites_destroy: '/activities/@me/@liked/{{id}}_delete',
-        favorites_destroy_real: '/activities/@me/@liked/{{id}}?key={{key}}&alt={{alt}}',
-//        PUT  /activities/userId/@liked/{{id}}
-//        DELETE /activities/userId/@liked/{{id}}
+        favorites_destroy: '/activities/@me/@liked/{{id}}?key={{key}}&alt={{alt}}_delete',
+        friendships_create: '/people/@me/@groups/@following/{{id}}?key={{key}}&alt={{alt}}',
+        friendships_destroy: '/people/@me/@groups/@following/{{id}}?key={{key}}&alt={{alt}}_delete',
         update: '/activities/@me/@self?key={{key}}&alt={{alt}}',
         repost: '/activities/@me/@self?key={{key}}&alt={{alt}}_repost',
         repost_real: '/activities/@me/@self?key={{key}}&alt={{alt}}',
@@ -2223,11 +2222,12 @@ $.extend(BuzzAPI, {
 			args.data.c = args.data.cursor;
 			delete args.data.cursor;
 		}
-		if(args.url == this.config.favorites_create) {
+		if(args.url == this.config.favorites_create || args.url == this.config.friendships_create) {
 			args.type = 'PUT';
-		} else if(args.url == this.config.favorites_destroy) {
+			args.contentType = 'application/json';
+		} else if(args.url == this.config.favorites_destroy || args.url == this.config.friendships_destroy) {
 			args.type = 'DELETE';
-			args.url = this.config.favorites_destroy_real;
+			args.url = args.url.replace('_delete', '');
 		} else if(args.url == this.config.update) {
 			delete args.data.sina_id;
 			args.content = JSON.stringify({data: {object: {type: 'note', content: args.data.status}}});
@@ -2251,6 +2251,9 @@ $.extend(BuzzAPI, {
 	},
 	
 	format_result: function(data, play_load, args) {
+		if(args.url == this.config.friendships_create) {
+			return true;
+		}
 		if(data.data) {
 			data = data.data;
 		}

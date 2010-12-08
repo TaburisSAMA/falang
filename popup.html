@@ -352,8 +352,8 @@
 					<?js if(!user.is_me){ ?>
 					<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">私</a>
 						<?js if(support_follow){ ?>
-						<a class="follow" href="javascript:" onclick="f_destroy('#{user.id}', this)">取消关注</a>
-						<a class="follow" href="javascript:" onclick="f_create('#{user.id}', this)"><span class="plus">+</span>加关注</a>
+						<a class="follow" href="javascript:" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">取消关注</a>
+						<a class="follow" href="javascript:" onclick="f_create('#{user.id}', this, '#{user.screen_name}')"><span class="plus">+</span>加关注</a>
 						<?js } ?>
 					<?js } ?>
 					</div>
@@ -387,9 +387,9 @@
 					</a>
 					<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">私</a>
 					<?js if(support_follow && user.unfollow === undefined && tType =='friends'){ ?>
-					<a class="follow" href="javascript:" onclick="f_destroy('#{user.id}', this)">取消关注</a>
+					<a class="follow" href="javascript:" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">取消关注</a>
 					<?js }else if(support_follow){ ?>
-					<a class="follow" href="javascript:" onclick="f_create('#{user.id}', this)"><span class="plus">+</span>加关注</a>
+					<a class="follow" href="javascript:" onclick="f_create('#{user.id}', this, '#{user.screen_name}')"><span class="plus">+</span>加关注</a>
 					<?js } ?>
 					</div>
 					<p>
