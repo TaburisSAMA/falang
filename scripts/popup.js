@@ -631,7 +631,7 @@ function _getFansList(to_t, read_more){
     var $active_t = $("#fans_tab .active");
     var active_t = $active_t.attr('t');
     var $to_t = $("#fans_tab .tab_" + to_t);
-    var cursor = $to_t.attr('cursor') || -1;
+    var cursor = $to_t.attr('cursor') || '-1';
     
     // 各微博自己cache
     var html_cache = get_current_user_cache(FANS_HTML_CACHE);
@@ -647,12 +647,12 @@ function _getFansList(to_t, read_more){
 	    		$list.html(html_cache[to_t]);
 	    		return;
 	    	}
-	    } else if(cursor != -1) { // 点击当前tab
+	    } else if(cursor != '-1') { // 点击当前tab
 	    	return;
 	    }
 	    $list.html('');
     }
-	if(String(cursor) == '0'){
+	if(cursor == '0'){
     	return;
     }
     params.cursor = cursor;
@@ -687,7 +687,7 @@ function _getFansList(to_t, read_more){
                 html_cache[to_t] += html;
             }
             // 设置游标，控制翻页
-            if(next_cursor !== undefined) {
+            if(next_cursor) {
         		$to_t.attr('cursor', next_cursor);
         	}
         }
@@ -749,7 +749,7 @@ function getUserTimeline(screen_name, user_id, read_more){
     	}
     	var sinaMsgs = data.items || data;
     	if(support_cursor_only) {
-    		cursor = data.next_cursor || -1;
+    		cursor = String(data.next_cursor || -1);
     		t.attr('cursor', cursor);
     	}
         if(sinaMsgs && sinaMsgs.length > 0){

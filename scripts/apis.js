@@ -28,6 +28,7 @@ var sinaApi = {
 		support_direct_messages: true, 
 		support_sent_direct_messages: true, //是否支持自己发送的私信
 		support_mentions: true, 
+		support_friendships_create: true,
 		need_processMsg: true, //是否需要处理消息的内容
         
 		// api
@@ -75,8 +76,7 @@ var sinaApi = {
         	"40025:Error: repeated weibo text!": "重复发送",
         	"40031:Error: target weibo does not exist!": "不存在的微博ID",
         	"40015:Error: not your own comment!": "评论ID不在登录用户的comments_by_me列表中",
-        	"40303:Error: already followed": "已跟随",
-        	"The source language could not be detected": "",
+        	"40303:Error: already followed": "已跟随"
         }
     },
     
@@ -2392,7 +2392,7 @@ $.extend(DoubanAPI, {
         oauth_secret: 'a29252a52eaa835d',
         result_format: '', // 豆瓣由alt参数确定返回值格式
         
-		userinfo_has_counts: true, // 用户信息中是否包含粉丝数、微博数等信息
+		userinfo_has_counts: false, // 用户信息中是否包含粉丝数、微博数等信息
         support_comment: false,
 		support_repost: false,
 		support_max_id: false,
@@ -2437,7 +2437,7 @@ $.extend(DoubanAPI, {
 				if(args.data.cursor) {
 					args.data['start-index'] = args.data.cursor;
 					// 设置下一页
-					args.next_cursor = args.data.cursor + args.data.count;
+					args.next_cursor = Number(args.data.cursor) + args.data.count;
 					delete args.data.cursor;
 				} else {
 					args.next_cursor = args.data.count + 1;
@@ -2480,6 +2480,9 @@ $.extend(DoubanAPI, {
 	    		}
 	    	}
 	    	data.items = items;
+	    	if(items.length == 0) {
+	    		args.next_cursor = '0';
+	    	}
 	    	if(args.next_cursor) {
 	    		data.next_cursor = args.next_cursor;
 	    	}

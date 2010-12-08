@@ -233,7 +233,7 @@ function getTimelinePage(user_uniqueKey, t, p){
     		cursor = getLastCursor(t, user_uniqueKey);
 //    		log('getLastCursor cursor: ' + cursor);
     	}
-    	if(cursor == -1) { // 再无数据
+    	if(cursor == '0') { // 再无数据
     		return;
     	} else if(cursor) {
     		params.cursor = cursor;
@@ -298,7 +298,7 @@ function getTimelinePage(user_uniqueKey, t, p){
         if(data.next_cursor) {
         	// 保存cursor信息
 //        	log('new page cursor: ' + data.next_cursor);
-    		tweets[t_key][tweets[t_key].length - 1].cursor = data.next_cursor;
+    		tweets[t_key][tweets[t_key].length - 1].cursor = String(data.next_cursor);
     	}
         hideLoading();
         setDoChecking(user_uniqueKey, t, 'paging', false);
