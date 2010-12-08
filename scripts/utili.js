@@ -259,29 +259,33 @@ function setUser(user){
 };
 
 //获取所有用户列表
-//@isAll: 默认只返回启用的用户，如果isAll为true，则返回全部用户
-function getUserList(isAll){
+//@t: all: 全部， send:用于发送的用户列表， show:正常显示的用户。默认为show
+function getUserList(t){
+    t = t || 'show'; //默认，获取用于显示的列表
     var userList = localStorage.getObject(USER_LIST_KEY) || [];
-    if(isAll && userList.length != undefined){ // 兼容旧格式
+    if(t==='all' && userList.length != undefined){ // 兼容旧格式
     	return userList;
     }
-    var items = [];
+    var items = [], user = null;
     for(var i in userList){
-        if(!userList[i].disabled){
+        user = userList[i];
+        if(!user.disabled){
+            if(t==='show' && user.only_for_send){ continue; }
         	items.push(userList[i]);
         }
     }
     return items;
 };
+
 //保存用户列表
 function saveUserList(userlist){
     localStorage.setObject(USER_LIST_KEY, userlist);
 };
 //根据uniqueKey获取用户
-//@includeDisabled: 如果为true，则会获取停用的用户，否则只会获取启用的用户
-function getUserByUniqueKey(uniqueKey, includeDisabled){
+//@t: all: 全部， send:用于发送的用户列表， show:正常显示的用户。默认为show
+function getUserByUniqueKey(uniqueKey, t){
     if(!uniqueKey){return null;}
-    var userList = getUserList(includeDisabled);
+    var userList = getUserList(t);
     for(var i in userList){
     	if(userList[i].uniqueKey == uniqueKey){
     		return userList[i];

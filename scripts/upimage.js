@@ -54,7 +54,7 @@ function sendMsg(){ //覆盖popup.js的同名方法
     if(selLi.length){
         selLi.each(function(){
             var uniqueKey = $(this).attr('uniqueKey');
-            var _user = getUserByUniqueKey(uniqueKey);
+            var _user = getUserByUniqueKey(uniqueKey, 'send');
             if(_user){
                 users.push(_user);
             }

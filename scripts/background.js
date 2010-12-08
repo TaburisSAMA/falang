@@ -510,8 +510,8 @@ function onChangeUser(){
 //刷新账号信息
 function refreshAccountInfo(){
     var stat = {errorCount: 0, successCount: 0};
-    // 获取排序信息
-    stat.userList = getUserList(true);
+    // 获取用户列表
+    stat.userList = getUserList('all');
     $("#refresh-account").attr("disabled", true);
     for(var i in stat.userList){
         refreshAccountWarp(stat.userList[i], stat);//由于闭包会造成变量共享问题，所以写多一个包装函数。
@@ -571,7 +571,7 @@ r_method_manager = {
     getQuickSendInitInfos: function(request, sender, sendResponse){
         var hotkeys = Settings.get().quickSendHotKey;
         var c_user = getUser();
-        var userList = getUserList();
+        var userList = getUserList('send');
         sendResponse({hotkeys: hotkeys, c_user:c_user, userList:userList});
     },
     publicQuickSendMsg: function(request, sender, sendResponse){

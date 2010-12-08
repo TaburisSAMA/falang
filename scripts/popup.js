@@ -416,7 +416,7 @@ function initSelectSendAccounts(is_upload){
     if(afs.data('inited')){
         return;
     }
-    var userList = getUserList();
+    var userList = getUserList('send');
     if(userList.length < 2){ return; } //多个用户才显示
     var li_tp = '<li class="{{sel}}" uniqueKey="{{uniqueKey}}" onclick="toggleSelectSendAccount(this)">' +
                    '<img src="{{profile_image_url}}" />' +
@@ -1228,7 +1228,7 @@ function sendMsg(msg){
     if(selLi.length){
         selLi.each(function(){
             var uniqueKey = $(this).attr('uniqueKey');
-            var _user = getUserByUniqueKey(uniqueKey);
+            var _user = getUserByUniqueKey(uniqueKey, 'send');
             if(_user){
                 users.push(_user);
             }

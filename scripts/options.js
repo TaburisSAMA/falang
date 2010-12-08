@@ -78,7 +78,7 @@ $(function(){
     $("#stop-account").click(function(){
         var uniqueKey = $("#account-list").val();
         var _user = toggleStopAccount(uniqueKey);
-        var stat = _user.disabled ? '停用' : '启用';
+        var stat = _user.disabled ? '停用' : (_user.only_for_send ? '仅发送' : '启用');
         showAccountList();
         $("#account-list").val(uniqueKey);
         _showMsg(_user.screen_name + ' 的状态修改为: ' + stat);
@@ -91,11 +91,11 @@ $(function(){
         showEditAccount(uniqueKey);
     });
 
-    //用户信息提示自定义
+    //用户账号
     $("#show-edit-user-custom").click(function(){
         var uniqueKey = $("#account-list").val();
         $("#edit-account-key").val(uniqueKey);
-        var user = getUserByUniqueKey(uniqueKey, true);
+        var user = getUserByUniqueKey(uniqueKey, 'all');
 
         if(tapi.get_config(user).support_comment){
             $("#userRefreshTime_comments_timeline").parent().show();
@@ -115,18 +115,19 @@ $(function(){
             }
             refTimeInp.val(refTime);
         }
-
         calculateUserRefreshTimeHits(user);
+
+        $("#account_only_for_send").attr('checked', user.only_for_send ? true : false);
 
         $("#new-account").hide();
         $("#edit-account-info").show().find('h3').html($(this).text()).end().find('.ainfo').html($("#account-list :selected").text());
         $("#user-custom-wrap").show();
     });
 
-    //保存用户信息提示自定义设置
+    //保存用户属性修改
     $("#save-user-custom").click(function(){
         var uniqueKey = $("#edit-account-key").val();
-        var user = getUserByUniqueKey(uniqueKey, true);
+        var user = getUserByUniqueKey(uniqueKey, 'all');
         if(user){
             user.refreshTime = user.refreshTime || {};
             var refTime = 0, refTimeInp = null;
@@ -141,8 +142,9 @@ $(function(){
                 user.refreshTime[T_LIST.all[i]] = refTime;
                 refTimeInp.val(refTime);
             }
+            user.only_for_send = $("#account_only_for_send").attr('checked');
 
-            var userList = getUserList(true);
+            var userList = getUserList('all');
             // 删除旧数据，替换新的
             var found = false;
             $.each(userList, function(i, item){
@@ -169,7 +171,7 @@ $(function(){
 
     $("#userRefreshTimeWrap input").change(function(){
         var uniqueKey = $("#edit-account-key").val();
-        var user = getUserByUniqueKey(uniqueKey, true);
+        var user = getUserByUniqueKey(uniqueKey, 'all');
         calculateUserRefreshTimeHits(user);
     });
 
@@ -211,7 +213,7 @@ $(function(){
     		$item.next().after($item);
     	}
     	var new_list = [];
-    	var userlist = getUserList(true);
+    	var userlist = getUserList('all');
     	$("#account-list option").each(function(){
     		var uniqueKey = $(this).val();
     		$.each(userlist, function(index, user){
@@ -280,7 +282,7 @@ function disabledUserEditBtns(){
 };
 
 function showAccountList(){
-    var userList = getUserList(true);
+    var userList = getUserList('all');
     var userCount = 0;
     var needRefresh = false;
     if(userList){
@@ -293,7 +295,7 @@ function showAccountList(){
                 needRefresh = true;
             } else {
             	user.blogTypeName = T_NAMES[user.blogType];
-                user.stat = user.disabled ? '停用' : '启用';
+                user.stat = user.disabled ? '停用' : (user.only_for_send ? '仅发送' : '启用');
             	op += tpl.format(user);
             }
         }
@@ -500,7 +502,7 @@ function _verify_credentials(user) {
                 _showMsg('出现错误，保存失败。' + err_msg);
             }
         } else {
-        	var userList = getUserList(true);
+        	var userList = getUserList('all');
             $.extend(user, data);
             user.uniqueKey = user.blogType + '_' + user.id;
             user.screen_name = user.screen_name || user.name;
@@ -632,7 +634,7 @@ function showSupportAuthTypes(blogType, authType){
 
 function showEditAccount(uniqueKey){
     if(uniqueKey){
-        var userList = getUserList(true);
+        var userList = getUserList('all');
         var user = null;
         $.each(userList, function(index, item) {
         	if(item.uniqueKey == uniqueKey){
@@ -655,7 +657,7 @@ function showEditAccount(uniqueKey){
 
 function delAccount(uniqueKey){
 	$("#account-list option:selected").remove();
-    var userList = getUserList(true);
+    var userList = getUserList('all');
     var new_list = [];
     var delete_user = {};
     for(var i in userList){
@@ -690,7 +692,7 @@ function delAccount(uniqueKey){
 //停、启用用户账号
 function toggleStopAccount(uniqueKey, is_stop){
     if(!uniqueKey){ return null; }
-    var userList = getUserList(true);
+    var userList = getUserList('all');
     var user = null;
     $.each(userList, function(i, item){
     	if(item.uniqueKey == uniqueKey){
@@ -862,7 +864,7 @@ var SmoothScrollerDemo = {
 function refreshAccountInfo(){
     var stat = {errorCount: 0, successCount: 0};
     // 获取排序信息
-    stat.userList = getUserList(true);
+    stat.userList = getUserList('all');
     $("#refresh-account").attr("disabled", true);
     for(var i in stat.userList){
         refreshAccountWarp(stat.userList[i], stat);//由于闭包会造成变量共享问题，所以写多一个包装函数。
