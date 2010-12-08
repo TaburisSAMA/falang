@@ -226,6 +226,14 @@ $(function(){
     if(window.location.hash){
         $("#navigation li[target_id=" + window.location.hash + "] a").click();
     }
+    
+    // 显示语言选项
+    var tanslate_options = '';
+    for(var k in Languages) {
+    	tanslate_options += '<option value="{{value}}">{{name}}</option>'.format({name: k, value: Languages[k]});
+    }
+    var settings = Settings.get();
+    $('#translate_target').html(tanslate_options).val(settings.translate_target);
 });
 
 //统计全局的刷新间隔设置产生的请求次数
@@ -793,6 +801,8 @@ function saveAll(){
     settings.font =  font;
     var fontSize = $("#selFontSize").val();
     settings.fontSite = fontSize;
+    
+    settings.translate_target = $('#translate_target').val();
 
     Settings.save();
 

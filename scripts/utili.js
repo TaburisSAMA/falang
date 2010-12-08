@@ -55,6 +55,60 @@ var T_NAMES = {
 	'leihou': '雷猴'
 };
 
+var Languages = {
+	'中文': 'zh',
+	'Afrikaans': 'af',
+	'Albanian': 'sq',
+	'Arabic': 'ar',
+	'Basque': 'eu',
+	'Belarusian': 'be',
+	'Bulgarian': 'bg',
+	'Catalan': 'ca',
+	'Croatian': 'hr',
+	'Czech': 'cs',
+	'Danish': 'da',
+	'Dutch': 'nl',
+	'English': 'en',
+	'Estonian': 'et',
+	'Filipino': 'tl',
+	'Finnish': 'fi',
+	'French': 'fr',
+	'Galician': 'gl',
+	'German': 'de',
+	'Greek': 'el',
+	'Haitian Creole': 'ht',
+	'Hebrew': 'iw',
+	'Hindi': 'hi',
+	'Hungarian': 'hu',
+	'Icelandic': 'is',
+	'Indonesian': 'id',
+	'Irish': 'ga',
+	'Italian': 'it',
+	'Japanese': 'ja',
+	'Latvian': 'lv',
+	'Lithuanian': 'lt',
+	'Macedonian': 'mk',
+	'Malay': 'ms',
+	'Maltese': 'mt',
+	'Norwegian': 'no',
+	'Persian': 'fa',
+	'Polish': 'pl',
+	'Portuguese': 'pt',
+	'Romanian': 'ro',
+	'Russian': 'ru',
+	'Serbian': 'sr',
+	'Slovak': 'sk',
+	'Slovenian': 'sl',
+	'Spanish': 'es',
+	'Swahili': 'sw',
+	'Swedish': 'sv',
+	'Thai': 'th',
+	'Turkish': 'tr',
+	'Ukrainian': 'uk',
+	'Vietnamese': 'vi',
+	'Welsh': 'cy',
+	'Yiddish': 'yi'
+};
 
 function showMsg(msg){
     var popupView = getPopupView();
@@ -132,6 +186,7 @@ var Settings = {
         popupWidth: 480, //弹出窗大小
         popupHeight: 520, 
         theme: 'pip_io', //主题样式
+        translate_target: 'zh', // 默认翻译语言
 
         lookingTemplate: '我正在看: {{title}} {{url}} '
     },

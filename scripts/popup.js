@@ -1874,7 +1874,8 @@ function translate(ele) {
 		$ele = $ele.find('.tweet_text');
 	}
 	$(ele).hide();
-	var target = 'zh-CN';
+	var settings = Settings.get();
+	var target = settings.translate_target;
 	tapi.translate(getUser(), $ele.html(), target, function(translatedText) {
 		if(translatedText) {
 			$ele.after('<hr /><div class="tweet_text_old">' + translatedText + '</div>');
