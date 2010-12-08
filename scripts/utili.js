@@ -17,6 +17,7 @@ var USER_LIST_KEY = 'idi_userlist';
 var CURRENT_USER_KEY = 'idi_current_user';
 
 var LAST_MSG_ID = 'idi_last_msg_id';
+var LAST_CURSOR = '_last_cursor';
 
 var LOCAL_STORAGE_NEW_TWEET_LIST_KEY = 'idi_LOCAL_STORAGE_NEW_TWEET_LIST_KEY';
 var LOCAL_STORAGE_TWEET_LIST_HTML_KEY = 'idi_LOCAL_STORAGE_TWEET_LIST_HTML_KEY';
@@ -471,6 +472,14 @@ function getLastMsgId(t, user_uniqueKey){
     return localStorage.getObject(user_uniqueKey + t + LAST_MSG_ID);
 }
 
+// 保存最新的cursor
+function setLastCursor(cursor, t, user_uniqueKey) {
+    localStorage.setObject(user_uniqueKey + t + LAST_CURSOR, cursor);
+}
+// 获取最新的cursor
+function getLastCursor(t, user_uniqueKey) {
+    return localStorage.getObject(user_uniqueKey + t + LAST_CURSOR);
+}
 //<<<<<<<<<<<<<<<<=========
 
 

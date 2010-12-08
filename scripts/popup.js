@@ -923,7 +923,7 @@ function showCounts(t, ids){
 
     showLoading();
     var c_user = getUser();
-    if(!c_user){
+    if(!c_user || !tapi.get_config(c_user).support_counts){
         return;
     }
     var data = {ids:ids, user:c_user};
@@ -937,8 +937,8 @@ function showCounts(t, ids){
                         if(_edit){
                             _edit.find('.repostCounts').html('('+ counts[i].rt +')');
                             var _comm_txt = '(0)';
-                            if(counts[i].comments>0){
-                                _comm_txt = '(<a href="javascript:void(0);" title="点击查看评论" onclick="showComments(this,' + counts[i].id + ')">' +counts[i].comments + '</a>)';
+                            if(counts[i].comments > 0){
+                                _comm_txt = '(<a href="javascript:void(0);" title="点击查看评论" onclick="showComments(this,' + counts[i].id + ');">' +counts[i].comments + '</a>)';
                             }
                             _edit.find('.commentCounts').html(_comm_txt);
                         }

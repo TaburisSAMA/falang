@@ -2243,6 +2243,7 @@ $.extend(BuzzAPI, {
 		args.data.key = args.data.source;
 		delete args.data.source;
 		delete args.data.screen_name;
+		delete args.data.since_id;
 		// 分页记录大小
 		if(args.data.count) {
 			args.data['max-results'] = args.data.count;

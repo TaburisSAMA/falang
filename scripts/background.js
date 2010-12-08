@@ -103,11 +103,7 @@ function checkTimeline(t, p, user_uniqueKey){
     if(last_id){
         params['since_id'] = last_id;
     }
-    if(p){
-        for(var key in p){
-            params[key] = p[key];
-        }
-    }
+    $.extend(params, p);
     showLoading();
 //    if(t == 'friends_timeline'){
 //    	log('start checkTimeline ' + user_uniqueKey + ' ' + t + ' last_id: ' + last_id);
@@ -118,16 +114,20 @@ function checkTimeline(t, p, user_uniqueKey){
     	if(data.items) {
     		sinaMsgs = data.items;
     	}
+    	if(data.next_cursor) {
+    		// 保存最新的cursor，用于分页
+    		setLastCursor(data.next_cursor, t, user_uniqueKey);
+    	}
     	if(!sinaMsgs) {
     		hideLoading();
     		return;
     	}
         var isFirstTime = false;
         //TODO: 这里不确定会不会有闭包造成的c_user变量覆盖问题，待测试
-        if(!c_user){
-            setDoChecking(user_uniqueKey, t, 'checking', false);
-            return;
-        }
+//        if(!c_user){
+//            setDoChecking(user_uniqueKey, t, 'checking', false);
+//            return;
+//        }
         var _key = user_uniqueKey + t + '_tweets';
         if(!tweets[_key]){
             tweets[_key] = [];
@@ -135,21 +135,23 @@ function checkTimeline(t, p, user_uniqueKey){
         }
         if(sinaMsgs.length > 0){
         	if(tweets[_key].length > 0){
-        		sinaMsgs = filterDatasByMaxId(sinaMsgs, String(tweets[_key][0].id), false);
+        		sinaMsgs = filterDatasByMaxId(sinaMsgs, tweets[_key][0].id, false);
 //        		sinaMsgs = filterDatasByMaxId(sinaMsgs, String(tweets[_key][0]), false);
         	}
         }
         var current_user = getUser();
         var popupView = getPopupView();
         if(sinaMsgs.length > 0){
+        	// 保存最新的id，用于过滤数据和判断
             setLastMsgId(sinaMsgs[0].id, t, user_uniqueKey);
 //            var ids = TweetStorage.setItems(sinaMsgs, t, user_uniqueKey);
 //            tweets[_key] = ids.concat(tweets[_key]);
             tweets[_key] = sinaMsgs.concat(tweets[_key]);
             var _unreadCount = 0, _msg_user = null;
+            var c_user_id = String(c_user.id);
             for(var i in sinaMsgs){
                 _msg_user = sinaMsgs[i].user || sinaMsgs[i].sender;
-                if(_msg_user && _msg_user.id != c_user.id){
+                if(_msg_user && String(_msg_user.id) != c_user_id){
                     _unreadCount += 1;
                 }
             }
@@ -208,36 +210,54 @@ function getTimelinePage(user_uniqueKey, t, p){
     if(!c_user){
         return;
     }
-    if(t == 'followers'){ return; } //忽略粉丝列表
+    if(t == 'followers'){ log('错误分页获取' + t);return; } //忽略粉丝列表
     if(isDoChecking(user_uniqueKey, t, 'paging')){ return; }
-    
+    var t_key = user_uniqueKey + t + '_tweets';
+    if(!tweets[t_key]) {
+        tweets[t_key] = [];
+    }
     var params = {user:c_user, count:PAGE_SIZE};
     var config = tapi.get_config(c_user);
+    var page = null;
+    var cursor = null;
     var support_max_id = config.support_max_id;
-    // 判断是否支持max_id形式获取数据
-    if(support_max_id) {
-	    var max_id = getMaxMsgId(t, user_uniqueKey);
-	    if(max_id){
-	        params['max_id'] = max_id;
-	    }
-    } else {
-    	// count, page 形式
-    	var page = getLastPage(t, user_uniqueKey);
-    	if(page == 0) {
-    		return; // 到底了
-    	} else if(page == undefined) {
-    		page = 1;
+    var support_cursor_only = config.support_cursor_only;
+    if(support_cursor_only) { // 只支持cursor分页
+    	// 先去tweets[t_key]获取最后一个数据是否带cursor，带则使用他，不带则使用last_cursor
+    	var length = tweets[t_key].length;
+    	if(length > 0 && tweets[t_key][length - 1].cursor) {
+    		cursor = tweets[t_key][length - 1].cursor;
+//    		log('page cursor: ' + cursor);
     	} else {
-    		page += 1;
+    		cursor = getLastCursor(t, user_uniqueKey);
+//    		log('getLastCursor cursor: ' + cursor);
     	}
-    	params['page'] = page;
+    	if(cursor == -1) { // 再无数据
+    		return;
+    	} else if(cursor) {
+    		params.cursor = cursor;
+    	}
+    } else {
+    	// 判断是否支持max_id形式获取数据
+	    if(support_max_id) {
+		    var max_id = getMaxMsgId(t, user_uniqueKey);
+		    if(max_id){
+		        params['max_id'] = max_id;
+		    }
+	    } else {
+	    	// count, page 形式
+	    	page = getLastPage(t, user_uniqueKey);
+	    	if(page == 0) {
+	    		return; // 到底了
+	    	} else if(page == undefined) {
+	    		page = 1;
+	    	} else {
+	    		page += 1;
+	    	}
+	    	params['page'] = page;
+	    }
     }
-    
-    if(p){
-        for(var key in p){
-            params[key] = p[key];
-        }
-    }
+    $.extend(params, p);
 
     setDoChecking(user_uniqueKey, t, 'paging', true);
     
@@ -247,18 +267,15 @@ function getTimelinePage(user_uniqueKey, t, p){
 //    		+ ' page:' + params.page + ' max_id:' + params.max_id);
 //	}
     
-    tapi[t](params, function(sinaMsgs, textStatus){
+    tapi[t](params, function(data, textStatus) {
+    	var sinaMsgs = data.items || data;
     	if($.isArray(sinaMsgs) && textStatus != 'error') {
     		if(sinaMsgs.length > 0){
                 //TODO: 这里不确定会不会有闭包造成的c_user变量覆盖问题，待测试
-                if(!c_user){
-                    setDoChecking(user_uniqueKey, t, 'paging', false);
-                    return;
-                }
-                var _key = user_uniqueKey + t + '_tweets';
-                if(!tweets[_key]){
-                    tweets[_key] = [];
-                }
+//                if(!c_user){
+//                    setDoChecking(user_uniqueKey, t, 'paging', false);
+//                    return;
+//                }
                 var max_id = getMaxMsgId(t, user_uniqueKey);
                 sinaMsgs = filterDatasByMaxId(sinaMsgs, max_id, true);
                 for(var i in sinaMsgs){
@@ -266,16 +283,22 @@ function getTimelinePage(user_uniqueKey, t, p){
                 }
 //                var ids = TweetStorage.setItems(sinaMsgs, t, user_uniqueKey);
 //                tweets[_key] = tweets[_key].concat(ids);
-                tweets[_key] = tweets[_key].concat(sinaMsgs);
-            } else {
-            	page = 0;
+                tweets[t_key] = tweets[t_key].concat(sinaMsgs);
             }
-            if(!support_max_id) {
+            if(page != null) { // page分页
+            	if(sinaMsgs.length == 0) {
+            		page = 0;
+            	}
                 setLastPage(t, page, user_uniqueKey);
             }
     	}
         // 设置翻页和填充新数据到ui列表的后面显示
         _showReadMore(t, user_uniqueKey, sinaMsgs);
+        if(data.next_cursor) {
+        	// 保存cursor信息
+//        	log('new page cursor: ' + data.next_cursor);
+    		tweets[t_key][tweets[t_key].length - 1].cursor = data.next_cursor;
+    	}
         hideLoading();
         setDoChecking(user_uniqueKey, t, 'paging', false);
 //        if(t == 'friends_timeline'){
