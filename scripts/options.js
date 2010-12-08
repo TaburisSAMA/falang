@@ -156,6 +156,9 @@ $(function(){
             });
             saveUserList(userList);
 
+            showAccountList();
+            $("#account-list").val(uniqueKey);
+
             if(found){
                 _showMsg('保存成功');
                 var b_view = getBackgroundView();
