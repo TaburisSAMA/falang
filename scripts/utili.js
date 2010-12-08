@@ -180,6 +180,8 @@ var Settings = {
         sharedUrlAutoShortWordCount: 15, //超过多少个字则自动缩短URL
         quickSendHotKey: '113', //快速发送微博的快捷键。默认 F2。保存的格式为： 33,34,35 用逗号分隔的keycode
         isSmoothScroller: false, //是否启用平滑滚动
+        smoothTweenType: 'Quad', //平滑滚动的动画类型
+        smoothSeaeType: 'easeOut', //平滑滚动的ease类型
 
         font: '微软雅黑', //字体
         fontSite: 12, //字体大小

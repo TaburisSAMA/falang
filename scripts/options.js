@@ -23,6 +23,8 @@ var AUTH_TYPE_NAME = {
     'xauth': 'xAuth(oAuth的简化)'
 };
 
+var TWEEN_TYPES = ['Quad', 'Cubic', 'Quart', 'Quint', 'Sine', 'Expo', 'Circ', 'Elastic', 'Back', 'Bounce'];
+
 $(function(){
     initTab();
 
@@ -329,6 +331,16 @@ function init(){
     
     //平滑滚动
     $("#isSmoothScroller").attr("checked", settings.isSmoothScroller);
+    var tween_options = '';
+    for(var i in TWEEN_TYPES){
+        tween_options += '<option value="{{name}}">{{name}}</option>'.format({name: TWEEN_TYPES[i]});
+    }
+    $("#tween_type").html(tween_options).val(settings.smoothTweenType);
+    $("#ease_type").val(settings.smoothSeaeType);
+    $("#tween_type, #ease_type").change(function(){
+        SmoothScrollerDemo.start();
+    });
+
 
     $("#autoShortUrlCount").val(settings.sharedUrlAutoShortWordCount);
 
@@ -731,6 +743,8 @@ function saveAll(){
 
     //平滑滚动
     settings.isSmoothScroller = $("#isSmoothScroller").attr("checked") ? true : false;
+    settings.smoothTweenType = $("#tween_type").val();
+    settings.smoothSeaeType = $("#ease_type").val();
 
     settings.isSyncReadedToSina = $("#unread_sync_to_page").attr("checked") ? true : false;
 
@@ -809,6 +823,35 @@ function saveAll(){
     _showMsg('保存成功！');
 };
 
+//平滑滚动
+/*
+ t: current time（当前时间）；
+ b: beginning value（初始值）；
+ c: change in value（变化量）；
+ d: duration（持续时间）。
+*/
+var SmoothScrollerDemo = {
+    T: '', //setTimeout引用
+    movable_block: '',
+    ease_type: 'easeOut',
+    tween_type: 'Quad',
+    status:{t:0, b:0, c:90, d:100},
+    start: function(){
+        clearTimeout(this.T);
+        this.movable_block = $("#tween_demo span").css('margin-left', 0);
+        this.ease_type = $("#ease_type").val();
+        this.tween_type = $("#tween_type").val();
+        this.status.t = 0;
+        this.status.b = 0;
+        this.run();
+    },
+    run: function(){
+        var _t = SmoothScrollerDemo;
+        var _left = Math.ceil(Tween[_t.tween_type][_t.ease_type](_t.status.t, _t.status.b, _t.status.c, _t.status.d));
+        _t.movable_block.css('margin-left', _left);
+        if(_t.status.t < _t.status.d){ _t.status.t++; setTimeout(_t.run, 10); }
+    }
+};
 
 
 //刷新账号信息

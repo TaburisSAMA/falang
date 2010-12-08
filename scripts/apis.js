@@ -15,6 +15,7 @@ var sinaApi = {
         // google app key
         google_appkey: 'AIzaSyAu4vq6sYO3WuKxP2G64fYg6T1LdIDu3pk',
         
+        userinfo_has_counts: true, // 用户信息中是否包含粉丝数、微博数等信息
         support_counts: true, // 是否支持批量获取转发和评论数
         support_comment: true, // 判断是否支持评论
 		support_upload: true, // 是否支持上传图片
@@ -1943,6 +1944,8 @@ $.extend(FanfouAPI, {
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api2.fanfou.com',
+        user_home_url: 'http://fanfou.com/',
+        search_url: 'http://fanfou.com/q/',
 		source: 'fawave',
 		repost_pre: '转',
 	    support_comment: false,
@@ -1954,6 +1957,13 @@ $.extend(FanfouAPI, {
 	url_encode: function(text) {
 		return text;
 	},
+    
+    processAt: function (str) { //@*** ,饭否的用户名支持“.”
+        str = str.replace(/^@([\w\-\u4e00-\u9fa5|\_\.]+)/g, ' <a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$1" title="左键查看微薄，右键打开主页">@$1</a>');
+        str = str.replace(/([^\w#])@([\w\-\u4e00-\u9fa5|\_\.]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ this.config.user_home_url +'$2" title="左键查看微薄，右键打开主页">@$2</a>');
+        
+        return str;
+    },
 	
 	reset_count: function(data, callback) {
 		callback();
@@ -2168,6 +2178,7 @@ $.extend(BuzzAPI, {
 		oauth_secret: 'y+6SWcLVshQvogadDzXtSra+',
         result_format: '', // 由alt参数确定返回值格式
         
+        userinfo_has_counts: false, //用户信息中是否包含粉丝数、微博数等信息
         support_counts: false,
 		support_upload: false, // 是否支持上传图片
 		support_comment: false,
@@ -2380,7 +2391,8 @@ $.extend(DoubanAPI, {
         oauth_secret: 'a29252a52eaa835d',
         result_format: '', // 豆瓣由alt参数确定返回值格式
         
-		support_comment: false,
+		userinfo_has_counts: true, // 用户信息中是否包含粉丝数、微博数等信息
+        support_comment: false,
 		support_repost: false,
 		support_max_id: false,
 		support_favorites: false,

@@ -354,7 +354,10 @@ function showHeaderUserInfo(c_user){
     h_user.find('.face .icon').attr('src', c_user.profile_image_url);
     h_user.find('.face .bt').attr('src', 'images/blogs/'+c_user.blogType+'_16.png');
     h_user.find('.info .name').html(c_user.screen_name);
-    var nums = '粉{{friends_count}}, {{followers_count}}粉, {{statuses_count}}微博'.format(c_user);
+    var nums = '';
+    if(tapi.get_config(c_user).userinfo_has_counts){
+        nums = '粉{{friends_count}}, {{followers_count}}粉, {{statuses_count}}微博'.format(c_user);
+    }
     h_user.find('.info .nums').html(nums);
 };
 
@@ -1824,6 +1827,8 @@ var SmoothScroller = {
     c_t: '', //当前tab
     list_warp: '',
     list_warp_height: 0, //当前的列表窗口高度
+    ease_type: 'easeOut',
+    tween_type: 'Quad',
     status:{t:0, b:0, c:0, d:15},
     start: function(e){
         if(e.wheelDelta == 0){ return; }
@@ -1832,7 +1837,9 @@ var SmoothScroller = {
         this.c_t = window.currentTab;
         this.list_warp = $(this.c_t + ' .list_warp');
         this.list_warp_height = this.list_warp.height(); //算好放缓存，免得每次都要算
-        var hasDo = Math.ceil(Tween.Quad.easeOut(this.status.t-1, this.status.b, this.status.c, this.status.d)) - this.status.b;
+        this.ease_type = Settings.get().smoothSeaeType;
+        this.tween_type = Settings.get().smoothTweenType;
+        var hasDo = this.status.t>0 ? (Math.ceil(Tween[this.tween_type][this.ease_type](this.status.t-1, this.status.b, this.status.c, this.status.d)) - this.status.b) : 0;
         this.status.c = -e.wheelDelta + this.status.c - hasDo;
         this.status.t = 0;
         this.status.b = this.list_warp.scrollTop();
@@ -1840,12 +1847,14 @@ var SmoothScroller = {
     },
     run: function(){
         var _t = SmoothScroller;
-        var _top = Math.ceil(Tween.Quad.easeOut(_t.status.t, _t.status.b, _t.status.c, _t.status.d));
+        var _top = Math.ceil(Tween[_t.tween_type][_t.ease_type](_t.status.t, _t.status.b, _t.status.c, _t.status.d));
         _t.list_warp.scrollTop( _top );
         var h = $(_t.c_t + ' .list').height();
         h = h - _t.list_warp_height;
-        if(_top >= h){
-            return; //分页？
+        if(_top >= h && _t.status.c > 0){
+            _t.status.b = _top;
+            _t.status.c = 0;
+            return;
         }
         if(_t.status.t < _t.status.d){ _t.status.t++; setTimeout(_t.run, 10); }
     }

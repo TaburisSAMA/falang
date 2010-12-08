@@ -321,7 +321,13 @@
 		<li>
 			<label class="title">是否启用平滑滚动：</label>
 			<span>
-				<input type="checkbox" id="isSmoothScroller"><label for="isSmoothScroller">启用</label>
+				<input type="checkbox" id="isSmoothScroller"><label for="isSmoothScroller">启用</label> &nbsp;
+				<label for="tween_type">动画类型:</label><select id="tween_type"></select> &nbsp;
+				<label for="ease_type">缓动类型:</label><select id="ease_type">
+					<option value="easeIn">easeIn</option>
+					<option value="easeOut">easeOut</option>
+				</select>
+				<span id="tween_demo"><span></span></span>
 			</span>
 		</li>
 		<li><label class="title">　　我正在看模板: </label>

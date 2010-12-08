@@ -148,6 +148,10 @@ ul#navigation li.selected{
 	margin-right: 10px;
 }
 
+/*Æ½»¬¹ö¶¯demo*/
+#tween_demo{ display:inline-block; padding:2px; border:solid 1px green; height:15px; width: 100px; }
+#tween_demo span{ display:inline-block; background:#2B477D; width:10px; height:15px; }
+
 /* ---------->>> jtip <<<---------------------------------------------------------------*/
 #JT_arrow_left{
 	background-image: url(../images/arrow_left.gif);
