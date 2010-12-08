@@ -224,6 +224,7 @@ function getTimelinePage(user_uniqueKey, t, p){
     var support_cursor_only = config.support_cursor_only;
     if(support_cursor_only) { // 只支持cursor分页
     	// 先去tweets[t_key]获取最后一个数据是否带cursor，带则使用他，不带则使用last_cursor
+    	// 这是最巧妙的地方。。。
     	var length = tweets[t_key].length;
     	if(length > 0 && tweets[t_key][length - 1].cursor) {
     		cursor = tweets[t_key][length - 1].cursor;
