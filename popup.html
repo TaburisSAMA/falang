@@ -381,7 +381,7 @@
 		<textarea id="tp_fans">
 			<div class="fans">
 				<div class="user_head"><img src="#{user.profile_image_url}" /></div>
-				<div class="user_info">
+				<div class="user_info" did="#{user.id}">
 					<div class="userName"><a  href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" 
 					rhref="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
 					</a>

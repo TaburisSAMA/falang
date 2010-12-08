@@ -671,6 +671,9 @@ function _getFansList(to_t, read_more){
         if(textStatus != 'error' && data && !data.error){
             var users = data.users || data.items;
             var next_cursor = data.next_cursor;
+            var max_id = $("#followers_timeline ul.list .user_info:last").attr('did');
+            var result = filterDatasByMaxId(users, max_id, true);
+            users = result.news;
             if(users && users.length > 0) {
             	var html = '';
                 for(var i in users){
@@ -823,7 +826,7 @@ function getFavorites(is_click){
     var support_cursor_only = config.support_cursor_only; // 只支持游标方式翻页
     if(!is_click) {
     	if(support_cursor_only) {
-    		if(cursor == '-1') {
+    		if(cursor == '0') {
     			return;
     		}
     		params.cursor = cursor;
@@ -838,7 +841,7 @@ function getFavorites(is_click){
     		return;
     	}
         if(textStatus != 'error' && data && !data.error){
-        	var status = data.items;
+        	var status = data.items || data;
         	list.attr('cursor', data.next_cursor || -1);
         	list.attr('page', Number(page) + 1);
         	status = addPageMsgs(status, t, true);
