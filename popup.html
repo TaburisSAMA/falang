@@ -348,12 +348,13 @@
 			<div class="userinfo_detail">
 				<div class="user_head"><img src="#{user.profile_image_url}" /></div>
 				<div class="user_info">
-					<div class="userName"><a href="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
-					</a>
+					<div class="userName"><a href="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?></a>
 					<?js if(!user.is_me){ ?>
 					<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">私</a>
-					<a class="follow" href="javascript:" onclick="f_destroy('#{user.id}', this)">取消关注</a>
-					<a class="follow" href="javascript:" onclick="f_create('#{user.id}', this)"><span class="plus">+</span>加关注</a>
+						<?js if(support_follow){ ?>
+						<a class="follow" href="javascript:" onclick="f_destroy('#{user.id}', this)">取消关注</a>
+						<a class="follow" href="javascript:" onclick="f_create('#{user.id}', this)"><span class="plus">+</span>加关注</a>
+						<?js } ?>
 					<?js } ?>
 					</div>
 					<p>
@@ -385,9 +386,9 @@
 					rhref="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
 					</a>
 					<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">私</a>
-					<?js if(user.unfollow === undefined && tType =='friends'){ ?>
+					<?js if(support_follow && user.unfollow === undefined && tType =='friends'){ ?>
 					<a class="follow" href="javascript:" onclick="f_destroy('#{user.id}', this)">取消关注</a>
-					<?js }else{ ?>
+					<?js }else if(support_follow){ ?>
 					<a class="follow" href="javascript:" onclick="f_create('#{user.id}', this)"><span class="plus">+</span>加关注</a>
 					<?js } ?>
 					</div>

@@ -180,6 +180,7 @@ function bildMsgLi(sinaMsg, t, c_user){
                         user: user,
                         account: c_user,
                         tweet: sinaMsg,
+                        support_follow: c_user.blogType != 'douban',
                         btn: crlBtn
                        };
         var tp = TEMPLATE;
@@ -229,7 +230,8 @@ function buildUserInfo(user){
     var context = {
                     provinces: provinces,
                     getUserCountsInfo: getUserCountsInfo,
-                    user: user
+                    user: user,
+                    support_follow: getUser().blogType != 'douban'
                    };
     var r = Shotenjin.render(TEMPLATE_USER_INFO, context);
     return r;

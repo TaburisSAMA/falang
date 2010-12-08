@@ -923,7 +923,7 @@ var sinaApi = {
                     	if(xhr.status == 201 || xhr.statusText == "Created") { // rest成功
                     		data = data;
                     	} else {
-                    		if(data.indexOf('{"wrong":"no data"}') > -1 || data == '' || data == 'OK'){
+                    		if(data.indexOf('{"wrong":"no data"}') > -1 || data == '' || data.toLowerCase() == 'ok'){
                         		data = [];
                         	} else {
                                 data = {error: callmethod + ' 服务器返回结果错误，本地解析错误。' + err, error_code:500};
@@ -2385,13 +2385,16 @@ $.extend(DoubanAPI, {
         direct_messages: '/doumail/inbox',
         friends: '/people/{{user_id}}/contacts',
         followers: '/people/{{user_id}}/friends',
-        
+        new_message: '/doumails',
+        destroy_msg: '/doumail/{{id}}',
 		verify_credentials: '/people/%40me'
 	}),
 	
 	counts: function(data, callback) {
 		callback();
 	},
+	
+	MSG_TPL: '<?xml version="1.0" encoding="UTF-8"?><entry xmlns="http://www.w3.org/2005/Atom" xmlns:db="http://www.douban.com/xmlns/" xmlns:gd="http://schemas.google.com/g/2005" xmlns:opensearch="http://a9.com/-/spec/opensearchrss/1.0/"><db:entity name="receiver"><uri>http://api.douban.com/people/{{id}}</uri></db:entity><content>{{text}}</content><title>{{text}}</title></entry>',
 	
 	/*
 	 * start-index	 返回多个元素时，起始元素的下标	 下标从1开始
@@ -2427,18 +2430,23 @@ $.extend(DoubanAPI, {
 				args.content = tpl.format(args.data);
 				args.contentType = 'application/atom+xml; charset=utf-8';
 				args.data = {};
-			} else if(args.url == this.config.destroy) {
+			} else if(args.url == this.config.destroy || args.url == this.config.destroy_msg) {
 				delete args.data.apikey;
 				delete args.data.alt;
 				args.type = 'DELETE';
 			} else if(args.url == this.config.friends_timeline || args.url == this.config.user_timeline) {
 				args.data.type = 'all';
+			} else if(args.url == this.config.new_message) {
+				args.content = this.MSG_TPL.format(args.data);
+				args.contentType = 'application/atom+xml; charset=utf-8';
+				args.data = {};
 			}
 		}
 	},
 	
 	format_result: function(data, play_load, args) {
-		if(args.url == this.config.update || args.url == this.config.destroy) {
+		if(args.url == this.config.update || args.url == this.config.destroy 
+				|| args.url == this.config.destroy_msg || args.url == this.config.new_message) {
 			return true;
 		}
 		var items = data.entry || data;
@@ -2510,10 +2518,13 @@ $.extend(DoubanAPI, {
 			delete data.content;
 		} else if(play_load == 'message') {
 			data.sender = data.user = this.format_result_item(data.author, 'user', args);
-//			data.recipient = this.format_result_item(data.recipient, 'user', args);
+			log(data);
 			data.text = data.title['$t'];
 			data.id = data.id['$t'];
-			data.id = data.id.substring(data.id.lastIndexOf('/doumail/') + 10, data.id.length);
+			data.id = data.id.substring(data.id.lastIndexOf('/doumail/') + 9, data.id.length);
+			data.t_url = data.link[1]['@href'];
+			data.text += ' <a href="{{t_url}}">查看</a>'.format(data);
+			delete data.title;
 		} else if(play_load == 'comment') {
 			this.format_result_item(data.user, 'user', args);
 			this.format_result_item(data.status, 'status', args);

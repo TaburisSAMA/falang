@@ -1296,7 +1296,7 @@ function sendWhisper(msg){
     btn.attr('disabled','true');
     txt.attr('disabled','true');
     tapi.new_message(data, function(sinaMsg, textStatus){
-        if(sinaMsg.id){
+        if(sinaMsg === true || sinaMsg.id){
             hideReplyInput();
             txt.val('');
             showMsg('发送成功！');
@@ -1590,6 +1590,7 @@ function doDelComment(ele, screen_name, tweetId){//删除评论
     if(!tweetId){return;}
     showLoading();
     var user = getUser();
+    var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
     tapi.comment_destroy({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
         	$(ele).closest('li').remove();
@@ -1604,6 +1605,7 @@ function delDirectMsg(ele, screen_name, tweetId){//删除私信
     if(!tweetId){return;}
     showLoading();
     var user = getUser();
+    var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
     tapi.destroy_msg({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
         	$(ele).closest('li').remove();
