@@ -12,6 +12,8 @@ var sinaApi = {
 		source: '3538199806',
         oauth_key: '3538199806',
         oauth_secret: '18cf587d60e11e3c160114fd92dd1f2b',
+        // google app key
+        google_appkey: 'AIzaSyAu4vq6sYO3WuKxP2G64fYg6T1LdIDu3pk',
         
         support_counts: true, // 是否支持批量获取转发和评论数
         support_comment: true, // 判断是否支持评论
@@ -72,8 +74,49 @@ var sinaApi = {
         	"40025:Error: repeated weibo text!": "重复发送",
         	"40031:Error: target weibo does not exist!": "不存在的微博ID",
         	"40015:Error: not your own comment!": "评论ID不在登录用户的comments_by_me列表中",
-        	"40303:Error: already followed": "已跟随"
+        	"40303:Error: already followed": "已跟随",
+        	"The source language could not be detected": "",
         }
+    },
+    
+    // 翻译
+    translate: function(text, target, callback) {
+    	var api = 'https://www.googleapis.com/language/translate/v2';
+    	if(!target || target == 'zh-CN' || target == 'zh-TW') {
+    		target = 'zh';
+    	}
+    	var params = {key: this.config.google_appkey, target: target, q: text};
+    	$.ajax({
+			url: api,
+		  	dataType: 'json',
+		  	data: params,
+		  	success: function(data, status) {
+				var tran = data.data.translations[0];
+				var detectedSourceLanguage = tran.detectedSourceLanguage;
+				if(detectedSourceLanguage == 'zh-CN' || detectedSourceLanguage == 'zh-TW') {
+		    		detectedSourceLanguage = 'zh';
+		    	}
+				if(detectedSourceLanguage == target) {
+					showMsg('无需翻译');
+					callback(null);
+				} else {
+					callback(tran.translatedText);
+				}
+		  	}, 
+		  	error: function(xhr, status) {
+		  		var error = {message: status + ': ' + xhr.statusText};
+		  		try {
+		  			error = JSON.parse(xhr.responseText).error;
+		  		} catch(e) {
+		  		}
+		  		if(error.message == 'The source language could not be detected') {
+		  			showMsg('无需翻译');
+		  		} else {
+		  			showMsg('暂时无法翻译, ' + error.message);
+		  		}
+		  		callback(null);
+		  	}
+		});
     },
 
     /**
@@ -2509,6 +2552,10 @@ var tapi = {
     // 自动判断当前用户所使用的api, 根据user.blogType判断
     api_dispatch: function(data) {
 		return T_APIS[(data.user ? data.user.blogType : data.blogType) || 'tsina'];
+	},
+	
+	translate: function(user, text, target, callback) {
+		return tapi.api_dispatch(user).translate(text, target, callback);
 	},
 	
 	processMsg: function(user, str, notEncode) {

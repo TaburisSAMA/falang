@@ -1866,3 +1866,18 @@ function _showLoading(){
 function _hideLoading(){
     $("#loading").hide();
 };
+
+// 翻译
+function translate(ele) {
+	var $ele = $(ele).parents('.userName').next();
+	if(!$ele.hasClass('tweet_text')) {
+		$ele = $ele.find('.tweet_text');
+	}
+	$(ele).hide();
+	var target = 'zh-CN';
+	tapi.translate(getUser(), $ele.html(), target, function(translatedText) {
+		if(translatedText) {
+			$ele.after('<hr /><div class="tweet_text_old">' + translatedText + '</div>');
+		}
+	});
+};

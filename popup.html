@@ -210,12 +210,13 @@
 							<?js if(tweet.related_dialogue_url){ ?>
 							<a href="#{tweet.related_dialogue_url}" title="查看相关对话" target="_blank"><img src="images/inreply.png" /></a>
 							<?js } ?>
+							<a href="javascript:void(0);" onclick="javascript:translate(this);" title="翻译此微博">翻</a>
 							#{ btn.addFavoritesMsgBtn + btn.delFavoritesMsgBtn + btn.replyBtn + btn.rtBtn + btn.oretweetBtn + btn.repostBtn + btn.repostCounts + btn.commentBtn + btn.commentCounts + btn.new_msgBtn + btn.delTweetBtn + btn.delCommentBtn + btn.delDirectMsgBtn }
 						</span>
 					</div>
 					<div class="msg">
 						<div class="tweet">
-							#{processMsg(account, tweet.text)}
+							<div class="tweet_text">#{processMsg(account, tweet.text)}</div>
 							<?js if(tweet.thumbnail_pic){ ?>
 							<div>
 								<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.bmiddle_pic}" original="#{tweet.original_pic}" onmousedown="rOpenPic(event, this)" title="右键点击打开原图" >
@@ -278,10 +279,11 @@
 									</span>
 									的微博: 
 									<span class="edit">
+										<a href="javascript:void(0);" onclick="javascript:translate(this);" title="翻译此微博">翻</a>
 										#{ btn.rtAddFavoritesMsgBtn + btn.rtReplyBtn + btn.rtRepostBtn + btn.rtRepostCounts + btn.rtCommentBtn + btn.rtCommentCounts}
 									</span>
 								</div>
-								#{processMsg(account, tweet.retweeted_status.text)}
+								<div class="tweet_text">#{processMsg(account, tweet.retweeted_status.text)}</div>
 								<?js if(tweet.retweeted_status.thumbnail_pic){ ?>
 								<div>
 									<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.retweeted_status.bmiddle_pic}" title="右键点击打开原图" original="#{tweet.retweeted_status.original_pic}" onmousedown="rOpenPic(event, this)" >
