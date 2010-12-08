@@ -76,7 +76,7 @@ function builFawaveTip(msg, account){
         picHtml = '<div><a target="_blank" href="'+msg.original_pic+'"> <img class="imgicon pic" src="' + msg.thumbnail_pic + '" /></a> </div>';
     }
     if(msg.retweeted_status){
-        rtHtml =  '<div class="retweeted"><span class="username">' + msg.retweeted_status.user.screen_name + ': </span>'
+        rtHtml =  '<div class="retweeted"><span class="username"><a target="_blank" href="' + msg.retweeted_status.user.t_url + '">' + msg.retweeted_status.user.screen_name + '</a>: </span>'
                 + tapi.processMsg(account, msg.retweeted_status.text);
         if(msg.retweeted_status.thumbnail_pic){
             rtHtml += '<div><a target="_blank" href="'+msg.retweeted_status.original_pic+'"> <img class="imgicon pic" src="' + msg.retweeted_status.thumbnail_pic + '" /> </a> </div>';
@@ -85,12 +85,12 @@ function builFawaveTip(msg, account){
     }
     var tp =  '<div class="msgRemind">'
             + '  <div class="usericon">'
-            + '	   <img src="' + user.profile_image_url.replace('24x24', '48x48') + '" class="face" />'
+            + '	   <a target="_blank" href="' + user.t_url + '"><img src="' + user.profile_image_url.replace('24x24', '48x48') + '" class="face" /></a>'
             + '	   <img src="' + chrome.extension.getURL("images/blogs/"+account.blogType+"_16.png") + '" class="blogType" />'
             + '  </div>'
             + '  <div class="maincontent">'
             + '    <div class="msg">'
-            + '       <span class="username">' + user.screen_name + ': </span>'
+            + '       <span class="username"><a target="_blank" href="' + user.t_url + '">' + user.screen_name + '</a>: </span>'
             +         tapi.processMsg(account, msg.text) + picHtml 
             + '    </div>'
             +      rtHtml

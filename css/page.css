@@ -120,7 +120,8 @@ body #fa_wave_msg_wrap .msgRemind .maincontent .pic{
 	margin:2px;
 	-webkit-box-shadow: #AAA 0px 0px 5px;
 }
-body #fa_wave_msg_wrap .msgRemind .username{color:green;font-weight: bold;}
+body #fa_wave_msg_wrap .msgRemind .username a{color:green;font-weight: bold;}
+body #fa_wave_msg_wrap .msgRemind .username a:hover{color:#fff;}
 
 /* Overlay */
 body #fawave-page-overlay {background-color:#000; height: 976px; left:0px; opacity:0.5; position:fixed; top:0px; width:100%; z-index:100001;}
