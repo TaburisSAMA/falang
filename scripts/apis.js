@@ -2521,7 +2521,6 @@ $.extend(DoubanAPI, {
 			delete data.content;
 		} else if(play_load == 'message') {
 			data.sender = data.user = this.format_result_item(data.author, 'user', args);
-			log(data);
 			data.text = data.title['$t'];
 			data.id = data.id['$t'];
 			data.id = data.id.substring(data.id.lastIndexOf('/doumail/') + 9, data.id.length);

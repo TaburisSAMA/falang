@@ -108,6 +108,7 @@ function checkTimeline(t, p, user_uniqueKey){
     
     var params = {user:c_user, count:PAGE_SIZE};
     var last_id = getLastMsgId(t, user_uniqueKey);
+//    log(user_uniqueKey + ' : ' +t + ' last id: ' + last_id);
     if(last_id){
         params['since_id'] = last_id;
     }
@@ -118,13 +119,11 @@ function checkTimeline(t, p, user_uniqueKey){
 //    }
 	
     tapi[t](params, function(data, textStatus){
-    	var sinaMsgs = data;
-    	if(data.items) {
-    		sinaMsgs = data.items;
-    	}
-    	if(data.next_cursor) {
+    	var sinaMsgs = data.items || data;
+    	if(data.next_cursor !== undefined) {
     		// 保存最新的cursor，用于分页
     		setLastCursor(data.next_cursor, t, user_uniqueKey);
+//    		log(t + ' ' + data.next_cursor);
     	}
     	if(!sinaMsgs) {
     		hideLoading();
@@ -141,11 +140,16 @@ function checkTimeline(t, p, user_uniqueKey){
             tweets[_key] = [];
             isFirstTime = true;//如果不存在，则为第一次获取微博
         }
-        if(sinaMsgs.length > 0){
-        	if(tweets[_key].length > 0){
-        		sinaMsgs = filterDatasByMaxId(sinaMsgs, tweets[_key][0].id, false);
-//        		sinaMsgs = filterDatasByMaxId(sinaMsgs, String(tweets[_key][0]), false);
+        if(!last_id && tweets[_key].length > 0){
+        	last_id = tweets[_key][0].id;
+        }
+        if(last_id && sinaMsgs.length > 0){
+        	var result = filterDatasByMaxId(sinaMsgs, last_id, false);
+        	if(tweets[_key].length == 0) {
+        		tweets[_key] = result.olds; // 填充旧的数据
         	}
+        	sinaMsgs = result.news;
+//        	log('news ' + result.news.length + ', olds ' + result.olds.length);
         }
         var current_user = getUser();
         var popupView = getPopupView();
@@ -273,7 +277,7 @@ function getTimelinePage(user_uniqueKey, t, p){
     showLoading();
 //	if(t == 'friends_timeline'){
 //		log('start getTimelinePage ' + user_uniqueKey + ' ' + t 
-//    		+ ' page:' + params.page + ' max_id:' + params.max_id);
+//    		+ ' page:' + params.page + ' max_id:' + params.max_id + ' cursor:' + cursor);
 //	}
     
     tapi[t](params, function(data, textStatus) {
@@ -286,7 +290,9 @@ function getTimelinePage(user_uniqueKey, t, p){
 //                    return;
 //                }
                 var max_id = getMaxMsgId(t, user_uniqueKey);
-                sinaMsgs = filterDatasByMaxId(sinaMsgs, max_id, true);
+                var result = filterDatasByMaxId(sinaMsgs, max_id, true);
+//                log('news ' + result.news.length + ', olds ' + result.olds.length);
+                sinaMsgs = result.news;
                 for(var i in sinaMsgs){
                     sinaMsgs[i].readed = true;
                 }

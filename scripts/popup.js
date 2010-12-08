@@ -672,9 +672,6 @@ function _getFansList(to_t, read_more){
             var users = data.users || data.items;
             var next_cursor = data.next_cursor;
             if(users && users.length > 0) {
-            	// 过滤最大id
-//            	var max_id = $("#" + t + "_timeline ul.list li.tweetItem:" + direct).attr('did');
-//    			msgs = filterDatasByMaxId(msgs, max_id, append);
             	var html = '';
                 for(var i in users){
                 	if(!get_c_user_fans) {
@@ -1157,7 +1154,8 @@ function addPageMsgs(msgs, t, append){
     var method = append ? 'append' : 'prepend';
     var direct = append ? 'last' : 'first';
     var max_id = $("#" + t + "_timeline ul.list li.tweetItem:" + direct).attr('did');
-    msgs = filterDatasByMaxId(msgs, max_id, append);
+    var result = filterDatasByMaxId(msgs, max_id, append);
+    msgs = result.news;
     for(var i in msgs){
     	//_ul[method](bildMsgLi(msgs[i], t));
         html += bildMsgLi(msgs[i], t);

@@ -721,7 +721,8 @@ function getDictLength(d) {
 // 判断最后一个等于最大id的，将它和它后面的删除
 // 如果是append
 // 判断最后一个等于最大id的，将它和它前面的删除，twitter很强大，id大到js无法计算
-function filterDatasByMaxId(datas, max_id, append){
+function filterDatasByMaxId(datas, max_id, append) {
+	var news = datas, olds = [];
     if(max_id && datas && datas.length > 0){
     	max_id = String(max_id);
     	var found_index = null;
@@ -734,15 +735,17 @@ function filterDatasByMaxId(datas, max_id, append){
     	if(found_index !== null){
     		if(append){
     			// id等于最大id的数据位于found_index，所以获取found_index+1开始往后的数据
-    			datas = datas.slice(found_index+1);
+    			news = datas.slice(found_index+1);
+    			olds = datas.slice(0, found_index+1);
     		} else {
     			// 如果不是append的，id等于最大id的数据位于found_index，
     			// 只需要从开始到found_index(不包含结束边界)
-    			datas = datas.slice(0, found_index);
+    			news = datas.slice(0, found_index);
+    			olds = datas.slice(found_index);
     		}
     	}
     }
-    return datas;
+    return {news: news, olds: olds};
 };
 
 /*
