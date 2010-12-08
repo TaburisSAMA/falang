@@ -2400,7 +2400,9 @@ $.extend(DoubanAPI, {
 		support_mentions: false,
 		support_upload: false,
 		need_processMsg: false,
+		support_cursor_only: true,
 		
+		oauth_callback: null,
 		oauth_host: 'http://www.douban.com',
 		oauth_authorize: 	  '/service/auth/authorize',
         oauth_request_token:  '/service/auth/request_token',
@@ -2432,12 +2434,17 @@ $.extend(DoubanAPI, {
 			args.data.alt = 'json';
 			if(args.data.count) {
 				args.data['max-results'] = args.data.count;
-				if(args.data.page) {
-					args.data['start-index'] = (Number(args.data.page) - 1) * args.data.count + 1;
-					delete args.data.page;
+				if(args.data.cursor) {
+					args.data['start-index'] = args.data.cursor;
+					// 设置下一页
+					args.next_cursor = args.data.cursor + args.data.count;
+					delete args.data.cursor;
+				} else {
+					args.next_cursor = args.data.count + 1;
 				}
 				delete args.data.count;
 			}
+			delete args.data.screen_name;
 			delete args.data.since_id;
 			// args.data.source => args.data.apikey
 			args.data.apikey = args.data.source;
@@ -2451,6 +2458,8 @@ $.extend(DoubanAPI, {
 				delete args.data.apikey;
 				delete args.data.alt;
 				args.type = 'DELETE';
+			} else if(args.url == this.config.friends_timeline || args.url == this.config.user_timeline) {
+				args.data.type = 'all';
 			}
 		}
 	},
@@ -2471,6 +2480,9 @@ $.extend(DoubanAPI, {
 	    		}
 	    	}
 	    	data.items = items;
+	    	if(args.next_cursor) {
+	    		data.next_cursor = args.next_cursor;
+	    	}
 	    } else {
 	    	data = this.format_result_item(data, play_load, args);
 	    }
