@@ -494,37 +494,6 @@ var sinaApi = {
             data: data
         };
         this._sendRequest(params, callbackFn);
-        // 是否支持获取自己发送的私信
-//        if(this.config.support_sent_direct_messages){
-//        	var sent_params = {
-//        		url: this.config.sent_direct_messages,
-//                type: 'get',
-//                play_load: 'message',
-//                data: data
-//            };
-//        	var me = this;
-//        	var callback = function(datas, textStatus, error_code){
-//            	var results = datas;
-//            	if(!error_code){ // 获取发送的私信
-//            		me._sendRequest(sent_params, function(sent_datas, textStatus, error_code){
-//            			if(!error_code){
-//            				results = results.concat(sent_datas).sort(function(i, j){
-//            					if(i.id < j.id){
-//            						return 1;
-//            					}
-//            					return -1;
-//            				});
-//            			}
-//            			callbackFn(results, 'success', null);
-//            		});
-//            	} else {
-//            		callbackFn(results, textStatus, error_code);
-//            	}
-//            };
-//        	this._sendRequest(params, callback);
-//        } else {
-//        	this._sendRequest(params, callbackFn);
-//        }
 	},
 
 	// id
@@ -1288,7 +1257,7 @@ $.extend(DiguAPI, {
 		} else if(args.url == this.config.friends || args.url == this.config.followers) {
 			// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
 			// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
-			args.data.page = args.data.cursor == -1 ? 1 : args.data.cursor;
+			args.data.page = args.data.cursor == '-1' ? 1 : args.data.cursor;
 			delete args.data.cursor;
 			if(!args.data.page){
 				args.data.page = 1;
@@ -1474,7 +1443,7 @@ $.extend(ZuosaAPI, {
 		if(args.url == this.config.friends || args.url == this.config.followers) {
 			// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
 			// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
-			args.data.page = args.data.cursor == -1 ? 1 : args.data.cursor;
+			args.data.page = args.data.cursor == '-1' ? 1 : args.data.cursor;
 			delete args.data.cursor;
 			if(!args.data.page) {
 				args.data.page = 1;
@@ -1614,7 +1583,7 @@ $.extend(LeiHouAPI, {
 		if(args.url == this.config.friends || args.url == this.config.followers) {
 			// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
 			// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
-			args.data.page = args.data.cursor == -1 ? 1 : args.data.cursor;
+			args.data.page = args.data.cursor == '-1' ? 1 : args.data.cursor;
 			delete args.data.cursor;
 			if(!args.data.page) {
 				args.data.page = 1;
@@ -1759,7 +1728,7 @@ $.extend(Follow5API, {
 		if(args.url == this.config.friends || args.url == this.config.followers) {
 			// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
 			// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
-			args.data.page = args.data.cursor == -1 ? 1 : args.data.cursor;
+			args.data.page = args.data.cursor == '-1' ? 1 : args.data.cursor;
 			delete args.data.cursor;
 			if(!args.data.page) {
 				args.data.page = 1;
@@ -2104,7 +2073,7 @@ $.extend(RenjianAPI, {
 		} else if(args.url == this.config.friends || args.url == this.config.followers) {
 			// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
 			// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
-			args.data.page = args.data.cursor == -1 ? 1 : args.data.cursor;
+			args.data.page = args.data.cursor == '-1' ? 1 : args.data.cursor;
 			delete args.data.cursor;
 			if(!args.data.page){
 				args.data.page = 1;
@@ -2437,7 +2406,11 @@ $.extend(DoubanAPI, {
 				if(args.data.cursor) {
 					args.data['start-index'] = args.data.cursor;
 					// 设置下一页
-					args.next_cursor = Number(args.data.cursor) + args.data.count;
+					args.data.cursor = Number(args.data.cursor);
+					if(args.data.cursor == -1) {
+						args.data.cursor = 1;
+					}
+					args.next_cursor = args.data.cursor + args.data.count;
 					delete args.data.cursor;
 				} else {
 					args.next_cursor = args.data.count + 1;
