@@ -143,16 +143,21 @@ function checkTimeline(t, p, user_uniqueKey){
         if(!last_id && tweets[_key].length > 0){
         	last_id = tweets[_key][0].id;
         }
+        var popupView = getPopupView();
         if(last_id && sinaMsgs.length > 0){
         	var result = filterDatasByMaxId(sinaMsgs, last_id, false);
         	if(tweets[_key].length == 0) {
         		tweets[_key] = result.olds; // 填充旧的数据
+        		if(popupView){
+        			popupView.addTimelineMsgs(result.olds, t, user_uniqueKey);
+        		}
+        		
         	}
         	sinaMsgs = result.news;
 //        	log('news ' + result.news.length + ', olds ' + result.olds.length);
         }
         var current_user = getUser();
-        var popupView = getPopupView();
+        
         if(sinaMsgs.length > 0){
         	// 保存最新的id，用于过滤数据和判断
             setLastMsgId(sinaMsgs[0].id, t, user_uniqueKey);
