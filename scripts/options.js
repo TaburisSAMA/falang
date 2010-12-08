@@ -581,6 +581,10 @@ function saveAccount(){
     			if(!login_url) {
     				_showMsg('get_authorization_url error: ' + text_status + ' code: ' + error_code);
     			} else {
+    				if(blogType == 'douban') {
+    					// 豆瓣无需pin，随便填充douban
+    					$('#account-pin').val('douban');
+    				}
     				// 在当前页保存 request token
         			$('#account-request-token-key').val(user.oauth_token_key);
         			$('#account-request-token-secret').val(user.oauth_token_secret);
