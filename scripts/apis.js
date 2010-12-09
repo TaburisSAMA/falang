@@ -239,26 +239,26 @@ var sinaApi = {
     get_authorization_url: function(user, callbackFn) {
     	if(user.authType == 'oauth') {
     		var login_url = null;
-    		var me = this;
+//    		var me = this;
     		this.get_request_token(user, function(token, text_status, error_code) {
     			if(token) {
     				user.oauth_token_key = token.oauth_token;
         			user.oauth_token_secret = token.oauth_token_secret;
         			// 返回登录url给用户登录
         			var params = {oauth_token: user.oauth_token_key};
-        			if(me.config.oauth_callback) {
-            			params.oauth_callback = me.config.oauth_callback;
+        			if(this.config.oauth_callback) {
+            			params.oauth_callback = this.config.oauth_callback;
             		}
-        			login_url = me.format_authorization_url(params);
+        			login_url = this.format_authorization_url(params);
     			}
     			callbackFn(login_url, text_status, error_code);
-    		});
+    		}, this);
     	} else {
     		throw new Error(user.authType + ' not support get_authorization_url');
     	}
     },
     
-    get_request_token: function(user, callbackFn) {
+    get_request_token: function(user, callbackFn, context) {
     	if(user.authType == 'oauth') {
     		var params = {
 	            url: this.config.oauth_request_token,
@@ -285,7 +285,7 @@ var sinaApi = {
     					text_status = 'error';
     				}
     			}
-    			callbackFn(token, text_status, error_code);
+    			callbackFn.call(context, token, text_status, error_code);
     		});
     	} else {
     		throw new Error(user.authType + ' not support get_request_token');
@@ -1341,7 +1341,7 @@ $.extend(DiguAPI, {
 		if(args.url == this.config.followers || args.url == this.config.friends) {
 			data = {users: data, next_cursor: Number(args.data.page) + 1, previous_cursor: args.data.page};
 			if(data.users.length == 0) {
-				data.next_cursor = 0;
+				data.next_cursor = '0';
 			}
 		}
 		return data;
@@ -1966,6 +1966,19 @@ $.extend(FanfouAPI, {
 				args.data.in_reply_to_status_id = args.data.sina_id;
 				delete args.data.sina_id;
 			}
+		} else if(args.url == this.config.friends || args.url == this.config.followers) {
+			// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
+			// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
+			args.data.page = args.data.cursor == '-1' ? 1 : args.data.cursor;
+			if(!args.data.page) {
+				args.data.page = 1;
+			}
+			if(args.data.user_id) {
+				args.data.id = args.data.user_id;
+			}
+			delete args.data.cursor;
+			delete args.data.user_id;
+			delete args.data.screen_name;
 		}
     },
 	
@@ -1974,6 +1987,26 @@ $.extend(FanfouAPI, {
 	format_upload_params: function(user, data, pic) {
     	pic.keyname = 'photo';
     },
+    
+    format_result: function(data, play_load, args) {
+		if($.isArray(data)) {
+	    	for(var i in data) {
+	    		data[i] = this.format_result_item(data[i], play_load);
+	    	}
+	    } else {
+	    	data = this.format_result_item(data, play_load);
+	    }
+		// 若是follwers api，则需要封装成cursor接口
+		// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
+		// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
+		if(args.url == this.config.followers || args.url == this.config.friends) {
+			data = {users: data, next_cursor: Number(args.data.page) + 1, previous_cursor: args.data.page};
+			if(data.users.length == 0) {
+				data.next_cursor = '0';
+			}
+		}
+		return data;
+	},
 	
 	format_result_item: function(data, play_load, args) {
 		if(play_load == 'status' && data.id) {
@@ -2596,10 +2629,6 @@ var tapi = {
 	
 	get_authorization_url: function(user, callbackFn) {
 		return this.api_dispatch(user).get_authorization_url(user, callbackFn);
-	},
-	
-	get_request_token: function(user, callbackFn) {
-		return this.api_dispatch(user).get_request_token(user, callbackFn);
 	},
 	
 	get_access_token: function(user, callbackFn) {
