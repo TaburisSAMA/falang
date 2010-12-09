@@ -296,7 +296,11 @@ function initIamDoing(){
 var Search = {
     toggleInput: function(){
         $("#searchWrap").toggle();
-        $("#txtSearch").focus();
+        $("#txtSearch").focus().keypress(function(event) {
+        	if(event.keyCode == '13') {
+        		Search.search();
+        	}
+        });
     },
     search: function(read_more) {
     	var c_user = getUser();
