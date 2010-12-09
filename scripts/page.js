@@ -302,9 +302,10 @@ function initSelectSendAccounts(is_upload){
         }
         li.push(fawaveFormatText(li_tp, user));
     }
-    afs.html('TO: ' + li.join(''));
+    afs.html('TO:(<a class="all" href="javascript:" id="fawave_toggleSelectAllSendAccount">全</a>) ' + li.join(''));
     afs.data('inited', 'true');
     afs.find('li').click(function(){ toggleSelectSendAccount(this); });
+    $("#fawave_toggleSelectAllSendAccount").click(function(){ toggleSelectAllSendAccount(); });
 };
 
 function toggleSelectSendAccount(ele){
@@ -313,6 +314,14 @@ function toggleSelectSendAccount(ele){
         _t.removeClass('sel');
     }else{
         _t.addClass('sel');
+    }
+};
+
+function toggleSelectAllSendAccount(){
+    if($("#fawave_accountsForSend .sel").length == $("#fawave_accountsForSend li").length){ //已全选
+        $("#fawave_accountsForSend li").removeClass('sel');
+    }else{
+        $("#fawave_accountsForSend li").addClass('sel');
     }
 };
 
