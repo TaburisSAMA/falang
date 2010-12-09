@@ -190,6 +190,7 @@ var Settings = {
         popupHeight: 520, 
         theme: 'pip_io', //主题样式
         translate_target: 'zh', // 默认翻译语言
+        shorten_url_service: 'v.gd', // 默认缩址服务
 
         lookingTemplate: '我正在看: {{title}} {{url}} '
     },
@@ -897,6 +898,30 @@ var Tween = {
             else return Tween.Bounce.easeOut(t*2-d, 0, c, d) * .5 + c*.5 + b;
         }
     }
+};
+
+// shorturl
+var ShortenUrl = {
+	services: {
+		'v.gd':  'http://v.gd/create.php?format=simple&url={{url}}',
+		'aa.cx': 'http://aa.cx/api.php?url={{url}}',
+		'tinyurl.com': 'http://tinyurl.com/api-create.php?url={{url}}',
+		//http://lnk.by/Shorten?url=http://yongwo.de/abc&format=json
+		'to.ly': 'http://to.ly/api.php?longurl={{url}}',
+		'zi.mu': 'http://zi.mu/api.php?format=simple&action=shorturl&url={{url}}'
+	},
+	short: function(longurl, callback, service) {
+		var s = service || Settings.get().shorten_url_service;
+		$.ajax({
+			url: this.services[s].format({url: encodeURIComponent(longurl)}),
+			success: function(text, status, xhr) {
+				callback(text);
+			}, 
+			error: function(xhr, status) {
+				callback(null);
+			}
+		});
+	}
 };
 
 // 缓存数据存储器

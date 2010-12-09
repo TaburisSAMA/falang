@@ -269,23 +269,24 @@ function initIamDoing(){
         chrome.tabs.getSelected(null, function(tab){
             var loc_url = tab.url;
             if(loc_url){
-                var title = tab.title;
-                if(Settings.get().isSharedUrlAutoShort && loc_url.replace(/^https?:\/\//i, '').length > Settings.get().sharedUrlAutoShortWordCount){
-                    s8Api.shorten({longUrl: loc_url}, function(data){
-                        if(data && data.shortUrl){
-                            loc_url = data.shortUrl;
+                var title = tab.title || '';
+                var settings = Settings.get();
+                if(settings.isSharedUrlAutoShort && loc_url.replace(/^https?:\/\//i, '').length > settings.sharedUrlAutoShortWordCount){
+                	var $this = $(this);
+                	$this.attr('disabled', true);
+                	ShortenUrl.short(loc_url, function(shorturl){
+                        if(shorturl){
+                            loc_url = shorturl;
                         }
-                        $("#txtContent").val( formatText(Settings.get().lookingTemplate, {title:(title||''), url:loc_url}) );
+                        $("#txtContent").val(formatText(settings.lookingTemplate, {title: title, url:loc_url}));
                         showMsgInput();
-                    },function(xhr, textStatus, errorThrown){
-                        $("#txtContent").val( formatText(Settings.get().lookingTemplate, {title:(title||''), url:loc_url}) );
-                        showMsgInput();
+                        $this.removeAttr('disabled');
                     });
-                }else{
-                    $("#txtContent").val( formatText(Settings.get().lookingTemplate, {title:(title||''), url:loc_url}) );
+                } else {
+                	$("#txtContent").val(formatText(settings.lookingTemplate, {title: title, url:loc_url}));
                     showMsgInput();
                 }
-            }else{
+            } else {
                 showMsg('当前页面的URL不正确。');
             }
         });

@@ -241,6 +241,15 @@ $(function(){
     }
     var settings = Settings.get();
     $('#translate_target').html(tanslate_options).val(settings.translate_target);
+    
+    // 缩址服务选择
+    var shorturls_options = '';
+    for(var k in ShortenUrl.services) {
+    	shorturls_options += '<option value="{{value}}">{{name}}</option>'.format({name: k, value: k});
+    }
+    var settings = Settings.get();
+    $('#shorten_url_service').html(shorturls_options).val(settings.shorten_url_service);
+    
 });
 
 //统计全局的刷新间隔设置产生的请求次数
@@ -829,6 +838,8 @@ function saveAll(){
     settings.fontSite = fontSize;
     
     settings.translate_target = $('#translate_target').val();
+    settings.shorten_url_service = $('#shorten_url_service').val();
+    
 
     Settings.save();
 
