@@ -496,7 +496,7 @@ function _verify_credentials(user) {
 	}
 	tapi.verify_credentials(user, function(data, textStatus, errorCode){
 		$('#save-account').removeAttr('disabled');
-        if(errorCode || textStatus=='error'){
+        if(!data.id || errorCode || textStatus=='error'){
             if(errorCode==400||errorCode==401||errorCode==403){
                 _showMsg('用户名或者密码不正确，请修改');
             }else{

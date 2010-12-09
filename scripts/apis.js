@@ -935,7 +935,20 @@ var sinaApi = {
                 var error_code = null;
                 if(data){
                 	error_code = data.error_code || data.code;
-                    var error = data.errors || data.error;
+                    var error = data.error;
+                    if(!error && data.errors){
+                        if(typeof(data.errors)==='string'){
+                            error = data.errors;
+                        }else if(data.errors.length){ //'{"errors":[{"code":53,"message":"Basic authentication is not supported"}]}'
+                            if(data.errors[0].message){
+                                error = data.errors[0].message;
+                            }else{
+                                for(var i in data.errors[0]){
+                                    error += i + ': ' + data.errors[0][i];
+                                }
+                            }
+                        }
+                    }
                     if(error || error_code){
                     	data.error = error;
                     	textStatus = this.format_error(data.error || data.wrong || data.message, error_code);
@@ -943,6 +956,7 @@ var sinaApi = {
                     	if(!textStatus && error_code){ // 错误为空，才显示错误代码
                     		error_msg += ', error_code: ' + error_code;
                     	}
+                        error_code = error_code || 'unknow';
                         showMsg(error_msg);
                     } else {
                         //成功再去格式化结果

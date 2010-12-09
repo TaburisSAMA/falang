@@ -40,6 +40,7 @@ function bildMsgLi(sinaMsg, t, c_user){
                 rtReplyBtn: '',
                 rtAddFavoritesMsgBtn: '',
                 // rt rt
+                rtrtOretweetBtn: '',
                 rtrtRepostBtn: '',
                 rtrtCommentBtn: '',
                 rtrtReplyBtn: '',
