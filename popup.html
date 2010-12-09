@@ -71,7 +71,17 @@
 					<span class="name"></span><br/>
 					<span class="nums"></span>
 				</span>
-				<a href="javascript:" class="quickUpImg" onclick="openUploadImage();" title="点击上传图片"><img src="images/image.gif" />发图</a>
+				<span class="top_btns">
+					<span>
+						<a href="javascript:" class="search" onclick="Search.toggleInput();" title="点击开始搜索"><img src="images/search.png" />搜索</a>
+						<span id="searchWrap">
+							<input type="text" id="txtSearch" />
+							<a href="javascript:" class="btnSearch" onclick="showSearch();" title="点击搜索"><img src="images/search.png" /></a>
+							<img class="arrow" src="images/layerArrow.gif"/>
+						</span>
+					</span>
+					<a href="javascript:" class="quickUpImg" onclick="openUploadImage();" title="点击上传图片"><img src="images/image.gif" />发图</a>
+				</span>
 				<a href="javascript:" class="write" onclick="toogleMsgInput(this)">写微博<b></b></a>
 			</div>
 			<ul id="tl_tabs" class="tabs">

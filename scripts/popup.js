@@ -292,6 +292,16 @@ function initIamDoing(){
     });
 };
 
+//搜索
+var Search = {
+    toggleInput: function(){
+        $("#searchWrap").toggle();
+        $("#txtSearch").focus();
+    },
+    search: function(){}
+};
+function toggleSearch(){};
+
 //隐藏那些不支持的Timeline Tab
 function checkSupportedTabs(user){
     if(!user){

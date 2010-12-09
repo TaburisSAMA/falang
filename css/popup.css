@@ -82,8 +82,26 @@ textarea:focus{outline: none;}
 #header .write.active{
 	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#ccc), color-stop(1, #fff));
 }
-#header .quickUpImg{position:absolute; right:120px; top:0; height:12px; color:#555; display:inline-block; padding:1px 0px;}
-#header .quickUpImg img{vertical-align:bottom;}
+#header .top_btns{position:absolute; right:120px; top:0; height:12px; color:#555; display:inline-block; padding:1px 0px;}
+#header .top_btns .search img{vertical-align: bottom; height:13px;}
+#searchWrap{
+	display:none;
+	background: white;
+	left: -70px;
+	position: absolute;
+	top: 20px;
+	z-index: 50;
+	-webkit-box-shadow: 0px 1px 5px rgba(0,0,0,.5);
+	-webkit-border-radius: 5px;
+}
+#searchWrap .arrow{position: absolute; top:-7px; left:70px;}
+#txtSearch{padding: 2px 20px 2px 2px; -webkit-border-radius: 5px; border:1px solid #ccc;}
+#searchWrap .btnSearch{
+	position: absolute;
+	right: 1px;
+	top: 3px;
+}
+#header .top_btns .quickUpImg img{vertical-align:bottom; }
 #header .write b{
 	border-color: #666 rgba(255,255,255,.1) rgba(255,255,255,.1);
 	border-style: solid;
