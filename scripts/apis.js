@@ -29,6 +29,7 @@ var sinaApi = {
 		support_sent_direct_messages: true, //是否支持自己发送的私信
 		support_mentions: true, 
 		support_friendships_create: true,
+		support_search: true,
 		need_processMsg: true, //是否需要处理消息的内容
         
 		// api
@@ -64,9 +65,18 @@ var sinaApi = {
         reset_count:          '/statuses/reset_count',
         user_show:            '/users/show/{{id}}',
         
+        // 用户标签
+        tags: 				  '/tags',
+        create_tag: 	      '/tags/create',
+        destroy_tag:          '/tags/destroy',
+        tags_suggestions:	  '/tags/suggestions',
+        
+        // 搜索
+        search:               '/statuses/search',
+        
         oauth_authorize: 	  '/oauth/authorize',
         oauth_request_token:  '/oauth/request_token',
-        oauth_callback: 'oob',
+        oauth_callback:       'oob',
         oauth_access_token:   '/oauth/access_token',
 
         detailUrl:        '/jump?aid=detail&twId=',
@@ -785,6 +795,48 @@ var sinaApi = {
         };
         this._sendRequest(params, callbackFn);
     },
+    
+    // user_id, count, page
+    tags: function(data, callback) {
+    	var params = {
+            url: this.config.tags,
+            play_load: 'tag',
+            data: data
+        };
+        this._sendRequest(params, callback);
+    },
+    
+    // count, page
+    tags_suggestions: function(data, callback) {
+    	var params = {
+            url: this.config.tags_suggestions,
+            play_load: 'tag',
+            data: data
+        };
+        this._sendRequest(params, callback);
+    },
+    
+    // tags
+    create_tag: function(data, callback) {
+    	var params = {
+            url: this.config.create_tag,
+            type: 'post',
+            play_load: 'tag',
+            data: data
+        };
+        this._sendRequest(params, callback);
+    },
+    
+    // tag_id
+    destroy_tag: function(data, callback) {
+    	var params = {
+            url: this.config.destroy_tag,
+            type: 'post',
+            play_load: 'tag',
+            data: data
+        };
+        this._sendRequest(params, callback);
+    },
 
     // id
     destroy: function(data, callbackFn){
@@ -798,16 +850,32 @@ var sinaApi = {
         this._sendRequest(params, callbackFn);
     },
     
+    // q, max_id, rpp
+    search: function(data, callback) {
+    	var params = {
+            url: this.config.search,
+            play_load: 'status',
+            data: data
+        };
+        this._sendRequest(params, callback);
+    },
+    
     // 格式化数据格式，其他微博实现兼容新浪微博的数据格式
     // play_load: status, user, comment, message, count, result(reset_count)
     // args: request arguments
     format_result: function(data, play_load, args) {
-		if($.isArray(data)) {
-	    	for(var i in data) {
-	    		data[i] = this.format_result_item(data[i], play_load, args);
+    	var items = data.results || data.users || data;
+		if($.isArray(items)) {
+	    	for(var i in items) {
+	    		items[i] = this.format_result_item(items[i], play_load, args);
 	    	}
 	    } else {
 	    	data = this.format_result_item(data, play_load, args);
+	    }
+	    if(args.url == this.config.search && data.next_page) {
+	    	// "next_page":"?page=2&max_id=1291867917&q=fawave", 提取max_id
+	    	var p = decodeForm(data.next_page);
+	    	data.max_id = p.max_id;
 	    }
 		return data;
 	},
@@ -816,6 +884,16 @@ var sinaApi = {
 		if(play_load == 'user' && data && data.id) {
 			data.t_url = 'http://t.sina.com.cn/' + (data.domain || data.id);
 		} else if(play_load == 'status') {
+			if(!data.user) { // search data
+				data.user = {
+					screen_name: data.from_user,
+					profile_image_url: data.profile_image_url,
+					id: data.from_user_id
+				};
+				delete data.profile_image_url;
+				delete data.from_user;
+				delete data.from_user_id;
+			}
 			this.format_result_item(data.user, 'user', args);
 			var tpl = this.config.host + '/{{user.id}}/statuses/{{id}}';
 			if(data.retweeted_status) {
@@ -2615,6 +2693,10 @@ var tapi = {
 		return T_APIS[(data.user ? data.user.blogType : data.blogType) || 'tsina'];
 	},
 	
+	search: function(data, callback) {
+		return tapi.api_dispatch(data).search(data, callback);
+	},
+	
 	translate: function(user, text, target, callback) {
 		return tapi.api_dispatch(user).translate(text, target, callback);
 	},
@@ -2767,5 +2849,25 @@ var tapi = {
 	// id
 	destroy: function(data, callbackFn){
 		return this.api_dispatch(data).destroy(data, callbackFn);
-	}
+	},
+	
+	// user_id, count, page
+    tags: function(data, callback) {
+    	return this.api_dispatch(data).tags(data, callback);
+    },
+    
+    // count, page
+    tags_suggestions: function(data, callback) {
+    	return this.api_dispatch(data).tags_suggestions(data, callback);
+    },
+    
+    // tags
+    create_tag: function(data, callback) {
+    	return this.api_dispatch(data).create_tag(data, callback);
+    },
+    
+    // tag_id
+    destroy_tag: function(data, callback) {
+    	return this.api_dispatch(data).destroy_tag(data, callback);
+    }
 };
