@@ -1988,6 +1988,7 @@ $.extend(TwitterAPI, {
 			data.t_url = tpl.format(data);
 			this.format_result_item(data.user, 'user', args);
 			if(data.retweeted_status) {
+                data.retweeted_status.id = data.retweeted_status.id_str || data.retweeted_status.id;
 				data.retweeted_status.t_url = tpl.format(data.retweeted_status);
 				this.format_result_item(data.retweeted_status.user, 'user', args);
 			}

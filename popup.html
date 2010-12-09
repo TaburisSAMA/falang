@@ -39,6 +39,7 @@
 
 		var W = Settings.get().popupWidth, H = Settings.get().popupHeight;
 		var wh_css = 'body{font-family:"'+ Settings.get().font +'";font-size:'+ Settings.get().fontSite +'px;}'
+				   + 'div.mainContent{line-height:' + (Number(Settings.get().fontSite) + 6) + 'px;}'
 				   + '#wrapper{width:'+ W +'px;}'
 				   + '#txtContent{width:'+ (W-2) +'px;}'
 				   + '.warp{width:' + W + 'px;} .list_warp{height:' + (H-61) + 'px;}'
