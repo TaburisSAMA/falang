@@ -994,6 +994,23 @@ var Instagram = {
 	}
 };
 
+// https://groups.google.com/group/plixi/web/fetch-photos-from-url
+var Plixi = {
+	/*
+	 * http://api.plixi.com/api/tpapi.svc/imagefromurl?size=thumbnail&url=http://tweetphoto.com/5527850
+	 * http://api.plixi.com/api/tpapi.svc/imagefromurl?size=medium&url=http://tweetphoto.com/5527850
+	 * http://api.plixi.com/api/tpapi.svc/imagefromurl?size=big&url=http://tweetphoto.com/5527850
+	 */
+	get: function(url, callback) {
+		var tpl = 'http://api.plixi.com/api/tpapi.svc/imagefromurl?size={{size}}&url=' + url;
+		var pics = {
+			thumbnail_pic: tpl.format({size: 'thumbnail'}),
+			bmiddle_pic: tpl.format({size: 'medium'}),
+			original_pic: url//tpl.format({size: 'big'})
+		};
+		callback(pics);
+	}
+};
 
 // 缓存数据存储器
 //var TweetStorage = {

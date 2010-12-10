@@ -182,6 +182,10 @@ var sinaApi = {
         	return '<a target="_blank" onclick="previewPic(this, Instagram.get);" href="javascript:void();" rhref="{{url}}" title="左键点击预览图片，右键直接打开网址">{{value}}</a>'.format({
 	            url: _url, title: g1, value: g2||g1
 	        });
+        } else if(_url.indexOf('http://tweetphoto.com/') == 0 || _url.indexOf('http://plixi.com/p/') == 0) {
+        	return '<a target="_blank" onclick="previewPic(this, Plixi.get);" href="javascript:void();" rhref="{{url}}" title="左键点击预览图片，右键直接打开网址">{{value}}</a>'.format({
+	            url: _url, title: g1, value: g2||g1
+	        });
         } else {
         	return '<a target="_blank" href="{{url}}" title="{{title}}">{{value}}</a>'.format({
 	            url: _url, title: g1, value: g2||g1
