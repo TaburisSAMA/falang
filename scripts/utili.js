@@ -903,9 +903,9 @@ var Tween = {
 // shorturl
 var ShortenUrl = {
 	services: {
-		'is.gd': 'http://is.gd/api.php?longurl={{url}}',
 		'goo.gl': {api: 'http://goo.gl/api/url', format: 'json', method: 'post', param_name: 'url', result_name: 'short_url'},
 //		'v.gd':  'http://v.gd/create.php?format=simple&url={{url}}',
+		'is.gd': 'http://is.gd/api.php?longurl={{url}}',
 		'tinyurl.com': 'http://tinyurl.com/api-create.php?url={{url}}',
 		'to.ly': 'http://to.ly/api.php?longurl={{url}}',
 		'zi.mu': 'http://zi.mu/api.php?format=simple&action=shorturl&url={{url}}',
