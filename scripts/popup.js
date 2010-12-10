@@ -1451,6 +1451,7 @@ function sendComment(msg, commentTweetId, notSendMord){
     if(cid){ //如果是回复别人的微博
     	m = 'reply';
     	data.cid = cid;
+        data.comment = data.comment.replace('回复 @'+ $('#replyUserName').val() +':', '');
     	var reply_user_id = $('#replyUserId').val();
     	data.reply_user_id = reply_user_id;
     } 
@@ -1603,13 +1604,13 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
 function doComment(ele, userName, tweetId, replyUserName, replyUserId, cid){//评论 cid:回复的评论ID
     $('#actionType').val('comment');
     $('#commentTweetId').val(tweetId);
-    $('#replyUserName').val(userName);
+    $('#replyUserName').val(replyUserName);
     $('#replyUserId').val(replyUserId || '');
     $('#commentCommentId').val(cid||'');
     $('#ye_dialog_title').html('评论@' + userName + ' 的信息');
     $('#ye_dialog_window').show();
-//    var _txt = replyUserName ? ('回复 @'+replyUserName+':') : '';
-    var _txt = '';
+    var _txt = replyUserName ? ('回复 @'+replyUserName+':') : '';
+    //var _txt = '';
 
     $('#chk_sendOneMore').attr("checked", false).val(tweetId).show();
     $('#txt_sendOneMore').text('同时发一条微博').show();

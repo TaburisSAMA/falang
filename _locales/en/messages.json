@@ -8,7 +8,7 @@
 		"description": "name"
 	},
 	"extDes": {
-		"message": "FaWave, is a so gelivable multi-microblog extension. It support Twitter,Sina,Buzz and more. It prompt at the same time, and seamless switching. Feedback to @QLeelulu .",
+		"message": "FaWave, is a Chrome extension supporting multiple microblogging, which can make all microblogs synchronously updating, work seamlessly across multiple microblogs when you switch between them. Feedback to @QLeelulu .",
 		"description": "该插件的简单描述"
 	},
 	"parserErrorMsg": {
