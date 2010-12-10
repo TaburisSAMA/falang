@@ -22,6 +22,7 @@ var sinaApi = {
 		support_repost: true, // 是否支持新浪形式转载
 		repost_pre: '转:', // 转发前缀
 		support_favorites: true,
+        support_geo: true, //是否支持地理位置信息上传
 		// 是否支持max_id 分页
 		support_max_id: true,
 		support_destroy_msg: true, //是否支持删除私信
@@ -548,6 +549,10 @@ var sinaApi = {
     
     update: function(data, callbackFn){
         if(!callbackFn) return;
+        if(this.config.support_geo && Settings.get().isGeoEnabled && Settings.get().geoPosition){
+            data.lat = Settings.get().geoPosition.coords.latitude;
+            data.long = Settings.get().geoPosition.coords.longitude;
+        }
         var params = {
             url: this.config.update,
             type: 'post',

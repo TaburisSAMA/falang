@@ -1534,7 +1534,7 @@ function resizeFawave(w, h){
     var wh_css = '#wrapper{width:'+ w +'px;}'
                    + '#txtContent{width:'+ (w-2) +'px;}'
 				   + '.warp{width:' + w + 'px;} .list_warp{height:' + (h-70) + 'px;}'
-				   + '#facebox img, #facebox canvas{max-width:'+ (w-50) +'px;}';
+                   + '#pb_map_canvas, #popup_box .image img, #popup_box .image canvas{max-width:'+ (w-50) +'px;}';
 	$("#styleCustomResize").html(wh_css);
 };
 
@@ -1849,7 +1849,12 @@ function previewPic(ele, get_method) {
 };
 
 function showFacebox(ele){
-    jQuery.facebox({image: $(ele).attr('bmiddle'), original: $(ele).attr('original') });
+    //jQuery.facebox({image: $(ele).attr('bmiddle'), original: $(ele).attr('original') });
+    popupBox.showImg($(ele).attr('bmiddle'), $(ele).attr('original'));
+};
+
+function showGeoMap(user_img, latitude, longitude){
+    popupBox.showMap(user_img, latitude, longitude);
 };
 
 //====>>>>
@@ -1970,7 +1975,7 @@ var SmoothScroller = {
     list_warp_height: 0, //当前的列表窗口高度
     ease_type: 'easeOut',
     tween_type: 'Quad',
-    status:{t:0, b:0, c:0, d:15},
+    status:{t:0, b:0, c:0, d:0},
     start: function(e){
         if(e.wheelDelta == 0){ return; }
         clearTimeout(this.T);
@@ -1981,7 +1986,8 @@ var SmoothScroller = {
         this.ease_type = Settings.get().smoothSeaeType;
         this.tween_type = Settings.get().smoothTweenType;
         var hasDo = this.status.t>0 ? (Math.ceil(Tween[this.tween_type][this.ease_type](this.status.t-1, this.status.b, this.status.c, this.status.d)) - this.status.b) : 0;
-        this.status.c = -e.wheelDelta + this.status.c - hasDo;
+        this.status.c = -e.wheelDelta + this.status.c - hasDo; 
+        this.status.d = this.status.d + 13 - this.status.t;
         this.status.t = 0;
         this.status.b = this.list_warp.scrollTop();
         this.run();
@@ -1994,10 +2000,14 @@ var SmoothScroller = {
         h = h - _t.list_warp_height;
         if(_top >= h && _t.status.c > 0){
             _t.status.b = _top;
+            _t.status.d = 0;
             _t.status.c = 0;
+            _t.status.t = 0;
             return;
         }
-        if(_t.status.t < _t.status.d){ _t.status.t++; setTimeout(_t.run, 10); }
+        if(_t.status.t < _t.status.d){
+            _t.status.t++; setTimeout(_t.run, 10);
+        }
     }
 };
 
@@ -2019,7 +2029,7 @@ function forceRefresh(ele){
 };
 function showRefreshBtn(){
     $("#btnForceRefresh").attr('disabled', true).fadeIn();
-};
+};// <<=== 强制刷新结束
 
 function _showLoading(){
     $("#loading").show();

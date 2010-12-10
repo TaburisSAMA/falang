@@ -152,6 +152,54 @@ ul#navigation li.selected{
 #tween_demo{ display:inline-block; padding:2px; border:solid 1px green; height:15px; width: 100px; }
 #tween_demo span{ display:inline-block; background:#2B477D; width:10px; height:15px; }
 
+/*¸¡¶¯²ã*/
+#popup_box{
+	background:#fff;
+	border:solid 1px #ccc;
+	border-radius:5px;
+	-webkit-box-shadow: 0 0px 15px rgba(0,0,0,.7);
+	position:absolute;
+	z-index:100;
+}
+#popup_box .pb_title{
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#DDD));
+	padding:2px 5px;
+	border-bottom:1px solid #ccc;
+}
+#popup_box .pb_close{
+	float:right;
+	color:#888;
+	border:solid 1px #ccc;
+	padding:1px 5px;
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#DDD));
+}
+#popup_box .pb_close:hover{
+	color:#555;
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#DDD), to(#fff));
+}
+#popup_box .pb_content{padding:5px;}
+#popup_box .pb_footer{
+	background: -webkit-gradient(linear, 0% 0%, 0% 50%, from(#fff), to(#DDD));
+	padding:2px;
+	border-top:1px solid #ccc;
+}
+#popup_box_overlay {
+  position: fixed;
+  background:#fff;
+  opacity: 0.7;
+  top: 0px;
+  left: 0px;
+  height:100%;
+  width:100%;
+  z-index:99;
+}
+/*¸¡¶¯²ãÍ¼Æ¬Ðý×ª°´Å¥*/
+#popup_box .image .rotate_btn{position: absolute; top: 25px; left: 10px; display:none;}
+#popup_box .image:hover .rotate_btn{display:block;}
+
+#popup_box canvas, .cur_min{cursor:url(../images/small.cur), auto;}
+
+
 /* ---------->>> jtip <<<---------------------------------------------------------------*/
 #JT_arrow_left{
 	background-image: url(../images/arrow_left.gif);
@@ -237,3 +285,6 @@ ul#navigation li.selected{
 }
 .jtip:hover{color:yellow;}
 .jTip .c{display:none;}
+
+
+#pb_map_canvas{width:400px; height:400px;}

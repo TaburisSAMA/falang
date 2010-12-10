@@ -25,6 +25,10 @@ function bildMsgLi(sinaMsg, t, c_user){
      		}
      	}
      	var crlBtn = {
+                showMapBtn: '',
+                rtShowMapBtn: '',
+                rtrtShowMapBtn: '',
+
                 delTweetBtn: '<a class="deltweet" href="javascript:void(0);" onclick="doDelTweet(\'' + sinaMsg.id + '\', this);" title="点击删除微博">删</a>',
                 replyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\');" title="进行@回复">@</a>',
                 oretweetBtn: '',
@@ -70,7 +74,19 @@ function bildMsgLi(sinaMsg, t, c_user){
                 crlBtn.rtrtReplyBtn = '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + rtrt_screen_name + '\',\'' + rtrt_id + '\');" title="进行@回复">@</a>';
                 crlBtn.rtrtAddFavoritesMsgBtn = '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'' + rtrt_screen_name + '\',\'' + rtrt_id + '\');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>';
                 
+                //地理位置
+                if(rt_status.retweeted_status.geo && rt_status.retweeted_status.geo.coordinates){
+                    crlBtn.rtrtShowMapBtn = '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'' + rt_status.retweeted_status.user.profile_image_url + '\', ' + rt_status.retweeted_status.geo.coordinates[0] + ', ' + rt_status.retweeted_status.geo.coordinates[1] + ')" title="点击查看地理位置信息"><img src="images/geo.png"/></a>';
+                }
             }
+            //地理位置
+            if(rt_status.geo && rt_status.geo.coordinates){
+                crlBtn.rtShowMapBtn = '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'' + rt_status.user.profile_image_url + '\', ' + rt_status.geo.coordinates[0] + ', ' + rt_status.geo.coordinates[1] + ')" title="点击查看地理位置信息"><img src="images/geo.png"/></a>';
+            }
+        }
+        //地理位置
+        if(sinaMsg.geo && sinaMsg.geo.coordinates){
+            crlBtn.showMapBtn = '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'' + user.profile_image_url + '\', ' + sinaMsg.geo.coordinates[0] + ', ' + sinaMsg.geo.coordinates[1] + ')" title="点击查看地理位置信息"><img src="images/geo.png"/></a>';
         }
         // 不支持评论
         if(!support_comment || sinaMsg.hide_comments === true) {

@@ -902,6 +902,108 @@ var Tween = {
     }
 };
 
+// getPageScroll() by quirksmode.com
+function getPageScroll() {
+    var xScroll, yScroll;
+    if (self.pageYOffset) {
+      yScroll = self.pageYOffset;
+      xScroll = self.pageXOffset;
+    } else if (document.documentElement && document.documentElement.scrollTop) {	 // Explorer 6 Strict
+      yScroll = document.documentElement.scrollTop;
+      xScroll = document.documentElement.scrollLeft;
+    } else if (document.body) {// all other Explorers
+      yScroll = document.body.scrollTop;
+      xScroll = document.body.scrollLeft;	
+    }
+    return new Array(xScroll,yScroll);
+};
+
+  // Adapted from getPageSize() by quirksmode.com
+function getPageHeight() {
+    var windowHeight;
+    if (self.innerHeight) {	// all except Explorer
+      windowHeight = self.innerHeight;
+    } else if (document.documentElement && document.documentElement.clientHeight) { // Explorer 6 Strict Mode
+      windowHeight = document.documentElement.clientHeight;
+    } else if (document.body) { // other Explorers
+      windowHeight = document.body.clientHeight;
+    }	
+    return windowHeight;
+};
+
+//浮动层
+var popupBox = {
+    tp: '<div id="popup_box">\
+            <div class="pb_title clearFix"><span class="t"></span><a href="javascript:" onclick="popupBox.close()" class="pb_close">关闭</a></div>\
+            <div class="pb_content"></div>\
+            <div class="pb_footer clearFix"><span class="t"></span><a href="javascript:" onclick="popupBox.close()" class="pb_close">关闭</a></div>\
+        </div>\
+        <div id="popup_box_overlay"></di>',
+    box: null,
+    checkBox: function(){
+        if(!this.box){
+            $("body").append(this.tp);
+            this.box = $("#popup_box");
+            this.overlay = $("#popup_box_overlay ");
+        }
+    },
+    close: function(){
+        this.box.hide();
+        this.overlay.hide();
+    },
+    show: function(){
+        this.overlay.show();
+        this.box.css({
+            top: getPageScroll()[1] + (getPageHeight() / 10),
+            left: $("body").width() / 2 - this.box.width() / 2
+        }).show();
+    },
+    showOverlay: function(){},
+    showImg: function(imgSrc, original){
+        this.checkBox();
+        var image = new Image();
+        image.onload = function() {
+            popupBox.showOverlay();
+            if(original){
+                popupBox.box.find('.pb_title .t, .pb_footer .t').html('<a target="_blank" href="' + original +'">查看原图</a>');
+            }else{
+                popupBox.box.find('.pb_title .t, .pb_footer .t').html('');
+            }
+            popupBox.box.find('.pb_content').html('<div class="image"><span class="rotate_btn">'
+              + '<a href="javascript:" onclick="$(\'#facebox_see_img\').rotateLeft(90);"><img src="/images/rotate_l.png"></a>'
+              + '<a href="javascript:" onclick="$(\'#facebox_see_img\').rotateRight(90);" style="margin-left:10px;"><img src="/images/rotate_r.png"></a></span>'
+              + '<img id="facebox_see_img" src="' + image.src + '" class="cur_min" onclick="popupBox.close()" /></div>');
+            popupBox.show();
+        }
+        image.src = imgSrc;
+    },
+    showMap: function(user_img, myLatitude, myLongitude){
+        this.checkBox();
+        var infowindow = new google.maps.InfoWindow();
+        var latlng = new google.maps.LatLng(myLatitude, myLongitude);
+        var myOptions = {
+          zoom: 13,
+          center: latlng,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        var map_canvas = $("#pb_map_canvas");
+        if(!map_canvas.length){
+            this.box.find('.pb_content').html('<div id="pb_map_canvas"></div>');
+            map_canvas = $("#pb_map_canvas");
+        }
+        popupBox.show();
+        var map = new google.maps.Map(map_canvas[0], myOptions);
+        var marker = new google.maps.Marker({map: map, position:latlng});
+        var infowindow = new google.maps.InfoWindow({
+            content: '<img class="map_user_icon" src="'+user_img+'" />',
+            maxWidth: 60
+        });
+        google.maps.event.addListener(marker, 'click', function() {
+          infowindow.open(map,marker);
+        });
+    }
+};
+
 // shorturl
 var ShortenUrl = {
 	services: {

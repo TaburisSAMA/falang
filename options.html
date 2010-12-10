@@ -1,11 +1,10 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>FaWave设置 -- FaWave(发微)--多微博插件</title>
-	<link rel="stylesheet" media="screen" type="text/css" href="/css/facebox/facebox.css">
 	<link rel="stylesheet" media="screen" type="text/css" href="/css/options.css" />
 	<script type="text/javascript" src="/scripts/lib/jquery-1.4.js" ></script>
-	<script type="text/javascript" src="/scripts/lib/facebox.js" ></script>
 	<script type="text/javascript" src="/scripts/lib/Base64.js" ></script>
 	<script type="text/javascript" src="scripts/emotional.js" ></script>
 	<script type="text/javascript" src="/scripts/utili.js" ></script>
@@ -323,7 +322,7 @@
 						<option value="simple">简洁</option>
 					</select>
 				</span>
-				<div><img id="themePreview" src="/themes/default/theme.png" onclick="jQuery.facebox({image:this.src});return false;" /></div>
+				<div><img id="themePreview" src="/themes/default/theme.png" onclick="popupBox.showImg(this.src);return false;" /></div>
 			</p>
 		</li>
 	</ul>
