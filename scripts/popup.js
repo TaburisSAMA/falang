@@ -1645,7 +1645,7 @@ function doRT(ele){//RT
     	// 有图片，自动带上图片地址，并尝试缩短
     	var settings = Settings.get();
     	var longurl = data.original_pic;
-    	val += '[图]' + longurl;
+    	val += ' [图]' + longurl;
         if(settings.isSharedUrlAutoShort && longurl.replace(/^https?:\/\//i, '').length > settings.sharedUrlAutoShortWordCount){
         	ShortenUrl.short(longurl, function(shorturl){
                 if(shorturl){
