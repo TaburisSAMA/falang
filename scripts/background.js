@@ -501,6 +501,15 @@ var RefreshManager = {
     restart: function(){
         this.stop();
         this.start();
+    },
+    refreshUser: function(user){
+        for(var i in T_LIST[user.blogType]){
+            var uniqueKey = user.uniqueKey, t = T_LIST[user.blogType][i];
+            refTime = Settings.getRefreshTime(user, t);
+            clearInterval(this.itv[uniqueKey+t]); //重新计时
+            checkTimeline(t, null, uniqueKey);
+            this.itv[uniqueKey+t] = setInterval(checkTimeline, 1000*refTime, t, null, uniqueKey);
+        }
     }
 };
 

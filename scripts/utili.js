@@ -177,7 +177,7 @@ var Settings = {
         },
         desktopNotificationsTimeout: 5, //桌面提示的延迟关闭时间
         isSyncReadedToSina: false, //已读消息是否和新浪微博页面同步
-        isSharedUrlAutoShort: false, //分享正在看的网址时是否自动缩短
+        isSharedUrlAutoShort: true, //分享正在看的网址时是否自动缩短
         sharedUrlAutoShortWordCount: 15, //超过多少个字则自动缩短URL
         quickSendHotKey: '113', //快速发送微博的快捷键。默认 F2。保存的格式为： 33,34,35 用逗号分隔的keycode
         isSmoothScroller: false, //是否启用平滑滚动

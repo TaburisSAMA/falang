@@ -1812,6 +1812,23 @@ function sendOretweet(ele, screen_name, tweetId){//twitter锐推
     tapi.retweet({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error && data.id){
             _a.removeAttr('onclick').addClass('orted').attr('title', '已成功锐推').show();
+
+            var c_user = getUser();
+            var cacheKey = c_user.uniqueKey + t + '_tweets';
+            var b_view = getBackgroundView();
+            if(b_view && b_view.tweets[cacheKey]){
+                var cache = b_view.tweets[cacheKey];
+                for(var i in cache){
+                    if(cache[i].id == tweetId){
+                        cache[i].retweeted = true;
+                        break;
+                    }else if(cache[i].retweeted_status && cache[i].retweeted_status.id == tweetId){
+                        cache[i].retweeted_status.retweeted = true;
+                        break;
+                    }
+                }
+            }
+
             showMsg('锐推成功');
         }else{
             showMsg('锐推失败');
@@ -1989,7 +2006,19 @@ $(function(){
             SmoothScroller.start(e);
         });
     }
-});
+});// <<=== 平滑滚动结束
+
+//强制刷新
+function forceRefresh(ele){
+    $(ele).attr('disabled', true).fadeOut();
+    var bg = getBackgroundView();
+    var user = getUser();
+    bg.RefreshManager.refreshUser(user);
+    setTimeout(showRefreshBtn, 10*1000);
+};
+function showRefreshBtn(){
+    $("#btnForceRefresh").attr('disabled', true).fadeIn();
+};
 
 function _showLoading(){
     $("#loading").show();

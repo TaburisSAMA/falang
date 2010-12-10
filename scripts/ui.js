@@ -160,9 +160,17 @@ function bildMsgLi(sinaMsg, t, c_user){
         else if(c_user.blogType == 'twitter' ){
             if(rt_status && rt_status.user){
                 crlBtn.oretweetBtn = '';
-                crlBtn.rtOretweetBtn = '<a class="oretweet ort" href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'' + rt_status.user.screen_name + '\',\'' + rt_status.id + '\');" title="Twitter锐推"></a>';
+                if(rt_status.retweeted){
+                    crlBtn.rtOretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="已成功锐推"></a>';
+                }else{
+                    crlBtn.rtOretweetBtn = '<a class="oretweet ort" href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'' + rt_status.user.screen_name + '\',\'' + rt_status.id + '\');" title="Twitter锐推"></a>';
+                }
             }else{
-                crlBtn.oretweetBtn = '<a class="oretweet ort" href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\');" title="Twitter锐推"></a>';
+                if(sinaMsg.retweeted){
+                    crlBtn.oretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="已成功锐推"></a>';
+                }else{
+                    crlBtn.oretweetBtn = '<a class="oretweet ort" href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\');" title="Twitter锐推"></a>';
+                }
                 crlBtn.rtOretweetBtn = '';
             }
         }
