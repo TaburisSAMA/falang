@@ -905,18 +905,48 @@ var ShortenUrl = {
 	services: {
 		'is.gd': 'http://is.gd/api.php?longurl={{url}}',
 //		'v.gd':  'http://v.gd/create.php?format=simple&url={{url}}',
-		'aa.cx': 'http://aa.cx/api.php?url={{url}}',
 		'tinyurl.com': 'http://tinyurl.com/api-create.php?url={{url}}',
-		//http://lnk.by/Shorten?url=http://yongwo.de/abc&format=json
 		'to.ly': 'http://to.ly/api.php?longurl={{url}}',
-		'zi.mu': 'http://zi.mu/api.php?format=simple&action=shorturl&url={{url}}'
+		'zi.mu': 'http://zi.mu/api.php?format=simple&action=shorturl&url={{url}}',
+		'sqze.it': {api: 'http://long-shore.com/api/squeeze/', format: 'json', method: 'post', param_name: 'long_url', result_name: 'url'},
+		'aa.cx': 'http://aa.cx/api.php?url={{url}}',
+		'lnk.by': {api: 'http://lnk.by/Shorten', 
+			format_name: 'format', 
+			format: 'json', 
+			method: 'get', 
+			param_name: 'url', result_name: 'shortUrl'}
 	},
-	short: function(longurl, callback, service) {
-		var s = service || Settings.get().shorten_url_service;
+	short: function(longurl, callback, name) {
+		var name = name || Settings.get().shorten_url_service;
+		var service = this.services[name];
+		var format = 'text';
+		var format_name = null;
+		var method = 'get';
+		var data = {};
+		var result_name = null;
+		if(typeof(service) !== 'string') {
+			format_name = service.format_name || format_name;
+			format = service.format || format;
+			method = service.method || method;
+			data[service.param_name] = longurl;
+			if(format_name) {
+				data[format_name] = format;
+			}
+			result_name = service.result_name;
+			service = service.api;
+		} else {
+			service = service.format({url: encodeURIComponent(longurl)});
+		}
 		$.ajax({
-			url: this.services[s].format({url: encodeURIComponent(longurl)}),
-			success: function(text, status, xhr) {
-				callback(text);
+			url: service,
+			type: method,
+			data: data,
+			dataType: format,
+			success: function(data, status, xhr) {
+				if(result_name) {
+					data = data[result_name];
+				}
+				callback(data);
 			}, 
 			error: function(xhr, status) {
 				callback(null);

@@ -1655,11 +1655,6 @@ function doRT(ele){//RT
     	var settings = Settings.get();
     	var longurl = data.original_pic;
     	val += ' [图]' + longurl;
-        if(settings.isSharedUrlAutoShort && longurl.replace(/^https?:\/\//i, '').length > settings.sharedUrlAutoShortWordCount){
-        	ShortenUrl.short(longurl, function(shorturl){
-                
-            });
-        }
         _shortenUrl(longurl, settings, function(shorturl) {
         	if(shorturl){
                 t.blur().val(t.val().replace(longurl, shorturl)).focus();
