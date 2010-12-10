@@ -18,7 +18,11 @@ function bildMsgLi(sinaMsg, t, c_user){
      	var support_favorites = config.support_favorites;
      	var comments_count = '-';
      	if(sinaMsg.comments_count !== undefined) {
-     		comments_count = '<a href="javascript:void(0);" title="点击查看评论" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>'.format(sinaMsg);
+     		if(sinaMsg.comments_count == 0) {
+     			comments_count = 0;
+     		} else {
+     			comments_count = '<a href="javascript:void(0);" title="点击查看评论" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>'.format(sinaMsg);
+     		}
      	}
      	var crlBtn = {
                 delTweetBtn: '<a class="deltweet" href="javascript:void(0);" onclick="doDelTweet(\'' + sinaMsg.id + '\', this);" title="点击删除微博">删</a>',

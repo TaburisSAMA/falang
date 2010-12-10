@@ -2683,7 +2683,8 @@ $.extend(DoubanAPI, {
 				// 没有评论数，就是代表不可以评论的，隐藏
 				data.hide_comments = true;
 			}
-			data.t_url = 'http://www.douban.com/people/{{user.id}}/miniblog/{{id}}/'.format(data);
+			// id方式访问是不准确的
+//			data.t_url = 'http://www.douban.com/people/{{user.id}}/miniblog/{{id}}/'.format(data);
 			delete data.author;
 			delete data.content;
 		} else if(play_load == 'message') {
