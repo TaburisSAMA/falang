@@ -191,6 +191,8 @@ var Settings = {
         theme: 'pip_io', //主题样式
         translate_target: 'zh', // 默认翻译语言
         shorten_url_service: 'is.gd', // 默认缩址服务
+        isGeoEnabled: false, //默认不开启上报地理位置信息
+        geoPosition: null, //获取到的地理位置信息，默认为空
 
         lookingTemplate: '我正在看: {{title}} {{url}} '
     },

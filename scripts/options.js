@@ -344,7 +344,7 @@ function init(){
     }
     
     //平滑滚动
-    $("#isSmoothScroller").attr("checked", settings.isSmoothScroller);
+    $("#isSmoothScroller").attr("checked", settings.isSmoothScroller ? true : false);
     var tween_options = '';
     for(var i in TWEEN_TYPES){
         tween_options += '<option value="{{name}}">{{name}}</option>'.format({name: TWEEN_TYPES[i]});
@@ -353,6 +353,28 @@ function init(){
     $("#ease_type").val(settings.smoothSeaeType);
     $("#tween_type, #ease_type").change(function(){
         SmoothScrollerDemo.start();
+    });
+
+    //地理位置
+    $("#isGeoEnabled").attr("checked", settings.isGeoEnabled ? true : false).data('position', settings.geoPosition);
+    $("#isGeoEnabled").click(function(){
+        if(!$(this).attr('checked')){ //未选中，不用检测
+            return;
+        }
+        if (navigator.geolocation) {
+            $("#save-all").attr('disabled',true);
+            navigator.geolocation.getCurrentPosition(function(position){
+                //success
+                $(this).data('position', position);
+                $("#save-all").removeAttr('disabled');
+            }, function(msg){
+                //error
+                _showMsg('启用地理位置定位失败。' + (typeof msg == 'string' ? msg : ""));
+                $("#save-all").removeAttr('disabled');
+            });
+        } else {
+            _showMsg('浏览器不支持地理位置定位');
+        }
     });
 
 
@@ -766,6 +788,10 @@ function saveAll(){
     settings.isSmoothScroller = $("#isSmoothScroller").attr("checked") ? true : false;
     settings.smoothTweenType = $("#tween_type").val();
     settings.smoothSeaeType = $("#ease_type").val();
+
+    //地理位置
+    settings.isGeoEnabled = $("#isGeoEnabled").attr("checked") ? true : false;
+    settings.geoPosition = $(this).data('position');
 
     settings.isSyncReadedToSina = $("#unread_sync_to_page").attr("checked") ? true : false;
 
