@@ -263,6 +263,17 @@ function cleanTxtContent(){
     countInputText();
 };
 
+// 封装重用的判断是否需要自动缩址的逻辑
+function _shortenUrl(longurl, settings, callback) {
+	if(longurl.indexOf('chrome-extension://') == 0) { // 插件地址就不处理了
+		return;
+	}
+	var settings = settings || Settings.get();
+	if(settings.isSharedUrlAutoShort && longurl.replace(/^https?:\/\//i, '').length > settings.sharedUrlAutoShortWordCount){
+    	ShortenUrl.short(longurl, callback);
+    }
+};
+
 //我正在看
 function initIamDoing(){
     $("#doing").click(function(){
@@ -274,13 +285,11 @@ function initIamDoing(){
                 var settings = Settings.get();
                 $txt.val(formatText(settings.lookingTemplate, {title: title, url: loc_url}));
                 showMsgInput();
-                if(settings.isSharedUrlAutoShort && loc_url.replace(/^https?:\/\//i, '').length > settings.sharedUrlAutoShortWordCount){
-                	ShortenUrl.short(loc_url, function(shorturl){
-                        if(shorturl){
-                            $txt.val($txt.val().replace(loc_url, shorturl));
-                        }
-                    });
-                }
+                _shortenUrl(loc_url, settings, function(shorturl){
+		            if(shorturl) {
+		                $txt.val($txt.val().replace(loc_url, shorturl));
+		            }
+		        });
             } else {
                 showMsg('当前页面的URL不正确。');
             }
@@ -1648,12 +1657,15 @@ function doRT(ele){//RT
     	val += ' [图]' + longurl;
         if(settings.isSharedUrlAutoShort && longurl.replace(/^https?:\/\//i, '').length > settings.sharedUrlAutoShortWordCount){
         	ShortenUrl.short(longurl, function(shorturl){
-                if(shorturl){
-                    t.blur().val(t.val().replace(longurl, shorturl)).focus();
-                    countInputText();
-                }
+                
             });
         }
+        _shortenUrl(longurl, settings, function(shorturl) {
+        	if(shorturl){
+                t.blur().val(t.val().replace(longurl, shorturl)).focus();
+                countInputText();
+            }
+        });
     }
     t.val(val);
     t.focus(); //光标在头部

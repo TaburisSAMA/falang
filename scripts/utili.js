@@ -190,7 +190,7 @@ var Settings = {
         popupHeight: 520, 
         theme: 'pip_io', //主题样式
         translate_target: 'zh', // 默认翻译语言
-        shorten_url_service: 'v.gd', // 默认缩址服务
+        shorten_url_service: 'is.gd', // 默认缩址服务
 
         lookingTemplate: '我正在看: {{title}} {{url}} '
     },
@@ -903,7 +903,8 @@ var Tween = {
 // shorturl
 var ShortenUrl = {
 	services: {
-		'v.gd':  'http://v.gd/create.php?format=simple&url={{url}}',
+		'is.gd': 'http://is.gd/api.php?longurl={{url}}',
+//		'v.gd':  'http://v.gd/create.php?format=simple&url={{url}}',
 		'aa.cx': 'http://aa.cx/api.php?url={{url}}',
 		'tinyurl.com': 'http://tinyurl.com/api-create.php?url={{url}}',
 		//http://lnk.by/Shorten?url=http://yongwo.de/abc&format=json
