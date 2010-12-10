@@ -1067,7 +1067,8 @@ function showComments(ele, tweetId, page, notHide){
         page = page || 1;
         var user = getUser();
         var data = {id:tweetId, page:page, count:COMMENT_PAGE_SIZE, user:user};
-        tapi.comments(data, function(comments, textStatus){
+        tapi.comments(data, function(data, textStatus){
+        	var comments = data.items || data;
             if(textStatus != 'error' && comments && !comments.error){
                 if(comments.length && comments.length>0){
                     var _html = '';
@@ -1460,7 +1461,7 @@ function sendComment(msg, commentTweetId, notSendMord){
     	data.reply_user_id = reply_user_id;
     } 
     tapi[m](data, function(sinaMsg, textStatus){
-        if(sinaMsg.id){
+        if(sinaMsg === true || sinaMsg.id){
             hideReplyInput();
             txt.val('');
             showMsg('发送评论成功！');

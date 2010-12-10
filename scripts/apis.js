@@ -904,7 +904,7 @@ var sinaApi = {
 			this.format_result_item(data.user, 'user', args);
 			var tpl = this.config.host + '/{{user.id}}/statuses/{{id}}';
 			if(data.retweeted_status) {
-				this.format_result_item(data.retweeted_status, 'status', args);
+				data.retweeted_status = this.format_result_item(data.retweeted_status, 'status', args);
 			}
 			// 设置status的t_url
 			data.t_url = tpl.format(data);
@@ -2500,7 +2500,7 @@ $.extend(DoubanAPI, {
         result_format: '', // 豆瓣由alt参数确定返回值格式
         
 		userinfo_has_counts: false, // 用户信息中是否包含粉丝数、微博数等信息
-        support_comment: false,
+//        support_comment: false,
 		support_repost: false,
 		support_max_id: false,
 		support_favorites: false,
@@ -2525,6 +2525,9 @@ $.extend(DoubanAPI, {
         followers: '/people/{{user_id}}/friends',
         new_message: '/doumails',
         destroy_msg: '/doumail/{{id}}',
+        comment: '/miniblog/{{id}}/comments_post',
+        reply: '/miniblog/{{id}}/comments_post',
+        comments: '/miniblog/{{id}}/comments',
 		verify_credentials: '/people/%40me'
 	}),
 	
@@ -2578,13 +2581,24 @@ $.extend(DoubanAPI, {
 				args.content = this.MSG_TPL.format(args.data);
 				args.contentType = 'application/atom+xml; charset=utf-8';
 				args.data = {};
+			} else if(args.url == this.config.comment) {
+				var tpl = '<?xml version="1.0" encoding="UTF-8"?><entry><content>{{comment}}</content></entry>';
+				args.content = tpl.format(args.data);
+				args.contentType = 'application/atom+xml; charset=utf-8';
+				args.data = {id: args.data.id};
+				args.url = args.url.replace('_post', '')
+				args.is_comment_post = true;
+			} else if(args.url == this.config.comments) {
+				// 记录下评论id填充
+				args.miniblog_id = args.data.id;
 			}
 		}
 	},
 	
 	format_result: function(data, play_load, args) {
 		if(args.url == this.config.update || args.url == this.config.destroy 
-				|| args.url == this.config.destroy_msg || args.url == this.config.new_message) {
+				|| args.url == this.config.destroy_msg || args.url == this.config.new_message 
+				|| args.is_comment_post) {
 			return true;
 		}
 		var items = data.entry || data;
@@ -2593,10 +2607,10 @@ $.extend(DoubanAPI, {
 				data.user = this.format_result_item(data.author, 'user', args);
 			}
 	    	for(var i in items) {
-	    		items[i] = this.format_result_item(items[i], play_load, args);
-	    		if(!items[i].user) {
+	    		if(!items[i].author && data.user) {
 	    			items[i].user = data.user;
 	    		}
+	    		items[i] = this.format_result_item(items[i], play_load, args);
 	    	}
 	    	data.items = items;
 	    	if(items.length == 0) {
@@ -2641,7 +2655,7 @@ $.extend(DoubanAPI, {
 			data.name = data.id;
 			delete data.link;
 			delete data.title;
-		} else if(play_load == 'status') {
+		} else if(play_load == 'status' || play_load == 'comment') {
 			if(data.author) {
 				data.user = this.format_result_item(data.author, 'user', args);
 			}
@@ -2649,9 +2663,27 @@ $.extend(DoubanAPI, {
 				data.id = data['db:uid']['$t'];
 			} else {
 				data.id = data.id['$t'];
-				data.id = data.id.substring(data.id.lastIndexOf('/miniblog/') + 10, data.id.length);
+				if(play_load == 'comment') {
+					data.id = data.id.substring(data.id.lastIndexOf('/comment/') + 9, data.id.length);
+				} else {
+					data.id = data.id.substring(data.id.lastIndexOf('/miniblog/') + 10, data.id.length);
+				}
 			}
 			data.text = data.content['$t'];
+			if(data['db:attribute']) {
+				// comments_count
+				$.each(data['db:attribute'], function(index, item){
+					if(item['@name'] == 'comments_count') {
+						data[item['@name']] = item['$t'];
+					}
+				});
+				if(data.comments_count === undefined) {
+					// 没有评论数，就是代表不可以评论的，隐藏
+					data.hide_comments = true;
+				}
+				delete data['db:attribute'];
+			}
+			data.t_url = 'http://www.douban.com/people/{{user.id}}/miniblog/{{id}}/'.format(data);
 			delete data.author;
 			delete data.content;
 		} else if(play_load == 'message') {
@@ -2662,9 +2694,6 @@ $.extend(DoubanAPI, {
 			data.t_url = data.link[1]['@href'];
 			data.text += ' <a href="{{t_url}}">查看</a>'.format(data);
 			delete data.title;
-		} else if(play_load == 'comment') {
-			this.format_result_item(data.user, 'user', args);
-			this.format_result_item(data.status, 'status', args);
 		}
 		if(data.published) {
 			data.created_at = data.published['$t'];

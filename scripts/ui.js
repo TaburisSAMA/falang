@@ -16,7 +16,11 @@ function bildMsgLi(sinaMsg, t, c_user){
      	var config = tapi.get_config(c_user);
      	var support_comment = config.support_comment;
      	var support_favorites = config.support_favorites;
-        var crlBtn = {
+     	var comments_count = '-';
+     	if(sinaMsg.comments_count !== undefined) {
+     		comments_count = '<a href="javascript:void(0);" title="点击查看评论" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>'.format(sinaMsg);
+     	}
+     	var crlBtn = {
                 delTweetBtn: '<a class="deltweet" href="javascript:void(0);" onclick="doDelTweet(\'' + sinaMsg.id + '\', this);" title="点击删除微博">删</a>',
                 replyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\');" title="进行@回复">@</a>',
                 oretweetBtn: '',
@@ -26,7 +30,7 @@ function bildMsgLi(sinaMsg, t, c_user){
                 rtRepostCounts: '<span class="repostCounts">(-)</span>',
                 rtrtRepostCounts: '<span class="repostCounts">(-)</span>',
                 commentBtn: '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\');" title="点击添加评论">评</a>',
-                commentCounts: '<span class="commentCounts">(-)</span>',
+                commentCounts: '<span class="commentCounts">(' + comments_count + ')</span>',
                 rtCommentCounts: '<span class="commentCounts">(-)</span>',
                 rtrtCommentCounts: '<span class="commentCounts">(-)</span>',
                 delCommentBtn: '<a class="delcommenttweet" href="javascript:void(0);" onclick="javascript:doDelComment(this,\'' + user.screen_name + '\',\'' + sinaMsg.id + '\');" title="点击删除评论">删</a>',
@@ -65,7 +69,7 @@ function bildMsgLi(sinaMsg, t, c_user){
             }
         }
         // 不支持评论
-        if(!support_comment) {
+        if(!support_comment || sinaMsg.hide_comments === true) {
         	crlBtn.commentBtn = crlBtn.commentCounts = crlBtn.rtCommentCounts = crlBtn.rtCommentBtn = '';
         }
         // 不支持收藏
@@ -269,18 +273,21 @@ function buildComment(comment, status_id, status_user_screen_name){
     		status_user_screen_name = comment.status.user.screen_name;
     	}
     }
-    var commentBtn = '<a class="replyComment" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{status_user_screen_name}}\',{{status_id}},\'{{comment_user_screen_name}}\',{{comment_user_id}},{{comment_id}});" title="评论回复">回复</a>'.format({
+    var commentBtn = '<a class="replyComment" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{status_user_screen_name}}\',\'{{status_id}}\',\'{{comment_user_screen_name}}\',\'{{comment_user_id}}\',\'{{comment_id}}\');" title="评论回复">回复</a>'.format({
     	status_id: status_id,
     	status_user_screen_name: status_user_screen_name,
     	comment_id: comment.id,
     	comment_user_screen_name: comment.user.screen_name,
     	comment_user_id: comment.user.id
     });
+    if(comment.user.verified) {
+    	comment.user.verified = '<img title="认证用户" src="/images/verified.gif" />';
+    } else {
+    	comment.user.verified = '';
+    }
+    var reply_user = '<a target="_blank" href="javascript:getUserTimeline(\'{{screen_name}}\', \'{{id}}\');" rhref="{{t_url}}" title="左键查看微薄，右键打开主页">@{{screen_name}}{{verified}}</a>'.format(comment.user);
     var tp = '<li>' 
-            + tapi.processMsg(c_user, '@'
-                        + comment.user.screen_name
-                        + (comment.user.verified ? '<img title="新浪认证" src="/images/verified.gif" />':'')
-                        + ': ' + HTMLEnCode(comment.text), true) 
+            + reply_user + ': ' + tapi.processMsg(c_user, HTMLEnCode(comment.text), true) 
             + '<span class="msgInfo">(' + new Date(comment.created_at).format("yyyy-MM-dd hh:mm:ss") + ')</span>'
             + commentBtn
             + '</li>';
