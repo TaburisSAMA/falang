@@ -271,9 +271,9 @@ function initIamDoing(){
             if(loc_url){
                 var title = tab.title || '';
                 var $txt = $("#txtContent");
+                var settings = Settings.get();
                 $txt.val(formatText(settings.lookingTemplate, {title: title, url: loc_url}));
                 showMsgInput();
-                var settings = Settings.get();
                 if(settings.isSharedUrlAutoShort && loc_url.replace(/^https?:\/\//i, '').length > settings.sharedUrlAutoShortWordCount){
                 	ShortenUrl.short(loc_url, function(shorturl){
                         if(shorturl){
