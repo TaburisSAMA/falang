@@ -384,7 +384,7 @@ function checkSupportedTabs(user){
     	                    '#tl_tabs .tab-direct_messages'],
     	support_mentions: ['#tl_tabs .tab-mentions, #mentions_timeline',
     	                    '#tl_tabs .tab-mentions'],
-    	support_search: ['a.search', 'a.search']
+    	support_search: ['a.search, #searchWrap', 'a.search']
     };
     for(var key in checks) {
     	if(!config[key]){
