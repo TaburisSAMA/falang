@@ -177,9 +177,16 @@ var sinaApi = {
         if(g1.indexOf('http') != 0){
             _url = 'http://' + g1;
         }
-        return '<a target="_blank" href="{{url}}" title="{{title}}">{{value}}</a>'.format({
-            url: _url, title: g1, value: g2||g1
-        });
+        // 增加图片预览功能
+        if(_url.indexOf('http://instagr.am/p/') == 0) {
+        	return '<a target="_blank" onclick="previewPic(this, Instagram.get);" href="javascript:void();" rhref="{{url}}" title="左键点击预览图片，右键直接打开网址">{{value}}</a>'.format({
+	            url: _url, title: g1, value: g2||g1
+	        });
+        } else {
+        	return '<a target="_blank" href="{{url}}" title="{{title}}">{{value}}</a>'.format({
+	            url: _url, title: g1, value: g2||g1
+	        });
+        }
     },
     _replaceEmotional: function(m, g1){
         var tpl = '<img title="{{title}}" src="{{src}}" />';

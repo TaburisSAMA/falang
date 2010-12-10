@@ -959,6 +959,31 @@ var ShortenUrl = {
 	}
 };
 
+// 图片服务
+var Instagram = {
+	/* 
+	 * http://instagr.am/p/BWp/ => 
+	 * big: <img src="http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_7.jpg" class="photo" /> 
+	 * middle: http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_6.jpg
+	 * small: http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_5.jpg
+	 */
+	get: function(url, callback) {
+		$.ajax({
+			url: url,
+			success: function(html, status, xhr) {
+				var src = $(html).find('.photo').attr('src');
+				var pics = {
+					thumbnail_pic: src.replace('_7.', '_5.'),
+					bmiddle_pic: src.replace('_7.', '_6.'),
+					original_pic: src
+				};
+				callback(pics);
+			}
+		});
+	}
+};
+
+
 // 缓存数据存储器
 //var TweetStorage = {
 //		_get_pre: function(t, unique_key){
