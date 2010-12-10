@@ -904,6 +904,7 @@ var Tween = {
 var ShortenUrl = {
 	services: {
 		'is.gd': 'http://is.gd/api.php?longurl={{url}}',
+		'goo.gl': {api: 'http://goo.gl/api/url', format: 'json', method: 'post', param_name: 'url', result_name: 'short_url'},
 //		'v.gd':  'http://v.gd/create.php?format=simple&url={{url}}',
 		'tinyurl.com': 'http://tinyurl.com/api-create.php?url={{url}}',
 		'to.ly': 'http://to.ly/api.php?longurl={{url}}',
@@ -937,6 +938,13 @@ var ShortenUrl = {
 				data[format_name] = format;
 			}
 			result_name = service.result_name;
+			if(name == 'goo.gl') {
+				data.user = 'toolbar@google.com';
+				data.auth_token = this._create_googl_auth_token(longurl);
+			} 
+//			user:'toolbar@google.com',
+//                url: LongUrl,
+//                auth_token: this.Auth(LongUrl)
 			service = service.api;
 		} else {
 			service = service.format({url: encodeURIComponent(longurl)});
@@ -956,7 +964,10 @@ var ShortenUrl = {
 				callback(null);
 			}
 		});
-	}
+	},
+	
+	// goo.gl的认证token计算函数
+	_create_googl_auth_token: function(f){function k(){for(var c=0,b=0;b<arguments.length;b++)c=c+arguments[b]&4294967295;return c}function m(c){c=c=String(c>0?c:c+4294967296);var b;b=c;for(var d=0,i=false,j=b.length-1;j>=0;--j){var g=Number(b.charAt(j));if(i){g*=2;d+=Math.floor(g/10)+g%10}else d+=g;i=!i}b=b=d%10;d=0;if(b!=0){d=10-b;if(c.length%2==1){if(d%2==1)d+=9;d/=2}}b=String(d);b+=c;return b}function n(c){for(var b=5381,d=0;d<c.length;d++)b=k(b<<5,b,c.charCodeAt(d));return b}function o(c){for(var b=0,d=0;d<c.length;d++)b=k(c.charCodeAt(d),b<<6,b<<16,-b);return b}f={byteArray_:f,charCodeAt:function(c){return this.byteArray_[c]}};f.length=f.byteArray_.length;var e=n(f.byteArray_);e=e>>2&1073741823;e=e>>4&67108800|e&63;e=e>>4&4193280|e&1023;e=e>>4&245760|e&16383;var l="7";f=o(f.byteArray_);var h=(e>>2&15)<<4|f&15;h|=(e>>6&15)<<12|(f>>8&15)<<8;h|=(e>>10&15)<<20|(f>>16&15)<<16;h|=(e>>14&15)<<28|(f>>24&15)<<24;l+=m(h);return l}
 };
 
 // 图片服务
