@@ -2677,11 +2677,11 @@ $.extend(DoubanAPI, {
 						data[item['@name']] = item['$t'];
 					}
 				});
-				if(data.comments_count === undefined) {
-					// 没有评论数，就是代表不可以评论的，隐藏
-					data.hide_comments = true;
-				}
 				delete data['db:attribute'];
+			}
+			if(data.comments_count === undefined) {
+				// 没有评论数，就是代表不可以评论的，隐藏
+				data.hide_comments = true;
 			}
 			data.t_url = 'http://www.douban.com/people/{{user.id}}/miniblog/{{id}}/'.format(data);
 			delete data.author;
