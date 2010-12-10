@@ -270,21 +270,16 @@ function initIamDoing(){
             var loc_url = tab.url;
             if(loc_url){
                 var title = tab.title || '';
+                var $txt = $("#txtContent");
+                $txt.val(formatText(settings.lookingTemplate, {title: title, url: loc_url}));
+                showMsgInput();
                 var settings = Settings.get();
                 if(settings.isSharedUrlAutoShort && loc_url.replace(/^https?:\/\//i, '').length > settings.sharedUrlAutoShortWordCount){
-                	var $this = $(this);
-                	$this.attr('disabled', true);
                 	ShortenUrl.short(loc_url, function(shorturl){
                         if(shorturl){
-                            loc_url = shorturl;
+                            $txt.val($txt.val().replace(loc_url, shorturl));
                         }
-                        $("#txtContent").val(formatText(settings.lookingTemplate, {title: title, url:loc_url}));
-                        showMsgInput();
-                        $this.removeAttr('disabled');
                     });
-                } else {
-                	$("#txtContent").val(formatText(settings.lookingTemplate, {title: title, url:loc_url}));
-                    showMsgInput();
                 }
             } else {
                 showMsg('当前页面的URL不正确。');
@@ -1645,9 +1640,23 @@ function doRT(ele){//RT
     t.val('').blur();
     var _msg_user = data.user || data.sender;
     var repost_pre = tapi.get_config(getUser()).repost_pre;
-    t.val(repost_pre + ' ' + '@' + _msg_user.screen_name + ' ' + data.text);
+    var val = repost_pre + ' ' + '@' + _msg_user.screen_name + ' ' + data.text;
+    if(data.original_pic) {
+    	// 有图片，自动带上图片地址，并尝试缩短
+    	var settings = Settings.get();
+    	var longurl = data.original_pic;
+    	val += '[图]' + longurl;
+        if(settings.isSharedUrlAutoShort && longurl.replace(/^https?:\/\//i, '').length > settings.sharedUrlAutoShortWordCount){
+        	ShortenUrl.short(longurl, function(shorturl){
+                if(shorturl){
+                    t.blur().val(t.val().replace(longurl, shorturl)).focus();
+                    countInputText();
+                }
+            });
+        }
+    }
+    t.val(val);
     t.focus(); //光标在头部
-    
 };
 
 function _delCache(id, t, unique_key) {
