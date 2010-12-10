@@ -1117,7 +1117,7 @@ $.extend(TSohuAPI, {
 		
 	    oauth_key: '5vi74qXPB5J97GNzsevN',
         oauth_secret: 'fxZbb-07bCvv-BCA1Qci2lO^7wnl0%pRE$mvG1K#',
-        
+        support_search: false,
         support_max_id: false,
         favorites: '/favourites',
 	    favorites_create: '/favourites/create/{{id}}',
@@ -1130,6 +1130,7 @@ $.extend(TSohuAPI, {
 	    mentions: '/statuses/mentions_timeline',
 	    comments: '/statuses/comments/{{id}}',
 	    reply: '/statuses/comment',
+	    
 	    user_timeline: '/statuses/user_timeline/{{id}}',
 	    
 	    ErrorCodes: {
@@ -1233,7 +1234,7 @@ $.extend(DiguAPI, {
         search_url: 'http://digu.com/search/',
 		source: 'fawave', 
 	    source2: 'fawave',
-	    
+	    support_search: false,
 	    support_comment: false,
 	    support_repost: false,
 	    support_max_id: false,
@@ -1485,7 +1486,7 @@ $.extend(ZuosaAPI, {
         user_home_url: 'http://zuosa.com/',
 		source: 'fawave', 
 		repost_pre: 'ZT',
-	    
+	    support_search: false,
 	    support_comment: false,
 	    support_repost: false,
 	    support_max_id: false,
@@ -1638,7 +1639,7 @@ $.extend(LeiHouAPI, {
         user_home_url: 'http://leihou.com/',
 		source: 'fawave', 
 		repost_pre: 'RT',
-	    
+	    support_search: false,
 	    support_comment: false,
 	    support_repost: false,
 	    
@@ -1773,7 +1774,7 @@ $.extend(Follow5API, {
         user_home_url: 'http://follow5.com',
 		source: '34140E56A31887F770053C2AF6D7B2AC', // 需要申请
 		repost_pre: '转发:',
-	    
+	    support_search: false,
 	    support_max_id: false,
 	    support_comment: false,
 	    support_repost: false,
@@ -1921,7 +1922,7 @@ $.extend(TwitterAPI, {
 	    support_comment: false,
 	    support_repost: false,
 	    support_upload: false,
-	    
+	    support_search: false,
 	    repost: '/statuses/update',
         retweet: '/statuses/retweet/{{id}}',
         favorites_create: '/favorites/create/{{id}}',
@@ -2010,6 +2011,7 @@ $.extend(FanfouAPI, {
         search_url: 'http://fanfou.com/q/',
 		source: 'fawave',
 		repost_pre: '转',
+		support_search: false,
 	    support_comment: false,
 	    support_repost: false,
 	    upload: '/photos/upload'
@@ -2121,7 +2123,7 @@ $.extend(T163API, {
 		source: 'CMlCI0PLHNtmjzCA', // 需要申请
 		oauth_key: 'CMlCI0PLHNtmjzCA',
         oauth_secret: 'tYU2lK30IlSRhuX8ouUtEx8Uk2fRf8Yk',
-        
+        support_search: false,
         oauth_authorize: '/oauth/authenticate',
         friends_timeline: '/statuses/home_timeline'
 	})
@@ -2138,7 +2140,7 @@ $.extend(RenjianAPI, {
 		source: 'fawave', 
 		support_comment: false,
 		support_repost: false,
-	    
+	    support_search: false,
 		favorites: '/statuses/likes',
         favorites_create: '/statuses/like/{{id}}',
         favorites_destroy: '/statuses/unlike/{{id}}',
@@ -2272,7 +2274,7 @@ $.extend(BuzzAPI, {
 		oauth_key: 'net4team.net',
 		oauth_secret: 'y+6SWcLVshQvogadDzXtSra+',
         result_format: '', // 由alt参数确定返回值格式
-        
+        support_search: false,
         userinfo_has_counts: false, //用户信息中是否包含粉丝数、微博数等信息
         support_counts: false,
 		support_upload: false, // 是否支持上传图片
@@ -2499,7 +2501,7 @@ $.extend(DoubanAPI, {
 		support_upload: false,
 		need_processMsg: false,
 		support_cursor_only: true,
-		
+		support_search: false,
 		oauth_callback: null,
 		oauth_host: 'http://www.douban.com',
 		oauth_authorize: 	  '/service/auth/authorize',

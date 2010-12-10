@@ -383,7 +383,8 @@ function checkSupportedTabs(user){
     	support_direct_messages: ['#tl_tabs .tab-direct_messages, #direct_messages_timeline',
     	                    '#tl_tabs .tab-direct_messages'],
     	support_mentions: ['#tl_tabs .tab-mentions, #mentions_timeline',
-    	                    '#tl_tabs .tab-mentions']
+    	                    '#tl_tabs .tab-mentions'],
+    	support_search: ['a.search', 'a.search']
     };
     for(var key in checks) {
     	if(!config[key]){
