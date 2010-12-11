@@ -176,6 +176,7 @@
 		<input type="hidden" id="replyUserId" value="" />
 		<input type="hidden" id="whisperToUserId" value="" />
 		<input type="hidden" id="repostTweetId" value="" />
+		<input type="hidden" id="commentUserId" value="" />
 		<input type="hidden" id="commentTweetId" value="" />
 		<input type="hidden" id="commentCommentId" value="" /><!-- 回复的评论ID -->
 	</div>
@@ -212,7 +213,7 @@
 				<div class="mainContent commentWrap">
 					<span class="arrow_r"></span>
 					<div class="userName">
-						<a target="_blank" href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" rhref="#{user.t_url}" title="#{getUserCountsInfo(user)}">
+						<a target="_blank" user_id="#{user.id}" user_screen_name="#{user.screen_name}" href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" rhref="#{user.t_url}" title="#{getUserCountsInfo(user)}">
 							#{user.screen_name}<?js if(user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
 						</a>
 						<span class="edit">
@@ -272,54 +273,54 @@
 		</textarea>
 		<!-- 转发模板（包括评论、@我的所带的原status） -->
 		<textarea id="tp_time_line_rt">
-						<!-- 转发 -->
-						<div class="msg">
-							<div class="tweetItem retweeted commentWrap showCounts_#{tweet.retweeted_status.id} <?js if(tweet.retweeted_status.is_rt){ ?>rt_retweeted<?js } ?>" id="tweet#{tweet.retweeted_status.id}">
-								<div class="userName"><?js if(tweet.retweeted_status.is_rt){ ?><a href="javascript:getUserTimeline('#{tweet.retweeted_status.user.screen_name}', '#{tweet.retweeted_status.user.id}');">@#{tweet.status.user.screen_name}</a> <?js } ?><?js if(tType=='comments_timeline' && !tweet.retweeted_status.is_rt){ ?>评<?js }else{ ?>转<?js } ?>
-									<span class="showtip">
-										<a target="_blank" 
-											href="javascript:getUserTimeline('#{tweet.retweeted_status.user.screen_name}', '#{tweet.retweeted_status.user.id}');" 
-											rhref="#{tweet.retweeted_status.user.t_url}" >
-											@#{tweet.retweeted_status.user.screen_name}<?js if(tweet.retweeted_status.user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
-										</a>
-										#{buildTipboxUserInfo(tweet.retweeted_status.user)}
-									</span>
-									的微博: 
-									<span class="edit">
-										<a href="javascript:void(0);" onclick="javascript:translate(this);" title="翻译此微博">译</a>
-										#{ btn.rtAddFavoritesMsgBtn + btn.rtReplyBtn + btn.rtRepostBtn + btn.rtRepostCounts + btn.rtOretweetBtn + btn.rtCommentBtn + btn.rtCommentCounts}
-									</span>
-								</div>
-								<div class="tweet_text">#{processMsg(account, tweet.retweeted_status.text)} #{btn.rtShowMapBtn}</div>
-								<?js if(tweet.retweeted_status.thumbnail_pic){ ?>
-								<div>
-									<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.retweeted_status.bmiddle_pic}" title="右键点击打开原图" original="#{tweet.retweeted_status.original_pic}" onmousedown="rOpenPic(event, this)" class="thumbnail_pic" >
-									<img class="imgicon pic" src="#{tweet.retweeted_status.thumbnail_pic}" /></a>
-								</div>
-								<?js } ?>
-								<!-- {{retweeted_retweeted_status_in}} -->
-								<?js if(tweet.retweeted_status.created_at){ ?>
-								<div class="msgInfo">
-									<?js if(tweet.retweeted_status.t_url){ ?>
-									<a href="#{tweet.retweeted_status.t_url}" target="_blank">#{new Date(tweet.retweeted_status.created_at).format("yyyy-MM-dd hh:mm:ss")}</a>
-									<?js } else { ?>
-									#{new Date(tweet.retweeted_status.created_at).format("yyyy-MM-dd hh:mm:ss")}
-									<?js } ?>
-									通过 #{tweet.retweeted_status.source||'网站'}
-								</div>
-								<?js } ?>
-								<div class="comments">
-									<p style="text-align:right;"><a href="javascript:void(0);" onclick="showComments(this, #{tweet.retweeted_status.id});">隐藏评论</a></p>
-									<ul class="comment_list"></ul>
-									<div class="comment_paging" page="1">
-										<a class="pre_page" href="javascript:void(0);" onclick="commentPage(this,#{tweet.retweeted_status.id}, true);" style="display:none;">《上一页</a>
-										<a class="next_page" href="javascript:void(0);" onclick="commentPage(this,#{tweet.retweeted_status.id});" style="display:none;">下一页》</a>
-									</div>
-									<br />
-								</div>
-							</div>
+			<!-- 转发 -->
+			<div class="msg">
+				<div class="tweetItem retweeted commentWrap showCounts_#{tweet.retweeted_status.id} <?js if(tweet.retweeted_status.is_rt){ ?>rt_retweeted<?js } ?>" id="tweet#{tweet.retweeted_status.id}">
+					<div class="userName"><?js if(tweet.retweeted_status.is_rt){ ?><a user_id='#{tweet.retweeted_status.user.id}' user_screen_name="#{tweet.retweeted_status.user.screen_name}" href="javascript:getUserTimeline('#{tweet.retweeted_status.user.screen_name}', '#{tweet.retweeted_status.user.id}');">@#{tweet.status.user.screen_name}</a> <?js } ?><?js if(tType=='comments_timeline' && !tweet.retweeted_status.is_rt){ ?>评<?js }else{ ?>转<?js } ?>
+						<span class="showtip">
+							<a target="_blank" 
+								href="javascript:getUserTimeline('#{tweet.retweeted_status.user.screen_name}', '#{tweet.retweeted_status.user.id}');" 
+								rhref="#{tweet.retweeted_status.user.t_url}">
+								@#{tweet.retweeted_status.user.screen_name}<?js if(tweet.retweeted_status.user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
+							</a>
+							#{buildTipboxUserInfo(tweet.retweeted_status.user)}
+						</span>
+						的微博: 
+						<span class="edit">
+							<a href="javascript:void(0);" onclick="javascript:translate(this);" title="翻译此微博">译</a>
+							#{ btn.rtAddFavoritesMsgBtn + btn.rtReplyBtn + btn.rtRepostBtn + btn.rtRepostCounts + btn.rtOretweetBtn + btn.rtCommentBtn + btn.rtCommentCounts}
+						</span>
+					</div>
+					<div class="tweet_text">#{processMsg(account, tweet.retweeted_status.text)} #{btn.rtShowMapBtn}</div>
+					<?js if(tweet.retweeted_status.thumbnail_pic){ ?>
+					<div>
+						<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.retweeted_status.bmiddle_pic}" title="右键点击打开原图" original="#{tweet.retweeted_status.original_pic}" onmousedown="rOpenPic(event, this)" class="thumbnail_pic" >
+						<img class="imgicon pic" src="#{tweet.retweeted_status.thumbnail_pic}" /></a>
+					</div>
+					<?js } ?>
+					<!-- {{retweeted_retweeted_status_in}} -->
+					<?js if(tweet.retweeted_status.created_at){ ?>
+					<div class="msgInfo">
+						<?js if(tweet.retweeted_status.t_url){ ?>
+						<a href="#{tweet.retweeted_status.t_url}" target="_blank">#{new Date(tweet.retweeted_status.created_at).format("yyyy-MM-dd hh:mm:ss")}</a>
+						<?js } else { ?>
+						#{new Date(tweet.retweeted_status.created_at).format("yyyy-MM-dd hh:mm:ss")}
+						<?js } ?>
+						通过 #{tweet.retweeted_status.source||'网站'}
+					</div>
+					<?js } ?>
+					<div class="comments">
+						<p style="text-align:right;"><a href="javascript:void(0);" onclick="showComments(this, '#{tweet.retweeted_status.id}');">隐藏评论</a></p>
+						<ul class="comment_list"></ul>
+						<div class="comment_paging" page="1">
+							<a class="pre_page" href="javascript:void(0);" onclick="commentPage(this, '#{tweet.retweeted_status.id}', true);" style="display:none;">《上一页</a>
+							<a class="next_page" href="javascript:void(0);" onclick="commentPage(this, '#{tweet.retweeted_status.id}');" style="display:none;">下一页》</a>
 						</div>
-						<!-- 转发 End -->
+						<br />
+					</div>
+				</div>
+			</div>
+			<!-- 转发 End -->
 		</textarea>
 		<!-- 用户信息tipbox模板 -->
 		<textarea id="tp_tipbox_user_info">
@@ -389,15 +390,14 @@
 			<div class="fans">
 				<div class="user_head"><img src="#{user.profile_image_url}" /></div>
 				<div class="user_info" did="#{user.id}">
-					<div class="userName"><a  href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" 
-					rhref="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
-					</a>
-					<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">私</a>
-					<?js if(support_follow && user.unfollow === undefined && tType =='friends'){ ?>
-					<a class="follow" href="javascript:" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">取消关注</a>
-					<?js }else if(support_follow){ ?>
-					<a class="follow" href="javascript:" onclick="f_create('#{user.id}', this, '#{user.screen_name}')"><span class="plus">+</span>加关注</a>
-					<?js } ?>
+					<div class="userName"><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" 
+							rhref="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?></a>
+						<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">私</a>
+						<?js if(support_follow && user.unfollow === undefined && tType =='friends'){ ?>
+						<a class="follow" href="javascript:" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">取消关注</a>
+						<?js }else if(support_follow){ ?>
+						<a class="follow" href="javascript:" onclick="f_create('#{user.id}', this, '#{user.screen_name}')"><span class="plus">+</span>加关注</a>
+						<?js } ?>
 					</div>
 					<p>
 				     <img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 

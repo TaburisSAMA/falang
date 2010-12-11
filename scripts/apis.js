@@ -32,6 +32,7 @@ var sinaApi = {
 		support_friendships_create: true,
 		support_search: true,
 		need_processMsg: true, //是否需要处理消息的内容
+		comment_need_user_id: false, // 评论是否需要使用到用户id，默认为false，兼容所有旧接口
         
 		// api
         public_timeline:      '/statuses/public_timeline',
@@ -2294,13 +2295,14 @@ $.extend(BuzzAPI, {
         userinfo_has_counts: false, //用户信息中是否包含粉丝数、微博数等信息
         support_counts: false,
 		support_upload: false, // 是否支持上传图片
-		support_comment: false,
 		support_cursor_only: true,  // 只支持游标方式翻页
 		support_mentions: false,
 		support_direct_messages: false,
 		support_upload: false,
 		need_processMsg: false,
+		support_geo: false,
 		repost_pre: 'RT ',
+		comment_need_user_id: true,
 		
 		oauth_host: 'https://www.google.com',
 		oauth_authorize: 	  '/accounts/OAuthAuthorizeToken',
@@ -2323,6 +2325,9 @@ $.extend(BuzzAPI, {
         repost: '/activities/@me/@self?key={{key}}&alt={{alt}}_repost',
         repost_real: '/activities/@me/@self?key={{key}}&alt={{alt}}',
         destroy: '/activities/@me/@self/{{id}}?key={{key}}&alt={{alt}}',
+        comments: '/activities/{{user_id}}/@self/{{id}}/@comments',
+        comment: '/activities/{{user_id}}/@self/{{id}}/@comments?key={{key}}&alt={{alt}}',
+        reply: '/activities/{{user_id}}/@self/{{id}}/@comments?key={{key}}&alt={{alt}}',
 		verify_credentials: '/people/@me/@self'
 	}),
 	
@@ -2391,6 +2396,16 @@ $.extend(BuzzAPI, {
 			args.url = this.config.repost_real;
 			delete args.data.status;
 			delete args.data.id;
+		} else if(args.url == this.config.comment) {
+			args.content = JSON.stringify({
+				data: {
+					content: args.data.comment
+				}
+			});
+			args.contentType = 'application/json';
+			delete args.data.comment;
+			delete args.data.reply_user_id;
+			delete args.data.cid;
 		}
 	},
 	
@@ -2463,21 +2478,31 @@ $.extend(BuzzAPI, {
 					data.source = '<a href="https://chrome.google.com/extensions/detail/aicelmgbddfgmpieedjiggifabdpcnln" target="_blank">FaWave</a>';
 				}
 			}
-			data.created_at = data.published;
 			var link = data.links.alternate || data.links.self;
 			data.t_url = link[0].href;
-			
+			if(data.links.replies) {
+				data.comments_count = data.links.replies[0].count;
+			}
 			data.user = this.format_result_item(data.actor, 'user', args);
 			if(args.url == this.config.favorites) {
 				data.favorited = true;
 			}
 			delete data.annotation;
 			delete data.crosspostSource;
-			delete data.published;
 			delete data.object;
 			delete data.title;
 			delete data.links;
 			delete data.actor;
+		} else if(play_load == 'comment') {
+			data.user = this.format_result_item(data.actor, 'user', args);
+			data.text = data.content;
+			delete data.actor;
+			delete data.links;
+			delete data.content;
+		}
+		if(data.published) {
+			data.created_at = data.published;
+			delete data.published;
 		}
 		return data;
 	}
@@ -2595,7 +2620,7 @@ $.extend(DoubanAPI, {
 				args.content = tpl.format(args.data);
 				args.contentType = 'application/atom+xml; charset=utf-8';
 				args.data = {id: args.data.id};
-				args.url = args.url.replace('_post', '')
+				args.url = args.url.replace('_post', '');
 				args.is_comment_post = true;
 			} else if(args.url == this.config.comments) {
 				// 记录下评论id填充

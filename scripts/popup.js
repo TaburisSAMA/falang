@@ -1082,7 +1082,9 @@ function showCounts(t, ids){
 function showComments(ele, tweetId, page, notHide){
     if(tweetId){
     	// 获取status的screen_name
-    	var screen_name = $.trim($(ele).parents('.userName').find('.showtip a').html()).substring(1);
+    	var $user_info = $(ele).parents('.userName').find('a:first');
+    	var screen_name = $user_info.attr('user_screen_name');
+    	var user_id = $user_info.attr('user_id');
         var comment_p = $(ele).closest('.commentWrap');
         var commentWrap = comment_p.children('.comments');
         if(!notHide && commentWrap.css('display') != 'none'){
@@ -1102,7 +1104,7 @@ function showComments(ele, tweetId, page, notHide){
                 if(comments.length && comments.length>0){
                     var _html = '';
                     for(var i in comments){
-                        var comment_li = buildComment(comments[i], tweetId, screen_name);
+                        var comment_li = buildComment(comments[i], tweetId, screen_name, user_id);
                         _html += comment_li;
                     }
                     commentWrap.children('.comment_list').html(_html);
@@ -1135,12 +1137,14 @@ function commentPage(ele, tweetId, is_pre){
     var $this = $(ele);
     var page_wrap = $this.parent();
     var page = Number(page_wrap.attr('page'));
-    if(isNaN(page)){page=1;}
-    if(page==1 && is_pre){
+    if(isNaN(page)){
+    	page = 1;
+    }
+    if(page == 1 && is_pre){
         $this.hide();
         return;
     }
-    page = is_pre ? page-1 : page+1;
+    page = is_pre ? page - 1 : page + 1;
     page_wrap.hide();
     showComments(ele, tweetId, page, true);
 }
@@ -1473,13 +1477,18 @@ function sendRepost(msg, repostTweetId, notSendMord){
 };
 
 function sendComment(msg, commentTweetId, notSendMord){
-    var btn, txt, cid, data;
+    var btn, txt, cid, data, user_id;
     btn = $("#replySubmit");
     txt = $("#replyTextarea");
     cid = $('#commentCommentId').val();
+    user_id = $('#commentUserId').val();
     commentTweetId = commentTweetId || $('#commentTweetId').val();
     data = {comment: msg, id: commentTweetId};
     var user = getUser();
+    // 判断评论是否需要用到原微博的id
+    if(tapi.get_config(user).comment_need_user_id) {
+    	data.user_id = user_id;
+    }
     data['user'] = user;
     btn.attr('disabled','true');
     txt.attr('disabled','true');
@@ -1637,9 +1646,10 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
     countReplyText();
 };
 
-function doComment(ele, userName, tweetId, replyUserName, replyUserId, cid){//评论 cid:回复的评论ID
+function doComment(ele, userName, userId, tweetId, replyUserName, replyUserId, cid){//评论 cid:回复的评论ID
     $('#actionType').val('comment');
     $('#commentTweetId').val(tweetId);
+    $('#commentUserId').val(userId);
     $('#replyUserName').val(replyUserName);
     $('#replyUserId').val(replyUserId || '');
     $('#commentCommentId').val(cid||'');
