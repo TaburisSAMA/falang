@@ -201,7 +201,7 @@
 	<div style="display:none;">
 		<textarea id="tp_time_line">
 			<li class="tweetItem showCounts_#{tweet.id} <?js if (!tweet.readed) { ?>unread-item<?js } ?> <?js if (tweet.myTweet) { ?>myTweet<?js } ?> " id="tweet#{tweet.id}" did="#{tweet.id}">
-			  <div class="li_wrap">
+			  <div class="li_wrap clearFix">
 				<div class="usericon">
 				    <span class="showtip">
 						<a class="user_head" target="_blank" href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" rhref="#{user.t_url}">

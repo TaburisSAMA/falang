@@ -2154,19 +2154,21 @@ $.extend(RenjianAPI, {
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.renjian.com/v2',
-		source: 'fawave', 
+		source: 'FaWave', 
 		support_comment: false,
-		support_repost: false,
+		support_repost: true,
 	    support_search: false,
 		favorites: '/statuses/likes',
         favorites_create: '/statuses/like/{{id}}',
         favorites_destroy: '/statuses/unlike/{{id}}',
 	    upload: '/statuses/create',
-	    repost: '/statuses/create',
+	    repost: '/statuses/forward',
 	    friends_timeline: '/statuses/friends_timeline',
 	    friends: '/statuses/followings/{{user_id}}',
 	    followers: '/statuses/followers/{{user_id}}',
-	    direct_messages: '/direct_messages/receive'
+	    direct_messages: '/direct_messages/receive',
+        
+        gender_map: {0:'n', 1:'m', 2:'f'}
 	}),
 	
 	// 无需urlencode
@@ -2191,7 +2193,16 @@ $.extend(RenjianAPI, {
 	},
 	
 	verify_credentials: function(user, callbackFn, data){
-        this.user_show({id: user.userName}, callbackFn);
+        //this.user_show({id: user.userName}, callbackFn);
+        if(!user || !callbackFn) return;
+        var params = {
+            url: this.config.verify_credentials,
+            type: 'post',
+            user: user,
+            play_load: 'user',
+            data: data
+        };
+        this._sendRequest(params, callbackFn);
 	},
 	
 	/* status_type	类型，PICTURE/LINK/MUSIC
@@ -2213,8 +2224,17 @@ $.extend(RenjianAPI, {
 				args.data.in_reply_to_status_id = args.data.sina_id;
 				delete args.data.sina_id;
 			}
+            if(args.data.in_reply_to_status_id){
+				args.data.reply_to = args.data.in_reply_to_status_id;
+			}
 		} else if(args.url == this.config.friends_timeline){
 			args.data.id = user.id;
+		} else if(args.url == this.config.new_message){
+			args.data.user = args.data.id;
+            delete args.data.id;
+		} else if(args.url == this.config.repost){
+			args.data.text = args.data.status;
+            delete args.data.status;
 		} else if(args.url == this.config.friends || args.url == this.config.followers) {
 			// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
 			// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
@@ -2262,6 +2282,12 @@ $.extend(RenjianAPI, {
 				delete data.replyed_status;
 				this.format_result_item(data.retweeted_status, 'status', args);
 			}
+            //转发
+            if(data.forwarded_status) {
+				data.retweeted_status = data.forwarded_status;
+				delete data.forwarded_status;
+				this.format_result_item(data.retweeted_status, 'status', args);
+			}
 			data.t_url = tpl + data.id;
 			this.format_result_item(data.user, 'user', args);
 		} else if(play_load == 'user' && data && data.id) {
@@ -2272,6 +2298,7 @@ $.extend(RenjianAPI, {
 				data.profile_image_url = data.profile_image_url.replace('120x120', '48x48');
 			}
 			data.name = data.name || data.screen_name;
+            data.gender = this.config.gender_map[data.gender];
 		} 
 		else if(play_load == 'comment') {
 			this.format_result_item(data.user, 'user', args);
