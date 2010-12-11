@@ -630,6 +630,10 @@ String.prototype.format = function(data) {
 	return formatText(this, data);
 };
 
+String.prototype.endswith = function(suffix) {
+    return this.indexOf(suffix, this.length - suffix.length) !== -1;
+};
+
 // HTML 编码
 function HTMLEnCode(str){
     if(!str){ return ''; }

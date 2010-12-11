@@ -2704,14 +2704,17 @@ $.extend(DoubanAPI, {
 				}
 			}
 			data.text = data.content['$t'];
-			if(data['db:attribute']) {
-				// comments_count
-				$.each(data['db:attribute'], function(index, item){
-					if(item['@name'] == 'comments_count') {
-						data[item['@name']] = item['$t'];
-					}
-				});
-				delete data['db:attribute'];
+			// saying 才支持评论
+			if(data.category && data.category['@term'].endswith('#miniblog.saying')) {
+				if(data['db:attribute']) {
+					// comments_count
+					$.each(data['db:attribute'], function(index, item){
+						if(item['@name'] == 'comments_count') {
+							data[item['@name']] = item['$t'];
+						}
+					});
+					delete data['db:attribute'];
+				}
 			}
 			if(data.comments_count === undefined) {
 				// 没有评论数，就是代表不可以评论的，隐藏

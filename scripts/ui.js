@@ -147,7 +147,7 @@ function bildMsgLi(sinaMsg, t, c_user){
             case 'comments_timeline':
                 crlBtn.repostBtn = crlBtn.repostCounts = crlBtn.commentCounts = crlBtn.delTweetBtn = crlBtn.delDirectMsgBtn = crlBtn.addFavoritesMsgBtn = crlBtn.delFavoritesMsgBtn = '';
                 crlBtn.commentBtn = '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'' + 
-                	sinaMsg.status.user.screen_name + '\',' + sinaMsg.status.id + ',\'' + user.screen_name + '\', ' + user.id + ',\'' + sinaMsg.id + '\');" title="点击回复评论">回复</a>';
+                	sinaMsg.status.user.screen_name + '\', \'' + sinaMsg.status.user.id + '\', \'' + sinaMsg.status.id + '\',\'' + user.screen_name + '\', \'' + user.id + '\',\'' + sinaMsg.id + '\');" title="点击回复评论">回复</a>';
                 if(c_user.id == user.id){
                     crlBtn.new_msgBtn = '';
                 }else{
