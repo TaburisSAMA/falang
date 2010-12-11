@@ -954,12 +954,12 @@ var popupBox = {
     show: function(){
         this.overlay.show();
         this.box.css({
-            top: getPageScroll()[1] + (getPageHeight() / 10),
+            top: getPageScroll()[1] + (Math.max(10, $("body").height() / 2 - this.box.height() / 2)),
             left: $("body").width() / 2 - this.box.width() / 2
         }).show();
     },
     showOverlay: function(){},
-    showImg: function(imgSrc, original){
+    showImg: function(imgSrc, original, callbackFn){
         this.checkBox();
         var image = new Image();
         image.onload = function() {
@@ -974,7 +974,15 @@ var popupBox = {
               + '<a href="javascript:" onclick="$(\'#facebox_see_img\').rotateRight(90);" style="margin-left:10px;"><img src="/images/rotate_r.png"></a></span>'
               + '<img id="facebox_see_img" src="' + image.src + '" class="cur_min" onclick="popupBox.close()" /></div>');
             popupBox.show();
-        }
+            image.onload = null;
+            image.onerror = null;
+            if(callbackFn){ callbackFn('success'); }
+        };
+        image.onerror = function(){
+            image.onload = null;
+            image.onerror = null;
+            if(callbackFn){ callbackFn('error'); }
+        };
         image.src = imgSrc;
     },
     showMap: function(user_img, myLatitude, myLongitude){

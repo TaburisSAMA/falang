@@ -76,17 +76,17 @@ function bildMsgLi(sinaMsg, t, c_user){
                 
                 //地理位置
                 if(rt_status.retweeted_status.geo && rt_status.retweeted_status.geo.coordinates){
-                    crlBtn.rtrtShowMapBtn = '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'' + rt_status.retweeted_status.user.profile_image_url + '\', ' + rt_status.retweeted_status.geo.coordinates[0] + ', ' + rt_status.retweeted_status.geo.coordinates[1] + ')" title="点击查看地理位置信息"><img src="images/geo.png"/></a>';
+                    crlBtn.rtrtShowMapBtn = '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'' + rt_status.retweeted_status.user.profile_image_url + '\', ' + rt_status.retweeted_status.geo.coordinates[0] + ', ' + rt_status.retweeted_status.geo.coordinates[1] + ')" title="点击查看地理位置信息"><img src="images/mapspin2a.png"/></a>';
                 }
             }
             //地理位置
             if(rt_status.geo && rt_status.geo.coordinates){
-                crlBtn.rtShowMapBtn = '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'' + rt_status.user.profile_image_url + '\', ' + rt_status.geo.coordinates[0] + ', ' + rt_status.geo.coordinates[1] + ')" title="点击查看地理位置信息"><img src="images/geo.png"/></a>';
+                crlBtn.rtShowMapBtn = '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'' + rt_status.user.profile_image_url + '\', ' + rt_status.geo.coordinates[0] + ', ' + rt_status.geo.coordinates[1] + ')" title="点击查看地理位置信息"><img src="images/mapspin2a.png"/></a>';
             }
         }
         //地理位置
         if(sinaMsg.geo && sinaMsg.geo.coordinates){
-            crlBtn.showMapBtn = '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'' + user.profile_image_url + '\', ' + sinaMsg.geo.coordinates[0] + ', ' + sinaMsg.geo.coordinates[1] + ')" title="点击查看地理位置信息"><img src="images/geo.png"/></a>';
+            crlBtn.showMapBtn = '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'' + user.profile_image_url + '\', ' + sinaMsg.geo.coordinates[0] + ', ' + sinaMsg.geo.coordinates[1] + ')" title="点击查看地理位置信息"><img src="images/mapspin2a.png"/></a>';
         }
         // 不支持评论
         if(!support_comment || sinaMsg.hide_comments === true) {

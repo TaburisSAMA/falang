@@ -213,6 +213,9 @@ textarea:focus{outline: none;}
 li .pic{max-width:160px; max-height:160px;}
 .geobtn{padding:0 3px;}
 
+li .thumbnail_pic{position:relative;display:inline-block;}
+li .thumbnail_pic .img_loading{position:absolute;left:45%;top:48%;}
+
 /* iPhone表情 */
 .iphoneEmoji{
 	background: url(../images/faces/iphone_emoji.png);
@@ -633,5 +636,5 @@ div.mainContent{word-wrap: break-word;}
   z-index:99;
 }
 /*浮动层图片旋转按钮*/
-#popup_box .image .rotate_btn{position: absolute; top: 25px; left: 10px; display:none;}
+#popup_box .image .rotate_btn{position: absolute; top: 8px; left: 10px; display:none;}
 #popup_box .image:hover .rotate_btn{display:block;}

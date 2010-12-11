@@ -1849,8 +1849,15 @@ function previewPic(ele, get_method) {
 };
 
 function showFacebox(ele){
-    //jQuery.facebox({image: $(ele).attr('bmiddle'), original: $(ele).attr('original') });
-    popupBox.showImg($(ele).attr('bmiddle'), $(ele).attr('original'));
+    var _t = $(ele);
+    if(!_t.find('.img_loading').lenght){
+        _t.append('<img class="img_loading" src="images/loading.gif" />');
+    }else{
+        _t.find('.img_loading').show();
+    }
+    popupBox.showImg(_t.attr('bmiddle'), _t.attr('original'), function(){
+        _t.find('.img_loading').hide();
+    });
 };
 
 function showGeoMap(user_img, latitude, longitude){
