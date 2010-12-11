@@ -214,7 +214,7 @@ li .pic{max-width:160px; max-height:160px;}
 .geobtn{padding:0 3px;}
 
 li .thumbnail_pic{position:relative;display:inline-block;}
-li .thumbnail_pic .img_loading{position:absolute;left:45%;top:48%;}
+li .thumbnail_pic .img_loading{position:absolute;left:42%;top:43%;}
 
 /* iPhone表情 */
 .iphoneEmoji{
@@ -591,11 +591,12 @@ div.mainContent{word-wrap: break-word;}
 
 
 #pb_map_canvas{width:400px; height:380px; position: relative;}
-#pb_map_canvas .map_user_icon{width:48px;height:48px;border:solid 1px #ccc;}
+#pb_map_canvas .map_user_icon{width:48px;height:48px;border:solid 1px #ccc; float:left;margin-right:5px;}
 /*浮动层*/
 #popup_box, #popup_box_overlay{display:none;}
 #popup_box canvas, .cur_min{cursor:url(../images/small.cur), auto;}
 #popup_box{
+	left:3px;
 	background:#fff;
 	border:solid 1px #ccc;
 	border-radius:5px;

@@ -936,7 +936,6 @@ var popupBox = {
     tp: '<div id="popup_box">\
             <div class="pb_title clearFix"><span class="t"></span><a href="javascript:" onclick="popupBox.close()" class="pb_close">关闭</a></div>\
             <div class="pb_content"></div>\
-            <div class="pb_footer clearFix"><span class="t"></span><a href="javascript:" onclick="popupBox.close()" class="pb_close">关闭</a></div>\
         </div>\
         <div id="popup_box_overlay"></di>',
     box: null,
@@ -987,7 +986,6 @@ var popupBox = {
     },
     showMap: function(user_img, myLatitude, myLongitude){
         this.checkBox();
-        var infowindow = new google.maps.InfoWindow();
         var latlng = new google.maps.LatLng(myLatitude, myLongitude);
         var myOptions = {
           zoom: 13,
@@ -1002,12 +1000,27 @@ var popupBox = {
         popupBox.show();
         var map = new google.maps.Map(map_canvas[0], myOptions);
         var marker = new google.maps.Marker({map: map, position:latlng});
-        var infowindow = new google.maps.InfoWindow({
-            content: '<img class="map_user_icon" src="'+user_img+'" />',
-            maxWidth: 60
-        });
-        google.maps.event.addListener(marker, 'click', function() {
-          infowindow.open(map,marker);
+        
+
+        var geocoder = new google.maps.Geocoder();
+        geocoder.geocode({'latLng': latlng}, function(results, status) {//根据经纬度查找地理位置
+            if (status == google.maps.GeocoderStatus.OK) {//判断查找状态
+                if (results[0]) {//查找成功
+                    /*
+                        InfoWindow 信息窗口类。显示标记位置的信息
+                    */
+                    var infowindow = new google.maps.InfoWindow({
+                        content: '<img class="map_user_icon" src="'+user_img+'" />' + results[0].formatted_address,
+                        maxWidth: 60
+                    });
+                    infowindow.open(map, marker);//打开信息窗口。一般与map和标记关联
+                    google.maps.event.addListener(marker, 'click', function() {
+                      infowindow.open(map,marker);
+                    });
+                }
+            } else {
+                showMsg("Geocoder failed due to: " + status);
+            }
         });
     }
 };

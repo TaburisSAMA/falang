@@ -579,6 +579,23 @@ function refreshAccountWarp(user, stat){
 
 refreshAccountInfo(); //每次启动的时候都刷新一下用户信息
 
+//更新用户的地理位置信息（笔记本位置可能会变）
+function updateGeoInfo(){
+    if(_settings.isGeoEnabled){
+        if (navigator.geolocation){
+            navigator.geolocation.getCurrentPosition(function(position){
+                //success
+                _settings.geoPosition = position;
+            }, function(msg){
+            });
+        }
+    }
+};
+try{
+    updateGeoInfo();
+}catch(err){
+}
+
 
 //与page.js通讯
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {

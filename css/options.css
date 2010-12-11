@@ -152,6 +152,9 @@ ul#navigation li.selected{
 #tween_demo{ display:inline-block; padding:2px; border:solid 1px green; height:15px; width: 100px; }
 #tween_demo span{ display:inline-block; background:#2B477D; width:10px; height:15px; }
 
+#pb_map_canvas{width:400px; height:380px; position: relative;}
+#pb_map_canvas .map_user_icon{width:48px;height:48px;border:solid 1px #ccc; float:left;margin-right:5px;}
+#pb_map_canvas .map_infowindow{height:50px;}
 /*¸¡¶¯²ã*/
 #popup_box{
 	background:#fff;

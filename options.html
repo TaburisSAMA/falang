@@ -332,6 +332,10 @@
 			<label class="title" for="isGeoEnabled">上报我的地理位置：</label>
 			<span>
 				<input type="checkbox" id="isGeoEnabled"><label for="isGeoEnabled">启用</label>
+				<a id="btnShowMyGeo" style="display:none;" href="javascript:" onclick="showMyGeo()">查看我的位置</a>
+			</span>
+			<span class="jTip" jTitle="位置准吗？　" jWidth="320">?
+				<span class="c">这里获取到的位置不一定准确，所以在启用后最好看下自己的当前位置是否正确。</span>
 			</span>
 		</li>
 		<li>
@@ -402,6 +406,9 @@
 	<div id="JT_close_left"></div>
 	<div id="JT_copy"></div>
 </div>
+
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+
 	<script type="text/javascript">
 		var _gaq = _gaq || [];
 		 _gaq.push(['_setAccount', 'UA-19689660-1']);

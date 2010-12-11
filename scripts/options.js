@@ -328,7 +328,16 @@ function showAccountList(){
     $('#account-blogType').html(blogtype_options);
     showSupportAuthTypes($('#account-blogType').val());
     
-}
+};
+
+function showMyGeo(){
+    var geoPosition = $("#isGeoEnabled").data('position');
+    if(geoPosition){
+        popupBox.showMap('icons/icon48.png', geoPosition.coords.latitude, geoPosition.coords.longitude);
+    }else{
+        _showMsg('没有可用的地理位置信息');
+    }
+};
 
 function init(){
     var settings = Settings.get();
@@ -357,8 +366,12 @@ function init(){
 
     //地理位置
     $("#isGeoEnabled").attr("checked", settings.isGeoEnabled ? true : false).data('position', settings.geoPosition);
+    if($("#isGeoEnabled").attr('checked')){
+        $("#btnShowMyGeo").show();
+    }
     $("#isGeoEnabled").click(function(){
         if(!$(this).attr('checked')){ //未选中，不用检测
+            $("#btnShowMyGeo").hide();
             return;
         }
         if (navigator.geolocation) {
@@ -367,10 +380,12 @@ function init(){
                 //success
                 $(this).data('position', position);
                 $("#save-all").removeAttr('disabled');
+                $("#btnShowMyGeo").show();
             }, function(msg){
                 //error
                 _showMsg('启用地理位置定位失败。' + (typeof msg == 'string' ? msg : ""));
                 $("#save-all").removeAttr('disabled');
+                $("#isGeoEnabled").attr('checked', false);
             });
         } else {
             _showMsg('浏览器不支持地理位置定位');

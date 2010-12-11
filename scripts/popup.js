@@ -84,8 +84,14 @@ function init(){
 
     $(window).unload(function(){ initOnUnload(); }); 
 
-    
+    //google map api，为了不卡，最后才载入
+    var script = document.createElement("script"); 
+    script.type = "text/javascript"; 
+    script.src = "http://maps.google.com/maps/api/js?sensor=false&callback=initializeMap"; 
+    document.body.appendChild(script);
 };
+
+function initializeMap(){};//给载入地图api调用
 
 function initTabs(){
     window.currentTab = '#friends_timeline_timeline';
@@ -1141,7 +1147,8 @@ function scrollPaging(){
     if(!isCanReadMore(tl)){
         return;
     }
-    var h = $(c_t + ' .list').height();
+    //var h = $(c_t + ' .list').height();
+    var h = $(c_t + ' .list')[0].scrollHeight;
     var list_warp = $(c_t + ' .list_warp');
     h = h - list_warp.height();
     if(list_warp.scrollTop() >= h){
@@ -1534,7 +1541,7 @@ function resizeFawave(w, h){
     var wh_css = '#wrapper{width:'+ w +'px;}'
                    + '#txtContent{width:'+ (w-2) +'px;}'
 				   + '.warp{width:' + w + 'px;} .list_warp{height:' + (h-70) + 'px;}'
-                   + '#pb_map_canvas, #popup_box .image img, #popup_box .image canvas{max-width:'+ (w-50) +'px;}';
+                   + '#pb_map_canvas, #popup_box .image img, #popup_box .image canvas{max-width:'+ (w-20) +'px;}';
 	$("#styleCustomResize").html(wh_css);
 };
 
@@ -1848,6 +1855,7 @@ function previewPic(ele, get_method) {
 	});
 };
 
+//查看图片
 function showFacebox(ele){
     var _t = $(ele);
     if(!_t.find('.img_loading').lenght){
@@ -1860,8 +1868,13 @@ function showFacebox(ele){
     });
 };
 
+//显示地图
 function showGeoMap(user_img, latitude, longitude){
-    popupBox.showMap(user_img, latitude, longitude);
+    if(google && google.maps){
+        popupBox.showMap(user_img, latitude, longitude);
+    }else{
+        showMsg('地图API正在载入中，请稍后再试');
+    }
 };
 
 //====>>>>
@@ -1983,6 +1996,12 @@ var SmoothScroller = {
     ease_type: 'easeOut',
     tween_type: 'Quad',
     status:{t:0, b:0, c:0, d:0},
+    resetStatus: function(){
+        SmoothScroller.status.t = 0;
+        SmoothScroller.status.b = 0;
+        SmoothScroller.status.c = 0;
+        SmoothScroller.status.d = 0;
+    },
     start: function(e){
         if(e.wheelDelta == 0){ return; }
         clearTimeout(this.T);
@@ -1994,26 +2013,31 @@ var SmoothScroller = {
         this.tween_type = Settings.get().smoothTweenType;
         var hasDo = this.status.t>0 ? (Math.ceil(Tween[this.tween_type][this.ease_type](this.status.t-1, this.status.b, this.status.c, this.status.d)) - this.status.b) : 0;
         this.status.c = -e.wheelDelta + this.status.c - hasDo; 
-        this.status.d = this.status.d + 13 - this.status.t;
+        this.status.d = (this.status.d/2) - (this.status.t/2) + 13;
         this.status.t = 0;
         this.status.b = this.list_warp.scrollTop();
+        if(this.status.b <= 0 && this.status.c < 0){//在顶部还往上滚动，直接无视
+            this.resetStatus();
+            return;
+        } 
         this.run();
     },
     run: function(){
         var _t = SmoothScroller;
         var _top = Math.ceil(Tween[_t.tween_type][_t.ease_type](_t.status.t, _t.status.b, _t.status.c, _t.status.d));
+        if(_top<=0){
+            log(_t.status);
+        }
         _t.list_warp.scrollTop( _top );
-        var h = $(_t.c_t + ' .list').height();
+        //var h = $(_t.c_t + ' .list').height();
+        var h = $(_t.c_t + ' .list')[0].scrollHeight;
         h = h - _t.list_warp_height;
         if(_top >= h && _t.status.c > 0){
-            _t.status.b = _top;
-            _t.status.d = 0;
-            _t.status.c = 0;
-            _t.status.t = 0;
+            _t.resetStatus();
             return;
         }
         if(_t.status.t < _t.status.d){
-            _t.status.t++; setTimeout(_t.run, 10);
+            _t.status.t++; _t.T = setTimeout(_t.run, 10);
         }
     }
 };
