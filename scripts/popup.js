@@ -137,6 +137,7 @@ function initTabs(){
         resetScrollTop(c_t); //复位到上次滚动条的位置
         removeUnreadTimelineCount(c_t);
         t.find(".unreadCount").html('');
+        /*
         var c_user = getUser();
         var userUnreaded = getUserUnreadTimelineCount(c_user.uniqueKey);
         if(userUnreaded > 0){
@@ -144,6 +145,8 @@ function initTabs(){
         }else{
             $("#accountListDock ." + c_user.uniqueKey + " .unr").html('').hide();
         }
+        */
+        updateDockUserUnreadCount(c_user.uniqueKey);
 
         checkShowGototop(); //检查是否要显示返回顶部按钮
     });
@@ -570,21 +573,41 @@ function addUnreadCountToTabs(){
             }
             ur = 0;
         }
+        /*
         if(user_unread > 0){
             $("#accountListDock ." + user.uniqueKey + " .unr").html(user_unread).show();
         }else{
             $("#accountListDock ." + user.uniqueKey + " .unr").html('').hide();
         }
+        */
+        updateDockUserUnreadCount(user.uniqueKey);
     }
 };
+
+
 //更新底部dock上的未读提示数
 function updateDockUserUnreadCount(user_uniqueKey){
-    var user_unread = getUserUnreadTimelineCount(user_uniqueKey);
+    if(!user_uniqueKey){ return; }
+    //var user_unread = getUserUnreadTimelineCount(user_uniqueKey);
+    var user = getUserByUniqueKey(user_uniqueKey);
+    var user_unread = 0, count = 0, d_html = '', t = '';
+    for(var i in T_LIST[user.blogType]){
+        t = T_LIST[user.blogType][i];
+        count = getUnreadTimelineCount(t, user_uniqueKey);
+        user_unread += count;
+        if(count > 0){
+            d_html = d_html ? d_html+', ' : d_html;
+            d_html += count + unreadDes[t];
+        }
+    }
     if(user_unread > 0){
         $("#accountListDock ." + user_uniqueKey + " .unr").html(user_unread).show();
     }else{
         $("#accountListDock ." + user_uniqueKey + " .unr").html('').hide();
     }
+
+    d_html = d_html ? ' ('+d_html+')' : d_html;
+    $("#accountListDock ." + user_uniqueKey + " .username").html(user.screen_name + d_html);
 };
 
 function initMsgHover(){
@@ -1242,7 +1265,8 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
         ur += _unreadCount;
         if(ur>0){
             li.find('.unreadCount').html('(' + ur + ')');
-            $("#accountListDock ." + user_uniqueKey + " .unr").html(_unreadCount + getUserUnreadTimelineCount(user_uniqueKey)).show();
+            //$("#accountListDock ." + user_uniqueKey + " .unr").html(_unreadCount + getUserUnreadTimelineCount(user_uniqueKey)).show();
+            updateDockUserUnreadCount(user_uniqueKey);
         }
         return false;
     }else{
@@ -2025,9 +2049,6 @@ var SmoothScroller = {
     run: function(){
         var _t = SmoothScroller;
         var _top = Math.ceil(Tween[_t.tween_type][_t.ease_type](_t.status.t, _t.status.b, _t.status.c, _t.status.d));
-        if(_top<=0){
-            log(_t.status);
-        }
         _t.list_warp.scrollTop( _top );
         //var h = $(_t.c_t + ' .list').height();
         var h = $(_t.c_t + ' .list')[0].scrollHeight;

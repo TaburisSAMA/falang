@@ -111,6 +111,13 @@ var Languages = {
 	'Yiddish': 'yi'
 };
 
+var unreadDes = {
+    'friends_timeline': '新', 
+    'mentions': '@', 
+    'comments_timeline': '评', 
+    'direct_messages': '私'
+};
+
 function showMsg(msg){
     var popupView = getPopupView();
     if(popupView){
