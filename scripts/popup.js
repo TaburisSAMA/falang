@@ -96,11 +96,13 @@ function init(){
     	var user = getUser();
     	var t = window.currentTab.replace('#', '').replace(/_timeline$/i, '');
     	var params = {id: $(this).attr('status_id'), user: user};
+    	$this.hide();
     	tapi.status_show(params, function(data) {
     		if(data && data.id) {
-    			var html = bildMsgLi(data, t, user);
+    			var html = buildStatusHtml([data], t, user).join('');
     			$this.parents('.mainContent').after(html);
-    			$this.hide();
+    		} else {
+    			$this.show();
     		}
     	});
     });
