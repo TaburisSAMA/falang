@@ -19,6 +19,8 @@ var CURRENT_USER_KEY = 'idi_current_user';
 var LAST_MSG_ID = 'idi_last_msg_id';
 var LAST_CURSOR = '_last_cursor';
 
+var LAST_SELECTED_SEND_ACCOUNTS = 'LAST_SELECTED_SEND_ACCOUNTS';
+
 var LOCAL_STORAGE_NEW_TWEET_LIST_KEY = 'idi_LOCAL_STORAGE_NEW_TWEET_LIST_KEY';
 var LOCAL_STORAGE_TWEET_LIST_HTML_KEY = 'idi_LOCAL_STORAGE_TWEET_LIST_HTML_KEY';
 
@@ -190,6 +192,7 @@ var Settings = {
         isSmoothScroller: false, //是否启用平滑滚动
         smoothTweenType: 'Quad', //平滑滚动的动画类型
         smoothSeaeType: 'easeOut', //平滑滚动的ease类型
+        sendAccountsDefaultSelected: 'remember', //多账号发送的时候默认选择的发送账号
 
         font: '微软雅黑', //字体
         fontSite: 12, //字体大小
@@ -477,25 +480,29 @@ function setLastMsgId(id, t, user_uniqueKey){
         user_uniqueKey = getUser().uniqueKey;
     }
     localStorage.setObject(user_uniqueKey + t + LAST_MSG_ID, id);
-}
+};
 
 function getLastMsgId(t, user_uniqueKey){
     if(!user_uniqueKey){
         user_uniqueKey = getUser().uniqueKey;
     }
     return localStorage.getObject(user_uniqueKey + t + LAST_MSG_ID);
-}
+};
 
 // 保存最新的cursor
 function setLastCursor(cursor, t, user_uniqueKey) {
     localStorage.setObject(user_uniqueKey + t + LAST_CURSOR, cursor);
-}
+};
 // 获取最新的cursor
 function getLastCursor(t, user_uniqueKey) {
     return localStorage.getObject(user_uniqueKey + t + LAST_CURSOR);
-}
+};
 //<<<<<<<<<<<<<<<<=========
 
+// 获取上次选择的发送账号
+function getLastSendAccounts() {
+    return localStorage.getObject(LAST_SELECTED_SEND_ACCOUNTS) || '';
+};
 
 //-- 信息提示模式 (alert or dnd ) --
 function getAlertMode(){
@@ -520,7 +527,7 @@ function getRefreshTime(){
         t = 3 * 1000 * 60;//默认3分钟
     }
     return t;
-}
+};
 
 //====>>>>>>>>>>>>>>>>>>
 function getBackgroundView(){

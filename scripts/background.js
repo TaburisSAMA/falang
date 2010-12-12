@@ -585,7 +585,8 @@ function updateGeoInfo(){
         if (navigator.geolocation){
             navigator.geolocation.getCurrentPosition(function(position){
                 //success
-                _settings.geoPosition = position;
+                var p = {latitude: position.coords.latitude, longitude: position.coords.longitude};
+                _settings.geoPosition = p;
             }, function(msg){
             });
         }

@@ -333,7 +333,7 @@ function showAccountList(){
 function showMyGeo(){
     var geoPosition = $("#isGeoEnabled").data('position');
     if(geoPosition){
-        popupBox.showMap('icons/icon48.png', geoPosition.coords.latitude, geoPosition.coords.longitude);
+        popupBox.showMap('icons/icon48.png', geoPosition.latitude, geoPosition.longitude);
     }else{
         _showMsg('没有可用的地理位置信息');
     }
@@ -378,7 +378,8 @@ function init(){
             $("#save-all").attr('disabled',true);
             navigator.geolocation.getCurrentPosition(function(position){
                 //success
-                $(this).data('position', position);
+                var p = {latitude: position.coords.latitude, longitude: position.coords.longitude};
+                $('#isGeoEnabled').data('position', p);
                 $("#save-all").removeAttr('disabled');
                 $("#btnShowMyGeo").show();
             }, function(msg){
@@ -397,6 +398,9 @@ function init(){
 
     //初始化是否同步未读提示到新浪微博
     $("#unread_sync_to_page").attr("checked", settings.isSyncReadedToSina);
+
+    //发送微博时默认选择的账号
+    $("#send_accounts_default_select").val(settings.sendAccountsDefaultSelected);
 
     $("#tp_looking").val(settings.lookingTemplate); //我正在看模板
 
@@ -799,6 +803,9 @@ function saveAll(){
         settings.sharedUrlAutoShortWordCount = Settings.defaults.sharedUrlAutoShortWordCount;
     }
 
+    //发送微博时默认选择的账号
+    settings.sendAccountsDefaultSelected = $("#send_accounts_default_select").val();
+
     //平滑滚动
     settings.isSmoothScroller = $("#isSmoothScroller").attr("checked") ? true : false;
     settings.smoothTweenType = $("#tween_type").val();
@@ -806,7 +813,7 @@ function saveAll(){
 
     //地理位置
     settings.isGeoEnabled = $("#isGeoEnabled").attr("checked") ? true : false;
-    settings.geoPosition = $(this).data('position');
+    settings.geoPosition = $("#isGeoEnabled").data('position');
 
     settings.isSyncReadedToSina = $("#unread_sync_to_page").attr("checked") ? true : false;
 

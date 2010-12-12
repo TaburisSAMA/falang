@@ -1,4 +1,3 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -243,6 +242,16 @@
 			</span>
 		</li>
 		<li>
+			<label class="title">多账号发送默认选择</label>
+			<select id="send_accounts_default_select">
+				<option value="remember">记住上次选择</option>
+				<option value="current">当前账号</option>
+				<option value="all">全部账号</option>
+			</select>
+			<span class="jTip" jTitle="" jWidth="330">?<span class="c">当你设置了多个账号，在发送微博的时候可以根据需要选择默认选中的发送账号。
+			</span></span>
+		</li>
+		<li>
 			<p>
 				<label class="title">快捷发微博快捷键：</label>
 				<input type="hidden" id="set_quick_send_key" value="" />
@@ -407,8 +416,6 @@
 	<div id="JT_copy"></div>
 </div>
 
-	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
-
 	<script type="text/javascript">
 		var _gaq = _gaq || [];
 		 _gaq.push(['_setAccount', 'UA-19689660-1']);
@@ -420,6 +427,13 @@
 		  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 		};
 		setTimeout(initGA, 1500);
+
+		function initializeMap(){};//给载入地图api调用
+		//google map api，为了不卡，最后才载入
+		var script = document.createElement("script"); 
+		script.type = "text/javascript"; 
+		script.src = "http://maps.google.com/maps/api/js?sensor=false&callback=initializeMap"; 
+		document.body.appendChild(script);
 	</script>
 </body>
 </html>

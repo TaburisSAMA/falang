@@ -160,6 +160,18 @@ function initOnUnload(){
         c='';
     }
     localStorage.setObject(UNSEND_TWEET_KEY, c||'');
+
+    if(Settings.get().sendAccountsDefaultSelected == 'remember'){
+        if($("#accountsForSend").data('inited')){
+            var keys = '';
+            $("#accountsForSend li.sel").each(function(){
+                keys += $(this).attr('uniquekey') + '_';
+            });
+            keys = keys ? '_'+keys : keys;
+
+            localStorage.setObject(LAST_SELECTED_SEND_ACCOUNTS, keys);
+        }
+    }
 };
 
 function initTxtContentEven(){
@@ -521,10 +533,24 @@ function initSelectSendAccounts(is_upload){
         if(is_upload === true && tapi.get_config(user).support_upload === false) {
         	continue;
         }
-        if(user.uniqueKey == c_user.uniqueKey){
-            user.sel = 'sel';
-        }else{
-            user.sel = '';
+        user.sel = '';
+        switch(Settings.get().sendAccountsDefaultSelected){
+            case 'all':
+                user.sel = 'sel';
+                break;
+            case 'current':
+                if(user.uniqueKey == c_user.uniqueKey){
+                    user.sel = 'sel';
+                }
+                break;
+            case 'remember':
+                var lastSend = getLastSendAccounts();
+                if(lastSend && lastSend.indexOf('_'+ user.uniqueKey + '_') >= 0){
+                    user.sel = 'sel';
+                }
+                break;
+            default:
+                break;
         }
         li.push(li_tp.format(user));
     }

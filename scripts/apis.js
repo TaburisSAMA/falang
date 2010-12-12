@@ -551,8 +551,8 @@ var sinaApi = {
     update: function(data, callbackFn){
         if(!callbackFn) return;
         if(this.config.support_geo && Settings.get().isGeoEnabled && Settings.get().geoPosition){
-            data.lat = Settings.get().geoPosition.coords.latitude;
-            data.long = Settings.get().geoPosition.coords.longitude;
+            data.lat = Settings.get().geoPosition.latitude;
+            data.long = Settings.get().geoPosition.longitude;
         }
         var params = {
             url: this.config.update,
