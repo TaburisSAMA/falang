@@ -46,6 +46,7 @@ var sinaApi = {
         favorites_create:     '/favorites/create',
         favorites_destroy:    '/favorites/destroy/{{id}}',
         counts:               '/statuses/counts',
+        status_show:          '/statuses/show/{{id}}',
         update:               '/statuses/update',
         upload:               '/statuses/upload',
         repost:               '/statuses/repost',
@@ -546,6 +547,16 @@ var sinaApi = {
             data: data
         };
         this._sendRequest(params, callbackFn);
+	},
+	
+	// id
+	status_show: function(data, callback) {
+		var params = {
+			url: this.config.status_show,
+			play_load: 'status',
+			data: data
+		};
+		this._sendRequest(params, callback);
 	},
     
     update: function(data, callbackFn){
@@ -1458,18 +1469,17 @@ $.extend(DiguAPI, {
 			delete data.picPath;
 			var tpl = 'http://digu.com/detail/';
 			if(data.in_reply_to_status_id != '0' && data.in_reply_to_status_id != '') {
-				data.retweeted_status = {
-					id: data.in_reply_to_status_id,
-					user: {
-						id: data.in_reply_to_user_id,
-						screen_name: data.in_reply_to_screen_name,
-						name: data.in_reply_to_user_name
-					}
-				};
-				data.retweeted_status.t_url = tpl + data.retweeted_status.id;
+//				data.retweeted_status = {
+//					id: data.in_reply_to_status_id,
+//					user: {
+//						id: data.in_reply_to_user_id,
+//						screen_name: data.in_reply_to_screen_name,
+//						name: data.in_reply_to_user_name
+//					}
+//				};
+				//data.retweeted_status.t_url = tpl + data.in_reply_to_status_id;
 				// 查看相关对话的url
 				data.related_dialogue_url = 'http://digu.com/relatedDialogue/' + data.id;
-				this.format_result_item(data.retweeted_status.user, 'user', args);
 			}
 			data.t_url = tpl + data.id;
 			this.format_result_item(data.user, 'user', args);
@@ -2973,5 +2983,10 @@ var tapi = {
     // tag_id
     destroy_tag: function(data, callback) {
     	return this.api_dispatch(data).destroy_tag(data, callback);
+    },
+    
+    // id
+    status_show: function(data, callback) {
+    	return this.api_dispatch(data).status_show(data, callback);
     }
 };

@@ -221,7 +221,7 @@
 							<a href="#{tweet.related_dialogue_url}" title="查看相关对话" target="_blank"><img src="images/inreply.png" /></a>
 							<?js } ?>
 							<a href="javascript:void(0);" onclick="javascript:translate(this);" title="翻译此微博">译</a>
-							#{ btn.addFavoritesMsgBtn + btn.delFavoritesMsgBtn + btn.replyBtn + btn.rtBtn + btn.oretweetBtn + btn.repostBtn + btn.repostCounts + btn.commentBtn + btn.commentCounts + btn.new_msgBtn + btn.delTweetBtn + btn.delCommentBtn + btn.delDirectMsgBtn }
+							#{ btn.addFavoritesMsgBtn + btn.delFavoritesMsgBtn + btn.replyBtn + btn.retweetBtn + btn.oretweetBtn + btn.repostBtn + btn.repostCounts + btn.commentBtn + btn.commentCounts + btn.new_msgBtn + btn.delTweetBtn + btn.delCommentBtn + btn.delDirectMsgBtn }
 						</span>
 					</div>
 					<div class="msg">
@@ -257,7 +257,10 @@
 					   <?js } else { ?>
 					   #{new Date(tweet.created_at).format("yyyy-MM-dd hh:mm:ss")}
 					   <?js } ?>
-					        通过 #{tweet.source||'网站'}
+					   通过 #{tweet.source||'网站'}
+					   <?js if(!tweet.retweeted_status && tweet.in_reply_to_status_id && tweet.in_reply_to_screen_name){ ?>
+					   <a href="javascript:void(0);" class="show_source_status_btn" status_id="#{tweet.in_reply_to_status_id}" title="查看原信息">对 #{tweet.in_reply_to_screen_name} 的回复</a>
+					   <?js } ?>
 					</div>
 					<?js } ?>
 				</div>
@@ -288,7 +291,7 @@
 						的微博: 
 						<span class="edit">
 							<a href="javascript:void(0);" onclick="javascript:translate(this);" title="翻译此微博">译</a>
-							#{ btn.rtAddFavoritesMsgBtn + btn.rtReplyBtn + btn.rtRepostBtn + btn.rtRepostCounts + btn.rtOretweetBtn + btn.rtCommentBtn + btn.rtCommentCounts}
+							#{ btn.rtAddFavoritesMsgBtn + btn.rtReplyBtn + btn.rtRetweetBtn + btn.rtRepostBtn + btn.rtRepostCounts + btn.rtOretweetBtn + btn.rtCommentBtn + btn.rtCommentCounts}
 						</span>
 					</div>
 					<div class="tweet_text">#{processMsg(account, tweet.retweeted_status.text)} #{btn.rtShowMapBtn}</div>

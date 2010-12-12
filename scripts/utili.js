@@ -625,7 +625,7 @@ Storage.prototype.getObject = function(key) {
  * @param {Object} values
  */
 function formatText(msg, values, filter) {
-    var pattern = /\{\{([\w\s\.\(\)"',-]+)?\}\}/g;
+    var pattern = /\{\{([\w\s\.\(\)"',-\[\]]+)?\}\}/g;
     return msg.replace(pattern, function(match, key) {
     	var value = values[key] || eval('(values.' +key+')');
         return jQuery.isFunction(filter) ? filter(value, key) : value;

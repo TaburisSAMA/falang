@@ -89,6 +89,21 @@ function init(){
     script.type = "text/javascript"; 
     script.src = "http://maps.google.com/maps/api/js?sensor=false&callback=initializeMap"; 
     document.body.appendChild(script);
+    
+    // 注册 查看原始围脖的按钮事件
+    $('a.show_source_status_btn').live('click', function() {
+    	var $this = $(this);
+    	var user = getUser();
+    	var t = window.currentTab.replace('#', '').replace(/_timeline$/i, '');
+    	var params = {id: $(this).attr('status_id'), user: user};
+    	tapi.status_show(params, function(data) {
+    		if(data && data.id) {
+    			var html = bildMsgLi(data, t, user);
+    			$this.parents('.mainContent').after(html);
+    			$this.hide();
+    		}
+    	});
+    });
 };
 
 function initializeMap(){};//给载入地图api调用
@@ -817,8 +832,8 @@ function _getFansList(to_t, read_more){
                 	if(!get_c_user_fans) {
                 		users[i].unfollow = true;
                 	}
-                    html += bildMsgLi(users[i], to_t); //TODO: 待优化
                 }
+                html = buildUsersHtml(users, to_t).join('');
                 if(to_t == $("#fans_tab .active").attr('t')) {
                 	// 还是当前页
                 	$list.append(html);
@@ -847,6 +862,7 @@ function getUserTimeline(screen_name, user_id, read_more) {
     var max_id = null;
     var cursor = null;
     var page = 1;
+    var user_id = user_id || '';
     if(read_more) {
     	// 滚动的话，获取上次的参数
     	max_id = $tab.attr('max_id');
@@ -920,12 +936,8 @@ function getUserTimeline(screen_name, user_id, read_more) {
             // 保存数据，用于翻页
             $tab.attr('max_id', max_id);
             $tab.attr('page', page);
-            if(screen_name) {
-            	$tab.attr('screen_name', screen_name);
-            }
-            if(user_id) {
-            	$tab.attr('user_id', user_id);
-            }
+            $tab.attr('screen_name', screen_name);
+            $tab.attr('user_id', user_id);
             showReadMore(m);
             if(!read_more) {
             	var user = data.user || sinaMsgs[0].user || sinaMsgs[0].sender;
@@ -1018,11 +1030,12 @@ function getSinaTimeline(t, notCheckNew){
         var msgs = tweetsAll.slice(0, PAGE_SIZE);
 //        var msg_ids = tweetsAll.slice(0, PAGE_SIZE);
 //        var msgs = TweetStorage.getItems(msg_ids, t, c_user.uniqueKey);
-        var html = '';
+        var htmls = [];
         var ids = [];
+        htmls = buildStatusHtml(msgs, t);
         for(var i in msgs){
             var msg = msgs[i];
-            html += bildMsgLi(msgs[i], t);
+//            html += bildMsgLi(msgs[i], t);
         	//_ul.append(bildMsgLi(msg, t)); //TODO: 待优化
             ids.push(msg.id);
             if(msg.retweeted_status){
@@ -1037,7 +1050,7 @@ function getSinaTimeline(t, notCheckNew){
                 }
             }
         }
-        _ul.append(html);
+        _ul.append(htmls.join(''));
         if(ids.length>0){
             if(ids.length > 100){
                 var ids2 = ids.slice(0, 99);
@@ -1311,15 +1324,20 @@ function addPageMsgs(msgs, t, append){
 		return [];
 	}
     var ids = [];
-    var _ul = $("#" + t + "_timeline ul.list"), html = '';
+    var _ul = $("#" + t + "_timeline ul.list"), htmls = [];
     var method = append ? 'append' : 'prepend';
     var direct = append ? 'last' : 'first';
     var max_id = $("#" + t + "_timeline ul.list li.tweetItem:" + direct).attr('did');
     var result = filterDatasByMaxId(msgs, max_id, append);
     msgs = result.news;
+//    var start_time = new Date();
+    htmls = buildStatusHtml(msgs, t);
+//    var end_time = new Date();
+//    log(end_time.getTime() - start_time.getTime());
     for(var i in msgs){
+//    	_ul[method](htmls[i]);
     	//_ul[method](bildMsgLi(msgs[i], t));
-        html += bildMsgLi(msgs[i], t);
+//        html += bildMsgLi(msgs[i], t);
         if(t != 'direct_messages'){
         	ids.push(msgs[i].id);
             if(msgs[i].retweeted_status){
@@ -1327,7 +1345,7 @@ function addPageMsgs(msgs, t, append){
                 if(msgs[i].retweeted_status.retweeted_status) {
                 	ids.push(msgs[i].retweeted_status.retweeted_status.id);
                 }
-            }else if(msgs[i].status){ // 评论
+            } else if (msgs[i].status){ // 评论
                 ids.push(msgs[i].status.id);
                 if(msgs[i].status.retweeted_status) {
                 	ids.push(msgs[i].status.retweeted_status.id);
@@ -1335,8 +1353,8 @@ function addPageMsgs(msgs, t, append){
             }
         }
     }
-    _ul[method](html);
-    if(ids.length>0){
+    _ul[method](htmls.join(''));
+    if(ids.length > 0){
         if(ids.length > 100){
             var ids2 = ids.slice(0, 99);
             ids = ids.slice(99, ids.length);
@@ -1709,13 +1727,18 @@ function doNewMessage(ele, userName, toUserId){//悄悄话
     countReplyText();
 };
 
-function doRT(ele){//RT
+function doRT(ele, is_rt, is_rt_rt){//RT
     var data = $(ele).closest('li').find('.msgObjJson').text();
     data = JSON.parse(data);
     var t = $("#txtContent");
     showMsgInput();
     t.val('').blur();
-    var _msg_user = data.user || data.sender;
+    if(is_rt) {
+    	data = data.retweeted_status;
+    } else if(is_rt_rt) {
+    	data = data.retweeted_status.retweeted_status;
+    }
+    var _msg_user = data.user;
     var repost_pre = tapi.get_config(getUser()).repost_pre;
     var val = repost_pre + ' ' + '@' + _msg_user.screen_name + ' ' + data.text;
     if(data.original_pic) {
