@@ -961,11 +961,22 @@ var popupBox = {
         this.box.hide();
         this.overlay.hide();
     },
-    show: function(){
+    show: function(img_width, img_height){
         this.overlay.show();
+        var w = img_width;
+        if(w){
+            var max_w = Number($("#facebox_see_img").css('max-width').replace('px', '')) + 10;
+            w = Math.min(w, max_w);
+        }else{
+            w = this.box.width();
+        }
+        var h = img_height;
+        if(!h){
+            h = this.box.height();
+        }
         this.box.css({
-            top: getPageScroll()[1] + (Math.max(10, $("body").height() / 2 - this.box.height() / 2)),
-            left: $("body").width() / 2 - this.box.width() / 2
+            top: getPageScroll()[1] + (Math.max(10, $("body").height() / 2 - h / 2)),
+            left: $("body").width() / 2 - w / 2
         }).show();
     },
     showOverlay: function(){},
@@ -983,7 +994,7 @@ var popupBox = {
               + '<a href="javascript:" onclick="$(\'#facebox_see_img\').rotateLeft(90);"><img src="/images/rotate_l.png"></a>'
               + '<a href="javascript:" onclick="$(\'#facebox_see_img\').rotateRight(90);" style="margin-left:10px;"><img src="/images/rotate_r.png"></a></span>'
               + '<img id="facebox_see_img" src="' + image.src + '" class="cur_min" onclick="popupBox.close()" /></div>');
-            popupBox.show();
+            popupBox.show(image.width, image.height);
             image.onload = null;
             image.onerror = null;
             if(callbackFn){ callbackFn('success'); }
