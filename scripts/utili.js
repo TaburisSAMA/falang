@@ -650,6 +650,13 @@ function HTMLEnCode(str){
     return str;
 };
 
+// html转换为text
+function htmlToText(html){
+   var tmp = document.createElement("DIV");
+   tmp.innerHTML = html;
+   return tmp.innerText;
+};
+
 ///UBB内容转换
 function ubbCode(str)	{
     var result = "";

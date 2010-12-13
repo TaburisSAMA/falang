@@ -1699,6 +1699,7 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
     $('#ye_dialog_window').show();
     var d = $(ele).closest('li').find('.msgObjJson').text();
     try{
+        d = unescape(d);
         d = JSON.parse(d);
     }
     catch(err){
@@ -1757,6 +1758,7 @@ function doNewMessage(ele, userName, toUserId){//悄悄话
 
 function doRT(ele, is_rt, is_rt_rt){//RT
     var data = $(ele).closest('li').find('.msgObjJson').text();
+    data = unescape(data);
     data = JSON.parse(data);
     var t = $("#txtContent");
     showMsgInput();
@@ -1768,7 +1770,8 @@ function doRT(ele, is_rt, is_rt_rt){//RT
     }
     var _msg_user = data.user;
     var repost_pre = tapi.get_config(getUser()).repost_pre;
-    var val = repost_pre + ' ' + '@' + _msg_user.screen_name + ' ' + data.text;
+    var val = tapi.get_config(getUser()).need_processMsg ? data.text : htmlToText(data.text);
+    val = repost_pre + ' ' + '@' + _msg_user.screen_name + ' ' + val;
     if(data.original_pic) {
     	// 有图片，自动带上图片地址，并尝试缩短
     	var settings = Settings.get();
