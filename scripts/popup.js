@@ -358,24 +358,33 @@ var Search = {
 	    var $ul = $("#user_timeline_timeline ul.list");
 	    var max_id = null;
 	    var page = 1;
-	    var support_search_max_id = tapi.get_config(c_user).support_search_max_id;
-	    
+	    var cursor = null;
+	    var config = tapi.get_config(c_user);
+	    var support_search_max_id = config.support_search_max_id;
+	    var support_cursor_only = config.support_cursor_only;
 	    if(read_more) {
 	    	// 滚动的话，获取上次的参数
 	        max_id = $tab.attr('max_id');
 	        q = $tab.attr('q');
+	        cursor = $tab.attr('cursor');
 	        page = Number($tab.attr('page') || 1);
 	    }  else {
 	    	// 第一次搜索
 	    	$ul.html('');
 	    }
 	    var params = {count: PAGE_SIZE, q: q, user: c_user};
-	    if(support_search_max_id) {
-	    	if(max_id) {
-		    	params.max_id = max_id;
-		    }
+	    if(support_cursor_only) { // 只支持cursor方式分页
+	    	if(cursor) {
+	    		params.cursor = cursor;
+	    	}
 	    } else {
-	    	params.page = page;
+	    	if(support_search_max_id) {
+		    	if(max_id) {
+			    	params.max_id = max_id;
+			    }
+		    } else {
+		    	params.page = page;
+		    }
 	    }
 	    showLoading();
 	    var m = 'user_timeline';
@@ -391,6 +400,9 @@ var Search = {
 	    	var statuses = data.results || data.items || data;
 	    	if(!statuses) { // 异常
 	    		return;
+	    	}
+	    	if(data.next_cursor !== undefined) {
+	    		$tab.attr('cursor', data.next_cursor);
 	    	}
 	        if(statuses.length > 0){
 	        	if(window.currentTab != "#user_timeline_timeline") {

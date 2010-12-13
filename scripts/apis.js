@@ -2344,7 +2344,6 @@ $.extend(BuzzAPI, {
 		oauth_key: 'net4team.net',
 		oauth_secret: 'y+6SWcLVshQvogadDzXtSra+',
         result_format: '', // 由alt参数确定返回值格式
-        support_search: false,
         userinfo_has_counts: false, //用户信息中是否包含粉丝数、微博数等信息
         support_counts: false,
 		support_upload: false, // 是否支持上传图片
@@ -2381,6 +2380,7 @@ $.extend(BuzzAPI, {
         comments: '/activities/{{user_id}}/@self/{{id}}/@comments',
         comment: '/activities/{{user_id}}/@self/{{id}}/@comments?key={{key}}&alt={{alt}}',
         reply: '/activities/{{user_id}}/@self/{{id}}/@comments?key={{key}}&alt={{alt}}',
+        search: '/activities/search',
 		verify_credentials: '/people/@me/@self'
 	}),
 	
