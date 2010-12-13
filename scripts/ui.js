@@ -145,9 +145,8 @@ function buildStatusHtml(statuses, t, c_user){
      	if(status.retweeted_status && status.retweeted_status.user) {
      		status.retweeted_status_screen_name = status.retweeted_status.user.screen_name;
      		status.retweeted_status_id = status.retweeted_status.id;
-     		if(status.retweeted_status.retweeted_status && status.retweeted_status.retweeted_status.user) {
-     			
-     		}
+     	} else {
+     		status.retweeted_status_id = status.retweeted_status_screen_name = '';
      	}
      	var buttons = {};
      	for(var key in BUTTON_TPLS) {
