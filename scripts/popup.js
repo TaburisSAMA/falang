@@ -469,7 +469,7 @@ var Search = {
 	            statuses = addPageMsgs(statuses, m, true);
 	            // 保存数据，用于翻页
 	            $tab.attr('q', q);
-	            $tab.attr('page', page + 1)
+	            $tab.attr('page', page + 1);
 	        }
 	        if(statuses.length > 0) {
             	max_id = data.max_id || String(statuses[statuses.length - 1].id);
