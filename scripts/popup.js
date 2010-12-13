@@ -368,6 +368,7 @@ var Search = {
 	    var m = 'user_timeline';
 	    hideReadMore(m);
 	    tapi.search(params, function(data, textStatus){
+            hideReadMoreLoading(m);
 	    	// 如果用户已经切换，则不处理
 	    	var now_user = getUser();
 	    	if(now_user.uniqueKey != c_user.uniqueKey) {
