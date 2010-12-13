@@ -201,6 +201,8 @@ var Settings = {
         theme: 'pip_io', //主题样式
         translate_target: 'zh', // 默认翻译语言
         shorten_url_service: 'is.gd', // 默认缩址服务
+        image_service: 'Imgur', // 默认的图片服务
+        enable_image_service: true, // 默认开启图片服务
         isGeoEnabled: false, //默认不开启上报地理位置信息
         geoPosition: null, //获取到的地理位置信息，默认为空
 
@@ -1140,7 +1142,7 @@ var Instagram = {
 	 * middle: http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_6.jpg
 	 * small: http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_5.jpg
 	 */
-	name: 'Instagram',
+	host: 'instagr.am',
 	url_re: /http:\/\/instagr\.am\/p\//i,
 	get: function(url, callback) {
 		$.ajax({
@@ -1168,7 +1170,7 @@ var Plixi = {
 	 * http://api.plixi.com/api/tpapi.svc/imagefromurl?size=medium&url=http://tweetphoto.com/5527850
 	 * http://api.plixi.com/api/tpapi.svc/imagefromurl?size=big&url=http://tweetphoto.com/5527850
 	 */
-	name: 'Plixi',
+	host: 'plixi.com',
 	url_re: /http:\/\/(plixi\.com\/p|tweetphoto\.com)\//i,
 	get: function(url, callback) {
 		var tpl = 'http://api.plixi.com/api/tpapi.svc/imagefromurl?size={{size}}&url=' + url;
@@ -1185,7 +1187,7 @@ var Plixi = {
 // http://i.imgur.com/xuCIW.png or http://imgur.com/z2pX5.png
 // key: cba6198873ac20498a5686839b189fc0
 var Imgur = {
-	name: 'Imgur',
+	host: 'imgur.com',
 	url_re: /http:\/\/(i\.)?imgur\.com\/\w+\.png/i,
 	get: function(url, callback) {
 		var re = /imgur.com\/(\w+)\.png/i;
@@ -1201,20 +1203,136 @@ var Imgur = {
 			};
 		}
 		callback(pics);
-	}
+	},
+	key: 'cba6198873ac20498a5686839b189fc0',
+	api: 'http://imgur.com/api/upload.json',
+	upload: function(pic, before_request, onprogress, callback) {
+    	pic.keyname = 'image';
+	    var boundary = '----multipartformboundary' + (new Date).getTime();
+	    var dashdash = '--';
+	    var crlf = '\r\n';
+	
+	    /* Build RFC2388 string. */
+	    var builder = '';
+	
+	    builder += dashdash;
+	    builder += boundary;
+	    builder += crlf;
+		
+	    /* Generate headers. [PIC] */            
+	    builder += 'Content-Disposition: form-data; name="' + pic.keyname + '"';
+	    if(pic.file.fileName) {
+	      builder += '; filename="' + this.url_encode(pic.file.fileName) + '"';
+	    }
+	    builder += crlf;
+	
+	    builder += 'Content-Type: '+ pic.file.type;
+	    builder += crlf;
+	    builder += crlf; 
+	
+	    var bb = new BlobBuilder(); //NOTE
+	    bb.append(builder);
+	    bb.append(pic.file);
+	    builder = crlf;
+	    
+	    /* Mark end of the request.*/ 
+	    builder += dashdash;
+	    builder += boundary;
+	    builder += dashdash;
+	    builder += crlf;
+	
+	    bb.append(builder);
+	    
+	    if(before_request) {
+	    	before_request();
+	    }
+	    $.ajax({
+	        url: this.api,
+	        cache: false,
+	        timeout: 5*60*1000, //5分钟超时
+	        type : 'post',
+	        data: bb.getBlob(),
+	        dataType: 'text',
+	        contentType: 'multipart/form-data; boundary=' + boundary,
+	        processData: false,
+	        beforeSend: function(req) {
+	            if(onprogress) {
+	            	if(req.upload){
+		                req.upload.onprogress = function(ev){
+		                    onprogress(ev);
+		                };
+		            }
+	            }
+	        },
+	        success: function(data, textStatus) {
+	            try{
+	                data = JSON.parse(data);
+	            }
+	            catch(err){
+	                //data = null;
+	                data = {error:'服务器返回结果错误，本地解析错误。', error_code:500};
+	                textStatus = 'error';
+	            }
+	            var error_code = null;
+	            if(data){
+                    var error = data.errors || data.error;
+	                if(error || data.error_code){
+	                	data.error = error;
+	                    _showMsg('error: ' + data.error + ', error_code: ' + data.error_code);
+	                    error_code = data.error_code || error_code;
+	                }
+	            }else{error_code = 400;}
+	            callback(data, textStatus, error_code);
+	        },
+	        error: function (xhr, textStatus, errorThrown) {
+	            var r = null, status = 'unknow';
+	            if(xhr){
+	                if(xhr.status){
+	                    status = xhr.status;
+	                }
+	                if(xhr.responseText){
+	                    var r = xhr.responseText;
+	                    try{
+	                        r = JSON.parse(r);
+	                    }
+	                    catch(err){
+	                        r = null;
+	                    }
+	                    if(r){_showMsg('error_code:' + r.error_code + ', error:' + r.error);}
+	                }
+	            }
+	            if(!r){
+	                textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';
+	                errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
+	                _showMsg('error: ' + textStatus + errorThrown + 'statuCode: ' + status);
+	            }
+	            callback({}, 'error', status); //不管什么状态，都返回 error
+	        }
+	    });
+    }
 };
 
+// 图片服务
 var ImageService = {
-	services: [Instagram, Plixi, Imgur],
+	services: {
+		Instagram: Instagram, 
+		Plixi: Plixi, 
+		Imgur: Imgur
+	},
 	check: function(url) {
 		var hit = null;
-		$.each(this.services, function(index, item) {
+		for(var name in this.services) {
+			var item = this.services[name];
 			if(item.url_re.test(url)) {
-				hit = item;
+				hit = {name: name, service: item};
 				return false;
 			}
-		});
+		}
 		return hit;
+	},
+	upload: function(pic, callback) {
+		var settings = Settings.get();
+		this.services[settings.image_service].upload(pic, callback);
 	}
 };
 

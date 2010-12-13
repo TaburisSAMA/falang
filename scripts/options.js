@@ -250,6 +250,21 @@ $(function(){
     var settings = Settings.get();
     $('#shorten_url_service').html(shorturls_options).val(settings.shorten_url_service);
     
+    // 图片服务选择
+    var image_service_options = '';
+    for(var k in ImageService.services) {
+    	var service = ImageService.services[k];
+    	if(service.upload) {
+    		image_service_options += '<option value="{{value}}">{{name}}</option>'.format({name: service.host, value: k});
+    	}
+    }
+    var settings = Settings.get();
+    $('#image_service').html(image_service_options).val(settings.image_service);
+    if(settings.enable_image_service) {
+    	$('#enableImageService').attr('checked', true);
+    } else {
+    	$('#enableImageService').removeAttr('checked');
+    }
 });
 
 //统计全局的刷新间隔设置产生的请求次数
@@ -887,7 +902,12 @@ function saveAll(){
     
     settings.translate_target = $('#translate_target').val();
     settings.shorten_url_service = $('#shorten_url_service').val();
-    
+    settings.image_service = $('#image_service').val();
+    if($('#enableImageService').attr('checked')) {
+    	settings.enable_image_service = true;
+    } else {
+    	settings.enable_image_service = false;
+    }
 
     Settings.save();
 
