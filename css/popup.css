@@ -220,6 +220,15 @@ li .thumbnail_pic .img_loading{position:absolute;left:42%;top:43%;}
 
 .readmore_loading{display:none; text-align:center; height:20px;}
 
+/* 人间网的表情*/
+.renjian_emot{
+	display: inline-block;
+	background: transparent url(http://renjian.com/images/base.gif?v=2) no-repeat scroll 0px 0px;
+	height: 20px;
+	vertical-align: middle;
+	width: 20px;
+}
+
 /* iPhone表情 */
 .iphoneEmoji{
 	background: url(../images/faces/iphone_emoji.png);

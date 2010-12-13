@@ -2201,6 +2201,18 @@ $.extend(RenjianAPI, {
 	url_encode: function(text) {
 		return text;
 	},
+
+    processEmotional: function(str){
+        str = str.replace(/\[\/\/(\w+)\]/g, this._replaceEmotional);
+        return str;
+    },
+    _replaceEmotional: function(m, g){
+        if(g && window.RENJIAN_EMOTIONS && RENJIAN_EMOTIONS[g]){
+            return '<span class="renjian_emot" style="background-position: ' + RENJIAN_EMOTIONS[g][1] + ';" title="' + RENJIAN_EMOTIONS[g][0] + '"></span>';
+        }else{
+            return m;
+        }
+    },
 	
 	comments_timeline: function(data, callback) {
 		callback();
