@@ -48,7 +48,7 @@ var T_NAMES = {
 	'digu': '嘀咕',
 	'fanfou': '饭否',
 	'tsohu': '搜狐微博',
-//	't163': '网易微博',
+	't163': '网易微博',
 	'zuosa': '做啥',
 //	'follow5': 'Follow5',
 	'twitter': 'Twitter',
@@ -1325,7 +1325,7 @@ var ImageService = {
 			var item = this.services[name];
 			if(item.url_re.test(url)) {
 				hit = {name: name, service: item};
-				return false;
+				break;
 			}
 		}
 		return hit;

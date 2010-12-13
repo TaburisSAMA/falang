@@ -892,7 +892,10 @@ var sinaApi = {
     // play_load: status, user, comment, message, count, result(reset_count)
     // args: request arguments
     format_result: function(data, play_load, args) {
-    	var items = data.results || data.users || data;
+    	var items = data;
+    	if(!$.isArray(items)) {
+    		items = data.results || data.users;
+    	}
 		if($.isArray(items)) {
 	    	for(var i in items) {
 	    		items[i] = this.format_result_item(items[i], play_load, args);
@@ -2168,10 +2171,139 @@ $.extend(T163API, {
 		source: 'CMlCI0PLHNtmjzCA', // 需要申请
 		oauth_key: 'CMlCI0PLHNtmjzCA',
         oauth_secret: 'tYU2lK30IlSRhuX8ouUtEx8Uk2fRf8Yk',
-        support_search: false,
         oauth_authorize: '/oauth/authenticate',
+        support_counts: false,
+        support_repost: false,
+        support_search_max_id: false,
+        
+        search: '/search',
+        repost: '/statuses/update',
+        comments: '/statuses/comments/{{id}}',
+        retweet: '/statuses/retweet/{{id}}', // RT
         friends_timeline: '/statuses/home_timeline'
-	})
+	}),
+	
+	retweet: TwitterAPI.retweet,
+	
+	url_encode: function(text) {
+		return text;
+	},
+	
+	before_sendRequest: function(args, user) {
+		if(args.url == this.config.user_timeline) {
+			if(args.data.id) {
+				// id => user_id
+				args.data.user_id = args.data.id;
+				delete args.data.id;
+				delete args.data.screen_name;
+			}
+		} else if(args.url == this.config.comment || args.url == this.config.reply) {
+			args.data.in_reply_to_status_id = args.data.id;
+			args.data.status = args.data.comment;
+			args.url = this.config.update;
+			args.is_comment = true;
+			args.data.dispatch_to_followers = '0';
+			delete args.data.comment;
+			delete args.data.id;
+			delete args.data.cid;
+			delete args.data.reply_user_id;
+		} else if(args.url == this.config.repost) {
+			if(args.data.sina_id) { // @回复
+				//args.data.in_reply_to_status_id = args.data.sina_id;
+				delete args.data.sina_id;
+			}
+		}
+    },
+    
+    format_result_item: function(data, play_load, args) {
+		if(play_load == 'user' && data && data.id) {
+			data.t_url = 'http://t.163.com/' + data.screen_name;
+		} else if(play_load == 'status') {
+			// search
+			if(!data.user) {
+				data.user = {
+					id: data.from_user_id,
+					screen_name: data.from_user,
+					name: data.from_user_name,
+					profile_image_url: data.profile_image_url
+				};
+				if(data.to_status_id && data.to_user_id) {
+					data.in_reply_to_status_id = data.to_status_id;
+					data.in_reply_to_user_id = data.to_user_id;
+					data.in_reply_to_screen_name = data.to_user;
+					data.in_reply_to_user_name = data.to_user_name;
+					data.in_reply_to_status_text = data.to_status_text;
+				}
+				delete data.from_user_id;
+				delete data.from_user;
+				delete data.from_user_name;
+				delete data.profile_image_url;
+				delete data.to_status_id;
+				delete data.to_user_id;
+				delete data.to_user;
+				delete data.to_user_name;
+				delete data.to_status_text;
+			}
+			data.user = this.format_result_item(data.user, 'user', args);
+			var tpl = '{{user.t_url}}/status/{{id}}';
+			if(data.retweeted_status) {
+				data.retweeted_status = this.format_result_item(data.retweeted_status, 'status', args);
+			}
+//			// 设置status的t_url
+			data.t_url = tpl.format(data);
+			// retweeted_status
+			if(data.in_reply_to_status_id && data.in_reply_to_status_text) {
+				data.retweeted_status = {
+					id: data.in_reply_to_status_id,
+					text: data.in_reply_to_status_text,
+					comments_count: data.comments_count,
+					user: {
+						id: data.in_reply_to_user_id,
+						screen_name: data.in_reply_to_screen_name,
+						name: data.in_reply_to_user_name
+					}
+				};
+				data.retweeted_status.user = this.format_result_item(data.retweeted_status.user, 'user', args);
+				data.retweeted_status = this.format_result_item(data.retweeted_status, 'status', args);
+				
+				if(data.root_in_reply_to_status_id && data.root_in_reply_to_status_id != data.in_reply_to_status_id 
+						&& data.root_in_reply_to_status_text) {
+					data.retweeted_status.retweeted_status = {
+						id: data.root_in_reply_to_status_id,
+						text: data.root_in_reply_to_status_text,
+						comments_count: data.retweeted_status.comments_count,
+						user: {
+							id: data.root_in_reply_to_user_id,
+							screen_name: data.root_in_reply_to_screen_name,
+							name: data.root_in_reply_to_user_name
+						}
+					};
+					delete data.root_in_reply_to_status_id;
+					delete data.root_in_reply_to_status_text;
+					delete data.root_in_reply_to_user_id;
+					delete data.root_in_reply_to_screen_name;
+					delete data.root_in_reply_to_user_name;
+					data.retweeted_status.retweeted_status.user = this.format_result_item(data.retweeted_status.retweeted_status.user, 'user', args);
+					data.retweeted_status.retweeted_status = this.format_result_item(data.retweeted_status.retweeted_status, 'status', args);
+				}
+				delete data.in_reply_to_status_id;
+				delete data.in_reply_to_status_text;
+				delete data.in_reply_to_user_id;
+				delete data.in_reply_to_screen_name;
+				delete data.in_reply_to_user_name;
+			}
+		} else if(play_load == 'message') {
+			data.sender = this.format_result_item(data.sender, 'user', args);
+			data.recipient = this.format_result_item(data.recipient, 'user', args);
+		} else if(play_load == 'comment') {
+			data.user = this.format_result_item(data.user, 'user', args);
+			if(data.status) {
+				data.status = this.format_result_item(data.status, 'status', args);
+			}
+		}
+		return data;
+	}
+	
 });
 
 // 人间

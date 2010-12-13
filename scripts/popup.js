@@ -2030,7 +2030,7 @@ function sendOretweet(ele, screen_name, tweetId){//twitter锐推
     var user = getUser();
     var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
     tapi.retweet({id:tweetId, user:user}, function(data, textStatus){
-        if(textStatus != 'error' && data && !data.error && data.id){
+        if(textStatus != 'error' && data && !data.error){
             _a.removeAttr('onclick').addClass('orted').attr('title', '已成功锐推').show();
 
             var c_user = getUser();

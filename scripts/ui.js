@@ -44,7 +44,7 @@ function buildStatusHtml(statuses, t, c_user){
         rtRetweetBtn: '<a class="rtweet" href="javascript:void(0);" onclick="doRT(this, true);" title="Twitter式转发">RT</a>',
         rtOretweetBtn: '<a class="oretweet ort" href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'{{retweeted_status.user.screen_name}}\',\'{{retweeted_status.id}}\');" title="Twitter锐推"></a>',
         rtCommentBtn: '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{retweeted_status.user.screen_name}}\', \'{{retweeted_status.user.id}}\', \'{{retweeted_status.id}}\');" title="点击添加评论">评</a>',
-        rtCommentCounts: '<span class="commentCounts">(-)</span>',
+        rtCommentCounts: '<span class="commentCounts">({{rt_comments_count}})</span>',
         rtReplyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'{{retweeted_status.user.screen_name}}\',\'{{retweeted_status.id}}\');" title="进行@回复">@</a>',
         rtAddFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'{{retweeted_status.user.screen_name}}\',\'{{retweeted_status.id}}\');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>',
         rtRepostCounts: '<span class="repostCounts">(-)</span>',
@@ -55,7 +55,7 @@ function buildStatusHtml(statuses, t, c_user){
         rtrtRetweetBtn: '<a class="rtweet" href="javascript:void(0);" onclick="doRT(this, false, true);" title="Twitter式转发">RT</a>',
         rtrtRepostBtn: '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\',\'{{retweeted_status.retweeted_status.id}}\');" title="转发这条微博">转</a>',
         rtrtCommentBtn: '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\', \'{{retweeted_status.retweeted_status.user.id}}\', ,\'{{retweeted_status.retweeted_status.id}}\');" title="点击添加评论">评</a>',
-        rtrtCommentCounts: '<span class="commentCounts">(-)</span>',
+        rtrtCommentCounts: '<span class="commentCounts">({{rtrt_comments_count}})</span>',
         rtrtReplyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\',\'{{retweeted_status.retweeted_status.id}}\');" title="进行@回复">@</a>',
         rtrtAddFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\',\'{{retweeted_status.retweeted_status.id}}\');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>',
         rtrtRepostCounts: '<span class="repostCounts">(-)</span>'
@@ -67,7 +67,8 @@ function buildStatusHtml(statuses, t, c_user){
     }
     // 不支持repost(转发)
     if(!config.support_repost) {
-    	BUTTON_TPLS.repostCounts = BUTTON_TPLS.rtRepostCounts = BUTTON_TPLS.repostBtn = BUTTON_TPLS.rtRepostBtn = '';
+    	BUTTON_TPLS.repostCounts = BUTTON_TPLS.rtRepostCounts = BUTTON_TPLS.rtrtRepostCounts = 
+    		BUTTON_TPLS.repostBtn = BUTTON_TPLS.rtRepostBtn = BUTTON_TPLS.rtrtRepostBtn = '';
     }
     if(!config.support_counts) {
     	BUTTON_TPLS.repostCounts = BUTTON_TPLS.rtRepostCounts = '';
@@ -109,7 +110,7 @@ function buildStatusHtml(statuses, t, c_user){
 	    default:
 	        break;
 	}
-    if(c_user.blogType != 'twitter') {
+    if(c_user.blogType != 'twitter' && c_user.blogType != 't163') {
     	BUTTON_TPLS.rtOretweetBtn = BUTTON_TPLS.oretweetBtn = '';
     }
 	
@@ -120,7 +121,7 @@ function buildStatusHtml(statuses, t, c_user){
 	    case 'renjian':
 	    	BUTTON_TPLS.repostCounts = BUTTON_TPLS.rtRepostCounts = BUTTON_TPLS.rtrtRepostCounts = '';
 	        break;
-        case 'douban':
+	    case 'douban':
 	    	BUTTON_TPLS.replyBtn = BUTTON_TPLS.rtReplyBtn = BUTTON_TPLS.rtrtReplyBtn = '';
             //BUTTON_TPLS.new_msgBtn = BUTTON_TPLS.new_msgBtn.replace('>私<', '>豆邮<');
 	        break;
@@ -146,9 +147,18 @@ function buildStatusHtml(statuses, t, c_user){
      		}
      	}
      	status.comments_count = comments_count;
+     	status.rt_comments_count = status.rtrt_comments_count = '-';
      	if(status.retweeted_status && status.retweeted_status.user) {
      		status.retweeted_status_screen_name = status.retweeted_status.user.screen_name;
      		status.retweeted_status_id = status.retweeted_status.id;
+     		if(status.retweeted_status.rt_comments_count !== undefined) {
+     			status.rt_comments_count = '<a href="javascript:void(0);" title="点击查看评论" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>'.format(status.retweeted_status);
+     		}
+     		if(status.retweeted_status.retweeted_status && status.retweeted_status.retweeted_status.user) {
+     			if(status.retweeted_status.retweeted_status.rt_comments_count !== undefined) {
+         			status.rtrt_comments_count = '<a href="javascript:void(0);" title="点击查看评论" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>'.format(status.retweeted_status.retweeted_status);
+         		}
+     		}
      	} else {
      		status.retweeted_status_id = status.retweeted_status_screen_name = '';
      	}
@@ -162,7 +172,7 @@ function buildStatusHtml(statuses, t, c_user){
      				tpl = '';
      			}
      		}
-     		if(tpl && key.endswith('MapBtn') && (!status.geo || !status.geo.coordinates)) {
+     		if(tpl && key.endswith('MapBtn') && (!status.geo || !status.geo.coordinates || status.geo.coordinates[0] == '0.0')) {
      			tpl = '';
  	        }
      		if(tpl) {
@@ -218,7 +228,6 @@ function buildStatusHtml(statuses, t, c_user){
             		status.retweeted_status.retweeted_status.is_rt = true;
             		html = html.replace(rt_rt_replace_pre, Shotenjin.render(TEMPLATE_RT_RT, context));
                 }
-            	
             }
             htmls.push(html);
         } catch(err) {
