@@ -383,7 +383,10 @@ var Search = {
 	    		return;
 	    	}
 	    	var statuses = data.results || data.items || data;
-	        if(statuses && statuses.length > 0){
+	    	if(!statuses) { // 异常
+	    		return;
+	    	}
+	        if(statuses.length > 0){
 	        	if(window.currentTab != "#user_timeline_timeline") {
 	        		//添加当前激活的状态
 	                $tab.siblings().removeClass('active').end().addClass('active');
@@ -402,13 +405,13 @@ var Search = {
 	            // 保存数据，用于翻页
 	            $tab.attr('q', q);
 	            $tab.attr('page', page + 1)
-	            if(statuses.length > 0) {
-	            	max_id = data.max_id || String(statuses[statuses.length - 1].id);
-	            	$tab.attr('max_id', max_id);
-	            	showReadMore(m);
-	            }
-	        }else{
-                hideReadMore(m, true); //没有分页了
+	        }
+	        if(statuses.length > 0) {
+            	max_id = data.max_id || String(statuses[statuses.length - 1].id);
+            	$tab.attr('max_id', max_id);
+            	showReadMore(m);
+            } else {
+            	hideReadMore(m, true); //没有分页了
             }
 	        checkShowGototop();
 	    });

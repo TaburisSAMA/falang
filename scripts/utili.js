@@ -1140,6 +1140,8 @@ var Instagram = {
 	 * middle: http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_6.jpg
 	 * small: http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_5.jpg
 	 */
+	name: 'Instagram',
+	url_re: /http:\/\/instagr\.am\/p\//i,
 	get: function(url, callback) {
 		$.ajax({
 			url: url,
@@ -1151,6 +1153,9 @@ var Instagram = {
 					original_pic: src
 				};
 				callback(pics);
+			},
+			error: function() {
+				callback(null);
 			}
 		});
 	}
@@ -1163,6 +1168,8 @@ var Plixi = {
 	 * http://api.plixi.com/api/tpapi.svc/imagefromurl?size=medium&url=http://tweetphoto.com/5527850
 	 * http://api.plixi.com/api/tpapi.svc/imagefromurl?size=big&url=http://tweetphoto.com/5527850
 	 */
+	name: 'Plixi',
+	url_re: /http:\/\/(plixi\.com\/p|tweetphoto\.com)\//i,
 	get: function(url, callback) {
 		var tpl = 'http://api.plixi.com/api/tpapi.svc/imagefromurl?size={{size}}&url=' + url;
 		var pics = {
@@ -1171,6 +1178,43 @@ var Plixi = {
 			original_pic: url//tpl.format({size: 'big'})
 		};
 		callback(pics);
+	}
+};
+
+// http://api.imgur.com/
+// http://i.imgur.com/xuCIWm.png or http://imgur.com/z2pX5.png
+// key: cba6198873ac20498a5686839b189fc0
+var Imgur = {
+	name: 'Imgur',
+	url_re: /http:\/\/(i\.)?imgur\.com\/\w+\.png/i,
+	get: function(url, callback) {
+		var re = /imgur.com\/(\w+)\.png/i;
+		var tpl = 'http://i.imgur.com/{{word}}.png';
+		var results = re.exec(url);
+		var pics = null;
+		if(results) {
+			var word = results[1];
+			pics = {
+				thumbnail_pic: tpl.format({word: word + 's'}),
+				bmiddle_pic: tpl.format({word: word + 'm'}),
+				original_pic: url
+			};
+		}
+		callback(pics);
+	}
+};
+
+var ImageService = {
+	services: [Instagram, Plixi, Imgur],
+	check: function(url) {
+		var hit = null;
+		$.each(this.services, function(index, item) {
+			if(item.url_re.test(url)) {
+				hit = item;
+				return false;
+			}
+		});
+		return hit;
 	}
 };
 
