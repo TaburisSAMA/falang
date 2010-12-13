@@ -226,7 +226,11 @@
 					</div>
 					<div class="msg">
 						<div class="tweet">
-							<div class="tweet_text">#{processMsg(account, tweet.text)} #{btn.showMapBtn}</div>
+							<div class="tweet_text">#{processMsg(account, tweet.text)} #{btn.showMapBtn}
+								<?js if(tweet.crosspostSource) { ?>
+								<a target="_blank" href="#{tweet.crosspostSource}" title="查看原文">查看原文</a>
+								<?js } ?>
+							</div>
 							<?js if(tweet.thumbnail_pic){ ?>
 							<div>
 								<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.bmiddle_pic}" original="#{tweet.original_pic}" onmousedown="rOpenPic(event, this)" title="右键点击打开原图" class="thumbnail_pic" >
@@ -294,7 +298,11 @@
 							#{ btn.rtAddFavoritesMsgBtn + btn.rtReplyBtn + btn.rtRetweetBtn + btn.rtRepostBtn + btn.rtRepostCounts + btn.rtOretweetBtn + btn.rtCommentBtn + btn.rtCommentCounts}
 						</span>
 					</div>
-					<div class="tweet_text">#{processMsg(account, tweet.retweeted_status.text)} #{btn.rtShowMapBtn}</div>
+					<div class="tweet_text">#{processMsg(account, tweet.retweeted_status.text)} #{btn.rtShowMapBtn}
+						<?js if(tweet.crosspostSource) { ?>
+						<a target="_blank" href="#{tweet.crosspostSource}" title="查看原文">查看原文</a>
+						<?js } ?>
+					</div>
 					<?js if(tweet.retweeted_status.thumbnail_pic){ ?>
 					<div>
 						<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.retweeted_status.bmiddle_pic}" title="右键点击打开原图" original="#{tweet.retweeted_status.original_pic}" onmousedown="rOpenPic(event, this)" class="thumbnail_pic" >

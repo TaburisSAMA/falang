@@ -1765,6 +1765,18 @@ function doRT(ele, is_rt, is_rt_rt){//RT
             }
         });
     }
+    if(data.crosspostSource) {
+    	// 有原文url地址，并尝试缩短
+//    	var settings = Settings.get();
+    	var longurl = data.crosspostSource;
+    	val += ' [原]' + longurl;
+//        _shortenUrl(longurl, settings, function(shorturl) {
+//        	if(shorturl){
+//                t.blur().val(t.val().replace(longurl, shorturl)).focus();
+//                countInputText();
+//            }
+//        });
+    }
     t.val(val);
     t.focus(); //光标在头部
 };

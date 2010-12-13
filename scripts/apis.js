@@ -2492,10 +2492,10 @@ $.extend(BuzzAPI, {
 				data.retweeted_status = this.format_result_item(data.object, 'status', args);
 			} else {
 				data.text = data.object ? data.object.content : data.content;
-//				if(data.crosspostSource) {
-//					var url = data.crosspostSource.substring(data.crosspostSource.indexOf('http://'));
+				if(data.crosspostSource) {
+					data.crosspostSource = data.crosspostSource.substring(data.crosspostSource.indexOf('http://'));
 //					data.text += ' <a href="' + url + '">' + url + '</a>';
-//				}
+				}
 				var attachments = data.object ? data.object.attachments : data.attachments;
 				if(attachments && attachments[0].type == 'photo') {
 					data.thumbnail_pic = attachments[0].links.preview[0].href;
@@ -2525,7 +2525,6 @@ $.extend(BuzzAPI, {
 				data.favorited = true;
 			}
 			delete data.annotation;
-			delete data.crosspostSource;
 			delete data.object;
 			delete data.title;
 			delete data.links;
