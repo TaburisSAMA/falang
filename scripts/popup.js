@@ -952,7 +952,7 @@ function getUserTimeline(screen_name, user_id, read_more) {
             $tab.attr('page', page);
             $tab.attr('screen_name', screen_name);
             $tab.attr('user_id', user_id);
-            if(sinaMsgs.length > 15){
+            if(sinaMsgs.length > 8){
                 showReadMore(m);
             }else{
                 hideReadMore(m, true); //没有分页了
