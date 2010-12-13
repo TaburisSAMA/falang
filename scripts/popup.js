@@ -403,7 +403,9 @@ var Search = {
 //	                $ul.prepend(userinfo_html);
 //	                resetScrollTop(m);
 //	            }
-	        }
+	        }else{
+                hideReadMore(m, true); //没有分页了
+            }
 	        hideLoading();
 	        checkShowGototop();
 	    });
@@ -817,7 +819,6 @@ function _getFansList(to_t, read_more){
     $to_t.attr('loading', true);
     tapi[to_t](params, function(data, textStatus, statuCode){
     	// 如果用户已经切换，则不处理
-    	showReadMore(to_t);
     	var now_user = getUser();
     	if(now_user.uniqueKey != c_user.uniqueKey) {
     		return;
@@ -843,9 +844,17 @@ function _getFansList(to_t, read_more){
                 html_cache[to_t] += html;
             }
             // 设置游标，控制翻页
-            if(next_cursor) {
+            if(next_cursor >= 0) {
         		$to_t.attr('cursor', next_cursor);
         	}
+
+            if(users && users.length > 15){
+                showReadMore(to_t);
+            }else{
+                hideReadMore(to_t, true);
+            }
+        }else{
+            hideReadMore(to_t, true);
         }
         $to_t.removeAttr('loading');
     });
@@ -914,7 +923,7 @@ function getUserTimeline(screen_name, user_id, read_more) {
     		return;
     	}
     	var sinaMsgs = data.items || data;
-    	if(support_cursor_only && data.next_cursor) {
+    	if(support_cursor_only && data.next_cursor >= 0) {
     		$tab.attr('cursor', data.next_cursor);
     	}
         if(sinaMsgs && sinaMsgs.length > 0){
@@ -940,7 +949,11 @@ function getUserTimeline(screen_name, user_id, read_more) {
             $tab.attr('page', page);
             $tab.attr('screen_name', screen_name);
             $tab.attr('user_id', user_id);
-            showReadMore(m);
+            if(sinaMsgs.length > 15){
+                showReadMore(m);
+            }else{
+                hideReadMore(m, true); //没有分页了
+            }
             if(!read_more) {
             	var user = data.user || sinaMsgs[0].user || sinaMsgs[0].sender;
             	// 是否当前用户
@@ -949,6 +962,8 @@ function getUserTimeline(screen_name, user_id, read_more) {
                 $ul.prepend(userinfo_html);
                 resetScrollTop(m);
             }
+        }else{
+            hideReadMore(m, true);
         }
         hideLoading();
         checkShowGototop();
@@ -1002,7 +1017,7 @@ function getFavorites(is_click){
     	}
         if(textStatus != 'error' && data && !data.error){
         	var status = data.items || data;
-        	if(data.next_cursor) {
+        	if(data.next_cursor >= 0) {
         		list.attr('cursor', data.next_cursor);
         	}
         	list.attr('page', Number(page) + 1);
@@ -1229,6 +1244,7 @@ function scrollPaging(){
     var c_t = window.currentTab;
     var tl = c_t.replace('#','').replace(/_timeline$/i,'');
     if(!isCanReadMore(tl)){
+        //hideReadMore(tl, true);
         return;
     }
     //var h = $(c_t + ' .list').height();
