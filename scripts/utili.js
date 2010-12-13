@@ -42,7 +42,7 @@ var T_LIST = {
 };
 T_LIST.tsina = T_LIST.tsohu = T_LIST.all;
 T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.digu;
-
+T_LIST.t163 = ['friends_timeline','mentions'];
 var T_NAMES = {
 	'tsina': '新浪微博',
 	'digu': '嘀咕',

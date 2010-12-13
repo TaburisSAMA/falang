@@ -2212,6 +2212,9 @@ $.extend(T163API, {
 				//args.data.in_reply_to_status_id = args.data.sina_id;
 				delete args.data.sina_id;
 			}
+		} else if(args.url == this.config.new_message) {
+			args.data.user = args.data.id;
+			delete args.data.id;
 		}
     },
     

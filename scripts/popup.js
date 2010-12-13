@@ -507,6 +507,10 @@ function checkSupportedTabs(user){
         	$(checks[key][1]).show();
         }
     }
+    // 如果是t163，则隐藏评论tab，但是它可以评论
+    if(user.blogType == 't163') {
+    	$('#tl_tabs .tab-comments_timeline, #comments_timeline_timeline').hide();
+    }
 };
 
 //多用户切换
@@ -1588,6 +1592,10 @@ function sendWhisper(msg){
     data['user'] = user;
     btn.attr('disabled','true');
     txt.attr('disabled','true');
+    if(user.blogType == 't163') {
+    	// 163只需要用户
+    	data.id = $('#replyUserName').val();
+    }
     tapi.new_message(data, function(sinaMsg, textStatus){
         if(sinaMsg === true || sinaMsg.id){
             hideReplyInput();
