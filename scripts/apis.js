@@ -31,6 +31,7 @@ var sinaApi = {
 		support_mentions: true, 
 		support_friendships_create: true,
 		support_search: true,
+		support_search_max_id: true,
 		need_processMsg: true, //是否需要处理消息的内容
 		comment_need_user_id: false, // 评论是否需要使用到用户id，默认为false，兼容所有旧接口
         
@@ -878,7 +879,7 @@ var sinaApi = {
         this._sendRequest(params, callbackFn);
     },
     
-    // q, max_id, rpp
+    // q, max_id, count
     search: function(data, callback) {
     	var params = {
             url: this.config.search,
@@ -1145,8 +1146,8 @@ $.extend(TSohuAPI, {
 		
 	    oauth_key: '5vi74qXPB5J97GNzsevN',
         oauth_secret: 'fxZbb-07bCvv-BCA1Qci2lO^7wnl0%pRE$mvG1K#',
-        support_search: false,
         support_max_id: false,
+        support_search_max_id: false,
         favorites: '/favourites',
 	    favorites_create: '/favourites/create/{{id}}',
 	    favorites_destroy: '/favourites/destroy/{{id}}',
@@ -1181,10 +1182,16 @@ $.extend(TSohuAPI, {
 		} else if(args.url == this.config.destroy) { 
 			// method => delete
 			args.type = 'delete';
+		} else if(args.url == this.config.search) {
+			args.data.rpp = args.data.count;
+			delete args.data.count;
 		}
 	},
 	
     format_result: function(data, play_load, args) {
+    	if(args.url == this.config.search) {
+    		data = data.statuses;
+    	}
 		if($.isArray(data)) {
 	    	for(var i in data) {
 	    		data[i] = this.format_result_item(data[i], play_load, args);
@@ -1262,12 +1269,12 @@ $.extend(DiguAPI, {
         search_url: 'http://digu.com/search/',
 		source: 'fawave', 
 	    source2: 'fawave',
-	    support_search: false,
 	    support_comment: false,
 	    support_repost: false,
 	    support_max_id: false,
 	    support_sent_direct_messages: false,
 	    repost_pre: '转载:',
+	    support_search_max_id: false,
 	    
 	    verify_credentials:   '/account/verify',
 	    
@@ -1280,6 +1287,7 @@ $.extend(DiguAPI, {
         repost:               '/statuses/update',
         comment:              '/statuses/update',
         reply:                '/statuses/update',
+        search: '/search_statuses',
         
         ErrorCodes: {
         	'-1': '服务器错误',
@@ -1513,13 +1521,14 @@ $.extend(ZuosaAPI, {
         user_home_url: 'http://zuosa.com/',
 		source: 'fawave', 
 		repost_pre: 'ZT',
-	    support_search: false,
 	    support_comment: false,
 	    support_repost: false,
 	    support_max_id: false,
+	    support_search_max_id: false,
 	    
 	    upload: '/statuses/update',
-	    repost: '/statuses/update'
+	    repost: '/statuses/update',
+	    search: '/search'
 	}),
 	
 	// 无需urlencode
@@ -1666,7 +1675,6 @@ $.extend(LeiHouAPI, {
         user_home_url: 'http://leihou.com/',
 		source: 'fawave', 
 		repost_pre: 'RT',
-	    support_search: false,
 	    support_comment: false,
 	    support_repost: false,
 	    
@@ -1675,7 +1683,8 @@ $.extend(LeiHouAPI, {
 	
 	    upload: '/statuses/update',
 	    repost: '/statuses/update',
-	    comment: '/statuses/update'
+	    comment: '/statuses/update',
+	    search: '/search'
 	}),
 	
 	// 无需urlencode
@@ -1949,7 +1958,7 @@ $.extend(TwitterAPI, {
 	    support_comment: false,
 	    support_repost: false,
 	    support_upload: false,
-	    support_search: false,
+	    search: '/search_statuses',
 	    repost: '/statuses/update',
         retweet: '/statuses/retweet/{{id}}',
         favorites_create: '/favorites/create/{{id}}',
@@ -2038,10 +2047,10 @@ $.extend(FanfouAPI, {
         search_url: 'http://fanfou.com/q/',
 		source: 'fawave',
 		repost_pre: '转',
-		support_search: false,
 	    support_comment: false,
 	    support_repost: false,
-	    upload: '/photos/upload'
+	    upload: '/photos/upload',
+	    search: '/search/public_timeline'
 	}),
 	
 	// 无需urlencode

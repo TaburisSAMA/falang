@@ -351,23 +351,31 @@ var Search = {
 	    $tab.attr('statusType', 'search');
 	    var $ul = $("#user_timeline_timeline ul.list");
 	    var max_id = null;
+	    var page = 1;
+	    var support_search_max_id = tapi.get_config(c_user).support_search_max_id;
 	    var q = $("#txtSearch").val();
 	    if(read_more) {
 	    	// 滚动的话，获取上次的参数
 	        max_id = $tab.attr('max_id');
 	        q = $tab.attr('q');
+	        page = Number($tab.attr('page') || 1);
 	    }  else {
 	    	// 第一次搜索
 	    	$ul.html('');
 	    }
 	    var params = {count: PAGE_SIZE, q: q, user: c_user};
-	    if(max_id) {
-	    	params.max_id = max_id;
+	    if(support_search_max_id) {
+	    	if(max_id) {
+		    	params.max_id = max_id;
+		    }
+	    } else {
+	    	params.page = page;
 	    }
 	    showLoading();
 	    var m = 'user_timeline';
 	    hideReadMore(m);
-	    tapi.search(params, function(data, textStatus){
+	    tapi.search(params, function(data, textStatus) {
+	    	hideLoading();
             hideReadMoreLoading(m);
 	    	// 如果用户已经切换，则不处理
 	    	var now_user = getUser();
@@ -390,24 +398,18 @@ var Search = {
 	
 	                window.currentTab = "#user_timeline_timeline";
 	        	}
-	            addPageMsgs(statuses, m, true);
-	            max_id = data.max_id || String(statuses[statuses.length - 1].id);
+	            statuses = addPageMsgs(statuses, m, true);
 	            // 保存数据，用于翻页
 	            $tab.attr('q', q);
-	            $tab.attr('max_id', max_id);
-//	            showReadMore(m);
-//	            if(!read_more) {
-//	            	var user = data.user || statuses[0].user || statuses[0].sender;
-//	            	// 是否当前用户
-//	            	user.is_me = String(c_user.id) == String(user.id);
-//	                var userinfo_html = buildUserInfo(user);
-//	                $ul.prepend(userinfo_html);
-//	                resetScrollTop(m);
-//	            }
+	            $tab.attr('page', page + 1)
+	            if(statuses.length > 0) {
+	            	max_id = data.max_id || String(statuses[statuses.length - 1].id);
+	            	$tab.attr('max_id', max_id);
+	            	showReadMore(m);
+	            }
 	        }else{
                 hideReadMore(m, true); //没有分页了
             }
-	        hideLoading();
 	        checkShowGototop();
 	    });
     }

@@ -1067,6 +1067,7 @@ var ShortenUrl = {
 		'goo.gl': {api: 'http://goo.gl/api/url', format: 'json', method: 'post', param_name: 'url', result_name: 'short_url'},
 //		'v.gd':  'http://v.gd/create.php?format=simple&url={{url}}',
 		'is.gd': 'http://is.gd/api.php?longurl={{url}}',
+		'seso.me': 'http://seso.me/api/?longurl={{url}}',
 		'tinyurl.com': 'http://tinyurl.com/api-create.php?url={{url}}',
 		'to.ly': 'http://to.ly/api.php?longurl={{url}}',
 		'zi.mu': 'http://zi.mu/api.php?format=simple&action=shorturl&url={{url}}',
