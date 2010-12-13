@@ -1011,7 +1011,7 @@ function getFavorites(is_click){
 	            showReadMore(t);
 	            user_cache[t] = list.html();
 	        } else {
-	            hideReadMore(t);
+	            hideReadMore(t, true);
 	        }
         } else {
         	showReadMore(t);
@@ -1195,18 +1195,34 @@ function commentPage(ele, tweetId, is_pre){
 var CAN_SCROLL_PAGING = {};
 //有分页
 function showReadMore(t){
-    //$("#" + t + "ReadMore").css({display:"block"});
     CAN_SCROLL_PAGING[t] = true;
+
+    hideReadMoreLoading(t);
 };
 //正在获取分页或者没有分页内容了
-function hideReadMore(t){
-    //$("#" + t + "ReadMore").hide();
+//@nomore: 没有分页内容了
+function hideReadMore(t, nomore){
     CAN_SCROLL_PAGING[t] = false;
+
+    if(!nomore){
+        showReadMoreLoading(t);
+    }else{
+        hideReadMoreLoading(t);
+    }
 };
 //是否可以分页
 function isCanReadMore(t){
     //$("#" + t + "ReadMore").hide();
     return CAN_SCROLL_PAGING[t] || false;
+};
+//显示获取分页loading
+function showReadMoreLoading(t){
+    $("#" + t + "_rm_loading").show();
+    $("#" + t + '_timeline .list_warp').scrollTop(100000); //底部
+};
+//隐藏获取分页loading
+function hideReadMoreLoading(t){
+    $("#" + t + "_rm_loading").hide();
 };
 
 function scrollPaging(){

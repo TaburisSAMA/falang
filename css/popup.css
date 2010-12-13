@@ -216,6 +216,8 @@ li .pic{max-width:160px; max-height:160px;}
 li .thumbnail_pic{position:relative;display:inline-block;}
 li .thumbnail_pic .img_loading{position:absolute;left:42%;top:43%;}
 
+.readmore_loading{display:none; text-align:center; height:20px;}
+
 /* iPhone表情 */
 .iphoneEmoji{
 	background: url(../images/faces/iphone_emoji.png);
