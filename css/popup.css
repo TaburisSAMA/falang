@@ -49,8 +49,8 @@ textarea:focus{outline: none;}
 	border-bottom:solid 1px #fff;
 	-webkit-transition: height .6s ease;
 }
-#submitWarp .ctr{margin-top:2px;}
-#wordCount{float:right;font-size:13px;font-weight: bold;}
+#submitWarp .ctr{margin-top:2px; position:relative;}
+#wordCount{font-size:13px;font-weight: bold; position:absolute; top:0; right:0;}
 #header{
 	font-size:12px;
 	position: relative;
@@ -207,6 +207,42 @@ textarea:focus{outline: none;}
 	vertical-align:bottom;
 }
 /* 用户发送列表选择 END */
+
+#doingWarp{
+	display:inline-block;
+	vertical-align: top;
+	padding:2px 3px;
+	height:16px;
+	width:16px;
+	border-radius: 3px 3px;
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#CCC));
+	border:solid 1px #ccc;
+}
+
+#urlShortenBtn{
+	display:inline-block;
+	vertical-align: top;
+	padding:2px;
+	height:16px;
+	width:18px;
+	border-bottom-left-radius: 3px 3px;
+	border-top-left-radius: 3px 3px;
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#CCC));
+	border:solid 1px #ccc;
+}
+#urlShortenBtn:hover{background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#ccc), to(#fff));}
+#urlShortenInp{
+	position: absolute;
+	margin-left: -5px;
+	height:16px;
+	border: 1px solid #CCC;
+	padding: 2px;
+	outline: none;
+	vertical-align: top;
+	width:5px;
+	-webkit-transition: all .2s;
+}
+#urlShortenInp.long{width:180px;}
 
 .quickUpImg{margin-left:5px;}
 

@@ -56,8 +56,10 @@
 				<input id="btnSend" type="button" value="发微!" title="ctrl + enter 发送" class="btn send" disabled="disabled" />&nbsp;
 				<a href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');" title="点击添加表情"><img src="images/face.gif" />表情</a>&nbsp;
 				<a href="javascript:void(0);" onclick="openUploadImage();" title="点击上传图片"><img src="images/image.gif" />图片</a>&nbsp;
-				<input type="button" value="清空" onclick="cleanTxtContent();" class="btn"/>&nbsp;
+				<input type="button" value="清空" onclick="cleanTxtContent();" class="btn"/>
 				<span id="doingWarp"></span>
+				<a id="urlShortenBtn" href="javascript:" title="缩短网址" onclick="addShortenUrl()"><img src="images/link_add.png"></a>
+				<input type="text" id="urlShortenInp" onclick="showAddShortenUrl()" />
 				<span id="wordCount">140</span>
 			</div>
 		  </div>

@@ -312,6 +312,48 @@ function _shortenUrl(longurl, settings, callback) {
     }
 };
 
+// 添加缩短url
+function addShortenUrl(){
+    var btn = $("#urlShortenBtn");
+    var status = btn.data('status');
+    switch(status){
+        case 'shorting':
+            showMsg('正在努力缩短中，请稍后');
+            break;
+        case 'opened':
+            var long_url = $("#urlShortenInp").val();
+            if(!long_url){
+                return;
+            }
+            btn.data('status', 'shorting');
+            $("#urlShortenInp").val('正在缩短...').attr('disabled', true);
+            ShortenUrl.short(long_url, function(shorturl){
+                if(shorturl){
+                    $("#txtContent").val($("#txtContent").val() + ' ' + shorturl + ' ');
+                    $("#urlShortenInp").removeClass('long').val('');
+                    btn.data('status', ''); 
+                }else{
+                    showMsg('缩短网址失败');
+                    $("#urlShortenInp").val(long_url);
+                    btn.data('status', 'opened'); //失败，仍然标记为打开的
+                }
+                $("#urlShortenInp").removeAttr('disabled');
+            });
+            break;
+        default:
+            btn.data('status', 'opened');
+            $("#urlShortenInp").addClass('long').focus();
+            break;
+    }
+};
+function showAddShortenUrl(){
+    var btn = $("#urlShortenBtn");
+    if(!btn.data('status')){
+        btn.data('status', 'opened');
+        $("#urlShortenInp").addClass('long').focus();
+    }
+};
+
 //我正在看
 function initIamDoing(){
     $("#doing").click(function(){
@@ -435,7 +477,6 @@ var Search = {
 	    });
     }
 };
-function toggleSearch(){};
 
 //隐藏那些不支持的Timeline Tab
 function checkSupportedTabs(user){
