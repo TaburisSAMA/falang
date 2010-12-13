@@ -353,6 +353,11 @@ function showAddShortenUrl(){
         $("#urlShortenInp").addClass('long').focus();
     }
 };
+function enterAddShortenUrl(e){
+    if(e.keyCode == '13') {
+        addShortenUrl();
+    }
+};
 
 //我正在看
 function initIamDoing(){

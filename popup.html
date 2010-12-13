@@ -59,7 +59,7 @@
 				<input type="button" value="清空" onclick="cleanTxtContent();" class="btn"/>
 				<span id="doingWarp"></span>
 				<a id="urlShortenBtn" href="javascript:" title="缩短网址" onclick="addShortenUrl()"><img src="images/link_add.png"></a>
-				<input type="text" id="urlShortenInp" onclick="showAddShortenUrl()" />
+				<input type="text" id="urlShortenInp" onclick="showAddShortenUrl()" onkeyup="enterAddShortenUrl(event)" />
 				<span id="wordCount">140</span>
 			</div>
 		  </div>
