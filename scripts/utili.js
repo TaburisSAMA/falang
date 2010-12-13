@@ -1182,7 +1182,7 @@ var Plixi = {
 };
 
 // http://api.imgur.com/
-// http://i.imgur.com/xuCIWm.png or http://imgur.com/z2pX5.png
+// http://i.imgur.com/xuCIW.png or http://imgur.com/z2pX5.png
 // key: cba6198873ac20498a5686839b189fc0
 var Imgur = {
 	name: 'Imgur',

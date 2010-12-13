@@ -1955,11 +1955,13 @@ $.extend(TwitterAPI, {
 	    support_comment: false,
 	    support_repost: false,
 	    support_upload: false,
+//	    support_search: false,
 	    search: '/search_statuses',
 	    repost: '/statuses/update',
         retweet: '/statuses/retweet/{{id}}',
         favorites_create: '/favorites/create/{{id}}',
-        friends_timeline: '/statuses/home_timeline'
+        friends_timeline: '/statuses/home_timeline',
+        search: '/search'
 	}),
        
     processSearch: function (str) {
@@ -2012,6 +2014,9 @@ $.extend(TwitterAPI, {
 			// id => user
 			args.data.user = args.data.id;
 			delete args.data.id;
+		} else if(args.url == this.config.search) {
+			args.data.rpp = args.data.count;
+			delete args.data.count;
 		}
     },
 
