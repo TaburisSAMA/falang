@@ -120,6 +120,10 @@ function buildStatusHtml(statuses, t, c_user){
 	    case 'renjian':
 	    	BUTTON_TPLS.repostCounts = BUTTON_TPLS.rtRepostCounts = BUTTON_TPLS.rtrtRepostCounts = '';
 	        break;
+        case 'douban':
+	    	BUTTON_TPLS.replyBtn = BUTTON_TPLS.rtReplyBtn = BUTTON_TPLS.rtrtReplyBtn = '';
+            //BUTTON_TPLS.new_msgBtn = BUTTON_TPLS.new_msgBtn.replace('>私<', '>豆邮<');
+	        break;
         default:
             break;
 	}

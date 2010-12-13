@@ -2575,7 +2575,7 @@ $.extend(DoubanAPI, {
         result_format: '', // 豆瓣由alt参数确定返回值格式
         
 		userinfo_has_counts: false, // 用户信息中是否包含粉丝数、微博数等信息
-//        support_comment: false,
+        support_comment: false,
 		support_repost: false,
 		support_max_id: false,
 		support_favorites: false,
