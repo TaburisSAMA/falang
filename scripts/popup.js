@@ -1355,7 +1355,17 @@ function addPageMsgs(msgs, t, append){
             }
         }
     }
+    var h_old = _ul.height();
     _ul[method](htmls.join(''));
+
+    //hold住当前阅读位置
+    var list_warp = $("#" + t + '_timeline .list_warp');
+    var st_old = list_warp.scrollTop();
+    if(!append && st_old > 50){ //大于50才做处理，否则不重新定位(顶部用户可能想直接看到最新的微博)
+        var h_new = _ul.height();
+        list_warp.scrollTop(h_new - h_old + st_old);
+    }
+
     if(ids.length > 0){
         if(ids.length > 100){
             var ids2 = ids.slice(0, 99);
