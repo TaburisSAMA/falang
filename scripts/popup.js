@@ -2052,10 +2052,16 @@ function sendOretweet(ele, screen_name, tweetId){//twitter锐推
     _a.hide();
     var user = getUser();
     var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
+    var title = _a.attr('title');
     tapi.retweet({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
-            _a.removeAttr('onclick').addClass('orted').attr('title', '已成功锐推').show();
-
+            _a.removeAttr('onclick').attr('title', '已成功').show();
+			if(_a.hasClass('ort')) {
+				_a.addClass('orted');
+			}
+			if(_a.html()) {
+				_a.html('已' + _a.html());
+			}
             var c_user = getUser();
             var cacheKey = c_user.uniqueKey + t + '_tweets';
             var b_view = getBackgroundView();
@@ -2072,9 +2078,9 @@ function sendOretweet(ele, screen_name, tweetId){//twitter锐推
                 }
             }
 
-            showMsg('锐推成功');
+            showMsg(title + '成功');
         }else{
-            showMsg('锐推失败');
+            showMsg(title + '失败');
             _a.show();
         }
     });
