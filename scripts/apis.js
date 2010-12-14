@@ -947,7 +947,7 @@ var sinaApi = {
 	
 	// urlencode，子类覆盖是否需要urlencode处理
 	url_encode: function(text) {
-		return encodeURIComponent(text);
+		return OAuth.percentEncode(text);
 	},
     
 	before_sendRequest: function(args) {
