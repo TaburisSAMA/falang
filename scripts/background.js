@@ -147,7 +147,7 @@ function checkTimeline(t, p, user_uniqueKey){
         }
         
         if(last_id && sinaMsgs.length > 0){
-        	if(typeof(last_id) == 'string' && last_id.indexOf(':') > 0) { // 兼容网易的id
+        	if(c_user.blogType == 't163' && last_id.indexOf(':') > 0) { // 兼容网易的id
         		last_id = last_id.split(':', 1)[0];
         	}
         	var result = filterDatasByMaxId(sinaMsgs, last_id, false);
