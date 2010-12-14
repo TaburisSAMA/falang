@@ -327,10 +327,18 @@ var sinaApi = {
 	            type: 'get',
 	            user: user,
 	            play_load: 'string',
-	            data: {'oauth_verifier': user.oauth_pin},
 	            apiHost: this.config.oauth_host,
+	            data: {},
 	            need_source: false
 	        };
+	        if(user.oauth_pin) {
+	        	params.data.oauth_verifier = user.oauth_pin;
+	        }
+	        if(user.authType == 'xauth') {
+	        	params.data.x_auth_username = user.userName;
+				params.data.x_auth_password = user.password;
+				params.data.x_auth_mode = "client_auth";
+	        }
     		this._sendRequest(params, function(token_str, text_status, error_code) {
     			var token = null;
     			if(text_status != 'error') {
@@ -2172,9 +2180,9 @@ $.extend(T163API, {
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.t.163.com',
-		source: 'CMlCI0PLHNtmjzCA', // 需要申请
-		oauth_key: 'CMlCI0PLHNtmjzCA',
-        oauth_secret: 'tYU2lK30IlSRhuX8ouUtEx8Uk2fRf8Yk',
+		source: 'cXU8SDfNTtF0esHy', // 需要申请
+		oauth_key: 'cXU8SDfNTtF0esHy',
+        oauth_secret: 'KDKVAlZYlx4Yvzwx9BQEbTAVhkdjXQ8I',
         oauth_authorize: '/oauth/authenticate',
         support_counts: false,
         support_repost: false,

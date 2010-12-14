@@ -5,14 +5,14 @@ var KEYCODE_MAP = {8:"BackSpace", 9:"Tab", 12:"Clear", 13:"Enter", 16:"Shift", 1
 var SUPPORT_AUTH_TYPES = {
 	'tsina': ['oauth', 'baseauth'],
 	'tsohu': ['oauth', 'baseauth'],
-	't163': ['oauth'],
+	't163': ['xauth'],
 	'fanfou': ['baseauth'],
 	'digu': ['baseauth'],
 	'zuosa': ['baseauth'],
 	'follow5': ['baseauth'],
 	'leihou': ['baseauth'],
 	'renjian': ['baseauth'],
-	'twitter': ['oauth', 'xauth', 'baseauth'],
+	'twitter': ['oauth', 'baseauth'],
 	'douban': ['oauth'],
 	'buzz': ['oauth']
 };
@@ -636,7 +636,13 @@ function saveAccount(){
         //userName = userName.toLowerCase(); //小写
         user.userName = userName;
         user.password = pwd;
-        _verify_credentials(user);
+        if(authType == 'xauth') {
+        	tapi.get_access_token(user, function(auth_user) {
+    			_verify_credentials(auth_user);
+    		});
+        } else {
+        	_verify_credentials(user);
+        }
     } else if(authType == 'oauth') {
     	var request_token_key = $('#account-request-token-key').val();
     	var request_token_secret = $('#account-request-token-secret').val();
