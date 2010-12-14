@@ -1263,7 +1263,7 @@ $.extend(TSohuAPI, {
 			delete data.transmit_count;
 			delete data.comments_count;
 		}
-		if(data.cursor_id) {
+		if(data && data.cursor_id) {
 			data.next_cursor = data.cursor_id;
 		}
 		return data;
