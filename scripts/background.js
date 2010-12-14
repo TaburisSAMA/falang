@@ -20,7 +20,8 @@ function getMaxMsgId(t, user_uniqueKey){
     var _t_tweets = tweets[_key];
     var _last_id = null;
     if(_t_tweets && _t_tweets.length){
-    	var _last_id = _t_tweets[_t_tweets.length-1].id;
+    	// 兼容网易的cursor_id
+    	var _last_id = _t_tweets[_t_tweets.length-1].cursor_id || _t_tweets[_t_tweets.length-1].id;
 //    	var _last_id = _t_tweets[_t_tweets.length-1];
     	if(typeof(_last_id) === 'number'){
     		_last_id--;
@@ -129,6 +130,7 @@ function checkTimeline(t, p, user_uniqueKey){
     		hideLoading();
     		return;
     	}
+    	var popupView = getPopupView();
         var isFirstTime = false;
         //TODO: 这里不确定会不会有闭包造成的c_user变量覆盖问题，待测试
 //        if(!c_user){
@@ -141,17 +143,19 @@ function checkTimeline(t, p, user_uniqueKey){
             isFirstTime = true;//如果不存在，则为第一次获取微博
         }
         if(!last_id && tweets[_key].length > 0){
-        	last_id = tweets[_key][0].id;
+        	last_id = tweets[_key][0].cursor_id || tweets[_key][0].id;
         }
-        var popupView = getPopupView();
+        
         if(last_id && sinaMsgs.length > 0){
+        	if(typeof(last_id) == 'string' && last_id.indexOf(':') > 0) { // 兼容网易的id
+        		last_id = last_id.split(':', 1)[0];
+        	}
         	var result = filterDatasByMaxId(sinaMsgs, last_id, false);
         	if(tweets[_key].length == 0) {
         		tweets[_key] = result.olds; // 填充旧的数据
         		if(popupView){
         			popupView.addTimelineMsgs(result.olds, t, user_uniqueKey);
         		}
-        		
         	}
         	sinaMsgs = result.news;
 //        	log('news ' + result.news.length + ', olds ' + result.olds.length);
@@ -160,7 +164,8 @@ function checkTimeline(t, p, user_uniqueKey){
         
         if(sinaMsgs.length > 0){
         	// 保存最新的id，用于过滤数据和判断
-            setLastMsgId(sinaMsgs[0].id, t, user_uniqueKey);
+        	// 兼容网易的cursor_id
+            setLastMsgId(sinaMsgs[0].cursor_id || sinaMsgs[0].id, t, user_uniqueKey);
 //            var ids = TweetStorage.setItems(sinaMsgs, t, user_uniqueKey);
 //            tweets[_key] = ids.concat(tweets[_key]);
             tweets[_key] = sinaMsgs.concat(tweets[_key]);
@@ -198,12 +203,12 @@ function checkTimeline(t, p, user_uniqueKey){
     	}
     	setDoChecking(user_uniqueKey, t, 'checking', false);
         if(isFirstTime){//如果是第一次(启动插件时),则获取以前的微薄
-            if(tweets[_key].length < PAGE_SIZE){ //如果第一次(启动插件时)获取的新信息少于分页大小，则加载一页以前的微薄，做缓冲
+            if(tweets[_key].length < PAGE_SIZE) { //如果第一次(启动插件时)获取的新信息少于分页大小，则加载一页以前的微薄，做缓冲
                 getTimelinePage(user_uniqueKey, t);
-            }else if(popupView){
+            } else if (popupView) {
                 popupView.showReadMore(t);
             }
-        } else if(popupView && sinaMsgs.length >= PAGE_SIZE){
+        } else if(popupView && sinaMsgs.length >= PAGE_SIZE) {
             popupView.showReadMore(t);
         }
         hideLoading();
@@ -341,7 +346,7 @@ function _showReadMore(t, user_uniqueKey, datas) {
                 if(datas.length >= (PAGE_SIZE / 2)) {
                     popupView.showReadMore(t);
                 } else {
-                    popupView.hideReadMore(t);
+                    popupView.hideReadMore(t, true);
                 }
         	} else { // 获取数据异常
         		popupView.showReadMore(t);

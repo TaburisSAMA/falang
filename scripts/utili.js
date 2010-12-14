@@ -41,8 +41,8 @@ var T_LIST = {
 	'douban': ['friends_timeline', 'direct_messages']
 };
 T_LIST.tsina = T_LIST.tsohu = T_LIST.all;
-T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.digu;
-T_LIST.t163 = ['friends_timeline','mentions'];
+T_LIST.t163 = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.digu;
+
 var T_NAMES = {
 	'tsina': '新浪微博',
 	'digu': '嘀咕',
@@ -757,7 +757,7 @@ function filterDatasByMaxId(datas, max_id, append) {
     	max_id = String(max_id);
     	var found_index = null;
     	$.each(datas, function(i, item){
-    		if(max_id == String(item.id)){
+    		if(max_id == String(item.id)) {
     			found_index = i;
     			return false;
     		}
@@ -1079,6 +1079,7 @@ var ShortenUrl = {
 		'2.gp': {api: 'http://2.gp/api/short', format: 'json', method: 'get', param_name: 'longurl', result_name: 'url'},
 		'7.ly': {api: 'http://7.ly/api/short', format: 'json', method: 'get', param_name: 'longurl', result_name: 'url'},
 		'aa.cx': 'http://aa.cx/api.php?url={{url}}',
+		'2br.in': {api: 'http://api.2br.in/shorten.json', format: 'json', method: 'get', param_name: 'url', result_name: 'shorten_url'},
 		'lnk.by': {api: 'http://lnk.by/Shorten', 
 			format_name: 'format', 
 			format: 'json', 

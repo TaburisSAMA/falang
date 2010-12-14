@@ -33,6 +33,8 @@ var sinaApi = {
 		support_friendships_create: true,
 		support_search: true,
 		support_search_max_id: true,
+		support_favorites_max_id: false, // 收藏分页使用max_id
+		
 		need_processMsg: true, //是否需要处理消息的内容
 		comment_need_user_id: false, // 评论是否需要使用到用户id，默认为false，兼容所有旧接口
         
@@ -2176,7 +2178,10 @@ $.extend(T163API, {
         support_counts: false,
         support_repost: false,
         support_search_max_id: false,
+        support_favorites_max_id: true,
         
+        favorites: '/favorites/{{id}}',
+        favorites_create: '/favorites/create/{{id}}',
         search: '/search',
         repost: '/statuses/update',
         comments: '/statuses/comments/{{id}}',
@@ -2191,6 +2196,13 @@ $.extend(T163API, {
 	},
 	
 	before_sendRequest: function(args, user) {
+		if(args.data.since_id) {
+			args.data.max_id = args.data.since_id;
+			delete args.data.since_id;
+		} else if(args.data.max_id) {
+			args.data.since_id = args.data.max_id;
+			delete args.data.max_id;
+		}
 		if(args.url == this.config.user_timeline) {
 			if(args.data.id) {
 				// id => user_id
@@ -2216,6 +2228,8 @@ $.extend(T163API, {
 		} else if(args.url == this.config.new_message) {
 			args.data.user = args.data.id;
 			delete args.data.id;
+		} else if(args.url == this.config.favorites) {
+			args.data.id = user.screen_name;
 		}
     },
     

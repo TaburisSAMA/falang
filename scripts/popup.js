@@ -900,7 +900,8 @@ function _getFansList(to_t, read_more){
         if(textStatus != 'error' && data && !data.error){
             var users = data.users || data.items;
             var next_cursor = data.next_cursor;
-            var max_id = $("#followers_timeline ul.list .user_info:last").attr('did');
+            var $last_item = $("#followers_timeline ul.list .user_info:last");
+            var max_id = $last_item.attr('did');
             var result = filterDatasByMaxId(users, max_id, true);
             users = result.news;
             if(users && users.length > 0) {
@@ -1016,7 +1017,7 @@ function getUserTimeline(screen_name, user_id, read_more) {
                 window.currentTab = "#user_timeline_timeline";
         	}
             addPageMsgs(sinaMsgs, m, true);
-            max_id = String(sinaMsgs[sinaMsgs.length - 1].id);
+            max_id = String(sinaMsgs[sinaMsgs.length - 1].cursor_id || sinaMsgs[sinaMsgs.length - 1].id);
             page += 1;
             // 保存数据，用于翻页
             $tab.attr('max_id', max_id);
@@ -1054,6 +1055,7 @@ function getFavorites(is_click){
     var list = $("#favorites_timeline .list");
     var t = $("#tl_tabs .tab-favorites_timeline");
     var cursor = list.attr('cursor');
+    var max_id = list.attr('max_id');
     var page = list.attr('page');
     var t = 'favorites';
     var user_cache = get_current_user_cache();
@@ -1063,24 +1065,34 @@ function getFavorites(is_click){
     	is_click = support_cursor_only ? !cursor : !page;
     }
     if(is_click) { // 点击或第一次加载
-    	page = 1;
     	if(user_cache[t]) {
     		list.html(user_cache[t]);
     		return;
     	} else {
     		list.html('');
+    		page = 1;
     	}
     }
     var params = {user: c_user, count: PAGE_SIZE};
     var support_cursor_only = config.support_cursor_only; // 只支持游标方式翻页
+    var support_favorites_max_id = config.support_favorites_max_id; // 支持max_id方式翻页
     if(!is_click) {
     	if(support_cursor_only) {
     		if(cursor == '0') {
     			return;
     		}
-    		params.cursor = cursor;
-    	} else {
-    		params.page = page;
+    		if(cursor) {
+    			params.cursor = cursor;
+    		}
+    	} else if(support_favorites_max_id) { // 163
+    		if(max_id) {
+    			params.max_id = max_id;
+    		}
+    	}
+    	else {
+    		if(page) {
+    			params.page = page;
+    		}
     	}
     }
     showLoading();
@@ -1097,6 +1109,7 @@ function getFavorites(is_click){
         	list.attr('page', Number(page) + 1);
         	status = addPageMsgs(status, t, true);
 	        if(status.length > 0){
+	        	list.attr('max_id', status[status.length - 1].id);
 	            showReadMore(t);
 	            user_cache[t] = list.html();
 	        } else {
@@ -1435,7 +1448,8 @@ function addPageMsgs(msgs, t, append){
     var _ul = $("#" + t + "_timeline ul.list"), htmls = [];
     var method = append ? 'append' : 'prepend';
     var direct = append ? 'last' : 'first';
-    var max_id = $("#" + t + "_timeline ul.list li.tweetItem:" + direct).attr('did');
+    var $last_item = $("#" + t + "_timeline ul.list li.tweetItem:" + direct);
+    var max_id = $last_item.attr('did');
     var result = filterDatasByMaxId(msgs, max_id, append);
     msgs = result.news;
 //    var start_time = new Date();
