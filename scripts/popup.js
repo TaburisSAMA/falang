@@ -101,6 +101,8 @@ function init(){
     		if(data && data.id) {
     			var html = buildStatusHtml([data], t, user).join('');
     			$this.parents('.mainContent').after(html);
+    			// 处理缩址
+        		ShortenUrl.expandAll();
     		} else {
     			$this.show();
     		}
@@ -1137,6 +1139,9 @@ function getSinaTimeline(t, notCheckNew){
         var htmls = [];
         var ids = [];
         htmls = buildStatusHtml(msgs, t);
+        _ul.append(htmls.join(''));
+        // 处理缩址
+        ShortenUrl.expandAll();
         for(var i in msgs){
             var msg = msgs[i];
 //            html += bildMsgLi(msgs[i], t);
@@ -1154,7 +1159,6 @@ function getSinaTimeline(t, notCheckNew){
                 }
             }
         }
-        _ul.append(htmls.join(''));
         if(ids.length>0){
             if(ids.length > 100){
                 var ids2 = ids.slice(0, 99);
@@ -1452,14 +1456,12 @@ function addPageMsgs(msgs, t, append){
     var max_id = $last_item.attr('did');
     var result = filterDatasByMaxId(msgs, max_id, append);
     msgs = result.news;
-//    var start_time = new Date();
+
     htmls = buildStatusHtml(msgs, t);
-//    var end_time = new Date();
-//    log(end_time.getTime() - start_time.getTime());
+    _ul[method](htmls.join(''));
+    // 处理缩址
+    ShortenUrl.expandAll();
     for(var i in msgs){
-//    	_ul[method](htmls[i]);
-    	//_ul[method](bildMsgLi(msgs[i], t));
-//        html += bildMsgLi(msgs[i], t);
         if(t != 'direct_messages'){
         	ids.push(msgs[i].id);
             if(msgs[i].retweeted_status){
@@ -1476,8 +1478,6 @@ function addPageMsgs(msgs, t, append){
         }
     }
     var h_old = _ul.height();
-    _ul[method](htmls.join(''));
-
     //hold住当前阅读位置
     var list_warp = $("#" + t + '_timeline .list_warp');
     var st_old = list_warp.scrollTop();

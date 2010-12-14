@@ -194,7 +194,7 @@ var sinaApi = {
                 });
             }
         }
-        return '<a target="_blank" href="{{url}}" title="{{title}}">{{value}}</a>'.format({
+        return '<a target="_blank" class="link" href="{{url}}">{{value}}</a>'.format({
             url: _url, title: g1, value: g2||g1
         });
     },

@@ -1088,22 +1088,43 @@ var ShortenUrl = {
 	},
 	// 还原
 	// http://urlexpand0-11.appspot.com/api?u=http://is.gd/imWyT
-	expand: function(shorturl, callback) {
+	expand: function(shorturl, callback, context) {
 		var index = Math.floor(Math.random() * 12);
 		var url = 'http://urlexpand' + index + '.appspot.com/api?u=' + shorturl;
 //		log(url);
 		$.ajax({
 			url: url,
 			success: function(data, status, xhr) {
-				callback(data);
+				callback.call(context, data);
 			}, 
 			error: function(xhr, status) {
-				callback(null);
+				callback.call(context, null);
 			}
 		});
 	},
 	
-	short: function(longurl, callback, name) {
+	expandAll: function() {
+		var b_view = getBackgroundView();
+		var cache = b_view.SHORT_URLS;
+		$('a.link:not([title^="http"])').each(function() {
+			var url = $(this).attr('href');
+			if(cache[url]) {
+//				log('cache: ' + url + ' ' + cache[url]);
+				$(this).attr('title', cache[url]);
+			} else {
+				ShortenUrl.expand(url, function(longurl) {
+					if(longurl) {
+						$(this).attr('title', longurl).addClass('longurl');
+						cache[$(this).attr('href')] = longurl;
+//						log('new: ' + $(this).attr('href') + ' ' + longurl);
+					}
+				}, this);
+			}
+			
+		});
+	},
+	
+	short: function(longurl, callback, name, context) {
 		var name = name || Settings.get().shorten_url_service;
 		var service = this.services[name];
 		var format = 'text';
@@ -1140,10 +1161,10 @@ var ShortenUrl = {
 				if(result_name) {
 					data = data[result_name];
 				}
-				callback(data);
+				callback.call(context, data);
 			}, 
 			error: function(xhr, status) {
-				callback(null);
+				callback.call(context, null);
 			}
 		});
 	},
