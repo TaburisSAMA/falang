@@ -2287,6 +2287,9 @@ $.extend(T163API, {
 			if(data.retweeted_status) {
 				data.retweeted_status = this.format_result_item(data.retweeted_status, 'status', args);
 			}
+			if(data.is_retweet_by_user) {
+				data.retweeted = true;
+			}
 //			// 设置status的t_url
 			data.t_url = tpl.format(data);
 			// retweeted_status
