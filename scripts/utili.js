@@ -1086,6 +1086,23 @@ var ShortenUrl = {
 			method: 'get', 
 			param_name: 'url', result_name: 'shortUrl'}
 	},
+	// 还原
+	// http://urlexpand1-11.appspot.com/api?u=http://is.gd/imWyT
+	expand: function(shorturl, callback) {
+		var index = Math.floor(Math.random() * 11 + 1);
+		var url = 'http://urlexpand' + index + '.appspot.com/api?u=' + shorturl;
+		log(url);
+		$.ajax({
+			url: url,
+			success: function(data, status, xhr) {
+				callback(data);
+			}, 
+			error: function(xhr, status) {
+				callback(null);
+			}
+		});
+	},
+	
 	short: function(longurl, callback, name) {
 		var name = name || Settings.get().shorten_url_service;
 		var service = this.services[name];
