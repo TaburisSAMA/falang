@@ -1863,14 +1863,15 @@ function doRT(ele, is_rt, is_rt_rt){//RT
     	data = data.retweeted_status.retweeted_status;
     }
     var _msg_user = data.user;
-    var repost_pre = tapi.get_config(getUser()).repost_pre;
+    var config = tapi.get_config(getUser());
+    var repost_pre = config.repost_pre;
     var val = tapi.get_config(getUser()).need_processMsg ? data.text : htmlToText(data.text);
     val = repost_pre + ' ' + '@' + _msg_user.screen_name + ' ' + val;
     if(data.original_pic) {
     	// 有图片，自动带上图片地址，并尝试缩短
     	var settings = Settings.get();
     	var longurl = data.original_pic;
-    	val += ' [图]' + longurl;
+    	val += config.image_shorturl_pre + longurl;
         _shortenUrl(longurl, settings, function(shorturl) {
         	if(shorturl){
                 t.blur().val(t.val().replace(longurl, shorturl)).focus();
