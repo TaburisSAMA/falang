@@ -573,8 +573,10 @@ var sinaApi = {
     update: function(data, callbackFn){
         if(!callbackFn) return;
         if(this.config.support_geo && Settings.get().isGeoEnabled && Settings.get().geoPosition){
-        	data.lat = Settings.get().geoPosition.latitude;
-            data.long = Settings.get().geoPosition.longitude;
+        	if(Settings.get().geoPosition.latitude) {
+    			data.lat = Settings.get().geoPosition.latitude;
+                data.long = Settings.get().geoPosition.longitude;
+    		}
         }
         var params = {
             url: this.config.update,
@@ -603,6 +605,12 @@ var sinaApi = {
     	var auth_args = {type: 'post', data: {}, headers: {}};
     	pic.keyname = pic.keyname || 'pic';
     	data.source = data.source || this.config.source;
+    	if(this.config.support_geo && Settings.get().isGeoEnabled && Settings.get().geoPosition){
+    		if(Settings.get().geoPosition.latitude) {
+    			data.lat = Settings.get().geoPosition.latitude;
+                data.long = Settings.get().geoPosition.longitude;
+    		}
+        }
     	this.format_upload_params(user, data, pic);
 	    var boundary = '----multipartformboundary' + (new Date).getTime();
 	    var dashdash = '--';
