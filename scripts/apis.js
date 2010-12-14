@@ -2213,6 +2213,7 @@ $.extend(T163API, {
 	},
 	
 	before_sendRequest: function(args, user) {
+		delete args.data.source;
 		if(args.data.since_id) {
 			args.data.max_id = args.data.since_id;
 			delete args.data.since_id;
