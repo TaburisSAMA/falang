@@ -1091,7 +1091,7 @@ var ShortenUrl = {
 	expand: function(shorturl, callback) {
 		var index = Math.floor(Math.random() * 11 + 1);
 		var url = 'http://urlexpand' + index + '.appspot.com/api?u=' + shorturl;
-		log(url);
+//		log(url);
 		$.ajax({
 			url: url,
 			success: function(data, status, xhr) {
