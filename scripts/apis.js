@@ -2291,7 +2291,7 @@ $.extend(T163API, {
 			// 获取缩略图
 			// http://oimagec6.ydstatic.com/image?w=120&h=120&url=http://126.fm/cwqG0
 			// http://oimagec6.ydstatic.com/image?w=460&url=http://126.fm/qMYPA
-			var url_re = /\s(http:\/\/126.fm\/\w+)/i;
+			var url_re = /\s?(http:\/\/126.fm\/\w+)/i;
 			var results = url_re.exec(data.text);
 			if(results) {
 				data.original_pic = results[1];

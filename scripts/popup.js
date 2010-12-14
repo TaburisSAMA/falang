@@ -2099,7 +2099,7 @@ function previewPic(ele, get_method) {
 //查看图片
 function showFacebox(ele){
     var _t = $(ele);
-    if(!_t.find('.img_loading').lenght){
+    if(!_t.find('.img_loading').length){
         _t.append('<img class="img_loading" src="images/loading.gif" />');
     }else{
         _t.find('.img_loading').show();

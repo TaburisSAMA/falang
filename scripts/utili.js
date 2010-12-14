@@ -1108,14 +1108,19 @@ var ShortenUrl = {
 		var cache = b_view.SHORT_URLS;
 		$('a.link:not([title^="http"])').each(function() {
 			var url = $(this).attr('href');
+			if(url.length > 30) {
+				return;
+			}
 			if(cache[url]) {
 //				log('cache: ' + url + ' ' + cache[url]);
 				$(this).attr('title', cache[url]);
+				VideoService.attempt(cache[url], this);
 			} else {
 				ShortenUrl.expand(url, function(longurl) {
 					if(longurl) {
 						$(this).attr('title', longurl).addClass('longurl');
 						cache[$(this).attr('href')] = longurl;
+						VideoService.attempt(longurl, this);
 //						log('new: ' + $(this).attr('href') + ' ' + longurl);
 					}
 				}, this);
@@ -1372,6 +1377,21 @@ var ImageService = {
 	upload: function(pic, callback) {
 		var settings = Settings.get();
 		this.services[settings.image_service].upload(pic, callback);
+	}
+};
+
+var VideoService = {
+	youku: {
+		url_re: /youku\.com\/v_show\/id_([^\.]+)\.html/i,
+		tpl: '<embed style="display:none;" src="http://player.youku.com/player.php/sid/{{id}}/v.swf" quality="high" width="480" height="400" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash"></embed>'
+	},
+	attempt: function(url, ele) {
+//		var matchs = this.youku.url_re.exec(url);
+//		if(matchs) {
+//			$(ele).after(this.youku.tpl.format({id: matchs[1]})).click(function() {
+//				$(this).next('embed').toggle();
+//			}).attr('rhref', $(ele).attr('href')).attr('href', 'javascript:void(0);');
+//		}
 	}
 };
 
