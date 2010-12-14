@@ -591,7 +591,7 @@ var sinaApi = {
      * onprogress: on_progress_callback function
      * callback: finish callback function
      * */
-    upload: function(user, data, pic, before_request, onprogress, callback) {
+    upload: function(user, data, pic, before_request, onprogress, callback, context) {
     	var auth_args = {type: 'post', data: {}, headers: {}};
     	this.format_upload_params(user, data, pic);
     	pic.keyname = pic.keyname || 'pic';
@@ -696,7 +696,7 @@ var sinaApi = {
 	                    error_code = data.error_code || error_code;
 	                }
 	            }else{error_code = 400;}
-	            callback(data, textStatus, error_code);
+	            callback.call(context, data, textStatus, error_code);
 	        },
 	        error: function (xhr, textStatus, errorThrown) {
 	            var r = null, status = 'unknow';
@@ -720,7 +720,7 @@ var sinaApi = {
 	                errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
 	                _showMsg('error: ' + textStatus + errorThrown + 'statuCode: ' + status);
 	            }
-	            callback({}, 'error', status); //不管什么状态，都返回 error
+	            callback.call(context, {}, 'error', status); //不管什么状态，都返回 error
 	        }
 	    });
     },
@@ -2165,6 +2165,7 @@ $.extend(FanfouAPI, {
 });
 
 var T163API = $.extend({}, sinaApi);
+T163API._upload = T163API.upload;
 
 $.extend(T163API, {
 	
@@ -2193,6 +2194,14 @@ $.extend(T163API, {
 	
 	url_encode: function(text) {
 		return text;
+	},
+	
+	upload: function(user, params, pic, before_request, onprogress, callback) {
+		this._upload(user, {}, pic, before_request, onprogress, function(data) {
+			params.user = user;
+			params.status += ' ' + data.upload_image_url;
+			this.update(params, callback);
+		}, this);
 	},
 	
 	before_sendRequest: function(args, user) {
@@ -2261,6 +2270,17 @@ $.extend(T163API, {
 				delete data.to_user;
 				delete data.to_user_name;
 				delete data.to_status_text;
+			}
+			// 获取缩略图
+			// http://oimagec6.ydstatic.com/image?w=120&h=120&url=http://126.fm/cwqG0
+			// http://oimagec6.ydstatic.com/image?w=460&url=http://126.fm/qMYPA
+			var url_re = /\s(http:\/\/126.fm\/\w+)/i;
+			var results = url_re.exec(data.text);
+			if(results) {
+				data.original_pic = results[1];
+				data.thumbnail_pic = 'http://oimagec6.ydstatic.com/image?w=120&h=120&url=' + data.original_pic;
+				data.bmiddle_pic = 'http://oimagec6.ydstatic.com/image?w=460&url=' + data.original_pic;
+				data.text = data.text.replace(results[0], '');
 			}
 			data.user = this.format_result_item(data.user, 'user', args);
 			var tpl = '{{user.t_url}}/status/{{id}}';
