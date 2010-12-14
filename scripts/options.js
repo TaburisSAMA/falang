@@ -639,6 +639,8 @@ function saveAccount(){
         if(authType == 'xauth') {
         	tapi.get_access_token(user, function(auth_user) {
     			_verify_credentials(auth_user);
+    			delete auth_user.userName;
+    			delete auth_user.password;
     		});
         } else {
         	_verify_credentials(user);
