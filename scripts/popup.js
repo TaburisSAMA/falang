@@ -580,7 +580,8 @@ function changeUser(uniqueKey){
             _li = $(this);
             _t = _li.attr('href').replace(/_timeline$/i,'').substring(1);
             $("#" + _t + '_timeline .list').html('');
-            showReadMore(_t); //TODO: show or hide ?
+//            showReadMore(_t); //TODO: show or hide ?
+            hideReadMore(_t);
         });
         checkSupportedTabs(to_user);
         if(activeLi.css('display')=='none'){ //如果不支持的tab刚好是当前tab
@@ -890,10 +891,6 @@ function _getFansList(to_t, read_more){
 	    }
     	cursor = '-1';
 	    $list.html('');
-    } else {
-    	if(cursor == '-1') { // 这个read more肯定不对，直接返回
-    		return;
-    	}
     }
 	if(cursor == '0'){
     	return;
@@ -902,7 +899,7 @@ function _getFansList(to_t, read_more){
     hideReadMore(to_t);
     showLoading();
     $to_t.attr('loading', true);
-    log(c_user.uniqueKey + ': ' + cursor + ' ' + read_more);
+//    log(c_user.uniqueKey + ': ' + cursor + ' ' + read_more);
     tapi[to_t](params, function(data, textStatus, statuCode){
     	// 如果用户已经切换，则不处理
     	var now_user = getUser();
@@ -912,7 +909,7 @@ function _getFansList(to_t, read_more){
         if(data){
             var users = data.users || data.items;
             var next_cursor = data.next_cursor;
-            log(c_user.uniqueKey + ': next_cursor ' + next_cursor);
+//            log(c_user.uniqueKey + ': next_cursor ' + next_cursor);
             var $last_item = $("#followers_timeline ul.list .user_info:last");
             var max_id = $last_item.attr('did');
             var result = filterDatasByMaxId(users, max_id, true);
