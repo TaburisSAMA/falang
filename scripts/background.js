@@ -116,28 +116,20 @@ function checkTimeline(t, p, user_uniqueKey){
     }
     $.extend(params, p);
     showLoading();
-//    if(t == 'friends_timeline'){
-//    	log('start checkTimeline ' + user_uniqueKey + ' ' + t + ' last_id: ' + last_id);
-//    }
-	
     tapi[t](params, function(data, textStatus){
+    	data = data || {};
     	var sinaMsgs = data.items || data;
     	if(data.next_cursor !== undefined) {
     		// 保存最新的cursor，用于分页
     		setLastCursor(data.next_cursor, t, user_uniqueKey);
-//    		log(t + ' ' + data.next_cursor);
     	}
-    	if(!sinaMsgs) {
+    	if(!$.isArray(sinaMsgs)) {
+    		setDoChecking(user_uniqueKey, t, 'checking', false);
     		hideLoading();
     		return;
     	}
     	var popupView = getPopupView();
         var isFirstTime = false;
-        //TODO: 这里不确定会不会有闭包造成的c_user变量覆盖问题，待测试
-//        if(!c_user){
-//            setDoChecking(user_uniqueKey, t, 'checking', false);
-//            return;
-//        }
         var _key = user_uniqueKey + t + '_tweets';
         if(!tweets[_key]){
             tweets[_key] = [];
@@ -159,7 +151,6 @@ function checkTimeline(t, p, user_uniqueKey){
         		}
         	}
         	sinaMsgs = result.news;
-//        	log('news ' + result.news.length + ', olds ' + result.olds.length);
         }
         var current_user = getUser();
         
@@ -167,8 +158,6 @@ function checkTimeline(t, p, user_uniqueKey){
         	// 保存最新的id，用于过滤数据和判断
         	// 兼容网易的cursor_id
             setLastMsgId(sinaMsgs[0].cursor_id || sinaMsgs[0].id, t, user_uniqueKey);
-//            var ids = TweetStorage.setItems(sinaMsgs, t, user_uniqueKey);
-//            tweets[_key] = ids.concat(tweets[_key]);
             tweets[_key] = sinaMsgs.concat(tweets[_key]);
             var _unreadCount = 0, _msg_user = null;
             var c_user_id = String(c_user.id);
@@ -181,14 +170,12 @@ function checkTimeline(t, p, user_uniqueKey){
         	if(popupView){
         		// 判断是否还是当前用户
                 if(!popupView.addTimelineMsgs(sinaMsgs, t, user_uniqueKey)){
-//                	log('addTimelineMsgs false' + t + user_uniqueKey);
                     setUnreadTimelineCount(_unreadCount, t, user_uniqueKey);
                     popupView.updateDockUserUnreadCount(user_uniqueKey);
                 } else {
                     if(current_user.uniqueKey == user_uniqueKey){
                         popupView._showMsg('有新微博');
                     } else {
-//                    	log('addTimelineMsgs true not current' + t + user_uniqueKey);
                     	setUnreadTimelineCount(_unreadCount, t, user_uniqueKey);
                     	popupView.updateDockUserUnreadCount(user_uniqueKey);
                     }
@@ -213,9 +200,6 @@ function checkTimeline(t, p, user_uniqueKey){
             popupView.showReadMore(t);
         }
         hideLoading();
-//        if(t == 'friends_timeline'){
-//        	log('finish checkTimeline ' + user_uniqueKey + ' ' + t + ': ' + sinaMsgs.length + ' max_id: ' + getMaxMsgId(t, user_uniqueKey));
-//        }
     });
 };
 
@@ -251,10 +235,8 @@ function getTimelinePage(user_uniqueKey, t, p){
     	var length = tweets[t_key].length;
     	if(length > 0 && tweets[t_key][length - 1].cursor) {
     		cursor = tweets[t_key][length - 1].cursor;
-//    		log('page cursor: ' + cursor);
     	} else {
     		cursor = getLastCursor(t, user_uniqueKey);
-//    		log('getLastCursor cursor: ' + cursor);
     	}
     	if(cursor == '0') { // 再无数据
     		return;
@@ -286,51 +268,35 @@ function getTimelinePage(user_uniqueKey, t, p){
     setDoChecking(user_uniqueKey, t, 'paging', true);
     
     showLoading();
-//	if(t == 'friends_timeline'){
-//		log('start getTimelinePage ' + user_uniqueKey + ' ' + t 
-//    		+ ' page:' + params.page + ' max_id:' + params.max_id + ' cursor:' + cursor);
-//	}
-    
     tapi[t](params, function(data, textStatus) {
-    	var sinaMsgs = data.items || data;
-    	if($.isArray(sinaMsgs) && textStatus != 'error') {
-    		if(sinaMsgs.length > 0){
-                //TODO: 这里不确定会不会有闭包造成的c_user变量覆盖问题，待测试
-//                if(!c_user){
-//                    setDoChecking(user_uniqueKey, t, 'paging', false);
-//                    return;
-//                }
-                var max_id = getMaxMsgId(t, user_uniqueKey);
-                var result = filterDatasByMaxId(sinaMsgs, max_id, true);
-//                log('news ' + result.news.length + ', olds ' + result.olds.length);
-                sinaMsgs = result.news;
-                for(var i in sinaMsgs){
-                    sinaMsgs[i].readed = true;
+    	hideLoading();
+    	if(data) {
+    		var sinaMsgs = data.items || data;
+        	if($.isArray(sinaMsgs) && textStatus != 'error') {
+        		if(sinaMsgs.length > 0){
+                    var max_id = getMaxMsgId(t, user_uniqueKey);
+                    var result = filterDatasByMaxId(sinaMsgs, max_id, true);
+                    sinaMsgs = result.news;
+                    for(var i in sinaMsgs){
+                        sinaMsgs[i].readed = true;
+                    }
+                    tweets[t_key] = tweets[t_key].concat(sinaMsgs);
                 }
-//                var ids = TweetStorage.setItems(sinaMsgs, t, user_uniqueKey);
-//                tweets[_key] = tweets[_key].concat(ids);
-                tweets[t_key] = tweets[t_key].concat(sinaMsgs);
-            }
-            if(page != null) { // page分页
-            	if(sinaMsgs.length == 0) {
-            		page = 0;
-            	}
-                setLastPage(t, page, user_uniqueKey);
-            }
+                if(page != null) { // page分页
+                	if(sinaMsgs.length == 0) {
+                		page = 0;
+                	}
+                    setLastPage(t, page, user_uniqueKey);
+                }
+        	}
+            // 设置翻页和填充新数据到ui列表的后面显示
+            _showReadMore(t, user_uniqueKey, sinaMsgs);
+            if(data.next_cursor) {
+            	// 保存cursor信息
+        		tweets[t_key][tweets[t_key].length - 1].cursor = String(data.next_cursor);
+        	}
     	}
-        // 设置翻页和填充新数据到ui列表的后面显示
-        _showReadMore(t, user_uniqueKey, sinaMsgs);
-        if(data.next_cursor) {
-        	// 保存cursor信息
-//        	log('new page cursor: ' + data.next_cursor);
-    		tweets[t_key][tweets[t_key].length - 1].cursor = String(data.next_cursor);
-    	}
-        hideLoading();
         setDoChecking(user_uniqueKey, t, 'paging', false);
-//        if(t == 'friends_timeline'){
-//        	log('finish getTimelinePage ' + user_uniqueKey + ' ' + t + ': ' + sinaMsgs.length 
-//        		+ ' page:' + params.page + ' max_id:' + params.max_id + ' new maxid: ' + getMaxMsgId(t, user_uniqueKey));
-//        }
     });
 };
 
