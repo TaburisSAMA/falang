@@ -508,7 +508,7 @@ function checkSupportedTabs(user){
         }
     }
     // 如果是t163，则隐藏评论tab，但是它可以评论
-    if(user.blogType == 't163') {
+    if(user.blogType == 't163' || user.blogType == 'buzz') {
     	$('#tl_tabs .tab-comments_timeline, #comments_timeline_timeline').hide();
     }
 };
