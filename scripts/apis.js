@@ -2180,6 +2180,7 @@ $.extend(T163API, {
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.t.163.com',
+		search_url: 'http://t.163.com/tag/',
 		source: 'cXU8SDfNTtF0esHy', // 需要申请
 		oauth_key: 'cXU8SDfNTtF0esHy',
         oauth_secret: 'KDKVAlZYlx4Yvzwx9BQEbTAVhkdjXQ8I',
@@ -2199,6 +2200,8 @@ $.extend(T163API, {
 	}),
 	
 	retweet: TwitterAPI.retweet,
+	
+	processSearch: DiguAPI.processSearch,
 	
 	url_encode: function(text) {
 		return text;
