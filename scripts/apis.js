@@ -601,9 +601,9 @@ var sinaApi = {
      * */
     upload: function(user, data, pic, before_request, onprogress, callback, context) {
     	var auth_args = {type: 'post', data: {}, headers: {}};
-    	this.format_upload_params(user, data, pic);
     	pic.keyname = pic.keyname || 'pic';
     	data.source = data.source || this.config.source;
+    	this.format_upload_params(user, data, pic);
 	    var boundary = '----multipartformboundary' + (new Date).getTime();
 	    var dashdash = '--';
 	    var crlf = '\r\n';
@@ -2204,11 +2204,19 @@ $.extend(T163API, {
 		return text;
 	},
 	
+	format_upload_params: function(user, data, pic) {
+    	delete data.source;
+    },
+	
 	upload: function(user, params, pic, before_request, onprogress, callback) {
 		this._upload(user, {}, pic, before_request, onprogress, function(data) {
-			params.user = user;
-			params.status += ' ' + data.upload_image_url;
-			this.update(params, callback);
+			if(data && data.upload_image_url) {
+				params.user = user;
+				params.status += ' ' + data.upload_image_url;
+				this.update(params, callback);
+			} else {
+				callback(null, 'error');
+			}
 		}, this);
 	},
 	
