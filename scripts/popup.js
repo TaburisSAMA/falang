@@ -94,7 +94,7 @@ function init(){
     $('a.show_source_status_btn').live('click', function() {
     	var $this = $(this);
     	var user = getUser();
-    	var t = window.currentTab.replace('#', '').replace(/_timeline$/i, '');
+    	var t = getCurrentTab().replace('#', '').replace(/_timeline$/i, '');
     	var params = {id: $(this).attr('status_id'), user: user};
     	$this.hide();
     	tapi.status_show(params, function(data) {
@@ -123,7 +123,7 @@ function initTabs(){
         //添加当前激活的状态
         t.siblings().removeClass('active').end().addClass('active');
         //切换tab前先保护滚动条位置
-        var old_t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
+        var old_t = getCurrentTab().replace('#','').replace(/_timeline$/i,'');
         saveScrollTop(old_t);
         //切换tab
         $('.list_p').hide();
@@ -136,8 +136,8 @@ function initTabs(){
             checkShowGototop();
             return;
         }else if(c_t =='followers'){
+        	window.currentTab = ''; // 防止自动滚动
         	showFollowers();
-            //getFansList('followers');
             checkShowGototop();
             return;
         } else if(c_t == 'favorites') {
@@ -148,23 +148,9 @@ function initTabs(){
         if(!c_ul.find('ul.list').html()){
             getSinaTimeline(c_t);
         }
-//        else if(c_t =='user_timeline'){ //用户自己的微薄，不定期自己获取更新，所以要通知后台去取一下
-//            showLoading();
-//            var b_view = getBackgroundView();
-//            b_view.checkTimeline(c_t);
-//        }
         resetScrollTop(c_t); //复位到上次滚动条的位置
         removeUnreadTimelineCount(c_t);
         t.find(".unreadCount").html('');
-        /*
-        var c_user = getUser();
-        var userUnreaded = getUserUnreadTimelineCount(c_user.uniqueKey);
-        if(userUnreaded > 0){
-            $("#accountListDock ." + c_user.uniqueKey + " .unr").html(userUnreaded).show();
-        }else{
-            $("#accountListDock ." + c_user.uniqueKey + " .unr").html('').hide();
-        }
-        */
         updateDockUserUnreadCount(c_user.uniqueKey);
 
         checkShowGototop(); //检查是否要显示返回顶部按钮
@@ -454,11 +440,12 @@ var Search = {
 	    		$tab.attr('cursor', data.next_cursor);
 	    	}
 	        if(statuses.length > 0){
-	        	if(window.currentTab != "#user_timeline_timeline") {
+	        	var c_tb = getCurrentTab();
+	        	if(c_tb != "#user_timeline_timeline") {
 	        		//添加当前激活的状态
 	                $tab.siblings().removeClass('active').end().addClass('active');
 	                //切换tab前先保护滚动条位置
-	                var old_t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
+	                var old_t = c_tb.replace('#','').replace(/_timeline$/i,'');
 	                saveScrollTop(old_t);
 	                //切换tab
 	                $('.list_p').hide();
@@ -804,8 +791,6 @@ function showFollowers(to_t, screen_name, user_id) {
     //切换tab
     $('.list_p').hide();
     $($t.attr('href')).show();
-    window.currentTab = $t.attr('href');
-    
 	to_t = to_t || $("#fans_tab .active").attr('t');
 	if(screen_name) {
 		$('#followers_timeline').attr('screen_name', screen_name);
@@ -817,6 +802,7 @@ function showFollowers(to_t, screen_name, user_id) {
 	} else {
 		$('#followers_timeline').removeAttr('user_id');
 	}
+//	log('show ' + to_t);
 	$("#fans_tab span").unbind('click').click(function() {
 		_getFansList($(this).attr('t'));
 	}).each(function() {
@@ -867,11 +853,11 @@ function _getFansList(to_t, read_more){
     var active_t = $active_t.attr('t');
     var $to_t = $("#fans_tab .tab_" + to_t);
     var cursor = $to_t.attr('cursor') || '-1';
-    var last_user = $to_t.attr('last_user');
+    var last_user = $followers_timeline.attr('last_user');
     if(c_user.uniqueKey != last_user) { // 用户切换了
     	cursor = '-1';
     }
-    $to_t.attr('last_user', c_user.uniqueKey);
+    $followers_timeline.attr('last_user', c_user.uniqueKey);
     // 各微博自己cache
     var html_cache = get_current_user_cache(FANS_HTML_CACHE);
     if($to_t.attr('loading') !== undefined) {
@@ -893,10 +879,12 @@ function _getFansList(to_t, read_more){
 	    $list.html('');
     }
 	if(cursor == '0'){
+		hideReadMore(to_t, true);
     	return;
     }
     params.cursor = cursor;
     hideReadMore(to_t);
+    window.currentTab = to_t;
     showLoading();
     $to_t.attr('loading', true);
 //    log(c_user.uniqueKey + ': ' + cursor + ' ' + read_more);
@@ -1013,11 +1001,12 @@ function getUserTimeline(screen_name, user_id, read_more) {
         		$tab.attr('cursor', data.next_cursor);
         	}
             if(sinaMsgs && sinaMsgs.length > 0){
-            	if(window.currentTab != "#user_timeline_timeline") {
+            	var c_tab = getCurrentTab();
+            	if(c_tab != "#user_timeline_timeline") {
             		//添加当前激活的状态
                     $tab.siblings().removeClass('active').end().addClass('active');
                     //切换tab前先保护滚动条位置
-                    var old_t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
+                    var old_t = c_tab.replace('#','').replace(/_timeline$/i,'');
                     saveScrollTop(old_t);
                     //切换tab
                     $('.list_p').hide();
@@ -1333,13 +1322,27 @@ function isCanReadMore(t){
 };
 //显示获取分页loading
 function showReadMoreLoading(t){
+	if(t == 'friends') {
+		t = 'followers';
+	}
     $("#" + t + "_rm_loading").show();
     $("#" + t + '_timeline .list_warp').scrollTop(100000); //底部
 };
 //隐藏获取分页loading
 function hideReadMoreLoading(t){
+	if(t == 'friends') {
+		t = 'followers';
+	}
     $("#" + t + "_rm_loading").hide();
 };
+
+function getCurrentTab() {
+	var c_t = window.currentTab;
+    if(c_t == 'followers' || c_t == 'friends') {
+    	c_t = '#followers_timeline';
+    }
+    return c_t;
+}
 
 function scrollPaging(){
     var c_t = window.currentTab;
@@ -1348,12 +1351,14 @@ function scrollPaging(){
         //hideReadMore(tl, true);
         return;
     }
-    //var h = $(c_t + ' .list').height();
+    var is_followers_tab = false;
+    c_t = getCurrentTab();
     var h = $(c_t + ' .list')[0].scrollHeight;
     var list_warp = $(c_t + ' .list_warp');
     h = h - list_warp.height();
     if(list_warp.scrollTop() >= h){
-        if(tl == 'followers'){ //粉丝列表特殊处理
+//    	log('scroll ' + tl);
+        if(c_t == '#followers_timeline'){ //粉丝列表特殊处理
             readMoreFans();
         } else if(tl == 'favorites') {
         	getFavorites();
@@ -1372,14 +1377,19 @@ function scrollPaging(){
 
 function initScrollPaging(){
     $(".list_warp").scroll(function(e){
+    	if($(this).attr('scrolling')) {
+    		return;
+    	}
+    	$(this).attr('scrolling', true);
         scrollPaging();
         checkShowGototop();
+        $(this).removeAttr('scrolling');
     });
 };
 
 //检查是否需要显示返回顶部按钮
 function checkShowGototop(){
-    var c_t = window.currentTab;
+    var c_t = getCurrentTab();
     var list_warp = $(c_t + ' .list_warp');
     if(list_warp.scrollTop() > 200){
         $("#gototop").show();
@@ -1389,7 +1399,7 @@ function checkShowGototop(){
 };
 
 function setScrollTotop(){
-    var c_t = window.currentTab;
+    var c_t = getCurrentTab();
     var list_warp = $(c_t + ' .list_warp');
     list_warp.scrollTop(0);
 };
@@ -1942,7 +1952,7 @@ function doDelTweet(tweetId, ele){//删除自己的微博
     if(!tweetId){return;}
     showLoading();
     var user = getUser();
-    var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
+    var t = getCurrentTab().replace('#','').replace(/_timeline$/i,'');
     tapi.destroy({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
         	$(ele).closest('li').remove();
@@ -1957,7 +1967,7 @@ function doDelComment(ele, screen_name, tweetId){//删除评论
     if(!tweetId){return;}
     showLoading();
     var user = getUser();
-    var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
+    var t = getCurrentTab().replace('#','').replace(/_timeline$/i,'');
     tapi.comment_destroy({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
         	$(ele).closest('li').remove();
@@ -1972,7 +1982,7 @@ function delDirectMsg(ele, screen_name, tweetId){//删除私信
     if(!tweetId){return;}
     showLoading();
     var user = getUser();
-    var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
+    var t = getCurrentTab().replace('#','').replace(/_timeline$/i,'');
     tapi.destroy_msg({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
         	$(ele).closest('li').remove();
@@ -1990,7 +2000,7 @@ function addFavorites(ele, screen_name, tweetId){//添加收藏
     var _aHtml = _a[0].outerHTML;
     _a.hide();
     var user = getUser();
-    var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
+    var t = getCurrentTab().replace('#','').replace(/_timeline$/i,'');
     tapi.favorites_create({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
             _a.after(_aHtml.replace('addFavorites','delFavorites')
@@ -2026,7 +2036,7 @@ function delFavorites(ele, screen_name, tweetId){//删除收藏
     var _aHtml = _a[0].outerHTML;
     _a.hide();
     var user = getUser();
-    var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
+    var t = getCurrentTab().replace('#','').replace(/_timeline$/i,'');
     tapi.favorites_destroy({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error && data.id){
             _a.after(_aHtml.replace('delFavorites','addFavorites')
@@ -2063,7 +2073,7 @@ function sendOretweet(ele, screen_name, tweetId){//twitter锐推
     var _aHtml = _a[0].outerHTML;
     _a.hide();
     var user = getUser();
-    var t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
+    var t = getCurrentTab().replace('#','').replace(/_timeline$/i,'');
     var title = _a.attr('title');
     tapi.retweet({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
@@ -2259,7 +2269,7 @@ var SmoothScroller = {
         if(e.wheelDelta == 0){ return; }
         clearTimeout(this.T);
         e.preventDefault();
-        this.c_t = window.currentTab;
+        this.c_t = getCurrentTab();
         this.list_warp = $(this.c_t + ' .list_warp');
         this.list_warp_height = this.list_warp.height(); //算好放缓存，免得每次都要算
         this.ease_type = Settings.get().smoothSeaeType;

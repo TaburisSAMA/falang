@@ -2217,6 +2217,8 @@ $.extend(T163API, {
 	
 	format_upload_params: function(user, data, pic) {
     	delete data.source;
+    	delete data.lat;
+    	delete data.long;
     },
 	
 	upload: function(user, params, pic, before_request, onprogress, callback) {
@@ -2268,6 +2270,16 @@ $.extend(T163API, {
 		} else if(args.url == this.config.favorites) {
 			args.data.id = user.screen_name;
 		}
+    },
+    
+    _format_result: sinaApi.format_result,
+    
+    format_result: function(data, play_load, args) {
+    	data = this._format_result(data, play_load, args);
+    	if(String(data.next_cursor) == '-1') {
+    		data.next_cursor = '0';
+    	}
+    	return data;
     },
     
     format_result_item: function(data, play_load, args) {
