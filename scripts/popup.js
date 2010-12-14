@@ -1517,12 +1517,14 @@ function sendReplyMsg(msg){
         userName = $("#ye_dialog_title").text();
     msg = userName + ' ' + msg;
     var tweetId = $("#replyTweetId").val();
-    data = {sina_id: tweetId}; // @回复
-    
+    if(tweetId) {
+    	data = {sina_id: tweetId}; // @回复
+    } else {
+    	data = {};
+    }
     btn.attr('disabled','true');
     txt.attr('disabled','true');
     data['status'] = msg;
-    
     var user = getUser();
     data['user'] = user;
     tapi.update(data, function(sinaMsg, textStatus){

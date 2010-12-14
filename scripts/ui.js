@@ -106,6 +106,7 @@ function buildStatusHtml(statuses, t, c_user){
 	    	BUTTON_TPLS.repostBtn = BUTTON_TPLS.oretweetBtn = BUTTON_TPLS.repostCounts = BUTTON_TPLS.commentBtn = BUTTON_TPLS.commentCounts = 
 	    		BUTTON_TPLS.delCommentBtn = BUTTON_TPLS.delTweetBtn = BUTTON_TPLS.addFavoritesMsgBtn = BUTTON_TPLS.delFavoritesMsgBtn = '';
 	    	BUTTON_TPLS.new_msgBtn = BUTTON_TPLS.new_msgBtn.replace('>私<', '>回复<');
+	    	BUTTON_TPLS.replyBtn = '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'{{user.screen_name}}\',\'\');" title="进行@回复">@</a>';
 	        break;
 	    default:
 	        break;
@@ -119,7 +120,7 @@ function buildStatusHtml(statuses, t, c_user){
 	
 	switch(c_user.blogType){
 	    case 'digu':
-	    	BUTTON_TPLS.replyBtn = BUTTON_TPLS.replyBtn.replace('>@<', '>回复<');
+	    	BUTTON_TPLS.replyBtn = BUTTON_TPLS.replyBtn.replace('>@<', '>@回复<');
 	        break;
 	    case 'renjian':
 	    	BUTTON_TPLS.repostCounts = BUTTON_TPLS.rtRepostCounts = BUTTON_TPLS.rtrtRepostCounts = '';
