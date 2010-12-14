@@ -866,7 +866,11 @@ function _getFansList(to_t, read_more){
     var active_t = $active_t.attr('t');
     var $to_t = $("#fans_tab .tab_" + to_t);
     var cursor = $to_t.attr('cursor') || '-1';
-    
+    var last_user = $to_t.attr('last_user');
+    if(c_user.uniqueKey != last_user) { // 用户切换了
+    	cursor = '-1';
+    }
+    $to_t.attr('last_user', c_user.uniqueKey);
     // 各微博自己cache
     var html_cache = get_current_user_cache(FANS_HTML_CACHE);
     if($to_t.attr('loading') !== undefined) {
@@ -884,7 +888,12 @@ function _getFansList(to_t, read_more){
 	    } else if(cursor != '-1') { // 点击当前tab
 	    	return;
 	    }
+    	cursor = '-1';
 	    $list.html('');
+    } else {
+    	if(cursor == '-1') { // 这个read more肯定不对，直接返回
+    		return;
+    	}
     }
 	if(cursor == '0'){
     	return;
@@ -893,15 +902,17 @@ function _getFansList(to_t, read_more){
     hideReadMore(to_t);
     showLoading();
     $to_t.attr('loading', true);
+    log(c_user.uniqueKey + ': ' + cursor + ' ' + read_more);
     tapi[to_t](params, function(data, textStatus, statuCode){
     	// 如果用户已经切换，则不处理
     	var now_user = getUser();
     	if(now_user.uniqueKey != c_user.uniqueKey) {
     		return;
     	}
-        if(textStatus != 'error' && data && !data.error){
+        if(data){
             var users = data.users || data.items;
             var next_cursor = data.next_cursor;
+            log(c_user.uniqueKey + ': next_cursor ' + next_cursor);
             var $last_item = $("#followers_timeline ul.list .user_info:last");
             var max_id = $last_item.attr('did');
             var result = filterDatasByMaxId(users, max_id, true);
@@ -920,18 +931,18 @@ function _getFansList(to_t, read_more){
                 }
                 html_cache[to_t] += html;
             }
-            // 设置游标，控制翻页
-            if(next_cursor >= 0) {
-        		$to_t.attr('cursor', next_cursor);
-        	}
-
-            if(users && users.length > 15){
+            if(users && users.length > 0) {
                 showReadMore(to_t);
-            }else{
+            } else {
                 hideReadMore(to_t, true);
             }
-        }else{
-            hideReadMore(to_t, true);
+            // 设置游标，控制翻页
+            if(next_cursor !== undefined) {
+        		$to_t.attr('cursor', next_cursor);
+        	}
+        } else {
+        	// 异常
+        	showReadMore(to_t);
         }
         $to_t.removeAttr('loading');
     });
@@ -999,49 +1010,51 @@ function getUserTimeline(screen_name, user_id, read_more) {
     	if(now_user.uniqueKey != c_user.uniqueKey) {
     		return;
     	}
-    	var sinaMsgs = data.items || data;
-    	if(support_cursor_only && data.next_cursor >= 0) {
-    		$tab.attr('cursor', data.next_cursor);
-    	}
-        if(sinaMsgs && sinaMsgs.length > 0){
-        	if(window.currentTab != "#user_timeline_timeline") {
-        		//添加当前激活的状态
-                $tab.siblings().removeClass('active').end().addClass('active');
-                //切换tab前先保护滚动条位置
-                var old_t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
-                saveScrollTop(old_t);
-                //切换tab
-                $('.list_p').hide();
-                
-                $("#user_timeline_timeline").show();
-                $ul.html('');
-
-                window.currentTab = "#user_timeline_timeline";
+    	if(data) {
+    		var sinaMsgs = data.items || data;
+        	if(support_cursor_only && data.next_cursor >= 0) {
+        		$tab.attr('cursor', data.next_cursor);
         	}
-            addPageMsgs(sinaMsgs, m, true);
-            max_id = String(sinaMsgs[sinaMsgs.length - 1].cursor_id || sinaMsgs[sinaMsgs.length - 1].id);
-            page += 1;
-            // 保存数据，用于翻页
-            $tab.attr('max_id', max_id);
-            $tab.attr('page', page);
-            $tab.attr('screen_name', screen_name);
-            $tab.attr('user_id', user_id);
-            if(sinaMsgs.length > 8){
-                showReadMore(m);
+            if(sinaMsgs && sinaMsgs.length > 0){
+            	if(window.currentTab != "#user_timeline_timeline") {
+            		//添加当前激活的状态
+                    $tab.siblings().removeClass('active').end().addClass('active');
+                    //切换tab前先保护滚动条位置
+                    var old_t = window.currentTab.replace('#','').replace(/_timeline$/i,'');
+                    saveScrollTop(old_t);
+                    //切换tab
+                    $('.list_p').hide();
+                    
+                    $("#user_timeline_timeline").show();
+                    $ul.html('');
+
+                    window.currentTab = "#user_timeline_timeline";
+            	}
+                addPageMsgs(sinaMsgs, m, true);
+                max_id = String(sinaMsgs[sinaMsgs.length - 1].cursor_id || sinaMsgs[sinaMsgs.length - 1].id);
+                page += 1;
+                // 保存数据，用于翻页
+                $tab.attr('max_id', max_id);
+                $tab.attr('page', page);
+                $tab.attr('screen_name', screen_name);
+                $tab.attr('user_id', user_id);
+                if(sinaMsgs.length > 8){
+                    showReadMore(m);
+                }else{
+                    hideReadMore(m, true); //没有分页了
+                }
+                if(!read_more) {
+                	var user = data.user || sinaMsgs[0].user || sinaMsgs[0].sender;
+                	// 是否当前用户
+                	user.is_me = String(c_user.id) == String(user.id);
+                    var userinfo_html = buildUserInfo(user);
+                    $ul.prepend(userinfo_html);
+                    resetScrollTop(m);
+                }
             }else{
-                hideReadMore(m, true); //没有分页了
+                hideReadMore(m, true);
             }
-            if(!read_more) {
-            	var user = data.user || sinaMsgs[0].user || sinaMsgs[0].sender;
-            	// 是否当前用户
-            	user.is_me = String(c_user.id) == String(user.id);
-                var userinfo_html = buildUserInfo(user);
-                $ul.prepend(userinfo_html);
-                resetScrollTop(m);
-            }
-        }else{
-            hideReadMore(m, true);
-        }
+    	}
         hideLoading();
         checkShowGototop();
     });
