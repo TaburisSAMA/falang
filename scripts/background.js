@@ -117,6 +117,7 @@ function checkTimeline(t, p, user_uniqueKey){
     $.extend(params, p);
     showLoading();
     tapi[t](params, function(data, textStatus){
+    	hideLoading();
     	data = data || {};
     	var sinaMsgs = data.items || data;
     	if(data.next_cursor !== undefined) {
@@ -196,10 +197,13 @@ function checkTimeline(t, p, user_uniqueKey){
             } else if (popupView) {
                 popupView.showReadMore(t);
             }
-        } else if(popupView && sinaMsgs.length >= PAGE_SIZE) {
-            popupView.showReadMore(t);
+        } else if(popupView) {
+        	if(sinaMsgs.length >= PAGE_SIZE) {
+        		popupView.showReadMore(t);
+        	} else {
+        		popupView.hideReadMoreLoading(t);
+        	}
         }
-        hideLoading();
     });
 };
 

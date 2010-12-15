@@ -1168,6 +1168,7 @@ function getSinaTimeline(t, notCheckNew){
             showReadMore(t);
         }
     } else if(!notCheckNew){
+    	showReadMoreLoading(t);
         b_view.checkTimeline(t);
     }
 };
