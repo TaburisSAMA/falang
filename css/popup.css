@@ -250,6 +250,7 @@ textarea:focus{outline: none;}
 .list_warp { margin:0; height: 470px; overflow-x:hidden; overflow-y:auto; -webkit-transition: height .6s ease;} 
 li .pic{max-width:160px; max-height:160px;}
 .geobtn{padding:0 3px;}
+.favicons_ico{height:14px; vertical-align:middle;}
 
 li .thumbnail_pic{position:relative;display:inline-block;}
 li .thumbnail_pic .img_loading{position:absolute;left:42%;top:43%;}

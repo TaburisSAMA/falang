@@ -1063,6 +1063,25 @@ var popupBox = {
     }
 };
 
+var UrlUtil = {
+    domainRe: /^https?:\/\/([^/]+)/i,
+    getDomain: function(url){
+        if(url){
+            var m = url.match(UrlUtil.domainRe);
+            if(m){
+                return m[1];
+            }
+        }
+        return '';
+    },
+    showFaviconBefore: function(ele, url){
+        var d = UrlUtil.getDomain(url);
+        if(d){
+            $(ele).before('<img class="favicons_ico" src="https://www.google.com/s2/favicons?domain='+d+'"/>');
+        }
+    }
+};
+
 // shorturl
 var ShortenUrl = {
 	services: {
@@ -1114,12 +1133,14 @@ var ShortenUrl = {
 			if(cache[url]) {
 //				log('cache: ' + url + ' ' + cache[url]);
 				$(this).attr('title', cache[url]);
+                UrlUtil.showFaviconBefore(this, cache[url]);
 				VideoService.attempt(cache[url], this);
 			} else {
 				ShortenUrl.expand(url, function(longurl) {
 					if(longurl) {
 						$(this).attr('title', longurl).addClass('longurl');
 						cache[$(this).attr('href')] = longurl;
+                        UrlUtil.showFaviconBefore(this, longurl);
 						VideoService.attempt(longurl, this);
 //						log('new: ' + $(this).attr('href') + ' ' + longurl);
 					}
