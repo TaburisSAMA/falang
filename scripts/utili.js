@@ -1077,7 +1077,9 @@ var UrlUtil = {
     showFaviconBefore: function(ele, url){
         var d = UrlUtil.getDomain(url);
         if(d){
-            $(ele).before('<img class="favicons_ico" src="https://www.google.com/s2/favicons?domain='+d+'"/>');
+            if(!$(ele).prev('.favicons_ico').length){
+                $(ele).before('<img class="favicons_ico" src="https://www.google.com/s2/favicons?domain='+d+'"/>');
+            }
         }
     }
 };
@@ -1128,6 +1130,7 @@ var ShortenUrl = {
 		$('a.link:not([title^="http"])').each(function() {
 			var url = $(this).attr('href');
 			if(url.length > 30) {
+                UrlUtil.showFaviconBefore(this, url);
 				return;
 			}
 			if(cache[url]) {
