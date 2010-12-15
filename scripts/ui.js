@@ -119,9 +119,9 @@ function buildStatusHtml(statuses, t, c_user){
     }
 	
 	switch(c_user.blogType){
-	    case 'digu':
-	    	BUTTON_TPLS.replyBtn = BUTTON_TPLS.replyBtn.replace('>@<', '>@回复<');
-	        break;
+//	    case 'digu':
+//	    	BUTTON_TPLS.replyBtn = BUTTON_TPLS.replyBtn.replace('>@<', '>@回复<');
+//	        break;
 	    case 'renjian':
 	    	BUTTON_TPLS.repostCounts = BUTTON_TPLS.rtRepostCounts = BUTTON_TPLS.rtrtRepostCounts = '';
 	        break;
