@@ -1266,17 +1266,18 @@ var Plixi = {
 // key: cba6198873ac20498a5686839b189fc0
 var Imgur = {
 	host: 'imgur.com',
-	url_re: /http:\/\/(i\.)?imgur\.com\/\w+\.png/i,
+	url_re: /http:\/\/(i\.)?imgur\.com\/\w+\.\w+/i,
 	get: function(url, callback) {
-		var re = /imgur.com\/(\w+)\.png/i;
-		var tpl = 'http://i.imgur.com/{{word}}.png';
+		var re = /imgur.com\/(\w+)\.(\w+)/i;
+		var tpl = 'http://i.imgur.com/{{word}}.{{ext}}';
 		var results = re.exec(url);
 		var pics = null;
 		if(results) {
 			var word = results[1];
+			var ext = results[2];
 			pics = {
-				thumbnail_pic: tpl.format({word: word + 's'}),
-				bmiddle_pic: tpl.format({word: word + 'm'}),
+				thumbnail_pic: tpl.format({word: word + 's', ext: ext}),
+				bmiddle_pic: tpl.format({word: word + 'm', ext: ext}),
 				original_pic: url
 			};
 		}

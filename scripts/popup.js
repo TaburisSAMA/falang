@@ -1125,16 +1125,14 @@ function getFavorites(is_click){
 //获取时间线微博列表
 //@t : 类型
 function getSinaTimeline(t, notCheckNew){
-    showLoading();
     var _ul = $("#" + t + "_timeline ul.list");
     var c_user = getUser();
     var b_view = getBackgroundView();
     var _key = c_user.uniqueKey + t + '_tweets';
-    if(b_view && b_view.tweets[_key] && b_view.tweets[_key].length>0){
+    hideReadMoreLoading(t);
+    if(b_view.tweets[_key] && b_view.tweets[_key].length > 0){
         var tweetsAll = b_view.tweets[_key];
         var msgs = tweetsAll.slice(0, PAGE_SIZE);
-//        var msg_ids = tweetsAll.slice(0, PAGE_SIZE);
-//        var msgs = TweetStorage.getItems(msg_ids, t, c_user.uniqueKey);
         var htmls = [];
         var ids = [];
         htmls = buildStatusHtml(msgs, t);
@@ -1143,8 +1141,6 @@ function getSinaTimeline(t, notCheckNew){
         ShortenUrl.expandAll();
         for(var i in msgs){
             var msg = msgs[i];
-//            html += bildMsgLi(msgs[i], t);
-        	//_ul.append(bildMsgLi(msg, t)); //TODO: 待优化
             ids.push(msg.id);
             if(msg.retweeted_status){
                 ids.push(msg.retweeted_status.id);
@@ -1168,17 +1164,11 @@ function getSinaTimeline(t, notCheckNew){
             	showCounts(t, ids);
             }
         }
-        if(tweetsAll.length >= (PAGE_SIZE/2)){
+        if(tweetsAll.length >= (PAGE_SIZE/2)) {
             showReadMore(t);
         }
-        hideLoading();
-        if(t=="user_timeline"){ //用户
-            b_view.checkTimeline(t);
-        }
-    }else if(!notCheckNew){
+    } else if(!notCheckNew){
         b_view.checkTimeline(t);
-    } else { // 关闭动画
-    	hideLoading();
     }
 };
 //<<<<<<<<<<<<<<<<<<<<<<<========
@@ -1428,8 +1418,6 @@ function readMore(t){
     if(!cache || getTimelineOffset(t) >= cache.length){
         _b_view.getTimelinePage(c_user.uniqueKey, t);
     }else{
-//        var msg_ids = cache.slice(getTimelineOffset(t), getTimelineOffset(t) + PAGE_SIZE);
-//        var msgs = TweetStorage.getItems(msg_ids, t, c_user.uniqueKey);
         var msgs = cache.slice(getTimelineOffset(t), getTimelineOffset(t) + PAGE_SIZE);
         addPageMsgs(msgs, t, true);
         showReadMore(t);
