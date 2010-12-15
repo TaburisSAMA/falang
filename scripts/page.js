@@ -187,7 +187,7 @@ var QUICK_SEND_TEMPLATE = ' \
                 </div>\
                 <span class="fawaveUserInfo">\
                     <span></span>\
-                    <a target="_blank"><img src="" /></a><img src="" class="blogType" />\
+                    <a target="_blank"><img /></a><img class="blogType" />\
                 </span>\
             </div> \
             <div class="fawaveInfoMsg"></div>\
@@ -328,12 +328,22 @@ function toggleSelectAllSendAccount(){
 function fawaveToggleLooking(ele){
     chrome.extension.sendRequest({method:'getLookingTemplate'}, function(response){
         var fawaveLookingTemplate = response.lookingTemplate;
-        var loc_url = window.location.href;
+        var loc_url = window.location.href, s_url = $(ele).data('short_url');
+        loc_url = s_url || loc_url;
         var title = document.title;
         result = fawaveFormatText(fawaveLookingTemplate, {title:(title||''), url:loc_url});
         //countInputText();
         if($(ele).attr('checked')){
             $("#fawaveTxtContentInp").val(result);
+            if(!s_url){
+                chrome.extension.sendRequest({method:'shortenUrl', long_url:loc_url}, function(response){
+                    if(response.short_url){
+                        $("#fawaveTxtContentInp").val($("#fawaveTxtContentInp").val().replace(loc_url, response.short_url));
+                        $(ele).data('short_url', response.short_url);
+                        fawaveCountInputText();
+                    }
+                });
+            }
         }else{
             $("#fawaveTxtContentInp").val($("#fawaveTxtContentInp").val().replace(result, ''));
         }

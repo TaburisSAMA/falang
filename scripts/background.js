@@ -586,6 +586,16 @@ r_method_manager = {
         var _l_tp = Settings.get().lookingTemplate;
         sendResponse({lookingTemplate: _l_tp});
     },
+    shortenUrl: function(request, sender, sendResponse){
+        var longurl = request.long_url;
+        if(Settings.get().isSharedUrlAutoShort && longurl.indexOf('chrome-extension://') != 0 && longurl.replace(/^https?:\/\//i, '').length > Settings.get().sharedUrlAutoShortWordCount){
+            ShortenUrl.short(longurl, function(shorturl){
+                sendResponse({short_url: shorturl});
+            });
+        }else{
+            sendResponse({short_url: ''});
+        }
+    },
     getQuickSendInitInfos: function(request, sender, sendResponse){
         var hotkeys = Settings.get().quickSendHotKey;
         var c_user = getUser();
