@@ -328,7 +328,12 @@ function getUserUnreadTimelineCount(user_uniqueKey){
 //获取用户的某一timeline的未读信息数
 function getUnreadTimelineCount(t, user_uniqueKey){
     if(!user_uniqueKey){
-        user_uniqueKey = getUser().uniqueKey;
+        var _user = getUser();
+        if(_user){
+            user_uniqueKey = _user.uniqueKey;
+        }else{
+            return 0;
+        }
     }
     //key 大概如： tsina#11234598_friends_timeline_UNREAD_TIMELINE_COUNT_KEY
     var count = localStorage.getObject(user_uniqueKey + t + UNREAD_TIMELINE_COUNT_KEY);
@@ -342,7 +347,12 @@ function getUnreadTimelineCount(t, user_uniqueKey){
 //@t: timeline的类型
 function setUnreadTimelineCount(count, t, user_uniqueKey){
     if(!user_uniqueKey){
-        user_uniqueKey = getUser().uniqueKey;
+        var _user = getUser();
+        if(_user){
+            user_uniqueKey = _user.uniqueKey;
+        }else{
+            return;
+        }
     }
     var setBadgeText = Settings.get().isSetBadgeText[t];
     count += getUnreadTimelineCount(t, user_uniqueKey);
