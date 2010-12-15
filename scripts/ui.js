@@ -31,7 +31,7 @@ function buildStatusHtml(statuses, t, c_user){
         repostBtn: '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'{{user.screen_name}}\',\'{{id}}\',\'{{retweeted_status_screen_name}}\',\'{{retweeted_status_id}}\');" title="转发这条微博">转</a>',
         repostCounts: '<span class="repostCounts">(-)</span>',
         commentBtn: '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{user.screen_name}}\', \'{{user.id}}\', \'{{id}}\');" title="点击添加评论">评</a>',
-        commentCounts: '<span class="commentCounts">({{comments_count}})</span>',
+        commentCounts: '<span class="commentCounts">({{comments_btn}})</span>',
         delCommentBtn: '<a class="delcommenttweet" href="javascript:void(0);" onclick="javascript:doDelComment(this,\'{{user.screen_name}}\',\'{{id}}\');" title="点击删除评论">删</a>',
         new_msgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="doNewMessage(this,\'{{user.screen_name}}\',\'{{user.id}}\');" title="发送私信">私</a>',
         delDirectMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="delDirectMsg(this,\'{{user.screen_name}}\',\'{{id}}\');" title="点击删除私信">删</a>',
@@ -142,15 +142,13 @@ function buildStatusHtml(statuses, t, c_user){
          */
     	status.retweeted_status = status.retweeted_status || status.status;
     	
-    	var comments_count = '-';
+    	var comments_btn = '<a href="javascript:void(0);" title="点击查看评论" onclick="showComments(this, \'{{id}}\');">看</a>'.format(status);;
      	if(status.comments_count !== undefined) {
-     		if(status.comments_count == 0) {
-     			comments_count = 0;
-     		} else {
-     			comments_count = '<a href="javascript:void(0);" title="点击查看评论" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>'.format(status);
+     		if(String(status.comments_count) != '0') {
+     			comments_btn = '<a href="javascript:void(0);" title="点击查看评论" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>'.format(status);
      		}
      	}
-     	status.comments_count = comments_count;
+     	status.comments_btn = comments_btn;
      	status.rt_comments_count = status.rtrt_comments_count = '-';
      	if(status.retweeted_status && status.retweeted_status.user) {
      		status.retweeted_status_screen_name = status.retweeted_status.user.screen_name;

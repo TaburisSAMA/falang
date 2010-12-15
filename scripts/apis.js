@@ -2779,7 +2779,7 @@ $.extend(BuzzAPI, {
 			delete data.links;
 			delete data.content;
 		}
-		if(data.published) {
+		if(data && data.published) {
 			data.created_at = data.published;
 			delete data.published;
 		}

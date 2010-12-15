@@ -1241,12 +1241,17 @@ function showComments(ele, tweetId, page, notHide){
             return;
         }
         showLoading();
-        page = page || 1;
         var user = getUser();
-        var data = {id:tweetId, page:page, count:COMMENT_PAGE_SIZE, user:user};
+        var data = {id:tweetId, count:COMMENT_PAGE_SIZE, user:user};
+        if(page) {
+        	data.page = page;
+        } else {
+        	page = 1;
+        }
         tapi.comments(data, function(data, textStatus){
+        	data = data || {};
         	var comments = data.items || data;
-            if(textStatus != 'error' && comments && !comments.error){
+            if(comments){
                 if(comments.length && comments.length>0){
                     var _html = '';
                     for(var i in comments){
@@ -1273,6 +1278,10 @@ function showComments(ele, tweetId, page, notHide){
                         commentWrap.find('.comment_paging a:eq(1)').hide();
                     }
                 }
+            }
+            if(!comments || !comments.length){
+//            	showMsg('暂无评论.');
+            	$(ele).parent().html('(0)');
             }
             hideLoading();
         });
