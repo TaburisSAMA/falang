@@ -192,7 +192,7 @@ var Settings = {
         isSmoothScroller: false, //是否启用平滑滚动
         smoothTweenType: 'Quad', //平滑滚动的动画类型
         smoothSeaeType: 'easeOut', //平滑滚动的ease类型
-        sendAccountsDefaultSelected: 'remember', //多账号发送的时候默认选择的发送账号
+        sendAccountsDefaultSelected: 'current', //多账号发送的时候默认选择的发送账号
 
         font: '微软雅黑', //字体
         fontSite: 12, //字体大小

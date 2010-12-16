@@ -600,6 +600,12 @@ function changeUser(uniqueKey){
 function initSelectSendAccounts(is_upload){
     var afs = $("#accountsForSend");
     if(afs.data('inited')){
+        if(Settings.get().sendAccountsDefaultSelected == 'current' && afs.find('li.sel').length < 2){
+            afs.find('li').removeClass('sel');
+            var c_user = getUser();
+            $("#accountsForSend li[uniqueKey=" + c_user.uniqueKey +"]").addClass('sel');
+        }
+        shineSelectedSendAccounts(afs.find('li.sel'));
         return;
     }
     var userList = getUserList('send');
@@ -639,6 +645,17 @@ function initSelectSendAccounts(is_upload){
     }
     afs.html('TO(<a class="all" href="javascript:" onclick="toggleSelectAllSendAccount()">全</a>): ' + li.join(''));
     afs.data('inited', 'true');
+    shineSelectedSendAccounts();
+};
+function shineSelectedSendAccounts(sels){
+    if(!sels){
+        sels = $("#accountsForSend li.sel");
+    }
+    sels.css('-webkit-transition', 'none').removeClass('sel');
+    function _highlightSels(){
+        sels.css('-webkit-transition', 'all 0.8s ease').addClass('sel');
+    }
+    setTimeout(_highlightSels, 150);
 };
 function toggleSelectSendAccount(ele){
     var _t = $(ele);
