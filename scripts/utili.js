@@ -1087,9 +1087,10 @@ var UrlUtil = {
     showFaviconBefore: function(ele, url){
         var d = UrlUtil.getDomain(url);
         if(d){
-            if(!$(ele).prev('.favicons_ico').length){
-                $(ele).before('<img class="favicons_ico" src="https://www.google.com/s2/favicons?domain='+d+'"/>');
-            }
+            $(ele).addClass('favicons_ico').css('background-image', 'url(https://www.google.com/s2/favicons?domain='+d+')');
+            //if(!$(ele).prev('.favicons_ico').length){
+            //    $(ele).before('<img class="favicons_ico" src="https://www.google.com/s2/favicons?domain='+d+'"/>');
+            //}
         }
     }
 };

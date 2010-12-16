@@ -20,7 +20,6 @@ div.usericon img {
 	background:url(../images/arrow_l.png) no-repeat;
 }
 div.mainContent {
-	line-height: 18px;
 	margin:0 0 0 60px;
 	color:#222;
 	position:relative;
@@ -60,10 +59,10 @@ div.msgInfo {padding-top:3px;}
 .list_p{ background:#fff; margin:0;padding:0;}
 .list li { padding:5px 0; margin: 0 2px; /*overflow:hidden;*/}
 .list li .msg a, .comments a{color:#F77004;}
-.list li .msg a:hover, .comments a:hover{color:#fff;background:#369;text-decoration:none;}
+.list li .msg a:hover, .comments a:hover{color:#fff;background-color:#369;text-decoration:none;}
 .unread-item{}
 .list li.activeTweet{color:black;}
-.list li .edit{display:none; float:right;}
+.list li .edit{display:none; float:right; line-height:1em;}
 .list li .edit a{margin:0 0 0 5px;}
 .list li .edit a:hover{background:none;text-decoration:underline;}
 .list li .commentCounts, .list li .repostCounts{color:#888;font-weight:normal;}

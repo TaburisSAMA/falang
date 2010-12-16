@@ -16,7 +16,7 @@ div.msgInfo {padding-top:3px;}
 .list li .msg a, .comments a{color:#F77004;}
 .unread-item{background-color: #FFFFDF;}
 .list li:hover{background-color: #FFFFEF;color:black;}
-.list li .edit{display:none; float:right;}
+.list li .edit{display:none; float:right; line-height:1em;}
 .list li .edit a{margin:0 0 0 5px;}
 .list li .commentCounts, .list li .repostCounts{color:#888;font-weight:normal;}
 .list li .commentCounts a{padding:0;margin:0;font-weight:normal;}
