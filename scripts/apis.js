@@ -2222,6 +2222,10 @@ $.extend(T163API, {
     reset_count: function(data, callback) {
 		callback();
 	},
+
+    rate_limit_status: function(data, callback){
+        callback({error:'没有提供接口'});
+    },
 	
 	format_upload_params: function(user, data, pic) {
     	delete data.source;
@@ -2626,6 +2630,10 @@ $.extend(BuzzAPI, {
 	reset_count: function(data, callback) {
 		callback();
 	},
+
+    rate_limit_status: function(data, callback){
+        callback({error:'没有提供接口'});
+    },
 	
 	counts: function(data, callback) {
 		callback();
@@ -2855,6 +2863,10 @@ $.extend(DoubanAPI, {
 	counts: function(data, callback) {
 		callback();
 	},
+
+    rate_limit_status: function(data, callback){
+        callback({error:'没有提供接口'});
+    },
 	
 	MSG_TPL: '<?xml version="1.0" encoding="UTF-8"?><entry xmlns="http://www.w3.org/2005/Atom" xmlns:db="http://www.douban.com/xmlns/" xmlns:gd="http://schemas.google.com/g/2005" xmlns:opensearch="http://a9.com/-/spec/opensearchrss/1.0/"><db:entity name="receiver"><uri>http://api.douban.com/people/{{id}}</uri></db:entity><content>{{text}}</content><title>{{text}}</title></entry>',
 	
