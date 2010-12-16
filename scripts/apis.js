@@ -2218,6 +2218,10 @@ $.extend(T163API, {
 	url_encode: function(text) {
 		return text;
 	},
+    
+    reset_count: function(data, callback) {
+		callback();
+	},
 	
 	format_upload_params: function(user, data, pic) {
     	delete data.source;
