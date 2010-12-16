@@ -4,6 +4,7 @@ var KEYCODE_MAP = {8:"BackSpace", 9:"Tab", 12:"Clear", 13:"Enter", 16:"Shift", 1
 
 var SUPPORT_AUTH_TYPES = {
 	'tsina': ['oauth', 'baseauth'],
+	'tqq': ['oauth'],
 	'tsohu': ['oauth', 'baseauth'],
 	't163': ['xauth'],
 	'fanfou': ['baseauth'],

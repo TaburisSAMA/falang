@@ -252,8 +252,13 @@ var sinaApi = {
 			OAuth.setTimestampAndNonce(message);
 			// 签名参数
 		    OAuth.SignatureMethod.sign(message, accessor);
-		    // 获取认证头部
-		    args.headers['Authorization'] = OAuth.getAuthorizationHeader(this.config.oauth_realm, message.parameters);
+		    // oauth参数通过get方式传递
+		    if(this.config.oauth_params_by_get === true) {
+		    	args.data = message.parameters;
+		    } else {
+		    	// 获取认证头部
+			    args.headers['Authorization'] = OAuth.getAuthorizationHeader(this.config.oauth_realm, message.parameters);
+		    }
 		}
 	},
 	
@@ -966,7 +971,7 @@ var sinaApi = {
 		return OAuth.percentEncode(text);
 	},
     
-	before_sendRequest: function(args) {
+	before_sendRequest: function(args, user) {
 		
 	},
 	
@@ -1009,7 +1014,7 @@ var sinaApi = {
         this.before_sendRequest(args, user);
         var api = user.apiProxy || args.apiHost || this.config.host;
     	var url = api + args.url.format(args.data);
-    	if(args.play_load != 'string') {
+    	if(args.play_load != 'string' && this.config.result_format) {
     		url += this.config.result_format;
     	}
     	// 删除已经填充到url中的参数
@@ -1153,8 +1158,97 @@ function make_base_auth_url(domain, user, password) {
   return "http://" + user + ":" + password + "@" + domain;
 };
 
+// 腾讯微博api
+var TQQAPI = $.extend({}, sinaApi);
+
+$.extend(TQQAPI, {
+	config: $.extend({}, sinaApi.config, {
+		host: 'http://open.t.qq.com/api',
+		result_format: '',
+		source: 'b6d893a83bd54e598b5a7c359599190a', 
+	    oauth_key: 'b6d893a83bd54e598b5a7c359599190a',
+	    oauth_secret: '34ad78be42426de26e5c4b445843bb78',
+	    oauth_host: 'https://open.t.qq.com',
+		oauth_authorize: 	  '/cgi-bin/authorize',
+        oauth_request_token:  '/cgi-bin/request_token',
+        oauth_access_token:   '/cgi-bin/access_token',
+        // 竟然是通过get传递
+        oauth_params_by_get: true,
+        friends_timeline: '/statuses/home_timeline',
+        verify_credentials: '/user/info'
+	}),
+	
+	before_sendRequest: function(args, user) {
+		if(args.play_load == 'string') {
+			// oauth
+			return;
+		}
+		args.data.format = 'json';
+		if(args.data.count) {
+			args.data.qeqnum = args.data.count;
+			delete args.data.count;
+		}
+		if(args.url == this.config.user_timeline) {
+			args.data.name = args.data.id;
+			delete args.data.id;
+		}
+	},
+	
+	format_result: function(data, play_load, args) {
+		if(play_load == 'string') {
+			return data;
+		}
+		
+		data = data.data;
+		var items = data.info || data;
+		if(!$.isArray(items)) {
+			items = data.results || data.users;
+		}
+		if($.isArray(items)) {
+	    	for(var i in items) {
+	    		items[i] = this.format_result_item(items[i], play_load, args);
+	    	}
+	    	data.items = items;
+	    } else {
+	    	data = this.format_result_item(data, play_load, args);
+	    }
+		log(data);
+		return data;
+	},
+
+	format_result_item: function(data, play_load, args) {
+		if(play_load == 'user' && data && data.name) {
+			var user = {};
+			user.t_url = 'http://t.qq.com/' + data.name;
+			user.screen_name = data.nick;
+			user.id = data.name;
+			user.province = data.province_code;
+			user.city = data.city_code;
+			user.verified = data.isvip;
+			user.gender = data.sex == 1 ? 'm' : 'f';
+			user.profile_image_url = data.head + '/50'; // 竟然直接获取的地址无法拿到头像
+			user.followers_count = data.fansnum;
+			user.friends_count = data.idolnum;
+			user.statuses_count = data.tweetnum;
+			user.description = data.introduction;
+			data = user;
+		} else if(play_load == 'status') {
+			var status = {};
+			status.id = data.id;
+			status.text = data.text;
+			if(data.source) {
+				// 转发
+				status.retweeted_status = this.format_result_item(data.source, 'status', args);
+			}
+			status.source = data.from;
+			status.user = this.format_result_item(data, 'user', args);
+			data = status;
+		}
+		return data;
+	}
+});
+
 // 搜狐微博api
-// 删除接口暂时无效
 var TSohuAPI = $.extend({}, sinaApi);
 
 $.extend(TSohuAPI, {
@@ -3047,6 +3141,7 @@ $.extend(DoubanAPI, {
 
 var T_APIS = {
 	'tsina': sinaApi,
+	'tqq': TQQAPI,
 	'tsohu': TSohuAPI,
 	'digu': DiguAPI,
 	'zuosa': ZuosaAPI,
