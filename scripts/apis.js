@@ -1590,6 +1590,10 @@ $.extend(ZuosaAPI, {
 	},
 	
 	before_sendRequest: function(args) {
+		if(args.data.source) {
+			args.headers.source= args.data.source;
+			delete args.data.source;
+		}
 		if(args.url == this.config.friends || args.url == this.config.followers) {
 			// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
 			// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
