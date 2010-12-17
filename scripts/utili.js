@@ -1120,9 +1120,9 @@ var ShortenUrl = {
 			param_name: 'url', result_name: 'shortUrl'}
 	},
 	// 还原
-	// http://urlexpand0-11.appspot.com/api?u=http://is.gd/imWyT
+	// http://urlexpand0-40.appspot.com/api?u=http://is.gd/imWyT
 	expand: function(shorturl, callback, context) {
-		var index = Math.floor(Math.random() * 12);
+		var index = Math.floor(Math.random() * 41);
 		var url = 'http://urlexpand' + index + '.appspot.com/api?u=' + shorturl;
 //		log(url);
 		$.ajax({
