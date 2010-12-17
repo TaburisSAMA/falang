@@ -62,7 +62,7 @@ var sinaApi = {
         destroy:              '/statuses/destroy/{{id}}',
         destroy_msg:          '/direct_messages/destroy/{{id}}',
         direct_messages:      '/direct_messages', 
-        sent_direct_messages: '/direct_messages/sent', 
+        sent_direct_messages: '/direct_messages/sent', //自己发送的私信列表，我当时为什么要命名为sent_direct_messages捏，我擦
         new_message:          '/direct_messages/new',
         verify_credentials:   '/account/verify_credentials',
         rate_limit_status:    '/account/rate_limit_status',
@@ -1069,6 +1069,10 @@ var sinaApi = {
                 if(data){
                 	error_code = data.error_code || data.code;
                     var error = data.error;
+                    if(data.ret && data.ret != 0){ //腾讯
+                        error = data.msg;
+                        error_code = data.ret;
+                    }
                     if(!error && data.errors){
                         if(typeof(data.errors)==='string'){
                             error = data.errors;
@@ -1172,10 +1176,61 @@ $.extend(TQQAPI, {
 		oauth_authorize: 	  '/cgi-bin/authorize',
         oauth_request_token:  '/cgi-bin/request_token',
         oauth_access_token:   '/cgi-bin/access_token',
+        oauth_callback: chrome.extension.getURL('oauth_cb.html'),
         // 竟然是通过get传递
         oauth_params_by_get: true,
         friends_timeline: '/statuses/home_timeline',
-        verify_credentials: '/user/info'
+
+        mentions:             '/statuses/mentions_timeline', //
+        followers:            '/friends/fanslist', //
+        friends:              '/friends/idollist', //
+        user_followers:       'friends/user_fanslist', //TX特有
+        user_friends:         'friends/user_idollist', //TX特有
+        favorites:            '/fav/list_t', //
+        favorites_create:     '/fav/addt', //
+        favorites_destroy:    '/fav/delt', //
+        counts:               '/t/re_count', //仅仅是转播数
+        status_show:          '/t/show', //
+        update:               '/t/add', //
+        upload:               '/t/add_pic', //
+        repost:               '/t/re_add', //
+        repost_timeline:      '/statuses/repost_timeline',
+        comment:              '/statuses/comment',
+        reply:                '/t/reply', //
+        comment_destroy:      '/statuses/comment_destroy/{{id}}',
+        comments:             '/t/re_list', //
+        destroy:              '/t/del', //
+        destroy_msg:          '/private/del', //
+        direct_messages:      '/private/recv',  //
+        sent_direct_messages: '/private/send',  //
+        new_message:          '/private/add', //
+        verify_credentials:   '/account/verify_credentials',
+        rate_limit_status:    '/account/rate_limit_status',
+        friendships_create:   '/friends/add', //
+        friendships_destroy:  '/friends/del', //
+        friendships_show:     '/friends/check', //
+        reset_count:          '/statuses/reset_count',
+        user_show:            '/users/show/{{id}}',
+        
+        // 用户标签
+        tags: 				  '/tags',
+        create_tag: 	      '/tags/create',
+        destroy_tag:          '/tags/destroy',
+        tags_suggestions:	  '/tags/suggestions',
+        
+        // 搜索
+        search:               '/search/t', //
+
+        verify_credentials: '/user/info',
+        
+        gender_map: {0:'n', 1:'m', 2:'f'},
+
+        ErrorCodes: {
+            1: '参数错误',
+            2: '频率受限',
+            3: '鉴权失败',
+            4: '服务器内部错误'
+        }
 	}),
 	
 	before_sendRequest: function(args, user) {
@@ -1188,6 +1243,10 @@ $.extend(TQQAPI, {
 			args.data.qeqnum = args.data.count;
 			delete args.data.count;
 		}
+        if(args.data.since_id) {
+			args.data.pagetime = args.data.since_id;
+			delete args.data.since_id;
+		}
 		if(args.url == this.config.user_timeline) {
 			args.data.name = args.data.id;
 			delete args.data.id;
@@ -1195,6 +1254,8 @@ $.extend(TQQAPI, {
 	},
 	
 	format_result: function(data, play_load, args) {
+        //log('unformat:');
+        //log(data);
 		if(play_load == 'string') {
 			return data;
 		}
@@ -1208,11 +1269,15 @@ $.extend(TQQAPI, {
 	    	for(var i in items) {
 	    		items[i] = this.format_result_item(items[i], play_load, args);
 	    	}
+            if(data.timestamp){
+                items.timestamp = data.timestamp;
+            }
 	    	data.items = items;
 	    } else {
 	    	data = this.format_result_item(data, play_load, args);
 	    }
-		log(data);
+        //log('formated:');
+		//log(data);
 		return data;
 	},
 
@@ -1225,7 +1290,7 @@ $.extend(TQQAPI, {
 			user.province = data.province_code;
 			user.city = data.city_code;
 			user.verified = data.isvip;
-			user.gender = data.sex == 1 ? 'm' : 'f';
+			user.gender = this.config.gender_map[data.sex||0];
 			user.profile_image_url = data.head + '/50'; // 竟然直接获取的地址无法拿到头像
 			user.followers_count = data.fansnum;
 			user.friends_count = data.idolnum;
@@ -1235,7 +1300,12 @@ $.extend(TQQAPI, {
 		} else if(play_load == 'status') {
 			var status = {};
 			status.id = data.id;
-			status.text = data.text;
+			status.text = data.origtext; //data.text;
+            if(data.image){
+                status.thumbnail_pic = data.image[0] + '/160';
+                status.bmiddle_pic = data.image[0] + '/460';
+                status.original_pic = data.image[0] + '/2000';
+            }
 			if(data.source) {
 				// 转发
 				status.retweeted_status = this.format_result_item(data.source, 'status', args);

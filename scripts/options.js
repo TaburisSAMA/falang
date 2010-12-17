@@ -42,6 +42,7 @@ $(function(){
         $("#account-name").val('');
         $("#account-pwd").val('');
         $("#edit-account-key").val('');
+        $("#account-pin, #account-request-token-key, #account-request-token-secret").val('');
         onSelBlogTypeChange();
         $("#edit-account-info").hide();
         $("#new-account").show();

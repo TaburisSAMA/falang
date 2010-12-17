@@ -40,8 +40,8 @@ var T_LIST = {
 	'buzz': ['friends_timeline'],
 	'douban': ['friends_timeline', 'direct_messages']
 };
-T_LIST.tsina = T_LIST.tsohu = T_LIST.tqq = T_LIST.all;
-T_LIST.t163 = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.digu;
+T_LIST.tsina = T_LIST.tsohu = T_LIST.all;
+T_LIST.t163 = T_LIST.tqq = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.digu;
 
 var T_NAMES = {
 	'tsina': '新浪微博',
@@ -1089,9 +1089,6 @@ var UrlUtil = {
         var d = UrlUtil.getDomain(url);
         if(d){
             $(ele).addClass('favicons_ico').css('background-image', 'url(https://www.google.com/s2/favicons?domain='+d+')');
-            //if(!$(ele).prev('.favicons_ico').length){
-            //    $(ele).before('<img class="favicons_ico" src="https://www.google.com/s2/favicons?domain='+d+'"/>');
-            //}
         }
     }
 };

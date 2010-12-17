@@ -1,0 +1,35 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>FaWave(发微) - 多微博插件 </title>
+	<script type="text/javascript" src="scripts/lib/jquery-1.4.js" ></script>
+	<script type="text/javascript" src="scripts/utili.js" ></script>
+	<script>
+		function closeWindow(){
+			window.open('', '_self', '');
+			window.close();
+		}
+	</script>
+</head>
+<body onload="" onmouseout="" onmouseover="">
+	<p id="msg"></p>
+	<p>3秒后自动关闭</p>
+	<script>
+		var d = decodeForm(window.location.href);
+		var verifier = d.oauth_verifier;
+		if(verifier){
+			var views = chrome.extension.getViews();
+			for (var i = 0; i < views.length; i++) {
+				var view = views[i];
+				if (view.theViewName && view.theViewName == 'options') {
+					view.document.getElementById('account-pin').value = verifier;
+				}
+			}
+			$("#msg").html('认证成功');
+		}else{
+			$("#msg").html('认证失败');
+		}
+		setTimeout(closeWindow, 1000*3);
+	</script>
+</body>
+</html>
