@@ -1179,6 +1179,8 @@ $.extend(TQQAPI, {
         oauth_callback: chrome.extension.getURL('oauth_cb.html'),
         // 竟然是通过get传递
         oauth_params_by_get: true,
+        support_comment: false,
+        support_counts: false, // 只有rt_count这个，不过貌似有问题，总是404。暂时隐藏
         friends_timeline: '/statuses/home_timeline',
 
         mentions:             '/statuses/mentions_timeline', //
@@ -1194,23 +1196,19 @@ $.extend(TQQAPI, {
         update:               '/t/add', //
         upload:               '/t/add_pic', //
         repost:               '/t/re_add', //
-        repost_timeline:      '/statuses/repost_timeline',
-        comment:              '/statuses/comment',
         reply:                '/t/reply', //
-        comment_destroy:      '/statuses/comment_destroy/{{id}}',
         comments:             '/t/re_list', //
         destroy:              '/t/del', //
         destroy_msg:          '/private/del', //
         direct_messages:      '/private/recv',  //
         sent_direct_messages: '/private/send',  //
         new_message:          '/private/add', //
-        verify_credentials:   '/account/verify_credentials',
         rate_limit_status:    '/account/rate_limit_status',
         friendships_create:   '/friends/add', //
         friendships_destroy:  '/friends/del', //
         friendships_show:     '/friends/check', //
         reset_count:          '/statuses/reset_count',
-        user_show:            '/users/show/{{id}}',
+        user_show:            '/user/other_info', //
         
         // 用户标签
         tags: 				  '/tags',
@@ -1221,7 +1219,7 @@ $.extend(TQQAPI, {
         // 搜索
         search:               '/search/t', //
 
-        verify_credentials: '/user/info',
+        verify_credentials: '/user/info', //
         
         gender_map: {0:'n', 1:'m', 2:'f'},
 
@@ -1247,10 +1245,16 @@ $.extend(TQQAPI, {
 			args.data.pagetime = args.data.since_id;
 			delete args.data.since_id;
 		}
-		if(args.url == this.config.user_timeline) {
-			args.data.name = args.data.id;
-			delete args.data.id;
-		}
+        switch(args.url){
+            case this.config.user_timeline:
+                args.data.name = args.data.id;
+			    delete args.data.id;
+                break;
+            case this.config.comments:
+                args.data.rootid = args.data.id;
+			    delete args.data.id;
+                break;
+        }
 	},
 	
 	format_result: function(data, play_load, args) {
@@ -1269,9 +1273,6 @@ $.extend(TQQAPI, {
 	    	for(var i in items) {
 	    		items[i] = this.format_result_item(items[i], play_load, args);
 	    	}
-            if(data.timestamp){
-                items.timestamp = data.timestamp;
-            }
 	    	data.items = items;
 	    } else {
 	    	data = this.format_result_item(data, play_load, args);
@@ -1297,10 +1298,11 @@ $.extend(TQQAPI, {
 			user.statuses_count = data.tweetnum;
 			user.description = data.introduction;
 			data = user;
-		} else if(play_load == 'status') {
+		} else if(play_load == 'status' || play_load == 'comment') {
 			var status = {};
 			status.id = data.id;
 			status.text = data.origtext; //data.text;
+            status.created_at = new Date(data.timestamp * 1000);
             if(data.image){
                 status.thumbnail_pic = data.image[0] + '/160';
                 status.bmiddle_pic = data.image[0] + '/460';
@@ -1313,7 +1315,7 @@ $.extend(TQQAPI, {
 			status.source = data.from;
 			status.user = this.format_result_item(data, 'user', args);
 			data = status;
-		}
+		} 
 		return data;
 	}
 });

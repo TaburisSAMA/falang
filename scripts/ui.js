@@ -84,7 +84,9 @@ function buildStatusHtml(statuses, t, c_user){
     }
     // 不支持评论
     if(!support_comment) {
-    	BUTTON_TPLS.commentBtn = BUTTON_TPLS.commentCounts = BUTTON_TPLS.rtCommentCounts = BUTTON_TPLS.rtCommentBtn = '';
+        if(c_user.blogType != 'tqq'){
+    	    BUTTON_TPLS.commentBtn = BUTTON_TPLS.commentCounts = BUTTON_TPLS.rtCommentCounts = BUTTON_TPLS.rtCommentBtn = '';
+        }
     }
     
     switch(t){
@@ -119,9 +121,11 @@ function buildStatusHtml(statuses, t, c_user){
     }
 	
 	switch(c_user.blogType){
-//	    case 'digu':
-//	    	BUTTON_TPLS.replyBtn = BUTTON_TPLS.replyBtn.replace('>@<', '>@回复<');
-//	        break;
+	    case 'digu':
+            if(t=='mentions'){
+	    	    BUTTON_TPLS.replyBtn = BUTTON_TPLS.replyBtn.replace('>@<', '>回复<');
+            }
+	        break;
 	    case 'renjian':
 	    	BUTTON_TPLS.repostCounts = BUTTON_TPLS.rtRepostCounts = BUTTON_TPLS.rtrtRepostCounts = '';
 	        break;
@@ -129,6 +133,9 @@ function buildStatusHtml(statuses, t, c_user){
 	    	BUTTON_TPLS.replyBtn = BUTTON_TPLS.rtReplyBtn = BUTTON_TPLS.rtrtReplyBtn = '';
             //BUTTON_TPLS.new_msgBtn = BUTTON_TPLS.new_msgBtn.replace('>私<', '>豆邮<');
 	        break;
+        case 'tqq':
+            BUTTON_TPLS.repostCounts = BUTTON_TPLS.rtRepostCounts = BUTTON_TPLS.rtrtRepostCounts = '';
+            break;
         default:
             break;
 	}
