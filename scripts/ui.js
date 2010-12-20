@@ -245,7 +245,6 @@ function buildStatusHtml(statuses, t, c_user){
             		}
             		context.is_rt_rt = true;
             		context.retweeted_status_user = status.retweeted_status.user;
-            		log(status.retweeted_status);
             		html = html.replace(rt_rt_replace_pre, Shotenjin.render(TEMPLATE_RT_RT, context));
                 }
             }
