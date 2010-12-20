@@ -1005,7 +1005,7 @@ var popupBox = {
             top: getPageScroll()[1] + (Math.max(10, $("body").height() / 2 - h / 2)),
             left: $("body").width() / 2 - w / 2 - 2
         }).show();
-        $("body").scrollTop(1);
+        $("body").scrollTop(1); //防止图片拉到底部关闭再打开无法滚动的问题
     },
     showOverlay: function(){},
     showImg: function(imgSrc, original, callbackFn){
