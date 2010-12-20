@@ -6,7 +6,7 @@ var SUPPORT_AUTH_TYPES = {
 	'tsina': ['oauth', 'baseauth'],
 	'tqq': ['oauth'],
 	'tsohu': ['oauth', 'baseauth'],
-	't163': ['xauth'],
+	't163': ['oauth', 'xauth'],
 	'fanfou': ['baseauth'],
 	'digu': ['baseauth'],
 	'zuosa': ['baseauth'],
@@ -664,10 +664,6 @@ function saveAccount(){
     			if(!login_url) {
     				_showMsg('get_authorization_url error: ' + text_status + ' code: ' + error_code);
     			} else {
-    				if(blogType == 'douban') {
-    					// 豆瓣无需pin，随便填充douban
-    					$('#account-pin').val('douban');
-    				}
     				// 在当前页保存 request token
         			$('#account-request-token-key').val(user.oauth_token_key);
         			$('#account-request-token-secret').val(user.oauth_token_secret);
@@ -1030,4 +1026,15 @@ function cleanLocalStorageData(){
         b_view.paging={};
         b_view.RefreshManager.restart();
     }
-}
+};
+
+//監控目前 chrome 上的 tabs
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
+	if(tab.url.indexOf(OAUTH_CALLBACK_URL) == 0) {
+		var d = decodeForm(tab.url);
+		var pin = d.oauth_verifier || 'impin';
+		$('#account-pin').val(pin);
+		$('#save-account').click();
+		chrome.windows.remove(tab.windowId);
+	}
+});

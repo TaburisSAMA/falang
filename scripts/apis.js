@@ -83,7 +83,7 @@ var sinaApi = {
         
         oauth_authorize: 	  '/oauth/authorize',
         oauth_request_token:  '/oauth/request_token',
-        oauth_callback:       'oob',
+        oauth_callback: OAUTH_CALLBACK_URL,
         oauth_access_token:   '/oauth/access_token',
 
         detailUrl:        '/jump?aid=detail&twId=',
@@ -1176,7 +1176,6 @@ $.extend(TQQAPI, {
 		oauth_authorize: 	  '/cgi-bin/authorize',
         oauth_request_token:  '/cgi-bin/request_token',
         oauth_access_token:   '/cgi-bin/access_token',
-        oauth_callback: chrome.extension.getURL('oauth_cb.html'),
         // 竟然是通过get传递
         oauth_params_by_get: true,
         support_comment: false,
@@ -3014,7 +3013,7 @@ $.extend(DoubanAPI, {
 		need_processMsg: false,
 		support_cursor_only: true,
 		support_search: false,
-		oauth_callback: null,
+//		oauth_callback: null,
 		oauth_host: 'http://www.douban.com',
 		oauth_authorize: 	  '/service/auth/authorize',
         oauth_request_token:  '/service/auth/request_token',

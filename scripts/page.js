@@ -331,7 +331,7 @@ function fawaveToggleLooking(ele){
         var loc_url = window.location.href, s_url = $(ele).data('short_url');
         loc_url = s_url || loc_url;
         var title = document.title;
-        result = fawaveFormatText(fawaveLookingTemplate, {title:(title||''), url:loc_url});
+        var result = fawaveFormatText(fawaveLookingTemplate, {title:(title||''), url:loc_url});
         //countInputText();
         if($(ele).attr('checked')){
             $("#fawaveTxtContentInp").val(result);

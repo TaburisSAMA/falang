@@ -2,6 +2,7 @@
 
 var PAGE_SIZE = 20;
 var COMMENT_PAGE_SIZE = 8;
+var OAUTH_CALLBACK_URL = chrome.extension.getURL('oauth_cb.html');
 
 var SINA = 'idi_sina';
 
