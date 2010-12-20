@@ -1003,8 +1003,9 @@ var popupBox = {
         }
         this.box.css({
             top: getPageScroll()[1] + (Math.max(10, $("body").height() / 2 - h / 2)),
-            left: $("body").width() / 2 - w / 2
+            left: $("body").width() / 2 - w / 2 - 2
         }).show();
+        $("body").scrollTop(1);
     },
     showOverlay: function(){},
     showImg: function(imgSrc, original, callbackFn){
