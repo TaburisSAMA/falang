@@ -2217,6 +2217,7 @@ $.extend(TwitterAPI, {
     format_result_item: function(data, play_load, args) {
 		if(play_load == 'status' && data.id) {
             data.id = data.id_str || data.id;
+            data.in_reply_to_status_id = data.in_reply_to_status_id_str || data.in_reply_to_status_id;
 			var tpl = 'http://twitter.com/{{user.screen_name}}/status/{{id}}';
 			data.t_url = tpl.format(data);
 			this.format_result_item(data.user, 'user', args);
