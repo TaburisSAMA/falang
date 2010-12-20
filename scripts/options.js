@@ -1028,7 +1028,7 @@ function cleanLocalStorageData(){
     }
 };
 
-//監控目前 chrome 上的 tabs
+// 监控oauth callback url，获取认证码
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
 	if(tab.url.indexOf(OAUTH_CALLBACK_URL) == 0) {
 		var d = decodeForm(tab.url);
