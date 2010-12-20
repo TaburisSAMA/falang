@@ -584,12 +584,6 @@ function changeUser(uniqueKey){
         $("#accountListDock").find('.current').removeClass('current')
             .end().find('.'+to_user.uniqueKey).addClass('current');
         addUnreadCountToTabs();
-//        for(var i in T_LIST[to_user.blogType]){
-//            getSinaTimeline(T_LIST[to_user.blogType][i], true);
-//            if(cur_t == T_LIST[to_user.blogType][i]) {
-//            	cur_t = null; // 不用处理了
-//            }
-//        }
         if(cur_t) { // 需要刷新一下数据
         	$("#tl_tabs li.active").click();
         }
@@ -1199,13 +1193,14 @@ function showCounts(t, ids){
 	ids = ids.join(',');
     if(['direct_messages'].indexOf(t) >= 0){return;}
 
-    showLoading();
     var c_user = getUser();
     if(!c_user || !tapi.get_config(c_user).support_counts){
         return;
     }
     var data = {ids:ids, user:c_user};
+    showLoading();
     tapi.counts(data, function(counts, textStatus){
+    	hideLoading();
         if(textStatus != 'error' && counts && !counts.error){
             if(counts.length && counts.length>0){
                 for(var i in counts){
@@ -1224,7 +1219,6 @@ function showCounts(t, ids){
                 }
             }
         }
-        hideLoading();
     });
 }//<<<<<===========
 
