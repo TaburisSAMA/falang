@@ -229,6 +229,7 @@ function buildStatusHtml(statuses, t, c_user){
             user: status.user,
             account: c_user,
             tweet: status,
+            is_rt_rt: false,
             support_follow: c_user.blogType != 'douban',
             btn: buttons
         };
@@ -242,7 +243,9 @@ function buildStatusHtml(statuses, t, c_user){
             		if(!TEMPLATE_RT_RT) {
             			TEMPLATE_RT_RT = TEMPLATE_RT.replace(/tweet\.retweeted_status\./g, 'tweet.retweeted_status.retweeted_status.').replace(/btn\.rt/g, 'btn.rtrt');
             		}
-            		status.retweeted_status.retweeted_status.is_rt = true;
+            		context.is_rt_rt = true;
+            		context.retweeted_status_user = status.retweeted_status.user;
+            		log(status.retweeted_status);
             		html = html.replace(rt_rt_replace_pre, Shotenjin.render(TEMPLATE_RT_RT, context));
                 }
             }
