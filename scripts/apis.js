@@ -1476,6 +1476,8 @@ $.extend(DiguAPI, {
         reply:                '/statuses/update',
         search: '/search_statuses',
         
+        gender_map: {0:'n', 1:'m', 2:'f'},
+
         ErrorCodes: {
         	'-1': '服务器错误',
 			'0': '未知原因',
@@ -1680,6 +1682,7 @@ $.extend(DiguAPI, {
 			this.format_result_item(data.user, 'user', args);
 		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = data.url || ('http://digu.com/' + (data.name || data.id));
+            data.gender = this.config.gender_map[data.gender];
 			// 将小头像从 _24x24 => _48x48
 			if(data.profile_image_url) {
 				data.profile_image_url = data.profile_image_url.replace(/([\/_])24x24/, function(m, $1) {
@@ -2247,7 +2250,9 @@ $.extend(FanfouAPI, {
 	    support_comment: false,
 	    support_repost: false,
 	    upload: '/photos/upload',
-	    search: '/search/public_timeline'
+	    search: '/search/public_timeline',
+
+        gender_map:{"男":'m', '女':'f'}
 	}),
 	
 	// 无需urlencode
@@ -2346,6 +2351,7 @@ $.extend(FanfouAPI, {
    			}
 		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = 'http://fanfou.com/' + (data.id || data.screen_name);
+            data.gender = this.config.gender_map[data.gender];
 		}
 		return data;
 	}
@@ -2375,7 +2381,9 @@ $.extend(T163API, {
         repost: '/statuses/update',
         comments: '/statuses/comments/{{id}}',
         retweet: '/statuses/retweet/{{id}}', // RT
-        friends_timeline: '/statuses/home_timeline'
+        friends_timeline: '/statuses/home_timeline',
+        
+        gender_map: {0:'n', 1:'m', 2:'f'}
 	}),
 	
 	retweet: TwitterAPI.retweet,
@@ -2464,6 +2472,7 @@ $.extend(T163API, {
     format_result_item: function(data, play_load, args) {
 		if(play_load == 'user' && data && data.id) {
 			data.t_url = 'http://t.163.com/' + data.screen_name;
+            data.gender = this.config.gender_map[data.gender];
 		} else if(play_load == 'status') {
 			// search
 			if(!data.user) {
