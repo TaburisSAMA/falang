@@ -1260,7 +1260,7 @@ $.extend(TQQAPI, {
 		}
 		args.data.format = 'json';
 		if(args.data.count) {
-			args.data.qeqnum = args.data.count;
+			args.data.reqnum = args.data.count;
 			delete args.data.count;
 		}
         if(args.data.since_id) {
@@ -1308,19 +1308,17 @@ $.extend(TQQAPI, {
            	case this.config.followers:
            	case this.config.friends:
            		args.data.startindex = args.data.cursor;
-           		args.data.reqnum = args.data.qeqnum;
            		args.data.name = args.data.user_id;
            		if(String(args.data.startindex) == '-1') {
            			args.data.startindex = '0';
            		}
            		delete args.data.cursor;
-           		delete args.data.qeqnum;
            		delete args.data.user_id;
            		break;
            	case this.config.search:
 	            args.data.keyword = args.data.q;
-	            args.data.pagesize = args.data.qeqnum;
-	            delete args.data.qeqnum;
+	            args.data.pagesize = args.data.reqnum;
+	            delete args.data.reqnum;
 	            delete args.data.q;
 		        break;
             case this.config.update:
