@@ -285,17 +285,16 @@ function getTimelinePage(user_uniqueKey, t, p){
                         sinaMsgs[i].readed = true;
                     }
                     tweets[t_key] = tweets[t_key].concat(sinaMsgs);
+                } else {
+                	page = 0;
                 }
                 if(page != null) { // page分页
-                	if(sinaMsgs.length == 0) {
-                		page = 0;
-                	}
                     setLastPage(t, page, user_uniqueKey);
                 }
         	}
             // 设置翻页和填充新数据到ui列表的后面显示
             _showReadMore(t, user_uniqueKey, sinaMsgs);
-            if(data.next_cursor) {
+            if(data.next_cursor && tweets[t_key].length > 0) {
             	// 保存cursor信息
         		tweets[t_key][tweets[t_key].length - 1].cursor = String(data.next_cursor);
         	}

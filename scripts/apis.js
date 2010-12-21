@@ -1344,6 +1344,8 @@ $.extend(TSohuAPI, {
         oauth_secret: 'fxZbb-07bCvv-BCA1Qci2lO^7wnl0%pRE$mvG1K#',
         support_max_id: false,
         support_search_max_id: false,
+//        support_cursor_only: true,
+        
         favorites: '/favourites',
 	    favorites_create: '/favourites/create/{{id}}',
 	    favorites_destroy: '/favourites/destroy/{{id}}',
@@ -1385,17 +1387,21 @@ $.extend(TSohuAPI, {
 	},
 	
     format_result: function(data, play_load, args) {
-    	if(args.url == this.config.search) {
-    		data = data.statuses;
+    	var items = data;
+    	if(data.statuses || data.comments) {
+    		items = data.statuses || data.comments;
+    		data.items = items;
+    		delete data.statuses;
+    		delete data.comments;
     	}
-		if($.isArray(data)) {
-	    	for(var i in data) {
-	    		data[i] = this.format_result_item(data[i], play_load, args);
+		if($.isArray(items)) {
+	    	for(var i in items) {
+	    		items[i] = this.format_result_item(items[i], play_load, args);
 	    	}
 	    } else {
 	    	data = this.format_result_item(data, play_load, args);
 	    }
-	    if(args.url == this.config.friends || args.url == this.config.followers){
+	    if(data.cursor_id) {
 	    	data.next_cursor = data.cursor_id;
 	    	delete data.cursor_id;
 	    }
