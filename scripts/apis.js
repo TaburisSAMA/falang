@@ -1260,11 +1260,13 @@ $.extend(TQQAPI, {
 			args.data.pagetime = args.data.since_id;
 			delete args.data.since_id;
 		}
-        if(args.data.status){
-            args.data.content = args.data.status;
+        if(args.data.status || args.data.text){
+            args.data.content = args.data.status || args.data.text;
             delete args.data.status;
+            delete args.data.text;
         }
         switch(args.url){
+            case this.config.new_message:
             case this.config.user_timeline:
                 args.data.name = args.data.id;
 			    delete args.data.id;
