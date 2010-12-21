@@ -17,5 +17,6 @@ r.close()
 items = {}
 for i in data:
     items[i['phrase'][1:-1]] = i['url'].replace("http://img.t.sinajs.cn/t3/style/images/common/face/ext/normal/", "")
-    print i['phrase'][1:-1]
+#    print i['phrase'][1:-1]
+print len(items)
 print json.dumps(items)
