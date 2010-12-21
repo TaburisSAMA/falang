@@ -139,12 +139,14 @@ function checkTimeline(t, p, user_uniqueKey){
             isFirstTime = true;//如果不存在，则为第一次获取微博
         }
         if(!last_id && tweets[_key].length > 0){
-        	last_id = tweets[_key][0].timestamp || tweets[_key][0].cursor_id || tweets[_key][0].id;
+        	last_id = tweets[_key][0].cursor_id || tweets[_key][0].id;
         }
         
         if(last_id && sinaMsgs.length > 0){
         	if(c_user.blogType == 't163' && last_id.indexOf(':') > 0) { // 兼容网易的id
         		last_id = last_id.split(':', 1)[0];
+        	} else if(c_user.blogType == 'tqq' && tweets[_key].length > 0) {
+        		last_id = tweets[_key][0].id; // tqq 重现修改last_id为id
         	}
         	var result = filterDatasByMaxId(sinaMsgs, last_id, false);
         	if(tweets[_key].length == 0) {
@@ -282,6 +284,9 @@ function getTimelinePage(user_uniqueKey, t, p){
         	if($.isArray(sinaMsgs) && textStatus != 'error') {
         		if(sinaMsgs.length > 0){
                     var max_id = getMaxMsgId(t, user_uniqueKey);
+                    if(c_user.blogType == 'tqq' && tweets[t_key].length > 0) {
+                    	max_id = tweets[t_key][0].id; // tqq 重现修改last_id为id
+                	}
                     var result = filterDatasByMaxId(sinaMsgs, max_id, true);
                     sinaMsgs = result.news;
                     for(var i in sinaMsgs){
