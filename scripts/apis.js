@@ -1247,6 +1247,11 @@ $.extend(TQQAPI, {
 	rate_limit_status: function(data, callback){
         callback({error:'没有提供接口'});
     },
+
+    //TODO: 腾讯是有提供重置未读数的接口的，后面加
+    reset_count: function(data, callback) {
+		callback();
+	},
 	
 	counts: function(data, callback) {
 		callback();
