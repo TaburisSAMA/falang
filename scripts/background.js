@@ -372,8 +372,16 @@ function showNewMsg(msgs, t, user){
 };
 
 //播放声音提醒
-var AlertaAudioFile = new Audio();
+var AlertaAudioFile = null;
+try{
+    AlertaAudioFile = new Audio(); //因为有一个Chrome的新版本居然没有Audio这个
+}catch(err){
+    log('Not Support Audio');
+}
 function playSound(t){
+    if(!AlertaAudioFile){
+        return;
+    }
     if(getAlertMode()!='dnd' && Settings.get().isEnabledSound[t]){
         if(!AlertaAudioFile.src){
             AlertaAudioFile.src = Settings.get().soundSrc;
