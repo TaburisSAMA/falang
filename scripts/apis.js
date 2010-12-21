@@ -1242,6 +1242,10 @@ $.extend(TQQAPI, {
 		return text;
 	},
 	
+	rate_limit_status: function(data, callback){
+        callback({error:'没有提供接口'});
+    },
+	
 	counts: function(data, callback) {
 		callback();
 	},

@@ -1123,7 +1123,6 @@ var ShortenUrl = {
 	expand: function(shorturl, callback, context) {
 		var index = Math.floor(Math.random() * 41);
 		var url = 'http://urlexpand' + index + '.appspot.com/api?u=' + shorturl;
-//		log(url);
 		$.ajax({
 			url: url,
 			success: function(data, status, xhr) {
@@ -1145,7 +1144,6 @@ var ShortenUrl = {
 				return;
 			}
 			if(cache[url]) {
-//				log('cache: ' + url + ' ' + cache[url]);
 				$(this).attr('title', cache[url]);
                 UrlUtil.showFaviconBefore(this, cache[url]);
 				VideoService.attempt(cache[url], this);
@@ -1156,7 +1154,6 @@ var ShortenUrl = {
 						cache[$(this).attr('href')] = longurl;
                         UrlUtil.showFaviconBefore(this, longurl);
 						VideoService.attempt(longurl, this);
-//						log('new: ' + $(this).attr('href') + ' ' + longurl);
 					}
 				}, this);
 			}
