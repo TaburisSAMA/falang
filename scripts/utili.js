@@ -47,7 +47,7 @@ T_LIST.t163 = T_LIST.tqq = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIS
 var T_NAMES = {
 	'tsina': '新浪微博',
 	'digu': '嘀咕',
-	'tqq': '腾讯微薄',
+	'tqq': '腾讯微博',
 	'fanfou': '饭否',
 	'tsohu': '搜狐微博',
 	't163': '网易微博',

@@ -139,7 +139,7 @@ function checkTimeline(t, p, user_uniqueKey){
             isFirstTime = true;//如果不存在，则为第一次获取微博
         }
         if(!last_id && tweets[_key].length > 0){
-        	last_id = tweets[_key][0].cursor_id || tweets[_key][0].id;
+        	last_id = tweets[_key][0].timestamp || tweets[_key][0].cursor_id || tweets[_key][0].id;
         }
         
         if(last_id && sinaMsgs.length > 0){
