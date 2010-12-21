@@ -185,7 +185,7 @@ function buildStatusHtml(statuses, t, c_user){
      		}
      		buttons[key] = tpl;
      	}
-     	if(status.favorited){
+     	if(status.favorited || (status.favorited === undefined && t == 'favorites')){
      		buttons.addFavoritesMsgBtn = '';
         } else {
         	buttons.delFavoritesMsgBtn = '';
