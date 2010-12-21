@@ -1232,6 +1232,11 @@ $.extend(TQQAPI, {
         }
 	}),
 	
+	// urlencode，子类覆盖是否需要urlencode处理
+	url_encode: function(text) {
+		return text;
+	},
+	
 	before_sendRequest: function(args, user) {
 		if(args.play_load == 'string') {
 			// oauth
