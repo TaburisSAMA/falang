@@ -290,7 +290,7 @@
 		<textarea id="tp_time_line_rt">
 			<!-- 转发 -->
 			<div class="msg">
-				<div class="tweetItem retweeted commentWrap showCounts_#{tweet.retweeted_status.id} <?js if(tweet.retweeted_status.is_rt){ ?>rt_retweeted<?js } ?>" id="tweet#{tweet.retweeted_status.id}">
+				<div class="tweetItem retweeted commentWrap showCounts_#{tweet.retweeted_status.id} <?js if(is_rt_rt){ ?>rt_retweeted<?js } ?>" id="tweet#{tweet.retweeted_status.id}">
 					<div class="userName"><?js if(is_rt_rt){ ?><a user_id='#{retweeted_status_user.id}' user_screen_name="#{retweeted_status_user.screen_name}" href="javascript:getUserTimeline('#{retweeted_status_user.screen_name}', '#{retweeted_status_user.id}');">@#{retweeted_status_user.screen_name}</a> <?js } ?><?js if(tType=='comments_timeline' && !is_rt_rt){ ?>评<?js }else{ ?>转<?js } ?>
 						<span class="showtip">
 							<a target="_blank" 
