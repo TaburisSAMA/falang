@@ -1187,7 +1187,9 @@ $.extend(TQQAPI, {
         // 竟然是通过get传递
         oauth_params_by_get: true,
         support_comment: false,
-        support_counts: false, // 只有rt_count这个，不过貌似有问题，总是404。暂时隐藏
+        support_favorites_max_id: true,
+        reply_dont_need_at_screen_name: true, // @回复无需填充@screen_name 
+//        support_counts: false, // 只有rt_count这个，不过貌似有问题，总是404。暂时隐藏
         friends_timeline: '/statuses/home_timeline',
 
         mentions:             '/statuses/mentions_timeline', //
@@ -1203,7 +1205,6 @@ $.extend(TQQAPI, {
         update:               '/t/add', //
         upload:               '/t/add_pic', //
         repost:               '/t/re_add', //
-        reply:                '/t/reply', //
         comments:             '/t/re_list', //
         destroy:              '/t/del', //
         destroy_msg:          '/private/del', //
@@ -1243,6 +1244,10 @@ $.extend(TQQAPI, {
 		return text;
 	},
 	
+	counts: function(data, callback) {
+		callback();
+	},
+	
 	format_upload_params: function(user, data, pic) {
     	if(data.status){
             data.content = data.status;
@@ -1270,11 +1275,13 @@ $.extend(TQQAPI, {
             args.data.pageflag = 1;
 			delete args.data.max_id;
 		}
-        if(args.data.status || args.data.text){
-            args.data.content = args.data.status || args.data.text;
+        if(args.data.status || args.data.text || args.data.comment){
+            args.data.content = args.data.status || args.data.text || args.data.comment;
             delete args.data.status;
             delete args.data.text;
+            delete args.data.comment;
         }
+        
         if(args.data.lat && args.data.long){
             args.data.wei = args.data.lat;
             args.data.jing = args.data.long;
@@ -1295,6 +1302,18 @@ $.extend(TQQAPI, {
                 args.data.reid = args.data.id;
 			    delete args.data.id;
                 break;
+            case this.config.friendships_create:
+            	args.data.name = args.data.id;
+            	delete args.data.id;
+            	break;
+            case this.config.update:
+            	// 判断是否@回复
+	            if(args.data.sina_id) {
+		        	args.data.reid = args.data.sina_id;
+		        	delete args.data.sina_id;
+		        	args.url = '/t/reply';
+		        }
+		        break;
         }
 	},
 	
@@ -1302,7 +1321,9 @@ $.extend(TQQAPI, {
 		if(play_load == 'string') {
 			return data;
 		}
-		
+		if(args.url == this.config.friendships_create) {
+			return true;
+		}
 		data = data.data;
 		var items = data.info || data;
 		if(!$.isArray(items)) {
@@ -1337,6 +1358,7 @@ $.extend(TQQAPI, {
 			data = user;
 		} else if(play_load == 'status' || play_load == 'comment' || play_load == 'message') {
 			var status = {};
+			status.t_url = 'http://t.qq.com/p/t/' + data.id;
 			status.id = data.id;
 			status.text = data.origtext; //data.text;
             status.created_at = new Date(data.timestamp * 1000);
@@ -1347,9 +1369,18 @@ $.extend(TQQAPI, {
                 status.original_pic = data.image[0] + '/2000';
             }
 			if(data.source) {
-				// 转发
-				status.retweeted_status = this.format_result_item(data.source, 'status', args);
+				if(data.type == 4) { 
+					// 回复
+					status.text = '@' + data.source.name + ' ' + status.text;
+					status.related_dialogue_url = 'http://t.qq.com/p/r/' + status.id;
+					status.in_reply_to_status_id = data.source.id;
+					status.in_reply_to_screen_name = data.source.nick;
+				} else {
+					// 转发
+					status.retweeted_status = this.format_result_item(data.source, 'status', args);
+				}
 			}
+			status.repost_count = data.count;
 			status.source = data.from;
 			status.user = this.format_result_item(data, 'user', args);
 			data = status;
@@ -1861,18 +1892,18 @@ $.extend(ZuosaAPI, {
 			}
 			var tpl = 'http://zuosa.com/Status/';
 			if(data.in_reply_to_status_id) {
-				data.retweeted_status = {
-					id: data.in_reply_to_status_id,
-					user: {
-						id: data.in_reply_to_user_id,
-						screen_name: data.in_reply_to_screen_name,
-						name: data.in_reply_to_screen_name
-					}
-				};
+//				data.retweeted_status = {
+//					id: data.in_reply_to_status_id,
+//					user: {
+//						id: data.in_reply_to_user_id,
+//						screen_name: data.in_reply_to_screen_name,
+//						name: data.in_reply_to_screen_name
+//					}
+//				};
 				// 查看相关对话的url
 				data.related_dialogue_url = 'http://zuosa.com/reply?eid=' + data.in_reply_to_status_id;
-				this.format_result_item(data.retweeted_status.user, 'user', args);
-				data.retweeted_status.t_url = tpl + data.retweeted_status.id;
+//				this.format_result_item(data.retweeted_status.user, 'user', args);
+//				data.retweeted_status.t_url = tpl + data.retweeted_status.id;
 			}
 			data.t_url = tpl + data.id;
 			this.format_result_item(data.user, 'user', args);

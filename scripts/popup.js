@@ -1028,7 +1028,7 @@ function getUserTimeline(screen_name, user_id, read_more) {
                     window.currentTab = "#user_timeline_timeline";
             	}
                 addPageMsgs(sinaMsgs, m, true);
-                max_id = String(sinaMsgs[sinaMsgs.length - 1].cursor_id || sinaMsgs[sinaMsgs.length - 1].id);
+                max_id = String(sinaMsgs[sinaMsgs.length - 1].timestamp || sinaMsgs[sinaMsgs.length - 1].cursor_id || sinaMsgs[sinaMsgs.length - 1].id);
                 page += 1;
                 // 保存数据，用于翻页
                 $tab.attr('max_id', max_id);
@@ -1121,7 +1121,8 @@ function getFavorites(is_click){
         	list.attr('page', Number(page) + 1);
         	status = addPageMsgs(status, t, true);
 	        if(status.length > 0){
-	        	list.attr('max_id', status[status.length - 1].id);
+	        	var index = status.length - 1;
+	        	list.attr('max_id', status[index].timestamp || status[index].id);
 	            showReadMore(t);
 	            user_cache[t] = list.html();
 	        } else {
@@ -1531,7 +1532,12 @@ function sendReplyMsg(msg){
     var btn = $("#replySubmit"),
         txt = $("#replyTextarea"),
         userName = $("#ye_dialog_title").text();
-    msg = userName + ' ' + msg;
+    var user = getUser();
+    var config = tapi.get_config(user);
+    // 判断是否需要填充 @screen_name
+    if(config.reply_dont_need_at_screen_name !== true) {
+    	msg = userName + ' ' + msg;
+    }
     var tweetId = $("#replyTweetId").val();
     if(tweetId) {
     	data = {sina_id: tweetId}; // @回复
@@ -1541,7 +1547,7 @@ function sendReplyMsg(msg){
     btn.attr('disabled','true');
     txt.attr('disabled','true');
     data['status'] = msg;
-    var user = getUser();
+    
     data['user'] = user;
     tapi.update(data, function(sinaMsg, textStatus){
         if(sinaMsg.id){

@@ -29,7 +29,7 @@ function buildStatusHtml(statuses, t, c_user){
         oretweetBtn: '<a class="oretweet ort" href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'{{user.screen_name}}\',\'{{id}}\');" title="Twitter锐推"></a>',
         retweetBtn: '<a class="rtweet" href="javascript:void(0);" onclick="doRT(this);" title="Twitter式转发">RT</a>',
         repostBtn: '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'{{user.screen_name}}\',\'{{id}}\',\'{{retweeted_status_screen_name}}\',\'{{retweeted_status_id}}\');" title="转发这条微博">转</a>',
-        repostCounts: '<span class="repostCounts">(-)</span>',
+        repostCounts: '<span class="repostCounts">({{repost_count}})</span>',
         commentBtn: '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{user.screen_name}}\', \'{{user.id}}\', \'{{id}}\');" title="点击添加评论">评</a>',
         commentCounts: '<span class="commentCounts">({{comments_btn}})</span>',
         delCommentBtn: '<a class="delcommenttweet" href="javascript:void(0);" onclick="javascript:doDelComment(this,\'{{user.screen_name}}\',\'{{id}}\');" title="点击删除评论">删</a>',
@@ -47,7 +47,7 @@ function buildStatusHtml(statuses, t, c_user){
         rtCommentCounts: '<span class="commentCounts">({{rt_comments_count}})</span>',
         rtReplyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'{{retweeted_status.user.screen_name}}\',\'{{retweeted_status.id}}\');" title="进行@回复">@</a>',
         rtAddFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'{{retweeted_status.user.screen_name}}\',\'{{retweeted_status.id}}\');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>',
-        rtRepostCounts: '<span class="repostCounts">(-)</span>',
+        rtRepostCounts: '<span class="repostCounts">({{retweeted_status.repost_count}})</span>',
         
         // rt rt
         rtrtShowMapBtn: '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'{{retweeted_status.retweeted_status.user.profile_image_url}}\', {{retweeted_status.retweeted_status.geo.coordinates[0]}}, {{retweeted_status.retweeted_status.geo.coordinates[1]}});" title="点击查看地理位置信息"><img src="images/mapspin2a.png"/></a>',
@@ -58,7 +58,7 @@ function buildStatusHtml(statuses, t, c_user){
         rtrtCommentCounts: '<span class="commentCounts">({{rtrt_comments_count}})</span>',
         rtrtReplyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\',\'{{retweeted_status.retweeted_status.id}}\');" title="进行@回复">@</a>',
         rtrtAddFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\',\'{{retweeted_status.retweeted_status.id}}\');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>',
-        rtrtRepostCounts: '<span class="repostCounts">(-)</span>'
+        rtrtRepostCounts: '<span class="repostCounts">({{retweeted_status.retweeted_status.repost_count}})</span>'
     };
  	
  	// 不支持收藏
@@ -84,9 +84,7 @@ function buildStatusHtml(statuses, t, c_user){
     }
     // 不支持评论
     if(!support_comment) {
-        if(c_user.blogType != 'tqq'){
-    	    BUTTON_TPLS.commentBtn = BUTTON_TPLS.commentCounts = BUTTON_TPLS.rtCommentCounts = BUTTON_TPLS.rtCommentBtn = '';
-        }
+        BUTTON_TPLS.commentBtn = BUTTON_TPLS.commentCounts = BUTTON_TPLS.rtCommentCounts = BUTTON_TPLS.rtCommentBtn = '';
     }
     
     switch(t){
@@ -133,15 +131,13 @@ function buildStatusHtml(statuses, t, c_user){
 	    	BUTTON_TPLS.replyBtn = BUTTON_TPLS.rtReplyBtn = BUTTON_TPLS.rtrtReplyBtn = '';
             //BUTTON_TPLS.new_msgBtn = BUTTON_TPLS.new_msgBtn.replace('>私<', '>豆邮<');
 	        break;
-        case 'tqq':
-            BUTTON_TPLS.repostCounts = BUTTON_TPLS.rtRepostCounts = BUTTON_TPLS.rtrtRepostCounts = '';
-            break;
         default:
             break;
 	}
  	
     for(var i in statuses) {
     	var status = statuses[i];
+    	status.repost_count = status.repost_count === undefined ? '-' : status.repost_count;
     	status.user = status.user || status.sender;
     	/*
          * status.retweeted_status 转发
