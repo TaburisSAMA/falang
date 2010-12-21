@@ -1246,6 +1246,10 @@ $.extend(TQQAPI, {
 			args.data.pagetime = args.data.since_id;
 			delete args.data.since_id;
 		}
+        if(args.data.status){
+            args.data.content = args.data.status;
+            delete args.data.status;
+        }
         switch(args.url){
             case this.config.user_timeline:
                 args.data.name = args.data.id;
@@ -1253,6 +1257,10 @@ $.extend(TQQAPI, {
                 break;
             case this.config.comments:
                 args.data.rootid = args.data.id;
+			    delete args.data.id;
+                break;
+            case this.config.repost:
+                args.data.reid = args.data.id;
 			    delete args.data.id;
                 break;
         }
@@ -1299,7 +1307,7 @@ $.extend(TQQAPI, {
 			user.statuses_count = data.tweetnum;
 			user.description = data.introduction;
 			data = user;
-		} else if(play_load == 'status' || play_load == 'comment') {
+		} else if(play_load == 'status' || play_load == 'comment' || play_load == 'message') {
 			var status = {};
 			status.id = data.id;
 			status.text = data.origtext; //data.text;
