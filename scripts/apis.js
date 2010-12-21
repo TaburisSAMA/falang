@@ -1176,7 +1176,9 @@ var TQQAPI = $.extend({}, sinaApi);
 $.extend(TQQAPI, {
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://open.t.qq.com/api',
-		result_format: '',
+		user_home_url: 'http://t.qq.com/',
+        search_url: 'http://t.qq.com/k/',
+        result_format: '',
 		source: 'b6d893a83bd54e598b5a7c359599190a', 
 	    oauth_key: 'b6d893a83bd54e598b5a7c359599190a',
 	    oauth_secret: '34ad78be42426de26e5c4b445843bb78',
