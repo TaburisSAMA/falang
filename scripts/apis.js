@@ -1265,6 +1265,12 @@ $.extend(TQQAPI, {
             delete args.data.status;
             delete args.data.text;
         }
+        if(args.data.lat && args.data.long){
+            args.data.wei = args.data.lat;
+            args.data.jing = args.data.long;
+            delete args.data.lat;
+            delete args.data.long;
+        }
         switch(args.url){
             case this.config.new_message:
             case this.config.user_timeline:
