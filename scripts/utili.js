@@ -1144,13 +1144,13 @@ var ShortenUrl = {
 				return;
 			}
 			if(cache[url]) {
-				$(this).attr('title', cache[url]);
+				$(this).attr('title', '右键直接打开 ' + cache[url]).attr('rhref', cache[url]);
                 UrlUtil.showFaviconBefore(this, cache[url]);
 				VideoService.attempt(cache[url], this);
 			} else {
 				ShortenUrl.expand(url, function(longurl) {
 					if(longurl) {
-						$(this).attr('title', longurl).addClass('longurl');
+						$(this).attr('title', '右键直接打开 ' + longurl).attr('rhref', longurl).addClass('longurl');
 						cache[$(this).attr('href')] = longurl;
                         UrlUtil.showFaviconBefore(this, longurl);
 						VideoService.attempt(longurl, this);
