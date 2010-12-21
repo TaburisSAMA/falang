@@ -631,24 +631,29 @@ var sinaApi = {
 	    builder += crlf;
 		
 	    for(var key in data) {
+		    var value = this.url_encode(data[key]);
+		    // set auth params
+		    auth_args.data[key] = value;
+	    }
+	    
+	    var api = user.apiProxy || this.config.host;
+		var url = api + this.config.upload + this.config.result_format;
+		// 设置认证头部
+        this.apply_auth(url, auth_args, user);
+        for(var key in auth_args.data) {
 	    	/* Generate headers. key */            
 		    builder += 'Content-Disposition: form-data; name="' + key + '"';
 		    builder += crlf;
 		    builder += crlf; 
 		     /* Append form data. */
-		    var value = this.url_encode(data[key]);
-		    builder += this.url_encode(data[key]);
+		    builder += auth_args.data[key];
 		    builder += crlf;
 		    
 		    /* Write boundary. */
 		    builder += dashdash;
 		    builder += boundary;
 		    builder += crlf;
-		    
-		    // set auth params
-		    auth_args.data[key] = value;
 	    }
-	    
 	    /* Generate headers. [PIC] */            
 	    builder += 'Content-Disposition: form-data; name="' + pic.keyname + '"';
 	    if(pic.file.fileName) {
@@ -676,10 +681,7 @@ var sinaApi = {
 	    if(before_request) {
 	    	before_request();
 	    }
-	    var api = user.apiProxy || this.config.host;
-		var url = api + this.config.upload + this.config.result_format;
-		// 设置认证头部
-        this.apply_auth(url, auth_args, user);
+		
 	    $.ajax({
 	        url: url,
 	        cache: false,
@@ -1237,6 +1239,13 @@ $.extend(TQQAPI, {
 		return text;
 	},
 	
+	format_upload_params: function(user, data, pic) {
+    	if(data.status){
+            data.content = data.status;
+            delete data.status;
+        }
+    },
+	
 	before_sendRequest: function(args, user) {
 		if(args.play_load == 'string') {
 			// oauth
@@ -1272,8 +1281,6 @@ $.extend(TQQAPI, {
 	},
 	
 	format_result: function(data, play_load, args) {
-        //log('unformat:');
-        //log(data);
 		if(play_load == 'string') {
 			return data;
 		}
@@ -1291,8 +1298,6 @@ $.extend(TQQAPI, {
 	    } else {
 	    	data = this.format_result_item(data, play_load, args);
 	    }
-        //log('formated:');
-		//log(data);
 		return data;
 	},
 
