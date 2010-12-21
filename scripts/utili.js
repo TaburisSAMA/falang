@@ -1073,6 +1073,12 @@ var popupBox = {
                 showMsg("Geocoder failed due to: " + status);
             }
         });
+    },
+    showVideo: function(url, playcode) {
+        this.checkBox();
+        popupBox.box.find('.pb_title .t, .pb_footer .t').html('<a target="_blank" href="' + url +'">查看原视频</a>');
+        popupBox.box.find('.pb_content').html(playcode);
+        popupBox.show();
     }
 };
 
@@ -1414,17 +1420,34 @@ var ImageService = {
 };
 
 var VideoService = {
-	youku: {
-		url_re: /youku\.com\/v_show\/id_([^\.]+)\.html/i,
-		tpl: '<embed style="display:none;" src="http://player.youku.com/player.php/sid/{{id}}/v.swf" quality="high" width="480" height="400" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash"></embed>'
+	services: {
+		youku: {
+			url_re: /youku\.com\/v_show\/id_([^\.]+)\.html/i,
+			tpl: '<embed src="http://player.youku.com/player.php/sid/{{id}}/v.swf" quality="high" width="460" height="400" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash"></embed>'
+		},
+		ku6: {
+			url_re: /ku6\.com\/show\/([^\.]+)\.html/i,
+			tpl: '<embed src="http://player.ku6.com/refer/{{id}}/v.swf" quality="high" width="460" height="400" align="middle" allowScriptAccess="always" allowfullscreen="true" type="application/x-shockwave-flash"></embed>'
+		},
+		tudou: {
+			url_re: /tudou\.com\/programs\/view\/([^\/]+)\//i,
+			tpl: '<embed src="http://www.tudou.com/v/{{id}}/v.swf" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" wmode="opaque" width="460" height="400"></embed>'
+		}
 	},
 	attempt: function(url, ele) {
-//		var matchs = this.youku.url_re.exec(url);
-//		if(matchs) {
-//			$(ele).after(this.youku.tpl.format({id: matchs[1]})).click(function() {
-//				$(this).next('embed').toggle();
-//			}).attr('rhref', $(ele).attr('href')).attr('href', 'javascript:void(0);');
-//		}
+		for(var name in this.services) {
+			if(this.services[name].url_re.test(url)) {
+				$(ele).attr('href', 'javascript:void(0);').attr('videoType', name).click(function() {
+					VideoService.show($(this).attr('videoType'), $(this).attr('rhref'));
+				});
+				break;
+			}
+		}
+	},
+	show: function(name, url) {
+		var info = this.services[name];
+		var matchs = info.url_re.exec(url);
+		popupBox.showVideo(url, info.tpl.format({id: matchs[1]}));
 	}
 };
 

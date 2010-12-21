@@ -1028,7 +1028,8 @@ function getUserTimeline(screen_name, user_id, read_more) {
                     window.currentTab = "#user_timeline_timeline";
             	}
                 addPageMsgs(sinaMsgs, m, true);
-                max_id = String(sinaMsgs[sinaMsgs.length - 1].timestamp || sinaMsgs[sinaMsgs.length - 1].cursor_id || sinaMsgs[sinaMsgs.length - 1].id);
+                var last_index = sinaMsgs.length - 1;
+                max_id = String(sinaMsgs[last_index].timestamp || sinaMsgs[last_index].cursor_id || sinaMsgs[last_index].id);
                 page += 1;
                 // 保存数据，用于翻页
                 $tab.attr('max_id', max_id);
