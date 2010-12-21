@@ -1074,8 +1074,12 @@ var sinaApi = {
                 	error_code = data.error_code || data.code;
                     var error = data.error;
                     if(data.ret && data.ret != 0){ //腾讯
-                        error = data.msg;
-                        error_code = data.ret;
+                        if(data.msg == 'have no tweet'){
+                            data.data = {info:[]};
+                        }else{
+                            error = data.msg;
+                            error_code = data.ret;
+                        }
                     }
                     if(!error && data.errors){
                         if(typeof(data.errors)==='string'){
@@ -1258,7 +1262,13 @@ $.extend(TQQAPI, {
 		}
         if(args.data.since_id) {
 			args.data.pagetime = args.data.since_id;
+            args.data.pageflag = 2;
 			delete args.data.since_id;
+		}
+        if(args.data.max_id) {
+			args.data.pagetime = args.data.max_id;
+            args.data.pageflag = 1;
+			delete args.data.max_id;
 		}
         if(args.data.status || args.data.text){
             args.data.content = args.data.status || args.data.text;
@@ -1330,6 +1340,7 @@ $.extend(TQQAPI, {
 			status.id = data.id;
 			status.text = data.origtext; //data.text;
             status.created_at = new Date(data.timestamp * 1000);
+            status.timestamp = data.timestamp;
             if(data.image){
                 status.thumbnail_pic = data.image[0] + '/160';
                 status.bmiddle_pic = data.image[0] + '/460';

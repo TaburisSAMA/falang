@@ -22,7 +22,9 @@ function getMaxMsgId(t, user_uniqueKey){
     var _last_id = null;
     if(_t_tweets && _t_tweets.length){
     	// 兼容网易的cursor_id
-    	var _last_id = _t_tweets[_t_tweets.length-1].cursor_id || _t_tweets[_t_tweets.length-1].id;
+        // 兼容腾讯的PageTime
+        var _last_id = _t_tweets[_t_tweets.length-1].timestamp || _t_tweets[_t_tweets.length-1].cursor_id || _t_tweets[_t_tweets.length-1].id;
+//    	var _last_id = _t_tweets[_t_tweets.length-1].cursor_id || _t_tweets[_t_tweets.length-1].id;
 //    	var _last_id = _t_tweets[_t_tweets.length-1];
     	if(typeof(_last_id) === 'number'){
     		_last_id--;
@@ -158,7 +160,8 @@ function checkTimeline(t, p, user_uniqueKey){
         if(sinaMsgs.length > 0){
         	// 保存最新的id，用于过滤数据和判断
         	// 兼容网易的cursor_id
-            setLastMsgId(sinaMsgs[0].cursor_id || sinaMsgs[0].id, t, user_uniqueKey);
+            // 兼容腾讯的pagetime
+            setLastMsgId(sinaMsgs[0].timestamp || sinaMsgs[0].cursor_id || sinaMsgs[0].id, t, user_uniqueKey);
             tweets[_key] = sinaMsgs.concat(tweets[_key]);
             var _unreadCount = 0, _msg_user = null;
             var c_user_id = String(c_user.id);
