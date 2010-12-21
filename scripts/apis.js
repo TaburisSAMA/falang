@@ -2,6 +2,8 @@
 * @author qleelulu@gmail.com
 */
 
+var OAUTH_CALLBACK_URL = chrome.extension.getURL('oauth_cb.html');
+
 var sinaApi = {
 	
 	config: {
