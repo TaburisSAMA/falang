@@ -1193,10 +1193,8 @@ $.extend(TQQAPI, {
         friends_timeline: '/statuses/home_timeline',
 
         mentions:             '/statuses/mentions_timeline', //
-        followers:            '/friends/fanslist', //
-        friends:              '/friends/idollist', //
-        user_followers:       'friends/user_fanslist', //TX特有
-        user_friends:         'friends/user_idollist', //TX特有
+        followers:            '/friends/user_fanslist', //
+        friends:              '/friends/user_idollist', //
         favorites:            '/fav/list_t', //
         favorites_create:     '/fav/addt', //
         favorites_destroy:    '/fav/delt', //
@@ -1302,10 +1300,29 @@ $.extend(TQQAPI, {
                 args.data.reid = args.data.id;
 			    delete args.data.id;
                 break;
+            case this.config.friendships_destroy:
             case this.config.friendships_create:
             	args.data.name = args.data.id;
             	delete args.data.id;
             	break;
+           	case this.config.followers:
+           	case this.config.friends:
+           		args.data.startindex = args.data.cursor;
+           		args.data.reqnum = args.data.qeqnum;
+           		args.data.name = args.data.user_id;
+           		if(String(args.data.startindex) == '-1') {
+           			args.data.startindex = '0';
+           		}
+           		delete args.data.cursor;
+           		delete args.data.qeqnum;
+           		delete args.data.user_id;
+           		break;
+           	case this.config.search:
+	            args.data.keyword = args.data.q;
+	            args.data.pagesize = args.data.qeqnum;
+	            delete args.data.qeqnum;
+	            delete args.data.q;
+		        break;
             case this.config.update:
             	// 判断是否@回复
 	            if(args.data.sina_id) {
@@ -1321,7 +1338,7 @@ $.extend(TQQAPI, {
 		if(play_load == 'string') {
 			return data;
 		}
-		if(args.url == this.config.friendships_create) {
+		if(args.url == this.config.friendships_create || args.url == this.config.friendships_destroy) {
 			return true;
 		}
 		data = data.data;
@@ -1334,6 +1351,17 @@ $.extend(TQQAPI, {
 	    		items[i] = this.format_result_item(items[i], play_load, args);
 	    	}
 	    	data.items = items;
+	    	if(args.url == this.config.followers || args.url == this.config.friends) {
+	    		if(data.items.length >= parseInt(args.data.reqnum)) {
+	    			var start_index = parseInt(args.data.startindex || '0');
+		    		if(start_index == -1) {
+		    			start_index = 0;
+		    		}
+		    		data.next_cursor = start_index + data.items.length;
+	    		} else {
+	    			data.next_cursor = '0'; // 无分页了
+	    		}
+	    	}
 	    } else {
 	    	data = this.format_result_item(data, play_load, args);
 	    }
