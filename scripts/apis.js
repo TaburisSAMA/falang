@@ -1389,6 +1389,7 @@ $.extend(TQQAPI, {
 			user.t_url = 'http://t.qq.com/' + data.name;
 			user.screen_name = data.nick;
 			user.id = data.name;
+			user.name = data.name;
 			user.province = data.province_code;
 			user.city = data.city_code;
 			user.verified = data.isvip;
