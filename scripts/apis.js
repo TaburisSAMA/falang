@@ -2574,7 +2574,7 @@ $.extend(T163API, {
 			args.data.user = args.data.id;
 			delete args.data.id;
 		} else if(args.url == this.config.favorites) {
-			args.data.id = user.screen_name;
+			args.data.id = user.name;
 		}
     },
     
