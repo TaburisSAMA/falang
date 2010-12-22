@@ -2264,7 +2264,7 @@ $.extend(TwitterAPI, {
 	    support_comment: false,
 	    support_repost: false,
 	    support_upload: false,
-//	    support_search: false,
+	    oauth_callback: 'oob',
 	    search: '/search_statuses',
 	    repost: '/statuses/update',
         retweet: '/statuses/retweet/{{id}}',
