@@ -1030,14 +1030,12 @@ var sinaApi = {
         this.apply_auth(url, args, user);
         var play_load = args.play_load; // 返回的是什么类型的数据格式
         delete args.play_load;
-        var callmethod = user.uniqueKey + ':' + args.url;
+        var callmethod = user.uniqueKey + ': ' + args.type + ' ' + args.url;
         var request_data = args.content || args.data;
         var processData = !args.content;
         var contentType = args.contentType || 'application/x-www-form-urlencoded';
         $.ajax({
             url: url,
-//            username: user.userName,
-//            password: user.password,
 //            cache: false, // chrome不会出现ie本地cache的问题, 若url参数带有_=xxxxx，digu无法获取完整的用户信息
             timeout: 60*1000, //一分钟超时
             type: args.type,
@@ -1129,7 +1127,10 @@ var sinaApi = {
                                 r = null;
                             }
                             if(r){
-                            	var error_code = r.error_code || r.code;
+                            	if(typeof(r.error) === 'object') {
+									r = r.error;
+                            	}
+                            	var error_code = r.error_code || r.code || r.type;
                             	r.error = this.format_error(r.error || r.wrong || r.message, error_code);
 		                    	var error_msg = callmethod + ' error: ' + r.error;
 		                    	if(!r.error && error_code){ // 错误为空，才显示错误代码
@@ -3344,6 +3345,238 @@ $.extend(DoubanAPI, {
 	}
 });
 
+// facebook: http://developers.facebook.com/docs/api
+var FacebookAPI = $.extend({}, sinaApi);
+$.extend(FacebookAPI, {
+	config: $.extend({}, sinaApi.config, {
+		host: 'https://graph.facebook.com',
+		source: '121425774590172', 
+		oauth_key: '121425774590172',
+        oauth_secret: 'ab7ffce878acf3c7e870c0e7f0a1b29a',
+        result_format: '',
+        userinfo_has_counts: false,
+        support_counts: false,
+        support_cursor_only: true,  // 只支持游标方式翻页
+        support_friends_only: true, // 只支持friends
+        support_repost: false,
+        support_comment: false,
+        support_mentions: false,
+        support_search: false,
+        
+        direct_messages: '/me/inbox',
+        verify_credentials: '/me',
+        friends_timeline: '/me/home',
+        destroy: '/{{id}}_delete',
+        user_timeline: '/{{id}}/feed',
+        update: '/me/feed_update',
+        upload: '/me/photos',
+        friends: '/{{user_id}}/friends',
+        
+        oauth_authorize: 	  '/oauth/authorize',
+        oauth_request_token:  '/oauth/request_token',
+        oauth_callback: 'https://chrome.google.com/extensions/detail/aicelmgbddfgmpieedjiggifabdpcnln/',
+        oauth_access_token:   '/oauth/access_token',
+        oauth_scope: [
+        	'offline_access', 
+        	'publish_stream',
+        	
+        	'read_insights', 'read_mailbox', 'read_requests',
+        	'read_stream',
+        	
+        	'user_activities', 'friends_activities',
+        	'user_birthday', 'friends_birthday',
+        	'user_about_me', 'friends_about_me',
+        	'user_photos', 'friends_photos',
+        	'user_relationships', 'friends_relationships',
+        	'user_status', 'friends_status',
+        	'user_interests', 'friends_interests',
+        	'user_likes', 'friends_likes',
+        	'user_online_presence', 'friends_online_presence',
+        	'user_website', 'friends_website',
+        	'user_videos', 'friends_videos',
+        	'read_friendlists', 'manage_friendlists',
+        	'user_checkins', 'friends_checkins',
+        	'user_hometown', 'friends_hometown',
+        	'user_location', 'friends_location',
+        	'user_religion_politics', 'friends_religion_politics'
+        ].join(',')
+	}),
+	
+	url_encode: function(text) {
+		return text;
+	},
+	
+	apply_auth: function(url, args, user) {
+		
+	},
+	
+	get_access_token: function(user, callbackFn) {
+    	var params = {
+            url: this.config.oauth_access_token,
+            type: 'get',
+            user: user,
+            play_load: 'string',
+            apiHost: this.config.oauth_host,
+            data: {
+				client_id: this.config.oauth_key, 
+	    		redirect_uri: this.config.oauth_callback,
+	    		client_secret: this.config.oauth_secret,
+	    		code: user.oauth_pin
+			},
+            need_source: false
+        };
+		this._sendRequest(params, function(token_str, text_status, error_code) {
+			var token = null;
+			if(text_status != 'error') {
+				// access_token=121425774590172|3362948c9a062a22ef18c6d5-1013655641|zUXlPP0oIA44zqAfAyndxhKZUp4
+				token = decodeForm(token_str);
+				if(!token.access_token) {
+					token = null;
+					error_code = token_str;
+					text_status = 'error';
+				} else {
+					user.oauth_token_key = token.access_token;
+				}
+			}
+			callbackFn(token ? user : null, text_status, error_code);
+		});
+    },
+    
+	// 获取认证url
+    get_authorization_url: function(user, callback) {
+    	var params = {
+    		client_id: this.config.oauth_key, 
+    		redirect_uri: this.config.oauth_callback,
+    		scope: this.config.oauth_scope
+    	};
+    	var login_url = this.format_authorization_url(params);
+    	callback(login_url, 'success', 200);
+    },
+    
+    format_upload_params: function(user, data, pic) {
+    	data.message = data.status;
+    	delete data.status;
+    	if(user.oauth_token_key) {
+			data.access_token = user.oauth_token_key;
+		}
+		pic.keyname = 'source';
+    },
+    
+    before_sendRequest: function(args, user) {
+		delete args.data.source;
+		delete args.data.since_id;
+		if(args.play_load == 'string') {
+			return;
+		}
+		if(user.oauth_token_key) {
+			args.data.access_token = user.oauth_token_key;
+		}
+		if(args.data.count) {
+			args.data.limit = args.data.count;
+			delete args.data.count;
+		}
+		if(args.data.cursor) {
+			if(String(args.data.cursor) != '-1') {
+				args.data.until = args.data.cursor;
+			}
+			delete args.data.cursor;
+		}
+		if(args.url == this.config.update) {
+			args.url = args.url.replace('_update', '');
+			args.data.message = args.data.status;
+			delete args.data.status;
+		}
+		if(args.url == this.config.destroy) {
+			args.url = args.url.replace('_delete', '');
+			args.type = 'DELETE';
+		}
+	},
+	
+	format_result: function(data, play_load, args) {
+    	var items = data;
+    	if(!$.isArray(data) && data.data) {
+    		items = data.items = data.data;
+    		delete data.data;
+    	}
+		if($.isArray(items)) {
+	    	for(var i in items) {
+	    		items[i] = this.format_result_item(items[i], play_load, args);
+	    	}
+	    } else {
+	    	data = this.format_result_item(data, play_load, args);
+	    }
+	    if(data.paging) { // cursor 分页
+	    	if(data.paging.next) {
+	    		var params = decodeForm(data.paging.next);
+	    		data.next_cursor = params.until;
+	    	} else {
+	    		data.next_cursor = '0'; // 到底了
+	    	}
+	    }
+		return data;
+	},
+	
+	format_result_item: function(data, play_load, args) {
+		if(play_load == 'user' && data && data.id) {
+			data.t_url = data.link || 'http://www.facebook.com/' + data.id;
+			data.profile_image_url = this.config.host + '/' + data.id + '/picture';
+			data.screen_name = data.name;
+			data.description = data.about;
+//			gender_map: {0:'n', 1:'m', 2:'f'},
+			if(data.gender) {
+				data.gender = data.gender == 'male' ? 'm' : 'f';
+			} else {
+				data.gender = 'n';
+			}
+			// "location": {"id": "106262882745698",  "name": "Guangzhou, China"}
+			if(data.location && data.location.name) {
+				data.province = data.location.name;
+			}
+			if(data.hometown && data.hometown.name) {
+				data.city = data.hometown.name;
+			}
+			delete data.location;
+			delete data.hometown;
+			delete data.about;
+		} else if(play_load == 'status' || play_load == 'message') {
+			data.text = data.message || '';
+			if(!data.text) {
+				if(data.name) {
+					data.text += ' ' + data.name;
+				}
+				if(data.link) {
+					data.text += ' ' + data.link;
+				}
+			}
+			delete data.message;
+			data.t_url = data.link;
+			delete data.link;
+			if(data.picture) {
+				if(data.picture.indexOf('/safe_image.php?') > 0) {
+					data.thumbnail_pic = data.picture;
+					var params = decodeForm(data.picture);
+					data.bmiddle_pic = params.url;
+					data.original_pic = data.bmiddle_pic;
+				} else {
+					data.thumbnail_pic = data.picture;
+					data.bmiddle_pic = data.picture.replace('_s.', '_n.');
+					data.original_pic = data.bmiddle_pic;
+				}
+				delete data.picture;
+			}
+			if(data.application) {
+				data.source = '<a href="http://www.facebook.com/apps/application.php?id={{id}}" target="_blank">{{name}}</a>'.format(data.application);
+				delete data.application;
+			}
+			data.user = this.format_result_item(data.from, 'user', args);
+			data.created_at = data.created_time || data.updated_time;
+			delete data.from;
+		} else if(play_load == 'comment') {
+		} 
+		return data;
+	}
+});
+
 var T_APIS = {
 	'tsina': sinaApi,
 	'tqq': TQQAPI,
@@ -3357,6 +3590,7 @@ var T_APIS = {
 	'renjian': RenjianAPI,
 	'douban': DoubanAPI,
 	'buzz': BuzzAPI,
+	'facebook': FacebookAPI,
 	'twitter': TwitterAPI // fxxx gxfxw first.
 };
 

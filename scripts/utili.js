@@ -39,6 +39,7 @@ var T_LIST = {
 	'all': ['friends_timeline','mentions','comments_timeline','direct_messages'],
 	'digu': ['friends_timeline','mentions', 'direct_messages'],
 	'buzz': ['friends_timeline'],
+	'facebook': ['friends_timeline'],
 	'douban': ['friends_timeline', 'direct_messages']
 };
 T_LIST.tsina = T_LIST.tsohu = T_LIST.all;
@@ -54,6 +55,7 @@ var T_NAMES = {
 	'zuosa': '做啥',
 //	'follow5': 'Follow5',
 	'twitter': 'Twitter',
+	'facebook': 'Facebook',
 	'renjian': '人间网',
 	'douban': '豆瓣',
 	'buzz': 'Google Buzz',

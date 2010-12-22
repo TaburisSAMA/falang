@@ -15,7 +15,8 @@ var SUPPORT_AUTH_TYPES = {
 	'renjian': ['baseauth'],
 	'twitter': ['oauth', 'baseauth'],
 	'douban': ['oauth'],
-	'buzz': ['oauth']
+	'buzz': ['oauth'],
+	'facebook': ['oauth']
 };
 
 var AUTH_TYPE_NAME = {
@@ -654,7 +655,7 @@ function saveAccount(){
     } else if(authType == 'oauth') {
     	var request_token_key = $('#account-request-token-key').val();
     	var request_token_secret = $('#account-request-token-secret').val();
-    	if(pin && request_token_key && request_token_secret) {
+    	if(pin && ((request_token_key && request_token_secret) || blogType == 'facebook')) {
     		user.oauth_pin = pin;
     		// 设置request token
     		user.oauth_token_key = request_token_key;
@@ -1033,10 +1034,12 @@ function cleanLocalStorageData(){
 };
 
 // 监控oauth callback url，获取认证码
+// facebook: 
+// https://chrome.google.com/extensions/detail/aicelmgbddfgmpieedjiggifabdpcnln/?code=3362948c9a062a22ef18c6d5-1013655641|T7VuPCHU79f6saU7MiQwHGG_mVc
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
-	if(changeInfo.status == 'complete' && tab.url.indexOf(OAUTH_CALLBACK_URL) == 0) {
+	if(changeInfo.status == 'loading' && (tab.url.indexOf(OAUTH_CALLBACK_URL) == 0 || tab.url.indexOf(FacebookAPI.config.oauth_callback + '?code=') == 0)) {
 		var d = decodeForm(tab.url);
-		var pin = d.oauth_verifier || 'impin';
+		var pin = d.oauth_verifier || d.code || 'impin';
 		$('#account-pin').val(pin);
 		$('#save-account').click();
 		chrome.windows.remove(tab.windowId);
