@@ -1916,9 +1916,10 @@ function doRT(ele, is_rt, is_rt_rt){//RT
     }
     var _msg_user = data.user;
     var config = tapi.get_config(getUser());
+    var rt_name = config.rt_at_name ? (_msg_user.name || _msg_user.id) : _msg_user.screen_name;
     var repost_pre = config.repost_pre;
     var val = tapi.get_config(getUser()).need_processMsg ? data.text : htmlToText(data.text);
-    val = repost_pre + ' ' + '@' + _msg_user.screen_name + ' ' + val;
+    val = repost_pre + ' ' + '@' + rt_name + ' ' + val;
     if(data.original_pic) {
     	// 有图片，自动带上图片地址，并尝试缩短
     	var settings = Settings.get();

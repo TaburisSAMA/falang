@@ -1191,6 +1191,7 @@ $.extend(TQQAPI, {
         support_comment: false,
         support_favorites_max_id: true,
         reply_dont_need_at_screen_name: true, // @回复无需填充@screen_name 
+        rt_at_name: true, // RT的@name而不是@screen_name
 //        support_counts: false, // 只有rt_count这个，不过貌似有问题，总是404。暂时隐藏
         friends_timeline: '/statuses/home_timeline',
 
@@ -1300,8 +1301,13 @@ $.extend(TQQAPI, {
         switch(args.url){
             case this.config.new_message:
             case this.config.user_timeline:
-                args.data.name = args.data.id;
-			    delete args.data.id;
+            	if(args.data.id) {
+            		args.data.name = args.data.id;
+			    	delete args.data.id;
+            	} else if(args.data.screen_name) {
+            		args.data.name = args.data.screen_name;
+			    	delete args.data.screen_name;
+            	}
                 break;
             case this.config.comments:
                 args.data.rootid = args.data.id;

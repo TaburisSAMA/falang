@@ -1143,10 +1143,11 @@ var ShortenUrl = {
 	expandAll: function() {
 		var b_view = getBackgroundView();
 		var cache = b_view.SHORT_URLS;
-		$('a.link:not([title^="http"])').each(function() {
+		$('a.link:not([title*="右键直接打开"])').each(function() {
 			var url = $(this).attr('href');
 			if(url.length > 30) {
                 UrlUtil.showFaviconBefore(this, url);
+                VideoService.attempt(url, this);
 				return;
 			}
 			if(cache[url]) {
@@ -1430,14 +1431,19 @@ var VideoService = {
 			tpl: '<embed src="http://player.ku6.com/refer/{{id}}/v.swf" quality="high" width="460" height="400" align="middle" allowScriptAccess="always" allowfullscreen="true" type="application/x-shockwave-flash"></embed>'
 		},
 		tudou: {
-			url_re: /tudou\.com\/programs\/view\/([^\/]+)\//i,
+			url_re: /tudou\.com\/programs\/view\/([^\/]+)\/?/i,
 			tpl: '<embed src="http://www.tudou.com/v/{{id}}/v.swf" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" wmode="opaque" width="460" height="400"></embed>'
 		}
 	},
 	attempt: function(url, ele) {
 		for(var name in this.services) {
 			if(this.services[name].url_re.test(url)) {
-				$(ele).attr('href', 'javascript:void(0);').attr('videoType', name).click(function() {
+				var old_title = $(ele).attr('title');
+				var title = '左键点击预览';
+				if(old_title) {
+					title += ', ' + old_title;
+				}
+				$(ele).attr('rhref', url).attr('title', title).attr('href', 'javascript:void(0);').attr('videoType', name).click(function() {
 					VideoService.show($(this).attr('videoType'), $(this).attr('rhref'));
 				});
 				break;
