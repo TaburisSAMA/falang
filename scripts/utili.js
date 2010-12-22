@@ -1429,12 +1429,17 @@ var VideoService = {
 			tpl: '<embed src="http://player.youku.com/player.php/sid/{{id}}/v.swf" quality="high" width="460" height="400" align="middle" allowScriptAccess="sameDomain" type="application/x-shockwave-flash"></embed>'
 		},
 		ku6: {
-			url_re: /ku6\.com\/show\/([^\.]+)\.html/i,
+			// http://v.ku6.com/special/show_3898167/rJ5BS7HWyEW4iHC3.html
+			url_re: /ku6\.com\/.+?\/([^\.\/]+)\.html/i,
 			tpl: '<embed src="http://player.ku6.com/refer/{{id}}/v.swf" quality="high" width="460" height="400" align="middle" allowScriptAccess="always" allowfullscreen="true" type="application/x-shockwave-flash"></embed>'
 		},
 		tudou: {
 			url_re: /tudou\.com\/programs\/view\/([^\/]+)\/?/i,
 			tpl: '<embed src="http://www.tudou.com/v/{{id}}/v.swf" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" wmode="opaque" width="460" height="400"></embed>'
+		},
+		56: {
+			url_re: /56\.com\/.+?\/(v_[^\.]+)\.html/i,
+			tpl: '<embed src="http://player.56.com/{{id}}.swf" type="application/x-shockwave-flash" allowNetworking="all" allowScriptAccess="always" width="460" height="400"></embed>'
 		}
 	},
 	attempt: function(url, ele) {
