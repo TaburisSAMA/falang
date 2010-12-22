@@ -84,6 +84,10 @@ $(function(){
         showAccountList();
         $("#account-list").val(uniqueKey);
         _showMsg(_user.screen_name + ' 的状态修改为: ' + stat);
+        var b_view = getBackgroundView();
+        if(b_view){
+            b_view.RefreshManager.restart();
+        }
     });
 
     $("#show-edit-account").click(function(){

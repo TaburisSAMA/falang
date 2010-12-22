@@ -2591,6 +2591,10 @@ $.extend(T163API, {
     format_result_item: function(data, play_load, args) {
 		if(play_load == 'user' && data && data.id) {
 			data.t_url = 'http://t.163.com/' + data.screen_name;
+            //163的screen_name是个性网址
+            var temp_name = data.screen_name;
+            data.screen_name = data.name || data.screen_name;
+            data.name = temp_name;
             data.gender = this.config.gender_map[data.gender];
 		} else if(play_load == 'status') {
 			// search
