@@ -2126,15 +2126,6 @@ function sendOretweet(ele, screen_name, tweetId){//twitter锐推
 };
 //<<<<<<<<<<<<<=====
 
-// 获取预览图片地址
-function previewPic(ele, get_method) {
-	var url = $(ele).unbind('click').attr('rhref');
-	get_method(url, function(pics) {
-		var tpl = '<div><a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="{{bmiddle_pic}}" original="{{original_pic}}" onmousedown="rOpenPic(event, this)" title="右键点击打开原图"><img class="imgicon pic" src="{{thumbnail_pic}}"></a></div>';
-		$(ele).hide().parent().after(tpl.format(pics));
-	});
-};
-
 //查看图片
 function showFacebox(ele){
     var _t = $(ele);

@@ -187,15 +187,17 @@ var sinaApi = {
             _url = 'http://' + g1;
         }
         // 增加图片预览功能
-        if(window.ImageService){ //page.js 里面没有加载这个
-            var service = ImageService.check(_url);
-            if(service) {
-                return '<a target="_blank" onclick="previewPic(this, {{service.name}}.get);" href="javascript:void();" rhref="{{url}}" title="左键点击预览图片，右键直接打开网址">{{value}}</a>'.format({
-                    url: _url, title: g1, value: g2||g1,
-                    service: service
-                });
-            }
-        }
+//        if(window.ImageService){ //page.js 里面没有加载这个
+//            var service = ImageService.check(_url);
+//            if(service) {
+//                return '<a target="_blank" onclick="previewPic(this, \"{{service.name}}\");" href="javascript:void();" rhref="{{url}}" title="左键点击预览图片，右键直接打开网址">{{value}}</a>'.format({
+//                    url: _url, 
+//                    title: g1, 
+//                    value: g2||g1,
+//                    service: service
+//                });
+//            }
+//        }
         return '<a target="_blank" class="link" href="{{url}}">{{value}}</a>'.format({
             url: _url, title: g1, value: g2||g1
         });

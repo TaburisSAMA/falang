@@ -1149,20 +1149,26 @@ var ShortenUrl = {
 			var url = $(this).attr('href');
 			if(url.length > 30) {
                 UrlUtil.showFaviconBefore(this, url);
-                VideoService.attempt(url, this);
+                if(!VideoService.attempt(url, this)) {
+                	ImageService.attempt(url, this);
+                }
 				return;
 			}
 			if(cache[url]) {
 				$(this).attr('title', '右键直接打开 ' + cache[url]).attr('rhref', cache[url]);
                 UrlUtil.showFaviconBefore(this, cache[url]);
-				VideoService.attempt(cache[url], this);
+				if(!VideoService.attempt(cache[url], this)) {
+                	ImageService.attempt(cache[url], this);
+                }
 			} else {
 				ShortenUrl.expand(url, function(longurl) {
 					if(longurl) {
 						$(this).attr('title', '右键直接打开 ' + longurl).attr('rhref', longurl).addClass('longurl');
 						cache[$(this).attr('href')] = longurl;
                         UrlUtil.showFaviconBefore(this, longurl);
-						VideoService.attempt(longurl, this);
+						if(!VideoService.attempt(longurl, this)) {
+		                	ImageService.attempt(longurl, this);
+		                }
 					}
 				}, this);
 			}
@@ -1257,7 +1263,7 @@ var Twitpic = {
 	 * http://twitpic.com/show/mini/1e10q
 	 */
 	host: 'twitpic.com',
-	url_re: /http:\/\/(twitpic\.com)/i,
+	url_re: /http:\/\/(twitpic\.com)\/\w+/i,
 	get: function(url, callback) {
 		var tpl = 'http://twitpic.com/show/{{size}}/{{id}}';
 		var re = /twitpic.com\/(\w+)/i;
@@ -1286,6 +1292,62 @@ var Plixi = {
 			thumbnail_pic: tpl.format({size: 'thumbnail'}),
 			bmiddle_pic: tpl.format({size: 'medium'}),
 			original_pic: url//tpl.format({size: 'big'})
+		};
+		callback(pics);
+	}
+};
+
+// http://code.google.com/p/imageshackapi/wiki/YFROGoptimizedimages
+var Yfrog = {
+	/*
+	 * http://yfrog.com/gyunmnrj:embed
+	 * http://yfrog.com/gyunmnrj:small
+	 */
+	host: 'yfrog.com',
+	url_re: /http:\/\/yfrog\.com\/\w+/i,
+	get: function(url, callback) {
+		var pics = {
+			thumbnail_pic: url + ':small',
+			bmiddle_pic: url + ':embed',
+			original_pic: url
+		};
+		callback(pics);
+	}
+};
+
+// http://twitgoo.com/49d => http://twitgoo.com/49d/mini , http://twitgoo.com/49d/img
+var Twitgoo = {
+	host: 'twitgoo.com',
+	url_re: /http:\/\/twitgoo\.com\/\w+/i,
+	get: function(url, callback) {
+		var pics = {
+			thumbnail_pic: url + '/mini',
+			bmiddle_pic: url + '/img',
+			original_pic: url + '/img'
+		};
+		callback(pics);
+	}
+};
+
+// Add ’:full’, ‘:square’, ‘:view’, ‘:medium’, ‘:thumbnail’, or ‘:thumb’ 
+// to the moby.to short url and you will be redirected to the correct image.
+// http://developers.mobypicture.com/documentation/additional/inline-thumbnails/
+// moby.to/sjhjvq
+var MobyPicture = {
+	host: 'moby.to',
+	url_re: /http:\/\/(moby\.to|www\.mobypicture\.com)\/\w+/i,
+	get: function(url, callback, ele) {
+		if(url.indexOf('mobypicture.com') >= 0) {
+			url = $(ele).html();
+			if(url.indexOf('moby.to') < 0) {
+				callback(null);
+				return;	
+			}
+		}
+		var pics = {
+			thumbnail_pic: url + ':thumb',
+			bmiddle_pic: url + ':medium',
+			original_pic: url + ':full'
 		};
 		callback(pics);
 	}
@@ -1427,19 +1489,40 @@ var ImageService = {
 		Instagram: Instagram, 
 		Plixi: Plixi, 
 		Imgur: Imgur,
-		Twitpic: Twitpic
+		Twitpic: Twitpic,
+		Yfrog: Yfrog,
+		Twitgoo: Twitgoo,
+		MobyPicture: MobyPicture
 	},
-	check: function(url) {
-		var hit = null;
+	
+	attempt: function(url, ele) {
 		for(var name in this.services) {
 			var item = this.services[name];
 			if(item.url_re.test(url)) {
-				hit = {name: name, service: item};
-				break;
+				var old_title = $(ele).attr('title');
+				var title = '左键点击预览';
+				if(old_title) {
+					title += ', ' + old_title;
+				}
+				$(ele).attr('rhref', url).attr('title', title).attr('href', 'javascript:void(0);').attr('service', name).click(function() {
+					ImageService.show(this, $(this).attr('service'), $(this).attr('rhref'));
+				});
+				return true;
 			}
 		}
-		return hit;
+		return false;
 	},
+	
+	show: function(ele, service, url) {
+		this.services[service].get(url, function(pics) {
+			if(!pics) {
+				return;
+			}
+			var tpl = '<div><a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="{{bmiddle_pic}}" original="{{original_pic}}" onmousedown="rOpenPic(event, this)" title="右键点击打开原图"><img class="imgicon pic" src="{{thumbnail_pic}}"></a></div>';
+			$(ele).hide().parent().after(tpl.format(pics));
+		}, ele);
+	},
+	
 	upload: function(pic, callback) {
 		var settings = Settings.get();
 		this.services[settings.image_service].upload(pic, callback);
@@ -1464,6 +1547,34 @@ var VideoService = {
 		56: {
 			url_re: /56\.com\/.+?\/(v_[^\.]+)\.html/i,
 			tpl: '<embed src="http://player.56.com/{{id}}.swf" type="application/x-shockwave-flash" allowNetworking="all" allowScriptAccess="always" width="460" height="400"></embed>'
+		},
+		// http://video.sina.com.cn/playlist/4576702-1405053100-1.html#44164340 => 
+		// http://you.video.sina.com.cn/api/sinawebApi/outplayrefer.php/vid=44164340_1405053100_1/s.swf
+		// http://you.video.sina.com.cn/b/32394075-1575345837.html =>
+		// http://you.video.sina.com.cn/api/sinawebApi/outplayrefer.php/vid=32394075_1575345837/s.swf
+		sina: {
+			url_re: /video\.sina\.com\.cn\/.+?\/([^\.\/]+)\.html(#\d+)?/i,
+			format: function(matchs) {
+				var id = matchs[1];
+				if(matchs[2]) {
+					id = matchs[2].substring(1) + id.substring(id.indexOf('-'));
+				}
+				return id.replace('-', '_');
+			},
+			tpl: '<embed src="http://you.video.sina.com.cn/api/sinawebApi/outplayrefer.php/vid={{id}}/s.swf" type="application/x-shockwave-flash" allowNetworking="all" allowScriptAccess="always" width="460" height="400"></embed>'
+		},
+		// http://www.youtube.com/v/A6vXOZbzBYY?fs=1
+		// http://youtu.be/A6vXOZbzBYY
+		youtube: {
+			url_re: /(youtube\.com|youtu\.be)\/(.+?\/)?(\w+)/i,
+			format: function(matchs, url, ele) {
+				if(url.indexOf('youtube.com/das_captcha') >= 0) {
+					matchs = this.url_re.exec($(ele).html());
+				}
+				var id = matchs[3];
+				return id;
+			},
+			tpl: '<embed src="http://www.youtube.com/v/{{id}}?fs=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="460" height="400"></embed>'
 		}
 	},
 	attempt: function(url, ele) {
@@ -1475,16 +1586,23 @@ var VideoService = {
 					title += ', ' + old_title;
 				}
 				$(ele).attr('rhref', url).attr('title', title).attr('href', 'javascript:void(0);').attr('videoType', name).click(function() {
-					VideoService.show($(this).attr('videoType'), $(this).attr('rhref'));
+					VideoService.show($(this).attr('videoType'), $(this).attr('rhref'), this);
 				});
-				break;
+				return true;
 			}
 		}
+		return false;
 	},
-	show: function(name, url) {
+	show: function(name, url, ele) {
 		var info = this.services[name];
 		var matchs = info.url_re.exec(url);
-		popupBox.showVideo(url, info.tpl.format({id: matchs[1]}));
+		var id = null;
+		if(info.format) {
+			id = info.format(matchs, url, ele);
+		} else {
+			id = matchs[1];
+		}
+		popupBox.showVideo(url, info.tpl.format({id: id}));
 	}
 };
 
