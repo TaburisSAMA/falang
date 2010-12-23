@@ -1586,34 +1586,64 @@ var VideoService = {
 				return id;
 			},
 			tpl: '<embed src="http://www.youtube.com/v/{{id}}?fs=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="460" height="400"></embed>'
+		},
+		
+		// http://www.yinyuetai.com/video/96953
+		yinyuetai: {
+			url_re: /yinyuetai\.com\/video\/(\w+)/i,
+			tpl: '<embed src="http://www.yinyuetai.com/video/player/{{id}}/v_0.swf" quality="high" width="460" height="400" align="middle"  allowScriptAccess="sameDomain" type="application/x-shockwave-flash"></embed>'
+		},
+		
+		// http://www.xiami.com/song/2112011
+		// http://www.xiami.com/widget/1_2112011/singlePlayer.swf
+		xiami: {
+			append: true, // 直接添加在链接后面
+			url_re: /xiami\.com\/song\/(\w+)/i,
+			tpl: '<embed src="http://www.xiami.com/widget/1_{{id}}/singlePlayer.swf" type="application/x-shockwave-flash" width="257" height="33" wmode="transparent"></embed>'
+		},
+		
+		// http://v.zol.com.cn/video105481.html
+		zol: {
+			url_re: /v\.zol\.com\.cn\/video(\w+)\.html/i,
+			tpl: '<embed height="400" width="460" wmode="opaque" allowfullscreen="false" allowscriptaccess="always" menu="false" swliveconnect="true" quality="high" bgcolor="#000000" src="http://v.zol.com.cn/meat_vplayer323.swf?movieId={{id}}&open_window=0&auto_start=1&show_ffbutton=1&skin=http://v.zol.com.cn/skin_black.swf" type="application/x-shockwave-flash">'
 		}
 	},
 	attempt: function(url, ele) {
 		for(var name in this.services) {
-			if(this.services[name].url_re.test(url)) {
-				var old_title = $(ele).attr('title');
-				var title = '左键点击预览';
-				if(old_title) {
-					title += ', ' + old_title;
+			var service = this.services[name];
+			if(service.url_re.test(url)) {
+				if(service.append) {
+					// 直接添加到后面
+					$(ele).after(this._format_tpl(service, url, ele));
+				} else {
+					var old_title = $(ele).attr('title');
+					var title = '左键点击预览';
+					if(old_title) {
+						title += ', ' + old_title;
+					}
+					$(ele).attr('rhref', url).attr('title', title).attr('href', 'javascript:void(0);').attr('videoType', name).click(function() {
+						VideoService.show($(this).attr('videoType'), $(this).attr('rhref'), this);
+					});
 				}
-				$(ele).attr('rhref', url).attr('title', title).attr('href', 'javascript:void(0);').attr('videoType', name).click(function() {
-					VideoService.show($(this).attr('videoType'), $(this).attr('rhref'), this);
-				});
 				return true;
 			}
 		}
 		return false;
 	},
-	show: function(name, url, ele) {
-		var info = this.services[name];
-		var matchs = info.url_re.exec(url);
+	_format_tpl: function(service, url, ele) {
+		var matchs = service.url_re.exec(url);
 		var id = null;
-		if(info.format) {
-			id = info.format(matchs, url, ele);
+		if(service.format) {
+			id = service.format(matchs, url, ele);
 		} else {
 			id = matchs[1];
 		}
-		popupBox.showVideo(url, info.tpl.format({id: id}));
+		return service.tpl.format({id: id});
+	},
+	show: function(name, url, ele) {
+		var service = this.services[name];
+		log(this._format_tpl(service, url, ele));
+		popupBox.showVideo(url, this._format_tpl(service, url, ele));
 	}
 };
 
