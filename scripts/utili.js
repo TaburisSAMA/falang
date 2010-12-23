@@ -1248,6 +1248,29 @@ var Instagram = {
 	}
 };
 
+
+// http://dev.twitpic.com/
+// http://dev.twitpic.com/docs/thumbnails/
+var Twitpic = {
+	/*
+	 * http://twitpic.com/show/thumb/1e10q
+	 * http://twitpic.com/show/mini/1e10q
+	 */
+	host: 'twitpic.com',
+	url_re: /http:\/\/(twitpic\.com)/i,
+	get: function(url, callback) {
+		var tpl = 'http://twitpic.com/show/{{size}}/{{id}}';
+		var re = /twitpic.com\/(\w+)/i;
+		var results = re.exec(url);
+		var pics = {
+			thumbnail_pic: tpl.format({size: 'mini', id: results[1]}),
+			bmiddle_pic: tpl.format({size: 'thumb', id: results[1]}),
+			original_pic: url
+		};
+		callback(pics);
+	}
+};
+
 // https://groups.google.com/group/plixi/web/fetch-photos-from-url
 var Plixi = {
 	/*
@@ -1403,7 +1426,8 @@ var ImageService = {
 	services: {
 		Instagram: Instagram, 
 		Plixi: Plixi, 
-		Imgur: Imgur
+		Imgur: Imgur,
+		Twitpic: Twitpic
 	},
 	check: function(url) {
 		var hit = null;
