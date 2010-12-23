@@ -1338,18 +1338,29 @@ var MobyPicture = {
 	url_re: /http:\/\/(moby\.to|www\.mobypicture\.com)\/\w+/i,
 	get: function(url, callback, ele) {
 		if(url.indexOf('mobypicture.com') >= 0) {
-			url = $(ele).html();
-			if(url.indexOf('moby.to') < 0) {
-				callback(null);
+			var short_url = $(ele).html();
+			if(short_url.indexOf('moby.to') < 0) {
+				// 如果还是不行，则直接爬页面获取
+				// ajax get: <input id="bookmark_directlink" type="text" value="http://moby.to/r2g9zv"/>
+				$.get(url, function(data) {
+					var new_url = $(data).find('#bookmark_directlink').val();
+					callback(MobyPicture._format_urls(new_url));
+				});
 				return;	
 			}
+			url = short_url;
 		}
-		var pics = {
+		callback(this._format_urls(url));
+	},
+	_format_urls: function(url) {
+		if(url.indexOf('moby.to') < 0) {
+			return null;
+		}
+		return {
 			thumbnail_pic: url + ':thumb',
 			bmiddle_pic: url + ':medium',
 			original_pic: url + ':full'
 		};
-		callback(pics);
 	}
 };
 
