@@ -1269,11 +1269,37 @@ var Twitpic = {
 		var re = /twitpic.com\/(\w+)/i;
 		var results = re.exec(url);
 		var pics = {
-			thumbnail_pic: tpl.format({size: 'mini', id: results[1]}),
-			bmiddle_pic: tpl.format({size: 'thumb', id: results[1]}),
-			original_pic: url
+			thumbnail_pic: tpl.format({size: 'thumb', id: results[1]}),
+			bmiddle_pic: tpl.format({size: 'full', id: results[1]}),
+			original_pic: tpl.format({size: 'full', id: results[1]})
 		};
 		callback(pics);
+	}
+};
+
+// http://p.twipple.jp/TxSpS => http://p.twipple.jp/data/T/x/S/p/S_s.jpg
+// => http://p.twipple.jp/data/T/x/S/p/S_m.jpg
+// => http://p.twipple.jp/data/T/x/S/p/S.jpg
+// 直接去页面获取 http://p.twipple.jp/g7G6e
+var Twipple = {
+	host: 'p.twipple.jp',
+	url_re: /http:\/\/p\.twipple\.jp\/\w+/i,
+	get: function(url, callback) {
+		$.ajax({
+			url: url,
+			success: function(html, status, xhr) {
+				var src = $(html).find('#post_image').attr('src');
+				var pics = {
+					thumbnail_pic: src.replace('_m.', '_s.'),
+					bmiddle_pic: src,
+					original_pic: src.replace('_m.', '.')
+				};
+				callback(pics);
+			},
+			error: function() {
+				callback(null);
+			}
+		});
 	}
 };
 
@@ -1503,7 +1529,8 @@ var ImageService = {
 		Twitpic: Twitpic,
 		Yfrog: Yfrog,
 		Twitgoo: Twitgoo,
-		MobyPicture: MobyPicture
+		MobyPicture: MobyPicture,
+		Twipple: Twipple
 	},
 	
 	attempt: function(url, ele) {
@@ -1628,7 +1655,9 @@ var VideoService = {
 			if(service.url_re.test(url)) {
 				if(service.append) {
 					// 直接添加到后面
-					$(ele).parent().after(this._format_tpl(service, url, ele));
+					if($(ele).parent().find('.embed_insert').length == 0) {
+						$(ele).parent().append('<div class="embed_insert">' + this._format_tpl(service, url, ele) + '</div>');
+					}
 				} else {
 					var old_title = $(ele).attr('title');
 					var title = '左键点击预览';
