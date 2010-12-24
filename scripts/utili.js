@@ -1147,6 +1147,9 @@ var ShortenUrl = {
 		var cache = b_view.SHORT_URLS;
 		$('a.link:not([title*="右键直接打开"])').each(function() {
 			var url = $(this).attr('href');
+			if(url.indexOf('javascript:') == 0) {
+				return;
+			}
 			if(url.length > 30) {
                 UrlUtil.showFaviconBefore(this, url);
                 if(!VideoService.attempt(url, this)) {
