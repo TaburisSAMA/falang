@@ -151,7 +151,7 @@ var sinaApi = {
             str = HTMLEnCode(str);
         }
 
-        var re = new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&\\-/#=;:!\\+]+)(?:\\](.+)\\[/url\\]|)', 'ig');
+        var re = new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&\\-/#=;:!\\+~]+)(?:\\](.+)\\[/url\\]|)', 'ig');
         str = str.replace(re, this._replaceUrl);
         
         str = this.processAt(str); //@***
