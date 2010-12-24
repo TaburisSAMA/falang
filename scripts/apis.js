@@ -1360,6 +1360,7 @@ $.extend(TQQAPI, {
 			return true;
 		}
 		data = data.data;
+        if(!data){ return data; }
 		var items = data.info || data;
 		if(!$.isArray(items)) {
 			items = data.results || data.users;

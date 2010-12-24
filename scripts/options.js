@@ -609,6 +609,11 @@ function _verify_credentials(user) {
             $("#account-pwd").val('');
             $("#account-pin").val('');
             _showMsg(btnVal + '用户"' + data.screen_name + '"成功！');
+
+            var b_view = getBackgroundView();
+            if(b_view){
+                b_view.RefreshManager.restart(true);
+            }
         }
     });
 }

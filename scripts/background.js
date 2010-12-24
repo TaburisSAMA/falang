@@ -489,9 +489,9 @@ var RefreshManager = {
             clearInterval(this.itv[i]);
         }
     },
-    restart: function(){
+    restart: function(getFirst){
         this.stop();
-        this.start();
+        this.start(getFirst);
     },
     refreshUser: function(user){
         for(var i in T_LIST[user.blogType]){
