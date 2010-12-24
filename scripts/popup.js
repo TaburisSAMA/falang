@@ -1855,7 +1855,16 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
     var t = $('#replyTextarea');
     t.focus().val('').blur();
     if(reTweetId && d && d.retweeted_status){
-        v = '//@' + userName + ':' + d.text;
+        if(user.blogType=='tqq'){
+            var data = $(ele).closest('li').find('.msgObjJson').text();
+            data = unescape(data);
+            try{
+                data = JSON.parse(data);
+                userName = data.user.name || userName;
+            }catch(err){
+            }
+        }
+        v = config.repost_delimiter + '@' + userName + ':' + d.text;
     } else {
     	v = '转发微博.';
     }

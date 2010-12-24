@@ -23,6 +23,7 @@ var sinaApi = {
 		support_upload: true, // 是否支持上传图片
 		support_repost: true, // 是否支持新浪形式转载
 		repost_pre: '转:', // 转发前缀
+        repost_delimiter: '//', //转发的分隔符
 		image_shorturl_pre: ' [图] ', // RT图片缩址前缀
 		support_favorites: true,
         support_geo: true, //是否支持地理位置信息上传
@@ -1195,6 +1196,7 @@ $.extend(TQQAPI, {
         support_favorites_max_id: true,
         reply_dont_need_at_screen_name: true, // @回复无需填充@screen_name 
         rt_at_name: true, // RT的@name而不是@screen_name
+        repost_delimiter: ' || ', //转发时的分隔符
 //        support_counts: false, // 只有rt_count这个，不过貌似有问题，总是404。暂时隐藏
         friends_timeline: '/statuses/home_timeline',
 
