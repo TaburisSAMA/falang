@@ -1606,6 +1606,20 @@ var VideoService = {
 		zol: {
 			url_re: /v\.zol\.com\.cn\/video(\w+)\.html/i,
 			tpl: '<embed height="400" width="460" wmode="opaque" allowfullscreen="false" allowscriptaccess="always" menu="false" swliveconnect="true" quality="high" bgcolor="#000000" src="http://v.zol.com.cn/meat_vplayer323.swf?movieId={{id}}&open_window=0&auto_start=1&show_ffbutton=1&skin=http://v.zol.com.cn/skin_black.swf" type="application/x-shockwave-flash">'
+		},
+		// http://v.ifeng.com/his/201012/00b4cb1a-7838-4846-aeaf-9967e3cdcd99.shtml
+		// http://v.ifeng.com/v/jiashumei/index.shtml#bcd47338-3558-4436-90ca-4e233fcbc37a
+		ifeng: {
+			url_re: /v\.ifeng\.com\/(.+?)\/([^\.\/]+)\./i,
+			format: function(matchs, url, ele) {
+				var re = /[A-F0-9]{8}(?:-[A-F0-9]{4}){3}-[A-Z0-9]{12}/i;
+				var m = re.exec(url);
+				if(m) {
+					matchs = m;
+				}
+				return matchs[matchs.length - 1];
+			},
+			tpl: '<embed src="http://v.ifeng.com/include/exterior.swf?guid={{id}}&pageurl=http://www.ifeng.com&fromweb=other&AutoPlay=true" quality="high"  allowScriptAccess="always" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" width="460" height="400"></embed>'
 		}
 	},
 	attempt: function(url, ele) {
@@ -1614,7 +1628,7 @@ var VideoService = {
 			if(service.url_re.test(url)) {
 				if(service.append) {
 					// 直接添加到后面
-					$(ele).after(this._format_tpl(service, url, ele));
+					$(ele).parent().after(this._format_tpl(service, url, ele));
 				} else {
 					var old_title = $(ele).attr('title');
 					var title = '左键点击预览';
@@ -1642,7 +1656,7 @@ var VideoService = {
 	},
 	show: function(name, url, ele) {
 		var service = this.services[name];
-		log(this._format_tpl(service, url, ele));
+//		log(this._format_tpl(service, url, ele));
 		popupBox.showVideo(url, this._format_tpl(service, url, ele));
 	}
 };
