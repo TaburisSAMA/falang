@@ -1128,9 +1128,15 @@ var ShortenUrl = {
 	},
 	// 还原
 	// http://urlexpand0-45.appspot.com/api?u=http://is.gd/imWyT
+	// MAX_INDEX => http://yongwo.de:1235/api?u=http://is.gd/imWyT&cb=foo
+	MAX_INDEX: 46,
 	expand: function(shorturl, callback, context) {
-		var index = Math.floor(Math.random() * 46);
-		var url = 'http://urlexpand' + index + '.appspot.com/api?u=' + shorturl;
+		var index = Math.floor(Math.random() * (this.MAX_INDEX + 1));
+		if(index == this.MAX_INDEX) {
+			var url = 'http://yongwo.de:1235/api?u=' + shorturl;
+		} else {
+			var url = 'http://urlexpand' + index + '.appspot.com/api?u=' + shorturl;
+		}
 		$.ajax({
 			url: url,
 			success: function(data, status, xhr) {
