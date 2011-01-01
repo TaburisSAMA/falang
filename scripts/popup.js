@@ -1535,11 +1535,11 @@ function sendReplyMsg(msg){
         userName = $("#ye_dialog_title").text();
     var user = getUser();
     var config = tapi.get_config(user);
+    var tweetId = $("#replyTweetId").val();
     // 判断是否需要填充 @screen_name
-    if(config.reply_dont_need_at_screen_name !== true) {
+    if(config.reply_dont_need_at_screen_name !== true || !tweetId) {
     	msg = userName + ' ' + msg;
     }
-    var tweetId = $("#replyTweetId").val();
     if(tweetId) {
     	data = {sina_id: tweetId}; // @回复
     } else {

@@ -3594,7 +3594,7 @@ $.extend(PlurkAPI, {
         support_cursor_only: true,  // 只支持游标方式翻页
         verify_credentials: '/Users/login',
         friends_timeline: '/Polling/getPlurks',
-        user_timeline: '/Timeline/getPlurks', // filter: Can be only_user
+        user_timeline: '/Timeline/getPlurks' // filter: Can be only_user
 	}),
 	
 	before_sendRequest: function(args) {
