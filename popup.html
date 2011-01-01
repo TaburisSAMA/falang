@@ -411,6 +411,7 @@
 				<div class="user_info" did="#{user.id}">
 					<div class="userName"><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" 
 							rhref="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?></a>
+						<a class="follow" href="javascript:" onclick="doReply(this, '#{user.screen_name}', '')">@</a>
 						<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">私</a>
 						<?js if(support_follow && user.unfollow === undefined && tType =='friends'){ ?>
 						<a class="follow" href="javascript:" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">取消关注</a>
