@@ -83,6 +83,7 @@ var sinaApi = {
         
         // 搜索
         search:               '/statuses/search',
+        user_search:               '/users/search',
         
         oauth_authorize: 	  '/oauth/authorize',
         oauth_request_token:  '/oauth/request_token',
@@ -914,6 +915,16 @@ var sinaApi = {
     	var params = {
             url: this.config.search,
             play_load: 'status',
+            data: data
+        };
+        this._sendRequest(params, callback);
+    },
+    
+    // q, page, count
+    user_search: function(data, callback) {
+    	var params = {
+            url: this.config.user_search,
+            play_load: 'user',
             data: data
         };
         this._sendRequest(params, callback);
@@ -2657,8 +2668,8 @@ $.extend(T163API, {
 					comments_count: data.comments_count,
 					user: {
 						id: data.in_reply_to_user_id,
-						screen_name: data.in_reply_to_screen_name,
-						name: data.in_reply_to_user_name
+						screen_name: data.in_reply_to_user_name,
+						name: data.in_reply_to_screen_name
 					}
 				};
 				data.retweeted_status.user = this.format_result_item(data.retweeted_status.user, 'user', args);
@@ -2672,8 +2683,8 @@ $.extend(T163API, {
 						comments_count: data.retweeted_status.comments_count,
 						user: {
 							id: data.root_in_reply_to_user_id,
-							screen_name: data.root_in_reply_to_screen_name,
-							name: data.root_in_reply_to_user_name
+							screen_name: data.root_in_reply_to_user_name,
+							name: data.root_in_reply_to_screen_name
 						}
 					};
 					delete data.root_in_reply_to_status_id;
