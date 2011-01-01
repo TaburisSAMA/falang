@@ -16,7 +16,8 @@ var SUPPORT_AUTH_TYPES = {
 	'twitter': ['oauth', 'baseauth'],
 	'douban': ['oauth'],
 	'buzz': ['oauth'],
-	'facebook': ['oauth']
+	'facebook': ['oauth'],
+	'plurk': ['baseauth']
 };
 
 var AUTH_TYPE_NAME = {

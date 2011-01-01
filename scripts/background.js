@@ -134,6 +134,7 @@ function checkTimeline(t, p, user_uniqueKey){
     	var popupView = getPopupView();
         var isFirstTime = false;
         var _key = user_uniqueKey + t + '_tweets';
+//        if(!tweets[_key] || tweets[_key].length == 0){
         if(!tweets[_key]){
             tweets[_key] = [];
             isFirstTime = true;//如果不存在，则为第一次获取微博

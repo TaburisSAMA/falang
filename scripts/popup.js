@@ -1008,7 +1008,7 @@ function getUserTimeline(screen_name, user_id, read_more) {
     	}
     	if(data) {
     		var sinaMsgs = data.items || data;
-        	if(support_cursor_only && data.next_cursor >= 0) {
+        	if(support_cursor_only && data.next_cursor) {
         		$tab.attr('cursor', data.next_cursor);
         	}
             if(sinaMsgs && sinaMsgs.length > 0){

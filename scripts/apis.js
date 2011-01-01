@@ -3582,6 +3582,122 @@ $.extend(FacebookAPI, {
 	}
 });
 
+// plurk: http://www.plurk.com/API/issueKey
+var PlurkAPI = $.extend({}, sinaApi);
+$.extend(PlurkAPI, {
+	config: $.extend({}, sinaApi.config, {
+		host: 'http://www.plurk.com/API',
+		source: '4e4QGBY94z6v3zvb2rvDqH8yzSccvk2D', 
+        result_format: '',
+        need_processMsg: false,
+        support_counts: false,
+        support_cursor_only: true,  // 只支持游标方式翻页
+        verify_credentials: '/Users/login',
+        friends_timeline: '/Polling/getPlurks',
+        user_timeline: '/Timeline/getPlurks', // filter: Can be only_user
+	}),
+	
+	before_sendRequest: function(args) {
+		// args.data.source => args.data.app_key
+		args.data.api_key = args.data.source;
+		delete args.data.source;
+		if(args.data.count) {
+			args.data.limit = args.data.count;
+			delete args.data.count;
+		}
+		if(args.url == this.config.friends_timeline) {
+			if(!args.data.since_id) {
+				args.url = this.config.user_timeline;
+			} else {
+				args.data.offset = args.data.since_id;
+				delete args.data.since_id;
+			}
+			args.is_friends_timeline = true;
+		}
+		if(args.data.cursor) {
+			args.data.offset = args.data.cursor;
+			// 如果是friends_timeline，获取旧数据需要user_timeline接口
+			if(args.is_friends_timeline) {
+				args.url = this.config.user_timeline;
+			}
+			delete args.data.cursor;
+		}
+		if(args.url == this.config.user_timeline) {
+//			args.data.filter = 'only_user';
+			delete args.data.screen_name;
+			delete args.data.id;
+		}
+	},
+	
+	apply_auth: function(url, args, user) {
+		// 登录的时候才需要认证数据
+		if(args.url == this.config.verify_credentials && user.authType == 'baseauth') {
+			args.data.username = user.userName;
+			args.data.password = user.password;
+		}
+	},
+	
+	format_result: function(data, play_load, args) {
+    	var items = data;
+    	var status_users = data.plurk_users || data.plurks_users;
+//    	delete data.plurk_users;
+    	if(args.url != this.config.verify_credentials && data && data.plurks) {
+    		items = data.plurks;
+    		data.items = items;
+    		delete data.plurks;
+    	}
+		if($.isArray(items)) {
+	    	for(var i in items) {
+	    		items[i].user = this.format_result_item(status_users[items[i].owner_id], 'user', args);
+	    		items[i] = this.format_result_item(items[i], play_load, args);
+	    	}
+	    	// 设置cursor
+    		if(items.length > 0) {
+    			// 需要去掉GMT才可以正确分页，奇怪
+    			data.next_cursor = new Date(items[items.length-1].created_at.replace(' GMT', '')).format("yyyy-M-dThh:mm:ss"); // 2009-6-20T21:55:34
+    			if(args.is_friends_timeline) {
+    				// 设置cursor_id
+    				items[0].cursor_id = new Date(items[0].created_at.replace(' GMT', '')).format("yyyy-M-dThh:mm:ss");
+    			}
+    		}
+	    } else {
+	    	data = this.format_result_item(data, play_load, args);
+	    }
+		return data;
+	},
+	
+	format_result_item: function(data, play_load, args) {
+		if(play_load == 'user' && data) {
+//			data.friends_count = data.fans_count;
+			data.followers_count = data.fans_count;
+			var user_info = data.user_info || data;
+			data.screen_name = user_info.display_name || user_info.full_name;
+			data.user_name = user_info.nick_name;
+			data.id = user_info.id;
+			data.gender = user_info.gender == 1 ? 'm' : (user_info.gender == 2 ? 'f' : 'n');
+			if(user_info.has_profile_image) {
+				if(user_info.avatar) {
+					data.profile_image_url = 'http://avatars.plurk.com/{{id}}-medium{{avatar}}.gif'.format(user_info);
+				} else {
+					data.profile_image_url = 'http://avatars.plurk.com/{{id}}-medium.gif'.format(user_info);
+				}
+			} else {
+				data.profile_image_url = 'http://www.plurk.com/static/default_medium.gif';
+			}
+//			data.statuses_count = '';
+		} else if(play_load == 'status') {
+			data.text = data.content;
+			data.id = data.plurk_id;
+			data.created_at = data.posted;
+			delete data.posted;
+			delete data.plurk_id;
+			delete data.content;
+			delete data.content_raw;
+		}
+		return data;
+	}
+});
+
 var T_APIS = {
 	'tsina': sinaApi,
 	'tqq': TQQAPI,
@@ -3596,6 +3712,7 @@ var T_APIS = {
 	'douban': DoubanAPI,
 	'buzz': BuzzAPI,
 	'facebook': FacebookAPI,
+	'plurk': PlurkAPI,
 	'twitter': TwitterAPI // fxxx gxfxw first.
 };
 
