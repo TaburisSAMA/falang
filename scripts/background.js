@@ -127,9 +127,10 @@ function checkTimeline(t, p, user_uniqueKey){
     		setLastCursor(data.next_cursor, t, user_uniqueKey);
     	}
     	if(!$.isArray(sinaMsgs)) {
-    		setDoChecking(user_uniqueKey, t, 'checking', false);
-    		hideLoading();
-    		return;
+    		sinaMsgs = [];
+//    		setDoChecking(user_uniqueKey, t, 'checking', false);
+//    		hideLoading();
+//    		return;
     	}
     	var popupView = getPopupView();
         var isFirstTime = false;
