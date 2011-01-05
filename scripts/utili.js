@@ -1636,7 +1636,7 @@ var VideoService = {
 		// http://www.xiami.com/widget/1_2112011/singlePlayer.swf
 		xiami: {
 			append: true, // 直接添加在链接后面
-			url_re: /xiami\.com\/song\/(\w+)/i,
+			url_re: /xiami\.com\/song\/(\d+)/i,
 			tpl: '<embed src="http://www.xiami.com/widget/1_{{id}}/singlePlayer.swf" type="application/x-shockwave-flash" width="257" height="33" wmode="transparent"></embed>'
 		},
 		

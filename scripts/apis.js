@@ -1256,6 +1256,20 @@ $.extend(TQQAPI, {
         }
 	}),
 	
+	_emotion_rex: new RegExp('\/(' + Object.keys(TQQ_EMOTIONS).join('|') + ')', 'g'),
+	processEmotional: function(str) {
+        return str.replace(this._emotion_rex, function(m, g1){
+	        if(window.TQQ_EMOTIONS && g1) {
+	        	var emotion = TQQ_EMOTIONS[g1];
+	            if(emotion) {
+	                var tpl = '<img title="{{title}}" src="http://mat1.gtimg.com/www/mb/images/face/{{emotion}}.gif" />';
+	                return tpl.format({title: g1, emotion: emotion});
+	            }
+	        }
+	        return m;
+	    });
+    },
+
 	// urlencode，子类覆盖是否需要urlencode处理
 	url_encode: function(text) {
 		return text;
