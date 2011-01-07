@@ -170,7 +170,12 @@ var sinaApi = {
         return "<span class=\"iphoneEmoji "+ str.charCodeAt(0).toString(16).toUpperCase()+"\"></span>";
     },
     processSearch: function (str) {
-        str = str.replace(/#([^#]+)#/g, '<a target="_blank" href="'+ this.config.search_url +'$1" title="Search #$1">#$1#</a>');
+    	var search_url = this.config.search_url;
+        str = str.replace(/#([^#]+)#/g, function(m, g1) {
+        	// 修复#xxx@xxx#嵌套问题
+        	var search = g1.remove_html_tag();
+        	return '<a target="_blank" href="'+ search_url + '{{search}}" title="Search #{{search}}">#{{search}}#</a>'.format({search: search});
+        });
         return str;
     },
     processAt: function (str) { //@***
@@ -1272,7 +1277,7 @@ $.extend(TQQAPI, {
     },
     
     processAt: function (str) { //@***
-        str = str.replace(/@([\w\-\_]+)/g, '<a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$1" title="左键查看微薄，右键打开主页">@$1</a>');
+        str = str.replace(/[^#]?@([\w\-\_]+)/g, '<a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$1" title="左键查看微薄，右键打开主页">@$1</a>');
 //        str = str.replace(/([^#])@([\w\-\_]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ this.config.user_home_url +'$2" title="左键查看微薄，右键打开主页">@$2</a>');
         return str;
     },
