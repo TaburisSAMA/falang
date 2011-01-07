@@ -2199,7 +2199,7 @@ function changeAlertMode(to_mode){
 //====>>>>
 //表情添加
 fawave.face = {
-    show: function($this, target_id){
+    show: function(ele, target_id){
         var f = $("#face_box");
         if(f.css('display')=='none' || $("#face_box_target_id").val()!=target_id){
         	// 初始化表情
@@ -2229,8 +2229,8 @@ fawave.face = {
         		$face_icons.attr('init_icons', true);
         	}
             $("#face_box_target_id").val(target_id);
-            var offset = $($this).offset();
-            f.css({"top":offset.top+20, "left":offset.left-25}).show();
+            var offset = $(ele).offset();
+            f.css({top: offset.top+20, left: offset.left}).show();
         }else{
             f.hide();
         }
@@ -2239,10 +2239,10 @@ fawave.face = {
         $("#face_box").hide();
         $("#face_box_target_id").val('');
     },
-    insert: function($this){
+    insert: function(ele){
         var target_textbox = $("#" + $("#face_box_target_id").val());
         if(target_textbox.length==1){
-            var tb = target_textbox[0], str = $($this).attr('value');
+            var tb = target_textbox[0], str = $(ele).attr('value');
             var newstart = tb.selectionStart+str.length;
             tb.value=tb.value.substr(0,tb.selectionStart)+str+tb.value.substring(tb.selectionEnd);
             tb.selectionStart = newstart;
