@@ -1256,7 +1256,8 @@ $.extend(TQQAPI, {
         }
 	}),
 	
-	_emotion_rex: new RegExp('\/(' + Object.keys(window.TQQ_EMOTIONS).join('|') + ')', 'g'),
+	//page.js里面调用的时候没有加载表情字典,所以需要判断
+	_emotion_rex: window.TQQ_EMOTIONS ? new RegExp('\/(' + Object.keys(window.TQQ_EMOTIONS).join('|') + ')', 'g') : null,
 	processEmotional: function(str) {
         return str.replace(this._emotion_rex, function(m, g1){
 	        if(window.TQQ_EMOTIONS && g1) {
