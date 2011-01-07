@@ -174,8 +174,8 @@ var sinaApi = {
         return str;
     },
     processAt: function (str) { //@***
-        str = str.replace(/^@([\w\-\u4e00-\u9fa5\_]+)/g, '<a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$1" title="左键查看微薄，右键打开主页">@$1</a>');
-        str = str.replace(/([^#])@([\w\-\u4e00-\u9fa5\_]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ this.config.user_home_url +'$2" title="左键查看微薄，右键打开主页">@$2</a>');
+        str = str.replace(/@([\w\-\u4e00-\u9fa5\_]+)/g, '<a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$1" title="左键查看微薄，右键打开主页">@$1</a>');
+//        str = str.replace(/([^#])@([\w\-\u4e00-\u9fa5\_]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ this.config.user_home_url +'$2" title="左键查看微薄，右键打开主页">@$2</a>');
         
         return str;
     },
@@ -1272,8 +1272,8 @@ $.extend(TQQAPI, {
     },
     
     processAt: function (str) { //@***
-        str = str.replace(/^@([\w\-\_]+)/g, '<a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$1" title="左键查看微薄，右键打开主页">@$1</a>');
-        str = str.replace(/([^#])@([\w\-\_]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ this.config.user_home_url +'$2" title="左键查看微薄，右键打开主页">@$2</a>');
+        str = str.replace(/@([\w\-\_]+)/g, '<a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$1" title="左键查看微薄，右键打开主页">@$1</a>');
+//        str = str.replace(/([^#])@([\w\-\_]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ this.config.user_home_url +'$2" title="左键查看微薄，右键打开主页">@$2</a>');
         return str;
     },
 
