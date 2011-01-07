@@ -170,14 +170,19 @@ function buildStatusHtml(statuses, t, c_user){
      	var buttons = {};
      	for(var key in BUTTON_TPLS) {
      		var tpl = BUTTON_TPLS[key];
-     		if(key.substring(0, 2) == 'rt') {
-     			if(!status.retweeted_status) {
+     		var map_status = status;
+     		if(key.substring(0, 4) == 'rtrt') {
+     			map_status = status.retweeted_status ? status.retweeted_status.retweeted_status: null;
+     			if(!map_status) {
      				tpl = '';
-     			} else if(key.substring(0, 4) == 'rtrt' && !status.retweeted_status.retweeted_status) {
+     			}
+ 			} else if(key.substring(0, 2) == 'rt') {
+     			map_status = status.retweeted_status;
+     			if(!map_status) {
      				tpl = '';
      			}
      		}
-     		if(tpl && key.endswith('MapBtn') && (!status.geo || !status.geo.coordinates || status.geo.coordinates[0] == '0.0')) {
+     		if(tpl && key.endswith('MapBtn') && (!map_status.geo || !map_status.geo.coordinates || map_status.geo.coordinates[0] == '0.0')) {
      			tpl = '';
  	        }
      		if(tpl) {
