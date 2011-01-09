@@ -45,6 +45,7 @@ body #fa_wave_msg_wrap .fawave_btns{
 	text-align: left;
 }
 body #fa_wave_msg_wrap a.fawave_logo img{
+	display: inline;
 	width:18px;
 	height:18px;
 	vertical-align: bottom;

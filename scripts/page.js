@@ -160,6 +160,10 @@ function fawaveFormatText(msg, values, filter) {
 String.prototype.format = function(data) {
 	return fawaveFormatText(this, data);
 };
+// 为字符串增加去除所有html tag和空白的字符的方法
+String.prototype.remove_html_tag = function() {
+	return this.replace(/(<.*?>|&nbsp;|\s)/ig, '');
+};
 /* 在页面上显示新信息 end */
 
 
