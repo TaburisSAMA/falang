@@ -1683,13 +1683,13 @@ $.extend(DiguAPI, {
 	}),
 
     processAt: function (str) { //@***
-        str = str.replace(/^@([\w\-\u4e00-\u9fa5|\_]+)/g, ' <a target="_blank" href="http://digu.com/search/friend/' +'$1" title="点击打开用户主页">@$1</a>');
+        str = str.replace(/^@([\w\-\u4e00-\u9fa5|\_]+)/g, '<a target="_blank" href="http://digu.com/search/friend/' +'$1" title="点击打开用户主页">@$1</a>');
         str = str.replace(/([^\w#])@([\w\-\u4e00-\u9fa5|\_]+)/g, '$1<a target="_blank" href="http://digu.com/search/friend/' +'$2" title="点击打开用户主页">@$2</a>');
         
         return str;
     },
     processSearch: function (str) {
-        str = str.replace(/(#|$)([\w\u4e00-\u9fa5|\_]+|$)/g, ' <a title="Search $1$2" href="' + this.config.search_url + '%23$2" target="_blank">$1$2</a>');
+        str = str.replace(/[^a-zA-Z0-9\/](#|$)([\w\u4e00-\u9fa5|\_]+|$)/g, '<a title="Search $1$2" href="' + this.config.search_url + '%23$2" target="_blank">$1$2</a>');
         //str = str.replace(/[^\w]#([\w\u4e00-\u9fa5|\_]+)/g, ' <a target="_blank" href="'+ this.config.search_url +'%23$1" title="Search #$1">#$1</a>');
         return str;
     },
