@@ -19,7 +19,8 @@ var sinaApi = {
         
         userinfo_has_counts: true, // 用户信息中是否包含粉丝数、微博数等信息
         support_counts: true, // 是否支持批量获取转发和评论数
-        support_comment: true, // 判断是否支持评论
+        support_comment: true, // 判断是否支持评论列表
+        support_do_comment: true, // 判断是否支持发送评论
 		support_upload: true, // 是否支持上传图片
 		support_repost: true, // 是否支持新浪形式转载
 		repost_pre: '转:', // 转发前缀
@@ -1209,6 +1210,7 @@ $.extend(TQQAPI, {
         // 竟然是通过get传递
         oauth_params_by_get: true,
         support_comment: false,
+        support_do_comment: false,
         support_favorites_max_id: true,
         reply_dont_need_at_screen_name: true, // @回复无需填充@screen_name 
         rt_at_name: true, // RT的@name而不是@screen_name
@@ -1619,6 +1621,7 @@ $.extend(DiguAPI, {
 		source: 'fawave', 
 	    source2: 'fawave',
 	    support_comment: false,
+	    support_do_comment: false,
 	    support_repost: false,
 	    support_max_id: false,
 	    support_sent_direct_messages: false,
@@ -1874,6 +1877,7 @@ $.extend(ZuosaAPI, {
 		source: 'fawave', 
 		repost_pre: 'ZT',
 	    support_comment: false,
+	    support_do_comment: false,
 	    support_repost: false,
 	    support_max_id: false,
 	    support_search_max_id: false,
@@ -2032,6 +2036,7 @@ $.extend(LeiHouAPI, {
 		source: 'fawave', 
 		repost_pre: 'RT',
 	    support_comment: false,
+	    support_do_comment: false,
 	    support_repost: false,
 	    
 		support_favorites: false,
@@ -2169,6 +2174,7 @@ $.extend(Follow5API, {
 	    support_search: false,
 	    support_max_id: false,
 	    support_comment: false,
+	    support_do_comment: false,
 	    support_repost: false,
 	    support_upload: false,
 
@@ -2312,6 +2318,7 @@ $.extend(TwitterAPI, {
         oauth_secret: 'MCskw4dW5dhWAYKGl3laRVTLzT8jTonOIOpmzEY',
         repost_pre: 'RT',
 	    support_comment: false,
+	    support_do_comment: false,
 	    support_repost: false,
 	    support_upload: false,
 	    oauth_callback: 'oob',
@@ -2410,6 +2417,7 @@ $.extend(FanfouAPI, {
 		source: 'fawave',
 		repost_pre: '转',
 	    support_comment: false,
+	    support_do_comment: false,
 	    support_repost: false,
 	    upload: '/photos/upload',
 	    search: '/search/public_timeline',
@@ -2751,6 +2759,7 @@ $.extend(RenjianAPI, {
 		host: 'http://api.renjian.com/v2',
 		source: 'FaWave', 
 		support_comment: false,
+		support_do_comment: false,
 		support_repost: true,
 	    support_search: false,
 		favorites: '/statuses/likes',
@@ -3171,7 +3180,7 @@ $.extend(DoubanAPI, {
         result_format: '', // 豆瓣由alt参数确定返回值格式
         
 		userinfo_has_counts: false, // 用户信息中是否包含粉丝数、微博数等信息
-        support_comment: true,
+        support_comment: false,
 		support_repost: false,
 		support_max_id: false,
 		support_favorites: false,
@@ -3402,6 +3411,7 @@ $.extend(FacebookAPI, {
         support_friends_only: true, // 只支持friends
         support_repost: false,
         support_comment: false,
+        support_do_comment: false,
         support_mentions: false,
         support_search: false,
         

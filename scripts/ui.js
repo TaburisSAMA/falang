@@ -20,7 +20,7 @@ function buildStatusHtml(statuses, t, c_user){
     }
     
     var config = tapi.get_config(c_user);
- 	var support_comment = config.support_comment;
+ 	var support_do_comment = config.support_do_comment;
  	var support_favorites = config.support_favorites;
  	var BUTTON_TPLS = {
         showMapBtn: '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'{{user.profile_image_url}}\', {{geo.coordinates[0]}}, {{geo.coordinates[1]}});" title="点击查看地理位置信息"><img src="images/mapspin2a.png"/></a>',
@@ -83,7 +83,7 @@ function buildStatusHtml(statuses, t, c_user){
     	BUTTON_TPLS.new_msgBtn = '';
     }
     // 不支持评论
-    if(!support_comment) {
+    if(!support_do_comment) {
         BUTTON_TPLS.commentBtn = BUTTON_TPLS.commentCounts = BUTTON_TPLS.rtCommentCounts = BUTTON_TPLS.rtCommentBtn = '';
     }
     
