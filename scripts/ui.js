@@ -154,6 +154,7 @@ function buildStatusHtml(statuses, t, c_user){
      	status.comments_btn = comments_btn;
      	status.rt_comments_count = status.rtrt_comments_count = '-';
      	if(status.retweeted_status && status.retweeted_status.user) {
+     		status.retweeted_status.repost_count = status.retweeted_status.repost_count === undefined ? '-' : status.retweeted_status.repost_count;
      		status.retweeted_status_screen_name = status.retweeted_status.user.screen_name;
      		status.retweeted_status_id = status.retweeted_status.id;
      		if(status.retweeted_status.rt_comments_count !== undefined) {
