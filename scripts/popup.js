@@ -2064,7 +2064,7 @@ function delFavorites(ele, screen_name, tweetId){//删除收藏
     var user = getUser();
     var t = getCurrentTab().replace('#','').replace(/_timeline$/i,'');
     tapi.favorites_destroy({id:tweetId, user:user}, function(data, textStatus){
-        if(textStatus != 'error' && data && !data.error && data.id){
+        if(textStatus != 'error' && data && !data.error){
             _a.after(_aHtml.replace('delFavorites','addFavorites')
                             .replace('favorites.gif','favorites_2.gif')
                             .replace('点击取消收藏','点击收藏'));

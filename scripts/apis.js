@@ -674,7 +674,7 @@ var sinaApi = {
 	    builder += 'Content-Type: '+ pic.file.type;
 	    builder += crlf;
 	    builder += crlf; 
-	
+
 	    var bb = new BlobBuilder(); //NOTE
 	    bb.append(builder);
 	    bb.append(pic.file);
@@ -3632,18 +3632,48 @@ $.extend(FacebookAPI, {
 
 // plurk: http://www.plurk.com/API/issueKey
 var PlurkAPI = $.extend({}, sinaApi);
+PlurkAPI._upload = PlurkAPI.upload;
 $.extend(PlurkAPI, {
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://www.plurk.com/API',
 		source: '4e4QGBY94z6v3zvb2rvDqH8yzSccvk2D', 
         result_format: '',
-        need_processMsg: false,
         support_counts: false,
+        support_mentions: false,
         support_cursor_only: true,  // 只支持游标方式翻页
         verify_credentials: '/Users/login',
+        update: '/Timeline/plurkAdd',
+        upload: '/Timeline/uploadPicture',
+        destroy: '/Timeline/plurkDelete',
+        favorites_create: '/Timeline/favoritePlurks',
+        favorites_destroy: '/Timeline/unfavoritePlurks',
         friends_timeline: '/Polling/getPlurks',
         user_timeline: '/Timeline/getPlurks' // filter: Can be only_user
 	}),
+	
+	url_encode: function(text) {
+		return text;
+	},
+	
+	format_upload_params: function(user, data, pic) {
+		data.api_key = data.source;
+		delete data.source;
+    	delete data.lat;
+    	delete data.long;
+    	pic.keyname = 'image';
+    },
+	
+	upload: function(user, params, pic, before_request, onprogress, callback) {
+		this._upload(user, {}, pic, before_request, onprogress, function(data) {
+			if(data && data.full) {
+				params.user = user;
+				params.status += ' ' + data.full;
+				this.update(params, callback);
+			} else {
+				callback(null, 'error');
+			}
+		}, this);
+	},
 	
 	before_sendRequest: function(args) {
 		// args.data.source => args.data.app_key
@@ -3652,6 +3682,19 @@ $.extend(PlurkAPI, {
 		if(args.data.count) {
 			args.data.limit = args.data.count;
 			delete args.data.count;
+		}
+		if(args.url == this.config.update) {
+			args.data.content = args.data.status;
+			delete args.data.status;
+			args.data.qualifier = ':';
+		}
+		if(args.url == this.config.destroy) {
+			args.data.plurk_id = args.data.id;
+			delete args.data.id;
+		}
+		if(args.url == this.config.favorites_create || args.url == this.config.favorites_destroy) {
+			args.data.ids = '[' + args.data.id + ']';
+			delete args.data.id;
 		}
 		if(args.url == this.config.friends_timeline) {
 			if(!args.data.since_id) {
@@ -3686,6 +3729,9 @@ $.extend(PlurkAPI, {
 	},
 	
 	format_result: function(data, play_load, args) {
+		if(data.success_text == 'ok') {
+			return true;
+		}
     	var items = data;
     	var status_users = data.plurk_users || data.plurks_users;
 //    	delete data.plurk_users;
@@ -3714,6 +3760,10 @@ $.extend(PlurkAPI, {
 		return data;
 	},
 	
+	STATUS_IMAGE_RE: /\[img\|\|([^\|]+)\|\|([^\|]+)\|\|[^\]]+\]/i,
+	// http://images.plurk.com/7599513_960138cc109c460ada4fc26195dcf79f.jpg
+	STATUS_IMAGE_RE2: /http:\/\/images\.plurk\.com\/([\w\_\-]+)\.\w+/i,
+	
 	format_result_item: function(data, play_load, args) {
 		if(play_load == 'user' && data) {
 //			data.friends_count = data.fans_count;
@@ -3734,7 +3784,23 @@ $.extend(PlurkAPI, {
 			}
 //			data.statuses_count = '';
 		} else if(play_load == 'status') {
-			data.text = data.content;
+			data.text = data.content_raw; // + '<hr />' + data.content;
+			// [img||http://images.plurk.com/tn_bce71a811306b51d7c6a4d09c824716d.gif||http://icanhascheezburger.files.wordpress.com/2011/01/8d541dd8-5efd-48be-b72a-cc777e57ded6.jpg||http://feedproxy.google.com/~r/ICanHasCheezburger/~3/43qwiPfzKOY/||comic]
+			var m = this.STATUS_IMAGE_RE.exec(data.text);
+			if(m) {
+				data.original_pic = m[2];
+				data.thumbnail_pic = m[1];
+				data.bmiddle_pic = m[2];
+				data.text = data.text.replace(m[0], '');
+			} else {
+				m = this.STATUS_IMAGE_RE2.exec(data.text);
+				if(m) {
+					data.original_pic = m[0];
+					data.thumbnail_pic = 'http://images.plurk.com/tn_' + m[1] + '.gif';
+					data.bmiddle_pic = m[0];
+					data.text = data.text.replace(m[0], '');
+				}
+			}
 			data.id = data.plurk_id;
 			data.created_at = data.posted;
 			delete data.posted;
