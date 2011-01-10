@@ -2421,6 +2421,7 @@ $.extend(FanfouAPI, {
 	    support_repost: false,
 	    upload: '/photos/upload',
 	    search: '/search/public_timeline',
+	    favorites_create: '/favorites/create/{{id}}',
 
         gender_map:{"男":'m', '女':'f'}
 	}),
