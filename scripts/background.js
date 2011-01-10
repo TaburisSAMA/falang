@@ -646,22 +646,6 @@ chrome.contextMenus.create({"title": "通过FaWave发送",
 	"onclick": function(info, tab) {
 		var text = info.selectionText;
 		var link = info.linkUrl || info.srcUrl || info.frameUrl || info.pageUrl;
-		if(info.srcUrl == link) {
-			var split = '';
-			if(info.mediaType == 'image') {
-				split = '[图]';
-			} else if(info.mediaType == 'video') {
-				split = '[视频]';
-			} else if(info.mediaType == 'audio') {
-				split = '[音乐]';
-			}
-			link = split + link;
-		}
-		if(!text) {
-			text = link;
-		} else {
-			text += ' ' + link;
-		}
-        chrome.tabs.sendRequest(tab.id, {method:'showSendQuickMessage', text: text});
+        chrome.tabs.sendRequest(tab.id, {method:'showSendQuickMessage', text: text, link: link});
 	}
 });

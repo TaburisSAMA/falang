@@ -24,8 +24,25 @@ var methodManager = {
         }
         //注意下面三句的顺序，不能乱
         var text = request.text;
+        var link = request.link;
+        if(!text) {
+        	text = link;
+        } else if(link) {
+        	text += ' ' + link;
+        }
         $("#fawaveTxtContentInp").focus();
-        if(text){ $("#fawaveTxtContentInp").val(text); }
+        if(text){ 
+        	$("#fawaveTxtContentInp").val(text); 
+        }
+        fawaveCountInputText();
+        if(link) {
+        	chrome.extension.sendRequest({method:'shortenUrl', long_url:link}, function(response){
+	            if(response.short_url){
+	                $("#fawaveTxtContentInp").val($("#fawaveTxtContentInp").val().replace(link, response.short_url));
+	                fawaveCountInputText();
+	            }
+	        });
+        }
 	},
     showNewMsgInPage: function(request, sender, sendResponse){
         if(window.fawave_not_alert){ return; }
