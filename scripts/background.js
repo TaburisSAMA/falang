@@ -641,7 +641,7 @@ r_method_manager = {
 
 
 // contextMenus, 右键快速发送微博
-chrome.contextMenus.create({"title": "通过FaWave发送", 
+chrome.contextMenus.create({"title": "通过FaWave分享", 
 	"contexts": ['all'],
 	"onclick": function(info, tab) {
 		var text = info.selectionText;
