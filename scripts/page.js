@@ -10,6 +10,23 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 });
 
 var methodManager = {
+	showSendQuickMessage: function(request, sender, sendResponse) {
+		fawaveInitTemplate();
+		var fsw = $("#fawaveSendMsgWrap");
+        if(fsw.css('display')=='none'){
+            //更新用户列表，避免切换用户或者修改用户列表
+            chrome.extension.sendRequest({method:'getQuickSendInitInfos'}, function(response){
+                CURRENT_USER = response.c_user;
+                USER_LIST = response.userList;
+                initSelectSendAccounts();
+            });
+            fsw.show();
+        }
+        //注意下面三句的顺序，不能乱
+        var text = request.text;
+        $("#fawaveTxtContentInp").focus();
+        if(text){ $("#fawaveTxtContentInp").val(text); }
+	},
     showNewMsgInPage: function(request, sender, sendResponse){
         if(window.fawave_not_alert){ return; }
         if(request.msgs && request.msgs.length>0){
