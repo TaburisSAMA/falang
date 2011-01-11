@@ -2536,6 +2536,7 @@ $.extend(T163API, {
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://api.t.163.com',
+		user_home_url: 'http://t.163.com/n/',
 		search_url: 'http://t.163.com/tag/',
 		source: 'cXU8SDfNTtF0esHy', // 需要申请
 		oauth_key: 'cXU8SDfNTtF0esHy',
