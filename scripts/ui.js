@@ -21,7 +21,7 @@ function buildStatusHtml(statuses, t, c_user){
     
     var config = tapi.get_config(c_user);
  	var support_do_comment = config.support_do_comment;
- 	var support_favorites = config.support_favorites;
+ 	var support_do_favorite = config.support_do_favorite;
  	var BUTTON_TPLS = {
         showMapBtn: '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'{{user.profile_image_url}}\', {{geo.coordinates[0]}}, {{geo.coordinates[1]}});" title="点击查看地理位置信息"><img src="images/mapspin2a.png"/></a>',
         delTweetBtn: '<a class="deltweet" href="javascript:void(0);" onclick="doDelTweet(\'{{id}}\', this);" title="点击删除微博">删</a>',
@@ -62,7 +62,7 @@ function buildStatusHtml(statuses, t, c_user){
     };
  	
  	// 不支持收藏
-    if(!support_favorites) {
+    if(!support_do_favorite) {
     	BUTTON_TPLS.addFavoritesMsgBtn = BUTTON_TPLS.delFavoritesMsgBtn = '';
     }
     // 不支持repost(转发)

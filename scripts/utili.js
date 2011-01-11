@@ -1270,6 +1270,33 @@ var Instagram = {
 	}
 };
 
+var Flickr = {
+	host: 'www.flickr.com',
+	url_re: /http:\/\/www\.flickr\.com\/photos\/\w+/i,
+	src_re: /<link\srel\=\"image\_src\"\shref\=\"([^\"]+)\"/i,
+	get: function(url, callback) {
+		$.ajax({
+			url: url,
+			success: function(html, status, xhr) {
+				// <link rel="image_src" href="http://farm6.static.flickr.com/5044/5345477530_171cfe59db_m.jpg">
+				var m = Flickr.src_re.exec(html);
+				if(m) {
+					var src = m[1];
+					var pics = {
+						thumbnail_pic: src.replace('_m.', '_s.'),
+						bmiddle_pic: src,
+						original_pic: src.replace('_m.', '.')
+					};
+					callback(pics);
+				}
+			},
+			error: function() {
+				callback(null);
+			}
+		});
+	}
+};
+
 
 // http://dev.twitpic.com/
 // http://dev.twitpic.com/docs/thumbnails/
@@ -1546,7 +1573,8 @@ var ImageService = {
 		Yfrog: Yfrog,
 		Twitgoo: Twitgoo,
 		MobyPicture: MobyPicture,
-		Twipple: Twipple
+		Twipple: Twipple,
+		Flickr: Flickr
 	},
 	
 	attempt: function(url, ele) {

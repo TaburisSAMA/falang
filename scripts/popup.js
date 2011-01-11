@@ -1246,13 +1246,13 @@ function showComments(ele, tweetId, page, notHide){
         }
         showLoading();
         var user = getUser();
-        var data = {id:tweetId, count:COMMENT_PAGE_SIZE, user:user};
+        var params = {id:tweetId, count:COMMENT_PAGE_SIZE, user:user};
         if(page) {
-        	data.page = page;
+        	params.page = page;
         } else {
         	page = 1;
         }
-        tapi.comments(data, function(data, textStatus){
+        tapi.comments(params, function(data, textStatus){
         	data = data || {};
         	var comments = data.items || data;
             if(comments){
@@ -1264,17 +1264,23 @@ function showComments(ele, tweetId, page, notHide){
                     }
                     commentWrap.children('.comment_list').html(_html);
                     commentWrap.show();
-                    if(page<2){
-                        commentWrap.find('.comment_paging a:eq(0)').hide();
-                    }else{
-                        commentWrap.find('.comment_paging a:eq(0)').show();
+                    // 如果明确显示没有下一页，则不显示分页按钮
+                    if(data.has_next !== false) {
+                    	if(page<2){
+	                        commentWrap.find('.comment_paging a:eq(0)').hide();
+	                    }else{
+	                        commentWrap.find('.comment_paging a:eq(0)').show();
+	                    }
+	                    if(comments.length < COMMENT_PAGE_SIZE){
+	                        commentWrap.find('.comment_paging a:eq(1)').hide();
+	                    }else{
+	                        commentWrap.find('.comment_paging a:eq(1)').show();
+	                    }
+	                    commentWrap.find('.comment_paging').attr('page',page).show();
                     }
-                    if(comments.length < COMMENT_PAGE_SIZE){
-                        commentWrap.find('.comment_paging a:eq(1)').hide();
-                    }else{
-                        commentWrap.find('.comment_paging a:eq(1)').show();
+                    if(data.comment_count) {
+                    	$(ele).html(data.comment_count);
                     }
-                    commentWrap.find('.comment_paging').attr('page',page).show();
                 }else{
                     if(page==1){
                         commentWrap.find('.comment_paging').hide();

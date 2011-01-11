@@ -26,7 +26,8 @@ var sinaApi = {
 		repost_pre: '转:', // 转发前缀
         repost_delimiter: '//', //转发的分隔符
 		image_shorturl_pre: ' [图] ', // RT图片缩址前缀
-		support_favorites: true,
+		support_favorites: true, // 判断是否支持收藏列表
+		support_do_favorite: true, // 判断是否支持收藏功能
         support_geo: true, //是否支持地理位置信息上传
 		// 是否支持max_id 分页
 		support_max_id: true,
@@ -1151,7 +1152,7 @@ var sinaApi = {
 									r = r.error;
                             	}
                             	var error_code = r.error_code || r.code || r.type;
-                            	r.error = this.format_error(r.error || r.wrong || r.message, error_code);
+                            	r.error = this.format_error(r.error || r.wrong || r.message || r.error_text, error_code);
 		                    	var error_msg = callmethod + ' error: ' + r.error;
 		                    	if(!r.error && error_code){ // 错误为空，才显示错误代码
 		                    		error_msg += ', error_code: ' + error_code;
@@ -2040,6 +2041,7 @@ $.extend(LeiHouAPI, {
 	    support_repost: false,
 	    
 		support_favorites: false,
+		support_do_favorite: false,
 		support_destroy_msg: false,
 	
 	    upload: '/statuses/update',
@@ -2705,7 +2707,8 @@ $.extend(T163API, {
 					user: {
 						id: data.in_reply_to_user_id,
 						screen_name: data.in_reply_to_user_name,
-						name: data.in_reply_to_screen_name
+						name: data.in_reply_to_screen_name,
+						profile_image_url: 'http://mimg.126.net/p/butter/1008031648/img/face_big.gif'
 					}
 				};
 				data.retweeted_status.user = this.format_result_item(data.retweeted_status.user, 'user', args);
@@ -2720,7 +2723,8 @@ $.extend(T163API, {
 						user: {
 							id: data.root_in_reply_to_user_id,
 							screen_name: data.root_in_reply_to_user_name,
-							name: data.root_in_reply_to_screen_name
+							name: data.root_in_reply_to_screen_name,
+							profile_image_url: 'http://mimg.126.net/p/butter/1008031648/img/face_big.gif'
 						}
 					};
 					delete data.root_in_reply_to_status_id;
@@ -3186,6 +3190,7 @@ $.extend(DoubanAPI, {
 		support_repost: false,
 		support_max_id: false,
 		support_favorites: false,
+		support_do_favorite: false,
 		support_mentions: false,
 		support_upload: false,
 		need_processMsg: false,
@@ -3640,15 +3645,27 @@ $.extend(PlurkAPI, {
 		source: '4e4QGBY94z6v3zvb2rvDqH8yzSccvk2D', 
         result_format: '',
         support_counts: false,
+        support_comment: false,
+        support_direct_messages: false,
+        support_repost: false,
         support_mentions: false,
         support_cursor_only: true,  // 只支持游标方式翻页
         verify_credentials: '/Users/login',
         update: '/Timeline/plurkAdd',
         upload: '/Timeline/uploadPicture',
         destroy: '/Timeline/plurkDelete',
+        favorites: '/Timeline/getPlurks?filter=only_favorite',
         favorites_create: '/Timeline/favoritePlurks',
         favorites_destroy: '/Timeline/unfavoritePlurks',
         friends_timeline: '/Polling/getPlurks',
+        followers: '/FriendsFans/getFansByOffset',
+        friends: '/FriendsFans/getFollowingByOffset',
+        friendships_create: '/FriendsFans/setFollowing?user_id={{id}}&follow=true',
+        friendships_destroy: '/FriendsFans/setFollowing?user_id={{id}}&follow=false',
+        comment: '/Responses/responseAdd',
+        comment_destroy: '/Responses/responseDelete',
+        comments: '/Responses/get',
+        search: '/PlurkSearch/search',
         user_timeline: '/Timeline/getPlurks' // filter: Can be only_user
 	}),
 	
@@ -3719,6 +3736,28 @@ $.extend(PlurkAPI, {
 			delete args.data.screen_name;
 			delete args.data.id;
 		}
+		if(args.url == this.config.followers || args.url == this.config.friends) {
+			delete args.data.screen_name;
+			delete args.data.limit;
+			if(args.data.offset && String(args.data.offset) == '-1') {
+				args.data.offset = 0;
+			}
+		}
+		if(args.url == this.config.comments) {
+			args.data.plurk_id = args.data.id;
+			delete args.data.id;
+		}
+		if(args.url == this.config.comment) {
+			args.data.plurk_id = args.data.id;
+			args.data.content = args.data.comment;
+			args.data.qualifier = ':';
+			delete args.data.comment;
+			delete args.data.id;
+		}
+		if(args.url == this.config.search) {
+			args.data.query = args.data.q;
+			delete args.data.q;
+		}
 	},
 	
 	apply_auth: function(url, args, user) {
@@ -3734,25 +3773,43 @@ $.extend(PlurkAPI, {
 			return true;
 		}
     	var items = data;
-    	var status_users = data.plurk_users || data.plurks_users;
-//    	delete data.plurk_users;
-    	if(args.url != this.config.verify_credentials && data && data.plurks) {
-    		items = data.plurks;
+    	var status_users = data.plurk_users || data.plurks_users || data.friends || data.users;
+    	delete data.plurk_users;
+    	delete data.plurks_users;
+    	delete data.friends;
+    	delete data.users;
+    	if(args.url != this.config.verify_credentials && data && (data.plurks || data.responses)) {
+    		items = data.plurks || data.responses;
     		data.items = items;
     		delete data.plurks;
+    		delete data.responses;
     	}
 		if($.isArray(items)) {
 	    	for(var i in items) {
-	    		items[i].user = this.format_result_item(status_users[items[i].owner_id], 'user', args);
+	    		if(play_load == 'status' || play_load == 'comment') {
+	    			items[i].user = this.format_result_item(status_users[String(items[i].owner_id || items[i].user_id)], 'user', args);
+	    		}
 	    		items[i] = this.format_result_item(items[i], play_load, args);
 	    	}
 	    	// 设置cursor
     		if(items.length > 0) {
-    			// 需要去掉GMT才可以正确分页，奇怪
-    			data.next_cursor = new Date(items[items.length-1].created_at.replace(' GMT', '')).format("yyyy-M-dThh:mm:ss"); // 2009-6-20T21:55:34
-    			if(args.is_friends_timeline) {
-    				// 设置cursor_id
-    				items[0].cursor_id = new Date(items[0].created_at.replace(' GMT', '')).format("yyyy-M-dThh:mm:ss");
+    			if(args.url == this.config.followers || args.url == this.config.friends) {
+    				data = {items: items};
+    				var last_offset = Number(args.data.offset || 0);
+    				data.next_cursor = last_offset + items.length;
+    			} else {
+    				// 需要去掉GMT才可以正确分页，奇怪
+    				if(items[items.length-1].created_at) {
+    					data.next_cursor = new Date(items[items.length-1].created_at.replace(' GMT', '')).format("yyyy-M-dThh:mm:ss"); // 2009-6-20T21:55:34
+    				}
+	    			if(args.is_friends_timeline) {
+	    				// 设置cursor_id
+	    				items[0].cursor_id = new Date(items[0].created_at.replace(' GMT', '')).format("yyyy-M-dThh:mm:ss");
+	    			}
+	    			if(args.url == this.config.comments) {
+	    				data.has_next = false;
+	    				data.comment_count = data.response_count;
+	    			}
     			}
     		}
 	    } else {
@@ -3770,7 +3827,7 @@ $.extend(PlurkAPI, {
 //			data.friends_count = data.fans_count;
 			data.followers_count = data.fans_count;
 			var user_info = data.user_info || data;
-			data.screen_name = user_info.display_name || user_info.full_name;
+			data.screen_name = user_info.display_name || user_info.nick_name;
 			data.user_name = user_info.nick_name;
 			data.id = user_info.id;
 			data.gender = user_info.gender == 1 ? 'm' : (user_info.gender == 2 ? 'f' : 'n');
@@ -3806,6 +3863,11 @@ $.extend(PlurkAPI, {
 			data.created_at = data.posted;
 			delete data.posted;
 			delete data.plurk_id;
+			delete data.content;
+			delete data.content_raw;
+		} else if(play_load == 'comment') {
+			data.text = data.content_raw;
+			data.created_at = data.posted;
 			delete data.content;
 			delete data.content_raw;
 		}

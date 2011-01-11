@@ -192,16 +192,19 @@
 	<div id="msgInfoWarp" style=""></div>
 	<!-- 表情选择 -->
 	<div id="face_box" class="layerBox" style="width:360px;display:none;">
-	<div class="layerBoxCon1" style="width:360px">
-	<div class="faceItem clearFix">
-	<div class="layerArrow"></div>
-	<div class="layerMedia_close">
-	<a class="close" href="javascript:void(fawave.face.hide())" title="关闭"></a>
+		<div class="layerBoxCon1" style="width:360px">
+			<div class="faceItem clearFix">
+				<div class="layerArrow"></div>
+				<div class="layerMedia_close">
+					<a class="close" href="javascript:void(fawave.face.hide())" title="关闭"></a>
+				</div>
+				<div class="faceItemPicbg">
+					<ul id="face_icons">
+					</ul>
+				</div>
+			</div>
+		</div>
 	</div>
-	<div class="faceItemPicbg">
-	<ul id="face_icons">
-	</ul>
-	</div></div></div></div>
 	<input id="face_box_target_id" type="hidden" value="" />
 	<!-- 表情选择 End -->
 
@@ -425,6 +428,8 @@
 					 <?js if(user.province){ ?>
                           #{provinces[user.province] ? provinces[user.province].name : user.province}, 
                           #{provinces[user.province] ? provinces[user.province]["citys"][user.city] : user.city}
+                     <?js } else if(user.location){ ?>
+                     	#{user.location}
                      <?js } ?>
                     </p>
 					<p>关注: <span><a href="javascript:showFollowers('friends', '#{user.screen_name}', '#{user.id}');">#{user.friends_count == undefined ? '查看': user.friends_count}</a></span>个　
