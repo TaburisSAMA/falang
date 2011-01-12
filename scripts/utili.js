@@ -1700,7 +1700,7 @@ var VideoService = {
 				if(service.append) {
 					// 直接添加到后面
 					if($(ele).parent().find('.embed_insert').length == 0) {
-						$(ele).parent().append('<div class="embed_insert">' + this._format_tpl(service, url, ele) + '</div>');
+						$(ele).parent().append('<div class="embed_insert">' + this.format_tpl(service, url, ele) + '</div>');
 					}
 				} else {
 					var old_title = $(ele).attr('title');
@@ -1710,14 +1710,14 @@ var VideoService = {
 					}
 					$(ele).attr('rhref', url).attr('title', title).attr('href', 'javascript:void(0);').attr('videoType', name).click(function() {
 						VideoService.show($(this).attr('videoType'), $(this).attr('rhref'), this);
-					});
+					}).after(' [<a onclick="VideoService.popshow(this);" href="javascript:void(0);" title="弹出独立窗口播放"><img src="images/external_link.png" />播</a>]');
 				}
 				return true;
 			}
 		}
 		return false;
 	},
-	_format_tpl: function(service, url, ele) {
+	format_tpl: function(service, url, ele) {
 		var matchs = service.url_re.exec(url);
 		var id = null;
 		if(service.format) {
@@ -1729,8 +1729,13 @@ var VideoService = {
 	},
 	show: function(name, url, ele) {
 		var service = this.services[name];
-//		log(this._format_tpl(service, url, ele));
-		popupBox.showVideo(url, this._format_tpl(service, url, ele));
+		popupBox.showVideo(url, this.format_tpl(service, url, ele));
+	},
+	popshow: function(ele) {
+		var l = (window.screen.availWidth-510)/2;
+		var $this = $(ele).prev();
+		var url = 'popshow.html?vtype=' + $this.attr('videoType') + '&url=' + $this.attr('rhref');
+    	window.open(url, '_blank', 'left=' + l + ',top=30,width=460,height=400,menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
 	}
 };
 
