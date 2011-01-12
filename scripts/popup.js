@@ -1890,10 +1890,15 @@ function doComment(ele, userName, userId, tweetId, replyUserName, replyUserId, c
     $('#ye_dialog_title').html('评论@' + userName + ' 的信息');
     $('#ye_dialog_window').show();
     var _txt = replyUserName ? ('回复 @'+replyUserName+':') : '';
-    //var _txt = '';
-
-    $('#chk_sendOneMore').attr("checked", false).val(tweetId).show();
-    $('#txt_sendOneMore').text('同时发一条微博').show();
+    var user = getUser();
+	var config = tapi.get_config(user);
+	if(config.support_repost) { // 支持repost才显示
+		$('#chk_sendOneMore').attr("checked", false).val(tweetId).show();
+    	$('#txt_sendOneMore').text('同时转发一条微博').show();
+	} else {
+		$('#chk_sendOneMore').val('').hide();
+    	$('#txt_sendOneMore').text('').hide();
+	}
     $('#chk_sendOneMore2').val('').hide();
     $('#txt_sendOneMore2').text('').hide();
 
