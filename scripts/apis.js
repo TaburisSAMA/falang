@@ -2550,6 +2550,7 @@ $.extend(T163API, {
         support_repost: false,
         support_search_max_id: false,
         support_favorites_max_id: true,
+        repost_pre: 'RT', // 转发前缀
         
         favorites: '/favorites/{{id}}',
         favorites_create: '/favorites/create/{{id}}',
@@ -3694,6 +3695,7 @@ $.extend(PlurkAPI, {
         support_repost: false,
         support_mentions: false,
         support_cursor_only: true,  // 只支持游标方式翻页
+        repost_pre: 'RT', // 转发前缀
         verify_credentials: '/Users/login',
         update: '/Timeline/plurkAdd',
         upload: '/Timeline/uploadPicture',
