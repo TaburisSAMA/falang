@@ -11,12 +11,16 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			var params = decodeForm(window.location.search);
+			$('#url').attr('href', params.url).html('[' + params.vtype + '] ' + params.url);
 			$('#content').html(VideoService.format_tpl(VideoService.services[params.vtype], params.url, '#content'));
 		});
 	</script>
  </head>
  <body style="margin:0 auto;">
-	<div id="content"></div>
+ 	<a id="url"></a>
+ 	<br />
+	<div id="content">
+	</div>
 	<script type="text/javascript">
 		var _gaq = _gaq || [];
 		 _gaq.push(['_setAccount', 'UA-19689660-1']);

@@ -1709,10 +1709,11 @@ var VideoService = {
 					if(old_title) {
 						title += ', ' + old_title;
 					}
-					$(ele).attr('rhref', url).attr('title', title).attr('href', 'javascript:void(0);').attr('videoType', name).click(function() {
+					$(ele).attr('rhref', url).attr('title', title).attr('href', 'javascript:void(0);').click(function() {
 						VideoService.show($(this).attr('videoType'), $(this).attr('rhref'), this);
-					}).after(' [<a onclick="VideoService.popshow(this);" href="javascript:void(0);" title="弹出独立窗口播放"><img src="images/external_link.png" />播</a>]');
+					});
 				}
+				$(ele).attr('videoType', name).after(' [<a onclick="VideoService.popshow(this);" href="javascript:void(0);" title="弹出独立窗口播放"><img src="images/external_link.png" />播</a>]');
 				return true;
 			}
 		}
@@ -1734,9 +1735,11 @@ var VideoService = {
 	},
 	popshow: function(ele) {
 		var l = (window.screen.availWidth-510)/2;
-		var $this = $(ele).prev();
-		var url = 'popshow.html?vtype=' + $this.attr('videoType') + '&url=' + $this.attr('rhref');
-    	window.open(url, '_blank', 'left=' + l + ',top=30,width=460,height=400,menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
+		var $this = $(ele).prev('a');
+		var vtype = $this.attr('videoType');
+		var url = 'popshow.html?vtype=' + vtype + '&url=' + ($this.attr('rhref') || $this.attr('href'));
+		var width_height = vtype == 'xiami' ? 'width=300,height=50': 'width=460,height=420';
+    	window.open(url, '_blank', 'left=' + l + ',top=30,' + width_height + ',menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
 	}
 };
 
