@@ -562,7 +562,7 @@ function refreshAccountWarp(user, stat){
                     c_user.uniqueKey = (c_user.blogType||'tsina') + '_' + c_user.id;
                 }
                 $.each(userlist, function(index, item){
-                	if(c_user.uniqueKey.toLowerCase() == item.uniqueKey){
+                	if(c_user.uniqueKey.toLowerCase() == item.uniqueKey.toLowerCase()){
                 		c_user = item;
                 		return false;
                 	}
