@@ -2609,6 +2609,9 @@ $.extend(T163API, {
 				args.data.user_id = args.data.id;
 				delete args.data.id;
 				delete args.data.screen_name;
+			} else {
+				args.data.name = args.data.screen_name;
+				delete args.data.screen_name;
 			}
 		} else if(args.url == this.config.comment || args.url == this.config.reply) {
 			args.data.in_reply_to_status_id = args.data.id;
