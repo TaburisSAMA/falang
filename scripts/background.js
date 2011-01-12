@@ -552,7 +552,10 @@ function refreshAccountWarp(user, stat){
         }
         if((stat.errorCount + stat.successCount) == stat.userList.length){
         	// 全部刷新完，更新
-            saveUserList(stat.userList);
+        	//为防止在刷新用户信息的过程中，修改了用户信息
+        	var userlist = getUserList('all');
+        	$.extend(userlist, stat.userList);
+            saveUserList(userlist);
             var c_user = getUser();
             if(c_user){
                 if(!c_user.uniqueKey){ //兼容单微博版本
