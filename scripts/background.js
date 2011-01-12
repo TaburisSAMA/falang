@@ -561,7 +561,7 @@ function refreshAccountWarp(user, stat){
                 if(!c_user.uniqueKey){ //兼容单微博版本
                     c_user.uniqueKey = (c_user.blogType||'tsina') + '_' + c_user.id;
                 }
-                $.each(stat.userList, function(index, item){
+                $.each(userlist, function(index, item){
                 	if(c_user.uniqueKey.toLowerCase() == item.uniqueKey){
                 		c_user = item;
                 		return false;
