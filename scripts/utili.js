@@ -1647,13 +1647,14 @@ var VideoService = {
 		},
 		// http://www.youtube.com/v/A6vXOZbzBYY?fs=1
 		// http://youtu.be/A6vXOZbzBYY
+		// http://www.youtube.com/watch?v=x9S37QbWYJc&feature=player_embedded
 		youtube: {
-			url_re: /(youtube\.com|youtu\.be)\/(.+?\/)?(\w+)/i,
+			url_re: /(?:(?:youtu\.be\/(\w+))|(?:youtube\.com\/watch\?v=(\w+)))/i,
 			format: function(matchs, url, ele) {
 				if(url.indexOf('youtube.com/das_captcha') >= 0) {
 					matchs = this.url_re.exec($(ele).html());
 				}
-				var id = matchs[3];
+				var id = matchs[1] || matchs[2];
 				return id;
 			},
 			tpl: '<embed src="http://www.youtube.com/v/{{id}}?fs=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="460" height="400"></embed>'
