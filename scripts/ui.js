@@ -115,7 +115,7 @@ function buildStatusHtml(statuses, t, c_user){
     	BUTTON_TPLS.rtOretweetBtn = BUTTON_TPLS.oretweetBtn = '';
     } else if(c_user.blogType == 't163') {
     	BUTTON_TPLS.rtOretweetBtn = '<a href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'{{retweeted_status.user.screen_name}}\',\'{{retweeted_status.id}}\');" title="163转发">转发</a>';
-    	BUTTON_TPLS.oretweetBtn = '<a href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'{{user.screen_name}}\',\'{{id}}\');" title="163转发">转发</a>';
+    	BUTTON_TPLS.oretweetBtn = '<a href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'{{user.screen_name}}\',\'{{id}}\');" title="163转发">转发({{retweet_count}})</a>';
     }
 	
 	switch(c_user.blogType){
@@ -216,7 +216,7 @@ function buildStatusHtml(statuses, t, c_user){
         }
         if(status.retweeted) {
         	if(c_user.blogType == 't163') {
-		    	buttons.oretweetBtn = '<a href="javascript:void(0);" title="已成功转发">已转发</a>';
+		    	buttons.oretweetBtn = '<a href="javascript:void(0);" title="已成功转发">已转发(' + status.retweet_count + ')</a>';
 		    } else {
         		buttons.oretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="已成功锐推"></a>';
 		    }

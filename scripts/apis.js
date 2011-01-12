@@ -1027,6 +1027,7 @@ var sinaApi = {
             callbackFn({}, 'error', 400);
             return;
         }
+        args.user = user;
         if(args.data && args.data.user) delete args.data.user;
         
         if(args.data.status){
@@ -2532,6 +2533,7 @@ $.extend(FanfouAPI, {
 
 var T163API = $.extend({}, sinaApi);
 T163API._upload = T163API.upload;
+T163API._user_timeline = T163API.user_timeline;
 
 $.extend(T163API, {
 	
@@ -2552,6 +2554,7 @@ $.extend(T163API, {
         favorites: '/favorites/{{id}}',
         favorites_create: '/favorites/create/{{id}}',
         search: '/search',
+        user_show: '/users/show',
         repost: '/statuses/update',
         comments: '/statuses/comments/{{id}}',
         retweet: '/statuses/retweet/{{id}}', // RT
@@ -2574,6 +2577,31 @@ $.extend(T163API, {
 
     rate_limit_status: function(data, callback){
         callback({error:'没有提供接口'});
+    },
+    
+    // 先获取用户信息 user_show
+    user_timeline: function(data, callback) {
+    	var $this = this;
+    	var params = {};
+    	if(data.id) {
+    		params.id = data.id;
+    	} else {
+    		params.name = data.screen_name;
+    	}
+    	this.user_show(params, function(user_info) {
+    		if(!data.id) {
+    			data.id = user_info.id;
+    		}
+    		$this._user_timeline(data, function(results, error) {
+    			$.each(results, function(index, item) {
+    				// 需要设置准确的用户
+	    			if(item.is_retweet_by_user) {
+	    				item.retweet_user = user_info;
+	    			}
+    			});
+    			callback({items: results, user: user_info}, error);
+    		});
+    	});
     },
 	
 	format_upload_params: function(user, data, pic) {
@@ -2696,8 +2724,21 @@ $.extend(T163API, {
 			if(data.retweeted_status) {
 				data.retweeted_status = this.format_result_item(data.retweeted_status, 'status', args);
 			}
-			if(data.is_retweet_by_user) {
+			if(data.is_retweet_by_user && (args.data.user_id === undefined || args.user.id == args.data.user_id)) { // 只有是当前登录用户，才显示已转发
 				data.retweeted = true;
+				data.retweet_me = args.user; // 当前用户转发
+				if(String(data.retweet_user_id) == String(args.user.id)) {
+					data.retweet_user_id = null;
+				}
+				data.is_retweet_by_user = false;
+			}
+			if(data.retweet_user_id) {
+				data.retweet_user = {
+					id: data.retweet_user_id,
+					screen_name: data.retweet_user_screen_name,
+					name: data.retweet_user_name
+				};
+				data.retweet_user = this.format_result_item(data.retweet_user, 'user', args);
 			}
 //			// 设置status的t_url
 			data.t_url = tpl.format(data);

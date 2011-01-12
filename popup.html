@@ -249,6 +249,23 @@
 								</a>
 							</div>
 							<?js } ?>
+							<?js if(tweet.retweet_me || tweet.retweet_user){ ?>
+						   <div class="retweet_info">由 <?js if(tweet.retweet_me){ ?>
+								<a target="_blank" 
+									href="javascript:getUserTimeline('#{tweet.retweet_me.screen_name}', '#{tweet.retweet_me.id}');" 
+									rhref="#{tweet.retweet_me.t_url}">
+									#{tweet.retweet_me.screen_name}<?js if(tweet.retweet_me.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
+								</a>
+							 <?js } ?>
+						     <?js if(tweet.retweet_user){ ?>
+						     	<?js if(tweet.retweet_me){ ?>、<?js } ?>
+						     	<a target="_blank" 
+									href="javascript:getUserTimeline('#{tweet.retweet_user.screen_name}', '#{tweet.retweet_user.id}');" 
+									rhref="#{tweet.retweet_user.t_url}">
+									#{tweet.retweet_user.screen_name}<?js if(tweet.retweet_user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
+								</a>
+							 <?js } ?> 等转发</div>
+						   <?js } ?>
 						</div>
 						<?js if(tweet.retweeted_status && tweet.retweeted_status.text){ ?>
 						<!-- 转发 -->
@@ -276,6 +293,7 @@
 					   <?js if(!tweet.retweeted_status && tweet.in_reply_to_status_id && tweet.in_reply_to_screen_name){ ?>
 					   <a href="javascript:void(0);" class="show_source_status_btn" status_id="#{tweet.in_reply_to_status_id}" title="查看原信息">对 #{tweet.in_reply_to_screen_name} 的回复</a>
 					   <?js } ?>
+					   
 					</div>
 					<?js } ?>
 				</div>

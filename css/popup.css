@@ -334,6 +334,7 @@ li .thumbnail_pic .img_loading{position:absolute;left:42%;top:43%;}
 .list li:hover .edit{display:block;}
 div.mainContent{word-wrap: break-word; line-height:1.5em;}
 .list li .msg .msgInfo a{color:#888;}
+.list li .retweet_info{color:#888;}
 
 .gototop{
 	background: #F5F5F5;
