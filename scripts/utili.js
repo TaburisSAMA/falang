@@ -1158,7 +1158,7 @@ var ShortenUrl = {
 	expandAll: function() {
 		var b_view = getBackgroundView();
 		var cache = b_view.SHORT_URLS;
-		$('a.link:not([title*="右键直接打开"])').each(function() {
+		$('a.link:not([title*="右键直接打开"],[videotype])').each(function() {
 			var url = $(this).attr('href');
 			if(url.indexOf('javascript:') == 0) {
 				return;
