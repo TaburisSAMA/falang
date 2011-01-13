@@ -1212,10 +1212,7 @@ var ShortenUrl = {
 			if(name == 'goo.gl') {
 				data.user = 'toolbar@google.com';
 				data.auth_token = this._create_googl_auth_token(longurl);
-			} 
-//			user:'toolbar@google.com',
-//                url: LongUrl,
-//                auth_token: this.Auth(LongUrl)
+			}
 			service = service.api;
 		} else {
 			service = service.format({url: encodeURIComponent(longurl)});
@@ -1713,7 +1710,7 @@ var VideoService = {
 						VideoService.show($(this).attr('videoType'), $(this).attr('rhref'), this);
 					});
 				}
-				$(ele).attr('videoType', name).after(' [<a onclick="VideoService.popshow(this);" href="javascript:void(0);" title="弹出独立窗口播放"><img src="images/external_link.png" />播</a>]');
+				$(ele).attr('videoType', name).after(' [<a onclick="VideoService.popshow(this);" href="javascript:void(0);" title="弹出独立窗口播放" class="external_link">播</a>]');
 				return true;
 			}
 		}

@@ -691,3 +691,7 @@ div.mainContent{word-wrap: break-word; line-height:1.5em;}
 /*浮动层图片旋转按钮*/
 #popup_box .image .rotate_btn{position: absolute; top: 8px; left: 10px; display:none;}
 #popup_box .image:hover .rotate_btn{display:block;}
+
+.external_link{padding-left:10px;background-repeat:no-repeat;background-position-y: 50%;
+  background-image: url(../images/external_link.png);
+}
