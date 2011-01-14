@@ -593,6 +593,30 @@ try{
 }catch(err){
 }
 
+// contextMenus, 右键快速发送微博
+var sharedContextmenuId = null;
+function createSharedContextmenu(){
+    if(!sharedContextmenuId){
+        sharedContextmenuId = chrome.contextMenus.create({"title": "通过FaWave分享", 
+            "contexts": ['all'],
+            "onclick": function(info, tab) {
+                var text = info.selectionText;
+                var link = info.linkUrl || info.srcUrl || info.frameUrl || info.pageUrl;
+                chrome.tabs.sendRequest(tab.id, {method:'showSendQuickMessage', text: text, link: link});
+            }
+        });
+    }
+};
+function removeSharedContextmenu(){
+    if(sharedContextmenuId){
+        chrome.contextMenus.remove(sharedContextmenuId);
+        sharedContextmenuId = null;
+    }
+};
+if(Settings.get().enableContextmenu){
+    createSharedContextmenu();
+};
+
 
 //与page.js通讯
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
@@ -641,14 +665,3 @@ r_method_manager = {
         setTimeout(checkNewMsg, 1000, 'friends_timeline');
     }
 };
-
-
-// contextMenus, 右键快速发送微博
-chrome.contextMenus.create({"title": "通过FaWave分享", 
-	"contexts": ['all'],
-	"onclick": function(info, tab) {
-		var text = info.selectionText;
-		var link = info.linkUrl || info.srcUrl || info.frameUrl || info.pageUrl;
-        chrome.tabs.sendRequest(tab.id, {method:'showSendQuickMessage', text: text, link: link});
-	}
-});

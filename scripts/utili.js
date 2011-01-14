@@ -199,6 +199,7 @@ var Settings = {
         smoothTweenType: 'Quad', //平滑滚动的动画类型
         smoothSeaeType: 'easeOut', //平滑滚动的ease类型
         sendAccountsDefaultSelected: 'current', //多账号发送的时候默认选择的发送账号
+        enableContextmenu: true, //启用右键菜单
 
         font: '微软雅黑', //字体
         fontSite: 12, //字体大小

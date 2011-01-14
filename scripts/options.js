@@ -421,6 +421,9 @@ function init(){
 
     //初始化是否同步未读提示到新浪微博
     $("#unread_sync_to_page").attr("checked", settings.isSyncReadedToSina);
+    
+    //初始化是否启用右键菜单
+    $("#enable_contextmenu").attr("checked", settings.enableContextmenu);
 
     //发送微博时默认选择的账号
     $("#send_accounts_default_select").val(settings.sendAccountsDefaultSelected);
@@ -805,6 +808,7 @@ function toggleStopAccount(uniqueKey, is_stop){
 
 function saveAll(){
     var settings = Settings.get();
+    var bg = getBackgroundView();
 
     //保存全局信息刷新时间间隔
     var gr = null, grv = null;
@@ -848,6 +852,14 @@ function saveAll(){
     settings.geoPosition = $("#isGeoEnabled").data('position');
 
     settings.isSyncReadedToSina = $("#unread_sync_to_page").attr("checked") ? true : false;
+    
+    //右键菜单
+    settings.enableContextmenu = $("#enable_contextmenu").attr("checked") ? true : false;
+    if(settings.enableContextmenu){
+        bg.createSharedContextmenu();
+    }else{
+        bg.removeSharedContextmenu();
+    }
 
     settings.lookingTemplate = $("#tp_looking").val(); //我正在看模板
 
@@ -875,7 +887,6 @@ function saveAll(){
     var _soundFile = $.trim($("#inpSoundFile").val());
     if(_soundFile){
         settings.soundSrc = _soundFile;
-        var bg = getBackgroundView();
         bg.AlertaAudioFile.src = _soundFile;
     }
 
