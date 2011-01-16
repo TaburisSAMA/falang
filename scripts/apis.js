@@ -2035,7 +2035,7 @@ $.extend(LeiHouAPI, {
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://leihou.com',
         user_home_url: 'http://leihou.com/',
-		source: 'fawave', 
+		source: '', //'fawave', //貌似fawave被雷猴封了？加入source=fawave就好返回404
 		repost_pre: 'RT',
 	    support_comment: false,
 	    support_do_comment: false,
