@@ -32,7 +32,7 @@ $(function(){
     initTab();
 
     showAccountList();
-    showAccountList_2();
+    showDndAccountList();
 
     init();
 
@@ -355,25 +355,31 @@ function showAccountList(){
     
 };
 
-function showAccountList_2(){
+function showDndAccountList(){
     var userList = getUserList('all');
     var userCount = 0;
     var needRefresh = false;
     if(userList){
         var op = '';
-        //var tpl = '<option value="{{uniqueKey}}">({{stat}}) ({{blogTypeName}}) {{screen_name}}</option>';
-        var tpl = '<li id="dnd_a_{{uniqueKey}}" class="{{uniqueKey}} {{statClass}} clearFix" uniqueKey="{{uniqueKey}}">' +
+        //var tpl = '<option value="{{uniqueKey}}">({{statName}}) ({{blogTypeName}}) {{screen_name}}</option>';
+        var tpl = '<li id="dnd_a_{{uniqueKey}}" class="{{uniqueKey}} {{stat}} clearFix" uniqueKey="{{uniqueKey}}" stat="{{stat}}">' +
                 '<div class="face_img drag">' +
                 '   <a class="face" href="javascript:"><img src="{{profile_image_url}}"></a>' +
                 '   <img src="/images/blogs/{{blogType}}_16.png" class="blogType">' +
                 '</div>' +
                 '<div class="detail">' +
-                '   <p><span class="userName">{{screen_name}}</span>({{blogTypeName}})<span class="stat">{{stat}}</span>' +
-                '       <span class="edit"><button><img src="images/delete.png">删除用户</button></span>' +
-                '   </p>' +
-                '   <p>' +
+                '   <div class="item"><span class="userName">{{screen_name}}</span>({{blogTypeName}})' +
+                '       <div class="stat"><span class="statName">{{statName}}</span>' +
+                '           <div><ul><li class="enabled" onclick="changeAccountStatus(\'{{uniqueKey}}\', \'enabled\')">启用</li>' +
+                '               <li class="onlysend" onclick="changeAccountStatus(\'{{uniqueKey}}\', \'onlysend\')">仅发送</li>' +
+                '               <li class="disabled" onclick="changeAccountStatus(\'{{uniqueKey}}\', \'disabled\')">停用</li></ul>' +
+                '           </div>' +
+                '       </div>' +
+                '       <span class="edit"><button onclick="delAccount(\'{{uniqueKey}}\')"><img src="images/delete.png">删除用户</button></span>' +
+                '   </div>' +
+                '   <div class="item">' +
                 '       <span><span>刷新间隔:  </span><span class="userRefreshTimeWrap">{{refTimeHtml}}</span></span>' +
-                '   </p>' +
+                '   </div>' +
                 '</div>' +
                 '</li>';
         for(var i in userList){
@@ -383,8 +389,8 @@ function showAccountList_2(){
                 needRefresh = true;
             } else {
             	user.blogTypeName = T_NAMES[user.blogType];
-                user.stat = user.disabled ? '停用' : (user.only_for_send ? '仅发送' : '启用');
-                user.statClass = user.disabled ? 'disabled' : (user.only_for_send ? 'onlysend' : 'enabled');
+                user.statName = user.disabled ? '停用' : (user.only_for_send ? '仅发送' : '启用');
+                user.stat = user.disabled ? 'disabled' : (user.only_for_send ? 'onlysend' : 'enabled');
                 
                 //绑定用户自定刷新时间
                 var refTime = 0, timelimes = T_LIST[user.blogType], c_html = '';
@@ -442,6 +448,59 @@ function saveDndSortList(){
 	saveUserList(new_list);
 	_showMsg('帐号排序已保存');
 };
+
+//修改帐号的启用状态
+function changeAccountStatus(uniqueKey, stat){
+    var _li = $("#dnd_a_"+uniqueKey);
+    if(_li.attr('stat')==stat){ return; } //状态一样，不用修改
+    var userList = getUserList('all');
+    var user = null;
+    $.each(userList, function(i, item){
+    	if(item.uniqueKey == uniqueKey){
+    		user = item;
+    		return false;
+    	}
+    });
+    if(user){
+        switch(stat){
+            case 'enabled':
+                user.disabled = false;
+                user.only_for_send = false;
+                break;
+            case 'disabled':
+                user.disabled = true;
+                user.only_for_send = false;
+                break;
+            case 'onlysend':
+                //仅用于发送的时候，帐号必须是启用的
+                user.disabled = false;
+                user.only_for_send = true;
+                break;
+        }
+        saveUserList(userList);
+        
+        var c_user = getUser();
+        if(c_user && c_user.uniqueKey.toLowerCase() == uniqueKey.toLowerCase()){
+            var b_view = getBackgroundView();
+            if(b_view){
+                b_view.setUser('');
+                b_view.onChangeUser();
+            }
+        }
+    }
+    
+    var b_view = getBackgroundView();
+    if(b_view){
+        b_view.RefreshManager.restart();
+    }
+    var statName = user.disabled ? '停用' : (user.only_for_send ? '仅发送' : '启用');
+    _showMsg(user.screen_name + ' 的状态修改为: ' + statName);
+    
+    _li.removeClass(_li.attr('stat')).addClass(stat).attr('stat', stat);
+    _li.find('.detail .stat .statName').html(statName);
+};
+
+
 
 function showMyGeo(){
     var geoPosition = $("#isGeoEnabled").data('position');
@@ -837,7 +896,9 @@ function showEditAccount(uniqueKey){
 };
 
 function delAccount(uniqueKey){
-	$("#account-list option:selected").remove();
+    if(!confirm('你确定要删除该账号吗？')){ return; }
+	//$("#account-list option:selected").remove();
+	$("#dnd_a_"+uniqueKey).remove();
     var userList = getUserList('all');
     var new_list = [];
     var delete_user = {};
@@ -866,7 +927,11 @@ function delAccount(uniqueKey){
         }
     }
     saveUserList(new_list);
-    disabledUserEditBtns();
+    //disabledUserEditBtns();
+    var b_view = getBackgroundView();
+    if(b_view){
+        b_view.RefreshManager.restart();
+    }
     _showMsg('成功删除账号 (' + T_NAMES[delete_user.blogType] + ')' + delete_user.screen_name + '！');
 };
 
