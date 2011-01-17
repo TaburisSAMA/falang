@@ -32,6 +32,7 @@ $(function(){
     initTab();
 
     showAccountList();
+    showAccountList_2();
 
     init();
 
@@ -309,7 +310,8 @@ function calculateUserRefreshTimeHits(user){
         }
         total += Math.round(60*60/refTime);
     }
-    $("#userRefreshTimeHits").html(total);
+    return total;
+    //$("#userRefreshTimeHits").html(total);
 };
 
 function disabledUserEditBtns(){
@@ -351,6 +353,94 @@ function showAccountList(){
     $('#account-blogType').html(blogtype_options);
     showSupportAuthTypes($('#account-blogType').val());
     
+};
+
+function showAccountList_2(){
+    var userList = getUserList('all');
+    var userCount = 0;
+    var needRefresh = false;
+    if(userList){
+        var op = '';
+        //var tpl = '<option value="{{uniqueKey}}">({{stat}}) ({{blogTypeName}}) {{screen_name}}</option>';
+        var tpl = '<li id="dnd_a_{{uniqueKey}}" class="{{uniqueKey}} {{statClass}} clearFix" uniqueKey="{{uniqueKey}}">' +
+                '<div class="face_img drag">' +
+                '   <a class="face" href="javascript:"><img src="{{profile_image_url}}"></a>' +
+                '   <img src="/images/blogs/{{blogType}}_16.png" class="blogType">' +
+                '</div>' +
+                '<div class="detail">' +
+                '   <p><span class="userName">{{screen_name}}</span>({{blogTypeName}})<span class="stat">{{stat}}</span>' +
+                '       <span class="edit"><button><img src="images/delete.png">删除用户</button></span>' +
+                '   </p>' +
+                '   <p>' +
+                '       <span><span>刷新间隔:  </span><span class="userRefreshTimeWrap">{{refTimeHtml}}</span></span>' +
+                '   </p>' +
+                '</div>' +
+                '</li>';
+        for(var i in userList){
+            userCount++;
+            var user = userList[i];
+            if(!user.uniqueKey){ //兼容单微博版本
+                needRefresh = true;
+            } else {
+            	user.blogTypeName = T_NAMES[user.blogType];
+                user.stat = user.disabled ? '停用' : (user.only_for_send ? '仅发送' : '启用');
+                user.statClass = user.disabled ? 'disabled' : (user.only_for_send ? 'onlysend' : 'enabled');
+                
+                //绑定用户自定刷新时间
+                var refTime = 0, timelimes = T_LIST[user.blogType], c_html = '';
+                for(var i in timelimes){
+                    if(c_html){ c_html += ', '; }
+                    c_html += tabDes[timelimes[i]];
+                    c_html += '('+ Settings.get().globalRefreshTime[timelimes[i]] +')';
+                    if(user.refreshTime && user.refreshTime[timelimes[i]]){
+                        refTime = user.refreshTime[timelimes[i]];
+                    }else{
+                        refTime = 0;
+                    }
+                    c_html += '<input type="text" value="' + refTime +'" class="inpRefTime" />秒';
+                }
+                c_html += '(<span class="refHits">' + calculateUserRefreshTimeHits(user) + '</span>请求/每小时)';
+                user.refTimeHtml = c_html;
+                
+            	op += tpl.format(user);
+            }
+        }
+        $("#dnd-account-list").html(op);
+        
+        $("#dnd-account-list").dragsort({ dragSelector: ".drag", dragBetween: false, dragEnd: saveDndSortList, placeHolderTemplate: "<li class='placeHolder'><div></div></li>" });
+    }
+    if(needRefresh || userCount <= 0){
+        $("#tab_user_set").click();
+    }
+    if(needRefresh){
+        $("#needRefresh").show();
+    }
+    
+    // 显示微博选项
+    var blogtype_options = '';
+    for(var k in T_NAMES) {
+    	blogtype_options += '<option value="{{value}}">{{name}}</option>'.format({name: T_NAMES[k], value: k});
+    }
+    $('#account-blogType').html(blogtype_options);
+    showSupportAuthTypes($('#account-blogType').val());
+    
+};
+
+//保存拖放排序后的用户列表顺序
+function saveDndSortList(){
+    var new_list = [];
+	var userlist = getUserList('all');
+	$("#dnd-account-list li").each(function(){
+		var uniqueKey = $(this).attr('uniqueKey');
+		$.each(userlist, function(index, user){
+			if(user.uniqueKey == uniqueKey){
+				new_list.push(user);
+				return false;
+			}
+		});
+	});
+	saveUserList(new_list);
+	_showMsg('帐号排序已保存');
 };
 
 function showMyGeo(){

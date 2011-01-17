@@ -126,6 +126,13 @@ var unreadDes = {
     'direct_messages': '私'
 };
 
+var tabDes = {
+    'friends_timeline': '首页', 
+    'mentions': '@我', 
+    'comments_timeline': '评论', 
+    'direct_messages': '私信'
+};
+
 function showMsg(msg){
     var popupView = getPopupView();
     if(popupView){

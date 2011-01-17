@@ -148,14 +148,31 @@ ul#navigation li.selected{
 	margin-right: 10px;
 }
 
-/*Æ½»¬¹ö¶¯demo*/
+/*å¸å·è®¾ç½®ï¼Œå¸å·åˆ—è¡¨*/
+#dnd-account-list li{border:#eee solid 1px; padding:3px;}
+#dnd-account-list li.disabled{ border-color:#87000e; background-color:#FFF0F0; }
+#dnd-account-list li.enabled{ border-color:green; background-color:honeyDew;}
+#dnd-account-list li.onlysend{ border-color:#888; background-color:#eee;}
+#dnd-account-list li button{margin:0 2px; padding:1px 3px;}
+#dnd-account-list li .face_img{ float:left; position: relative;}
+#dnd-account-list li .face_img .face img{width:48px;height:48px; border-radius:4px; -webkit-box-shadow: #AAA 0px 0px 3px;}
+#dnd-account-list li .face_img .blogType{bottom: 0px; position: absolute; right: -2px;}
+#dnd-account-list li .detail{margin-left: 55px;}
+#dnd-account-list li .detail p{padding:2px;margin:2px;}
+#dnd-account-list li .detail .username{font-weight:bold; color:green;}
+#dnd-account-list li .detail .stat{margin-left:10px; padding:1px 2px; border:solid 1px #888; border-radius:5px;}
+#dnd-account-list li.disabled .detail .stat{background:#87000e; color:#fff;}
+#dnd-account-list li.enabled .detail .stat{background:green; color:#fff;}
+#dnd-account-list li.onlysend .detail .stat{background:#8BF; color:#222;}
+
+/*å¹³æ»‘æ»šåŠ¨demo*/
 #tween_demo{ display:inline-block; padding:2px; border:solid 1px green; height:15px; width: 100px; }
 #tween_demo span{ display:inline-block; background:#2B477D; width:10px; height:15px; }
 
 #pb_map_canvas{width:400px; height:380px; position: relative;}
 #pb_map_canvas .map_user_icon{width:48px;height:48px;border:solid 1px #ccc; float:left;margin-right:5px;}
 #pb_map_canvas .map_infowindow{height:50px;}
-/*¸¡¶¯²ã*/
+/*æµ®åŠ¨å±‚*/
 #popup_box{
 	background:#fff;
 	border:solid 1px #ccc;
@@ -196,7 +213,7 @@ ul#navigation li.selected{
   width:100%;
   z-index:99;
 }
-/*¸¡¶¯²ãÍ¼Æ¬Ğı×ª°´Å¥*/
+/*æµ®åŠ¨å±‚å›¾ç‰‡æ—‹è½¬æŒ‰é’®*/
 #popup_box .image .rotate_btn{position: absolute; top: 25px; left: 10px; display:none;}
 #popup_box .image:hover .rotate_btn{display:block;}
 
