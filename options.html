@@ -36,30 +36,13 @@
 	</ul>
 	<!-- 用户设置 START -->
 	<div id="user_set" class="set_wrap" style="display:none;">
-		<br/>
 		<div class="alert" id="needRefresh" style="display:none;">你看到这个是因为你的账户信息需要刷新FaWave才能继续使用，请点击“更新用户信息”进行刷新用户信息。</div>
-		<table>
-			<tr>
-			    <td>
-			        <button id="up-account" direction="up" disabled="disabled">向上</button><br/>
-			        <button id="down-account" direction="down" disabled="disabled">向下</button>
-			    </td>
-				<td><select id="account-list" size="6" style="width:250px; height:150px;"></select></td>
-				<td>
-					<button id="refresh-account"><img src="images/refresh.png" />更新用户信息</button>
-					<span class="jTip" jTitle="为什么要更新？　" jWidth="320">?<span class="c">为了快速启动，用户信息会缓存在本地，如果你修改了用户头像或者其他用户信息，需要手动更新一下。
-						</span></span><br/>
-					<button id="show-new-account"><img src="images/add.png" />添加新用户</button><br/>
-					<button id="stop-account" disabled="disabled"><img src="images/exclamation.png" />停/启用</button>
-					<span class="jTip" jTitle="为什么要停用？　" jWidth="320">?<span class="c">当你暂时不想查看某一账号的时候，你可以将该账号暂时停用，你以后可以重新启用</span></span><br/>
-					<button id="show-edit-account" disabled="disabled"><img src="images/user_edit.png" />编辑用户</button>
-					<button id="show-edit-user-custom" disabled="disabled"><img src="images/user_edit.png" />修改用户属性</button><br/>
-					<button id="del-account" disabled="disabled"><img src="images/delete.png" />删除用户</button>
-				</td>
-			</tr>
-		</table>
-		
-		<ul id="dnd-account-list"></ul>
+		<div>
+			<button id="show-new-account"><img src="images/add.png" />添加新用户</button>
+			<button id="refresh-account"><img src="images/refresh.png" />更新用户信息</button>
+			<span class="jTip" jTitle="为什么要更新？　" jWidth="320">?<span class="c">为了快速启动，用户信息会缓存在本地，如果你修改了用户头像或者其他用户信息，需要手动更新一下。
+				</span></span>
+		</div>
 
 		<div id="edit-account-info" style="display:none;">
 			<h3></h3>
@@ -120,6 +103,7 @@
 				</li>
 			<ul>
 		</div>
+		<!-- 
 		<div id="user-custom-wrap" style="display:none;">
 			<ul>
 				<li>
@@ -146,7 +130,7 @@
 					<br/>　　　　　　　　　　　(注:括号内数字为当前全局设置值，填“0”表示使用全局设置)
 				</li>
 				
-				<!-- 
+				
 				<li>
 					<p id="user_set_badge_wrap"><label class="title">　　　　未读提示：</label>
 						<input type="checkbox" id="user_set_badge_friends_timeline" /><label for="user_set_badge_friends_timeline">最新微博</label>
@@ -169,13 +153,25 @@
 						</span>
 					</p>
 				</li>
-				-->
+				
 				<li>
 					<input type="button" id="save-user-custom" value="保存" class="btn" />   
 					<input type="button" id="cancel-save-user-custom" value="取消" />
 				</li>
 			</ul>
-		</div>
+		</div>-->
+		<h3>用户管理
+			<span class="jTip" jTitle="" jWidth="320">?<span class="c"><span class="note">帐号状态：</span>“启用”的帐号可以查看微博和发送微博。
+			“仅发送”的帐号不可以查看，仅在发送微博的时候可以选择同步发送。
+			“停用”的帐号既不能查看也不可以同步发送，请仅在你暂时不想管理这个帐号的时候将它设为“停用”。<br/>
+			<span class="note">刷新间隔：</span>这里的刷新频率设置会覆盖“<span class="note">基本设置</span>”里面的“获取信息间隔时间”的设置，
+			你可以在这里为特定的账户设置特定的刷新时间间隔，而不影响其他账号使用全局设置。最低可以设置的值为<span class="note">30秒</span>。
+			括号内数字为当前全局设置值，填“0”表示使用全局设置。<br/>
+			<span class="note">帐号排序：</span>直接拖动帐号的头像可以进行拖动排序。<br/>
+			<span class="note">保存：</span>所有操作会在你操作完成后自动保存。
+			</span></span>
+		</h3>
+		<ul id="dnd-account-list"></ul>
 	</div>
 	<!-- 用户设置END -->
 	<!-- 基本设置 -->
@@ -403,7 +399,7 @@
 	<!-- 关于与感谢 -->
 	<div id="about_me" class="set_wrap" style="display:none;">
 		
-		<b>作者(Net4 Team)：</b>
+		<h3>作者(Net4 Team)：</h3>
 		<div class="clearFix">
 			<span class="author clearFix">
 				<img src="http://tp4.sinaimg.cn/1644902943/50/1279883084/1"/>
@@ -418,7 +414,7 @@
 		</div>
 		<!-- <div><a target="_blank" href="http://t.sina.com.cn/qleelulu" ><img style="padding:3px;border:solid 1px #ccc;" src="http://tp4.sinaimg.cn/1644902943/50/1279883084/1" /></a></div> -->
 		<br/><br/>
-		<b>官方微博：</b>
+		<h3>官方微博：</h3>
 		<span class="author clearFix">
 			<a target="_blank" href="http://t.sina.com.cn/falang" title="FaWave@新浪微博" ><img src="images/blogs/tsina_16.png" /></a>
 			<a target="_blank" href="http://t.qq.com/fawave" title="FaWave@腾讯微博" ><img src="images/blogs/tqq_16.png" /></a>

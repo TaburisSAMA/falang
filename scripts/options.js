@@ -31,8 +31,8 @@ var TWEEN_TYPES = ['Quad', 'Cubic', 'Quart', 'Quint', 'Sine', 'Expo', 'Circ', 'E
 $(function(){
     initTab();
 
-    showAccountList();
-    showDndAccountList();
+    //showAccountList();
+    showDndAccountList(true);
 
     init();
 
@@ -67,6 +67,7 @@ $(function(){
         $(this).fadeOut(500).delay(5000).fadeIn(500);
     });
 
+/*
     $("#account-list").change(function(){
         if($(this).val()){
             $("#show-edit-account, #del-account, #stop-account, #show-edit-user-custom").removeAttr('disabled');
@@ -92,6 +93,7 @@ $(function(){
             b_view.RefreshManager.restart();
         }
     });
+    */
 
     $("#show-edit-account").click(function(){
         var uniqueKey = $("#account-list").val();
@@ -100,6 +102,7 @@ $(function(){
         showEditAccount(uniqueKey);
     });
 
+/*
     //用户账号
     $("#show-edit-user-custom").click(function(){
         var uniqueKey = $("#account-list").val();
@@ -186,6 +189,7 @@ $(function(){
         var user = getUserByUniqueKey(uniqueKey, 'all');
         calculateUserRefreshTimeHits(user);
     });
+    */
 
     $("#gRefreshTimeWrap input").change(function(){
         calculateGlobalRefreshTimeHits();
@@ -216,6 +220,7 @@ $(function(){
     	}
     }));
     
+    /*
     // 帐号排序按钮
     $('#up-account, #down-account').click(function(){
     	var $item = $("#account-list option:selected");
@@ -237,6 +242,7 @@ $(function(){
     	});
     	saveUserList(new_list);
     });
+    */
 
     //检查url中有没 #user_set 之类的，有就定位到指定tab
     if(window.location.hash){
@@ -297,14 +303,19 @@ function calculateGlobalRefreshTimeHits(){
 function calculateUserRefreshTimeHits(user){
     var total = 0, refTime = 0, refTimeInp = null, timelimes = T_LIST[user.blogType];
     for(var i in timelimes){
-        refTimeInp = $("#userRefreshTime_" + timelimes[i]);
-        refTime = Number(refTimeInp.val());
-        if(isNaN(refTime)){
+        //refTimeInp = $("#userRefreshTime_" + timelimes[i]);
+        //refTime = Number(refTimeInp.val());
+        //if(isNaN(refTime)){
+        //    refTime = 0;
+        //}else if(refTime!==0 && refTime<30){
+        //    refTime = 30;
+        //}
+        //refTimeInp.val(refTime);
+        if(user.refreshTime && user.refreshTime[timelimes[i]]){
+            refTime = user.refreshTime[timelimes[i]];
+        }else{
             refTime = 0;
-        }else if(refTime!==0 && refTime<30){
-            refTime = 30;
         }
-        refTimeInp.val(refTime);
         if(refTime==0){
             refTime = Settings.get().globalRefreshTime[timelimes[i]];
         }
@@ -313,11 +324,54 @@ function calculateUserRefreshTimeHits(user){
     return total;
     //$("#userRefreshTimeHits").html(total);
 };
+//检查用户输入的刷新时间并计算设置产生的请求次数，然后保存
+function checkUserRefreshTimeHitsAndSave(inp){
+    inp = $(inp);
+    var refTime = 0, total = 0, _li = inp.closest('li');
+    
+    var uniqueKey = _li.attr('uniqueKey');
+    var userList = getUserList('all');
+    var user = null;
+    $.each(userList, function(i, item){
+    	if(item.uniqueKey == uniqueKey){
+    		user = item;
+    		return false;
+    	}
+    });
+    if(!user){
+        return;
+    }
+    user.refreshTime = user.refreshTime || {};
+    
+    _li.find('.inpRefTime').each(function(){
+        refTime = Number($(this).val());
+        if(isNaN(refTime)){
+            refTime = 0;
+        }else if(refTime!==0 && refTime<30){
+            refTime = 30;
+        }
+        $(this).val(refTime);
+        user.refreshTime[$(this).attr('t')] = refTime;
+        if(refTime==0){
+            refTime = Settings.get().globalRefreshTime[$(this).attr('t')];
+        }
+        total += Math.round(60*60/refTime);
+    });
+    _li.find('.refHits').html(total);
+    saveUserList(userList);
+    var b_view = getBackgroundView();
+    if(b_view){
+        b_view.RefreshManager.restart();
+    }
+    _showMsg('刷新间隔已更新');
+};
+var curthas = checkUserRefreshTimeHitsAndSave;
 
 function disabledUserEditBtns(){
     $("#show-edit-account, #del-account, #stop-account, #show-edit-user-custom").attr('disabled', true);
 };
 
+/*
 function showAccountList(){
     var userList = getUserList('all');
     var userCount = 0;
@@ -354,8 +408,9 @@ function showAccountList(){
     showSupportAuthTypes($('#account-blogType').val());
     
 };
+*/
 
-function showDndAccountList(){
+function showDndAccountList(bindDnd){
     var userList = getUserList('all');
     var userCount = 0;
     var needRefresh = false;
@@ -369,7 +424,7 @@ function showDndAccountList(){
                 '</div>' +
                 '<div class="detail">' +
                 '   <div class="item"><span class="userName">{{screen_name}}</span>({{blogTypeName}})' +
-                '       <div class="stat"><span class="statName">{{statName}}</span>' +
+                '       <div class="stat"><span class="statName">{{statName}}</span><span class="nav-arrow">&nbsp;</span>' +
                 '           <div><ul><li class="enabled" onclick="changeAccountStatus(\'{{uniqueKey}}\', \'enabled\')">启用</li>' +
                 '               <li class="onlysend" onclick="changeAccountStatus(\'{{uniqueKey}}\', \'onlysend\')">仅发送</li>' +
                 '               <li class="disabled" onclick="changeAccountStatus(\'{{uniqueKey}}\', \'disabled\')">停用</li></ul>' +
@@ -377,7 +432,7 @@ function showDndAccountList(){
                 '       </div>' +
                 '       <span class="edit"><button onclick="delAccount(\'{{uniqueKey}}\')"><img src="images/delete.png">删除用户</button></span>' +
                 '   </div>' +
-                '   <div class="item">' +
+                '   <div class="item item2">' +
                 '       <span><span>刷新间隔:  </span><span class="userRefreshTimeWrap">{{refTimeHtml}}</span></span>' +
                 '   </div>' +
                 '</div>' +
@@ -403,7 +458,7 @@ function showDndAccountList(){
                     }else{
                         refTime = 0;
                     }
-                    c_html += '<input type="text" value="' + refTime +'" class="inpRefTime" />秒';
+                    c_html += '<input type="text" t="' + timelimes[i] + '" value="' + refTime +'" class="inpRefTime" onchange="curthas(this)" />秒';
                 }
                 c_html += '(<span class="refHits">' + calculateUserRefreshTimeHits(user) + '</span>请求/每小时)';
                 user.refTimeHtml = c_html;
@@ -411,9 +466,11 @@ function showDndAccountList(){
             	op += tpl.format(user);
             }
         }
+        $("#dnd-account-list li .drag").unbind();
         $("#dnd-account-list").html(op);
-        
-        $("#dnd-account-list").dragsort({ dragSelector: ".drag", dragBetween: false, dragEnd: saveDndSortList, placeHolderTemplate: "<li class='placeHolder'><div></div></li>" });
+        if(bindDnd){
+            $("#dnd-account-list").dragsort({ dragSelector: ".drag", dragBetween: false, dragEnd: saveDndSortList, placeHolderTemplate: "<li class='placeHolder'><div></div></li>" });
+        }
     }
     if(needRefresh || userCount <= 0){
         $("#tab_user_set").click();
@@ -755,7 +812,8 @@ function _verify_credentials(user) {
                 setUser(user);
             }
             var btnVal = $("#save-account").val();
-            showAccountList();
+            //showAccountList();
+            showDndAccountList();
 
             $("#new-account").hide();
             $("#account-name").val('');
