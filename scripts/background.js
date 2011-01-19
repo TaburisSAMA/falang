@@ -601,6 +601,7 @@ function createSharedContextmenu(){
             "contexts": ['all'],
             "onclick": function(info, tab) {
                 var text = info.selectionText;
+                text = text || tab.title;
                 var link = info.linkUrl || info.srcUrl || info.frameUrl || info.pageUrl;
                 chrome.tabs.sendRequest(tab.id, {method:'showSendQuickMessage', text: text, link: link});
             }

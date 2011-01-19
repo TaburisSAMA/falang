@@ -31,7 +31,6 @@ var TWEEN_TYPES = ['Quad', 'Cubic', 'Quart', 'Quint', 'Sine', 'Expo', 'Circ', 'E
 $(function(){
     initTab();
 
-    //showAccountList();
     showDndAccountList(true);
 
     init();
@@ -67,129 +66,12 @@ $(function(){
         $(this).fadeOut(500).delay(5000).fadeIn(500);
     });
 
-/*
-    $("#account-list").change(function(){
-        if($(this).val()){
-            $("#show-edit-account, #del-account, #stop-account, #show-edit-user-custom").removeAttr('disabled');
-            $('#up-account, #down-account').removeAttr('disabled');
-        }
-    });
-
-    $("#del-account").click(function(){
-        if(confirm('你确定要删除该账号吗？')){
-            delAccount($("#account-list").val());
-        }
-    });
-    
-    $("#stop-account").click(function(){
-        var uniqueKey = $("#account-list").val();
-        var _user = toggleStopAccount(uniqueKey);
-        var stat = _user.disabled ? '停用' : (_user.only_for_send ? '仅发送' : '启用');
-        showAccountList();
-        $("#account-list").val(uniqueKey);
-        _showMsg(_user.screen_name + ' 的状态修改为: ' + stat);
-        var b_view = getBackgroundView();
-        if(b_view){
-            b_view.RefreshManager.restart();
-        }
-    });
-    */
-
     $("#show-edit-account").click(function(){
         var uniqueKey = $("#account-list").val();
         $("#edit-account-key").val(uniqueKey);
         $("#edit-account-info").show().find('h3').html($(this).text()).end().find('.ainfo').html($("#account-list :selected").text());
         showEditAccount(uniqueKey);
     });
-
-/*
-    //用户账号
-    $("#show-edit-user-custom").click(function(){
-        var uniqueKey = $("#account-list").val();
-        $("#edit-account-key").val(uniqueKey);
-        var user = getUserByUniqueKey(uniqueKey, 'all');
-
-        if(tapi.get_config(user).support_comment){
-            $("#userRefreshTime_comments_timeline").parent().show();
-        }else{
-            $("#userRefreshTime_comments_timeline").val('0').parent().hide();
-        }
-
-        //绑定用户自定刷新时间
-        var refTime = 0, refTimeInp = null, timelimes = T_LIST[user.blogType];
-        for(var i in timelimes){
-            refTimeInp = $("#userRefreshTime_" + timelimes[i]);
-            refTimeInp.prev('span:eq(0)').html('('+ Settings.get().globalRefreshTime[timelimes[i]] +')');
-            if(user.refreshTime && user.refreshTime[timelimes[i]]){
-                refTime = user.refreshTime[timelimes[i]];
-            }else{
-                refTime = 0;
-            }
-            refTimeInp.val(refTime);
-        }
-        calculateUserRefreshTimeHits(user);
-
-        $("#account_only_for_send").attr('checked', user.only_for_send ? true : false);
-
-        $("#new-account").hide();
-        $("#edit-account-info").show().find('h3').html($(this).text()).end().find('.ainfo').html($("#account-list :selected").text());
-        $("#user-custom-wrap").show();
-    });
-
-    //保存用户属性修改
-    $("#save-user-custom").click(function(){
-        var uniqueKey = $("#edit-account-key").val();
-        var user = getUserByUniqueKey(uniqueKey, 'all');
-        if(user){
-            user.refreshTime = user.refreshTime || {};
-            var refTime = 0, refTimeInp = null;
-            for(var i in T_LIST.all){
-                refTimeInp = $("#userRefreshTime_" + T_LIST.all[i]);
-                refTime = Number(refTimeInp.val());
-                if(isNaN(refTime)){
-                    refTime = 0;
-                }else if(refTime!==0 && refTime<30){
-                    refTime = 30;
-                }
-                user.refreshTime[T_LIST.all[i]] = refTime;
-                refTimeInp.val(refTime);
-            }
-            user.only_for_send = $("#account_only_for_send").attr('checked');
-
-            var userList = getUserList('all');
-            // 删除旧数据，替换新的
-            var found = false;
-            $.each(userList, function(i, item){
-            	if(item.uniqueKey == uniqueKey){
-            		userList[i] = user;
-            		found = true;
-            		return false;
-            	}
-            });
-            saveUserList(userList);
-
-            showAccountList();
-            $("#account-list").val(uniqueKey);
-
-            if(found){
-                _showMsg('保存成功');
-                var b_view = getBackgroundView();
-                if(b_view){
-                    b_view.RefreshManager.restart();
-                }
-            }
-        }else{
-            _showMsg('保存失败：未指定编辑的用户');
-        }
-        $("#cancel-save-user-custom").click();
-    });
-
-    $("#userRefreshTimeWrap input").change(function(){
-        var uniqueKey = $("#edit-account-key").val();
-        var user = getUserByUniqueKey(uniqueKey, 'all');
-        calculateUserRefreshTimeHits(user);
-    });
-    */
 
     $("#gRefreshTimeWrap input").change(function(){
         calculateGlobalRefreshTimeHits();
@@ -219,30 +101,6 @@ $(function(){
     		$('#account-request-token-secret').val('');
     	}
     }));
-    
-    /*
-    // 帐号排序按钮
-    $('#up-account, #down-account').click(function(){
-    	var $item = $("#account-list option:selected");
-    	if($(this).attr('direction') == 'up') {
-    		$item.prev().before($item);
-    	} else {
-    		$item.next().after($item);
-    	}
-    	var new_list = [];
-    	var userlist = getUserList('all');
-    	$("#account-list option").each(function(){
-    		var uniqueKey = $(this).val();
-    		$.each(userlist, function(index, user){
-    			if(user.uniqueKey == uniqueKey){
-    				new_list.push(user);
-    				return false;
-    			}
-    		});
-    	});
-    	saveUserList(new_list);
-    });
-    */
 
     //检查url中有没 #user_set 之类的，有就定位到指定tab
     if(window.location.hash){
@@ -303,14 +161,6 @@ function calculateGlobalRefreshTimeHits(){
 function calculateUserRefreshTimeHits(user){
     var total = 0, refTime = 0, refTimeInp = null, timelimes = T_LIST[user.blogType];
     for(var i in timelimes){
-        //refTimeInp = $("#userRefreshTime_" + timelimes[i]);
-        //refTime = Number(refTimeInp.val());
-        //if(isNaN(refTime)){
-        //    refTime = 0;
-        //}else if(refTime!==0 && refTime<30){
-        //    refTime = 30;
-        //}
-        //refTimeInp.val(refTime);
         if(user.refreshTime && user.refreshTime[timelimes[i]]){
             refTime = user.refreshTime[timelimes[i]];
         }else{
@@ -322,7 +172,6 @@ function calculateUserRefreshTimeHits(user){
         total += Math.round(60*60/refTime);
     }
     return total;
-    //$("#userRefreshTimeHits").html(total);
 };
 //检查用户输入的刷新时间并计算设置产生的请求次数，然后保存
 function checkUserRefreshTimeHitsAndSave(inp){
@@ -366,49 +215,6 @@ function checkUserRefreshTimeHitsAndSave(inp){
     _showMsg('刷新间隔已更新');
 };
 var curthas = checkUserRefreshTimeHitsAndSave;
-
-function disabledUserEditBtns(){
-    $("#show-edit-account, #del-account, #stop-account, #show-edit-user-custom").attr('disabled', true);
-};
-
-/*
-function showAccountList(){
-    var userList = getUserList('all');
-    var userCount = 0;
-    var needRefresh = false;
-    if(userList){
-        var op = '';
-        var tpl = '<option value="{{uniqueKey}}">({{stat}}) ({{blogTypeName}}) {{screen_name}}</option>';
-        for(var i in userList){
-            userCount++;
-            var user = userList[i];
-            if(!user.uniqueKey){ //兼容单微博版本
-                needRefresh = true;
-            } else {
-            	user.blogTypeName = T_NAMES[user.blogType];
-                user.stat = user.disabled ? '停用' : (user.only_for_send ? '仅发送' : '启用');
-            	op += tpl.format(user);
-            }
-        }
-        $("#account-list").html(op);
-    }
-    if(needRefresh || userCount <= 0){
-        $("#tab_user_set").click();
-    }
-    if(needRefresh){
-        $("#needRefresh").show();
-    }
-    
-    // 显示微博选项
-    var blogtype_options = '';
-    for(var k in T_NAMES) {
-    	blogtype_options += '<option value="{{value}}">{{name}}</option>'.format({name: T_NAMES[k], value: k});
-    }
-    $('#account-blogType').html(blogtype_options);
-    showSupportAuthTypes($('#account-blogType').val());
-    
-};
-*/
 
 function showDndAccountList(bindDnd){
     var userList = getUserList('all');
@@ -812,7 +618,6 @@ function _verify_credentials(user) {
                 setUser(user);
             }
             var btnVal = $("#save-account").val();
-            //showAccountList();
             showDndAccountList();
 
             $("#new-account").hide();
@@ -985,38 +790,11 @@ function delAccount(uniqueKey){
         }
     }
     saveUserList(new_list);
-    //disabledUserEditBtns();
     var b_view = getBackgroundView();
     if(b_view){
         b_view.RefreshManager.restart();
     }
     _showMsg('成功删除账号 (' + T_NAMES[delete_user.blogType] + ')' + delete_user.screen_name + '！');
-};
-
-//停、启用用户账号
-function toggleStopAccount(uniqueKey, is_stop){
-    if(!uniqueKey){ return null; }
-    var userList = getUserList('all');
-    var user = null;
-    $.each(userList, function(i, item){
-    	if(item.uniqueKey == uniqueKey){
-    		user = item;
-    		return false;
-    	}
-    });
-    if(user){
-    	user.disabled = (is_stop == undefined) ? (!user.disabled) : is_stop;
-        var c_user = getUser();
-        saveUserList(userList);
-        if(c_user && c_user.uniqueKey.toLowerCase() == uniqueKey.toLowerCase()){
-            var b_view = getBackgroundView();
-            if(b_view){
-                b_view.setUser('');
-                b_view.onChangeUser();
-            }
-        }
-    }
-    return user;
 };
 
 function saveAll(){
@@ -1239,6 +1017,8 @@ function refreshAccountWarp(user, stat){
             $("#refresh-account").removeAttr("disabled");
             if($("#needRefresh").css('display') != 'none'){ //如果是强制需要刷新用户信息的，则在刷新后刷新页面
                 window.location.reload(); //TODO: 修改为不用刷新页面的
+            }else{
+                showDndAccountList();
             }
         }
     });
