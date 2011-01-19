@@ -31,6 +31,9 @@ label.title{color:#AB5603; font-weight:bold;}
 	border-top: 1px dashed #D5B163;
 }
 
+.footer{margin-top:20px; border-top:solid 1px #ccc; padding-top:10px; text-align:center;}
+.footer img{vertical-align: middle;}
+
 #facebox{right:auto;left:20px;}
 
 #gRefreshTimeHits, #userRefreshTimeHits{ color:#BA2636; }

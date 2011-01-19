@@ -97,6 +97,7 @@ var sinaApi = {
         
         ErrorCodes: {
         	"40025:Error: repeated weibo text!": "重复发送",
+        	"40028:": "新浪微博接口内部错误",
         	"40031:Error: target weibo does not exist!": "不存在的微博ID",
         	"40015:Error: not your own comment!": "评论ID不在登录用户的comments_by_me列表中",
         	"40303:Error: already followed": "已跟随"
@@ -2035,7 +2036,7 @@ $.extend(LeiHouAPI, {
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://leihou.com',
         user_home_url: 'http://leihou.com/',
-		source: '', //'fawave', //貌似fawave被雷猴封了？加入source=fawave就好返回404
+		source: 'fawave', //貌似fawave被雷猴封了？加入source=fawave就好返回404
 		repost_pre: 'RT',
 	    support_comment: false,
 	    support_do_comment: false,
