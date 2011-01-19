@@ -1037,8 +1037,8 @@ var popupBox = {
                 popupBox.box.find('.pb_title .t, .pb_footer .t').html('');
             }
             popupBox.box.find('.pb_content').html('<div class="image"><span class="rotate_btn">'
-              + '<a href="javascript:" onclick="$(\'#facebox_see_img\').rotateLeft(90);"><img src="/images/rotate_l.png"></a>'
-              + '<a href="javascript:" onclick="$(\'#facebox_see_img\').rotateRight(90);" style="margin-left:10px;"><img src="/images/rotate_r.png"></a></span>'
+              + '<a href="javascript:" onclick="$(\'#facebox_see_img\').rotateLeft(90);popupBox.show();"><img src="/images/rotate_l.png"></a>'
+              + '<a href="javascript:" onclick="$(\'#facebox_see_img\').rotateRight(90);popupBox.show();" style="margin-left:10px;"><img src="/images/rotate_r.png"></a></span>'
               + '<img id="facebox_see_img" src="' + image.src + '" class="cur_min" onclick="popupBox.close()" /></div>');
             popupBox.show(image.width, image.height);
             image.onload = null;
