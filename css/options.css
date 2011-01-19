@@ -161,6 +161,7 @@ ul#navigation li.selected{
 #dnd-account-list li .face_img{ float:left; position: relative;}
 #dnd-account-list li .face_img .face img{width:48px;height:48px; border-radius:4px; -webkit-box-shadow: #AAA 0px 0px 3px;}
 #dnd-account-list li .face_img .blogType{bottom: 0px; position: absolute; right: -2px;}
+#dnd-account-list li .drag a{cursor:move;}
 #dnd-account-list li .detail{margin-left: 55px;}
 #dnd-account-list li .detail .item{padding:2px;}
 #dnd-account-list li .detail .item2{margin-top:3px;}
