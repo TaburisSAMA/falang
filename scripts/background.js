@@ -147,8 +147,10 @@ function checkTimeline(t, p, user_uniqueKey){
         if(last_id && sinaMsgs.length > 0){
         	if(c_user.blogType == 't163' && last_id.indexOf(':') > 0) { // 兼容网易的id
         		last_id = last_id.split(':', 1)[0];
-        	} else if(c_user.blogType == 'tqq' && tweets[_key].length > 0) {
-        		last_id = tweets[_key][0].id; // tqq 重现修改last_id为id
+        	} else if(c_user.blogType == 'tqq') {
+                // tqq 重现修改last_id为id
+        		//last_id = tweets[_key][0].id;
+                last_id = getLastMsgId(t+'_real_id', user_uniqueKey);
         	}
         	var result = filterDatasByMaxId(sinaMsgs, last_id, false);
         	if(tweets[_key].length == 0) {
@@ -166,6 +168,10 @@ function checkTimeline(t, p, user_uniqueKey){
         	// 兼容网易的cursor_id
             // 兼容腾讯的pagetime
             setLastMsgId(sinaMsgs[0].timestamp || sinaMsgs[0].cursor_id || sinaMsgs[0].id, t, user_uniqueKey);
+            if(c_user.blogType == 'tqq'){
+                //qq的last_id保存的是timestamp，但是在过滤重复信息的时候需要用到id，所以再保存一个ID
+                setLastMsgId(sinaMsgs[0].id, t+'_real_id', user_uniqueKey);
+            }
             tweets[_key] = sinaMsgs.concat(tweets[_key]);
             var _unreadCount = 0, _msg_user = null;
             var c_user_id = String(c_user.id);
