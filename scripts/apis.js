@@ -2663,6 +2663,9 @@ $.extend(T163API, {
 			delete args.data.id;
 		} else if(args.url == this.config.favorites) {
 			args.data.id = user.name;
+		} else if(args.url == this.config.friendships_destroy || args.url == this.config.friendships_create) {
+			args.data.user_id = args.data.id;
+			delete args.data.id;
 		}
     },
     
