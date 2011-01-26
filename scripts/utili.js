@@ -133,6 +133,24 @@ var tabDes = {
     'direct_messages': '私信'
 };
 
+//刷新时间限制
+var refreshTimeLimit = {
+    'tsina':{
+        'friends_timeline': 30, 
+        'mentions': 30, 
+        'comments_timeline': 30, 
+        'direct_messages': 30
+    },
+    'tqq':{
+        'friends_timeline': 45, 
+        'mentions': 45, 
+        'comments_timeline': 45, 
+        'direct_messages': 45
+    }
+};
+refreshTimeLimit.digu = refreshTimeLimit.twitter = refreshTimeLimit.tsohu = refreshTimeLimit.t163 = refreshTimeLimit.fanfou = refreshTimeLimit.plurk = refreshTimeLimit.tsina;
+refreshTimeLimit.renjian = refreshTimeLimit.zuosa = refreshTimeLimit.follow5 = refreshTimeLimit.leihou = refreshTimeLimit.douban = refreshTimeLimit.buzz = refreshTimeLimit.tqq;
+
 function showMsg(msg){
     var popupView = getPopupView();
     if(popupView){
@@ -249,10 +267,16 @@ var Settings = {
     * 获取刷新间隔时间
     */
     getRefreshTime: function(user, t){
+        var r = 60;
         if(user && user.refreshTime && user.refreshTime[t]){
-            return user.refreshTime[t];
+            r = user.refreshTime[t];
+        }else{
+            r = this.get().globalRefreshTime[t];
         }
-        return this.get().globalRefreshTime[t];
+        if(refreshTimeLimit[user.blogType] && refreshTimeLimit[user.blogType][t] && refreshTimeLimit[user.blogType][t] > r){
+            r = refreshTimeLimit[user.blogType][t];
+        }
+        return r;
     }
 };
 
@@ -540,20 +564,6 @@ function setAlertMode(mode){
     localStorage.setObject(ALERT_MODE_KEY, mode);
 };
 //<<--
-
-function getRefreshTime(){
-    var t = false;
-    if(t){
-        t = Number(t);
-        if(isNaN(t)){
-            t = 3;
-        }
-        t = t * 1000 * 60;
-    }else{
-        t = 3 * 1000 * 60;//默认3分钟
-    }
-    return t;
-};
 
 //====>>>>>>>>>>>>>>>>>>
 function getBackgroundView(){
