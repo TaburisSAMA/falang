@@ -276,6 +276,13 @@ var Settings = {
         if(refreshTimeLimit[user.blogType] && refreshTimeLimit[user.blogType][t] && refreshTimeLimit[user.blogType][t] > r){
             r = refreshTimeLimit[user.blogType][t];
         }
+        if(isNaN(r)){
+            r = 60;
+        }else if(r < 30){
+            r = 30;
+        }else if(r > 24 * 60 * 60){
+            r = 24 * 60 * 60;
+        }
         return r;
     }
 };
