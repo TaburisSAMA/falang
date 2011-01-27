@@ -8,7 +8,7 @@
 		"description": "name"
 	},
 	"extDes": {
-		"message": "FaWave(发微)，支持多微博的Chrome插件，各微博同时提示、无缝切换。有问题请到新浪微博找 @QLeelulu 反馈。",
+		"message": "FaWave(发微)，支持多微博的Chrome插件，各微博同时提示、无缝切换。有问题请找 @QLeelulu 反馈。",
 		"description": "该插件的简单描述"
 	},
 	"parserErrorMsg": {
