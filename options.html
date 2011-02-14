@@ -18,7 +18,7 @@
 <body>
 <div>
 	<div class="logo">
-		<h1>FaWave - 发微</h1>
+		<h1><script>_u.wi('extName')</script></h1>
 		
 		<span style="margin-right: 150px;color:green;font-size:18px; font-weight:bold;float:right;">
 			应用推荐： <a href="http://timgs.sinaapp.com/" target="_blank">微博图墙</a>
@@ -27,20 +27,20 @@
 <div>
 <div class="other">
 	<ul id="navigation"> 
-		<li class="selected" target_id="#common_set"><a href="javascript:">基本设置</a></li> 
-		<li class="" target_id="#appearance_set"><a href="javascript:">外观设置</a></li> 
-		<li class="" target_id="#user_set" hide_save_btn="1"><a id="tab_user_set" href="javascript:">帐号设置</a></li> 
-		<li class="" target_id="#advanced_set" ><a href="javascript:">高级设置</a></li> 
-		<li class="" target_id="#about_me" hide_save_btn="1"><a href="javascript:">关于与感谢</a></li> 
+		<li class="selected" target_id="#common_set"><a href="javascript:"><script>_u.wi('sett_TabName_common_set')</script></a></li> 
+		<li class="" target_id="#appearance_set"><a href="javascript:"><script>_u.wi('sett_TabName_appearance_set')</script></a></li> 
+		<li class="" target_id="#user_set" hide_save_btn="1"><a id="tab_user_set" href="javascript:"><script>_u.wi('sett_TabName_user_set')</script></a></li> 
+		<li class="" target_id="#advanced_set" ><a href="javascript:"><script>_u.wi('sett_TabName_advanced_set')</script></a></li> 
+		<li class="" target_id="#about_me" hide_save_btn="1"><a href="javascript:"><script>_u.wi('sett_TabName_about')</script></a></li> 
 		<li class="shadow"></li> 
 	</ul>
 	<!-- 用户设置 START -->
 	<div id="user_set" class="set_wrap" style="display:none;">
 		<div class="alert" id="needRefresh" style="display:none;">你看到这个是因为你的账户信息需要刷新FaWave才能继续使用，请点击“更新用户信息”进行刷新用户信息。</div>
 		<div>
-			<button id="show-new-account"><img src="images/add.png" />添加新用户</button>
-			<button id="refresh-account"><img src="images/refresh.png" />更新用户信息</button>
-			<span class="jTip" jTitle="为什么要更新？　" jWidth="320">?<span class="c">为了快速启动，用户信息会缓存在本地，如果你修改了用户头像或者其他用户信息，需要手动更新一下。
+			<button id="show-new-account"><img src="images/add.png" /><script>_u.wi('sett_btn_add_new_account')</script></button>
+			<button id="refresh-account"><img src="images/refresh.png" /><script>_u.wi('sett_btn_update_accounts')</script></button>
+			<span class="jTip" jTitle="" jWidth="320">?<span class="c"><script>_u.wi('sett_jTip_update_accounts')</script>
 				</span></span>
 		</div>
 
@@ -53,16 +53,16 @@
 				<li>* 新浪微博的API，由于cookie信息会干扰认证，而我至今未找到解决办法，所以在添加或者编辑用户信息的时候，为了确保你可以正确设置你的账号信息，设置新浪微博的账号时，请你先<b><a href="http://t.sina.com.cn/logout.php?backurl=/" target="_blank">退出新浪微博</a></b></li>
 				<li>* 网易微博的API同样受到cookie信息干扰，设置网易微博的账号时，或者你已经在web版登录了，请你先<b><a href="http://reg.163.com/Logout.jsp?username=&url=http://t.163.com" target="_blank">退出网易微博</a></b></li>
 				<li>
-					<label for="account-blogType">微　　博：</label>
+					<label for="account-blogType"><script>_u.wi('sett_des_account_blog_type')</script></label>
 					<select id="account-blogType" onchange="onSelBlogTypeChange()">
 					</select>
 					<img id="account-blogType-img" src="images/blogs/tsina_16.png" />
 				</li>
 				<li class="account-proxy">
-                    <label for="account-proxy-api">API 代理：</label>
+                    <label for="account-proxy-api"><script>_u.wi('sett_des_account_proxy_api')</script></label>
                     <input type="text" id="account-proxy-api" style="width: 400px" />
-					<span class="jTip" jTitle="API说明:　" jWidth="310">?
-						<span class="c">oAuth方式请将api留空。gtap或者twip(O模式)请配合Basic Auth方式。</span>
+					<span class="jTip" jTitle="" jWidth="310">?
+						<span class="c"><script>_u.wi('sett_jTip_account_proxy_api')</script></span>
 					</span>
                 </li>
                 <!--  
@@ -72,34 +72,32 @@
                 </li>
                 -->
 				<li>
-					<label for="account-authType">验证类型：</label>
+					<label for="account-authType"><script>_u.wi('sett_des_account_auth_type')</script></label>
 					<select id="account-authType">
 					</select>
-					<span class="jTip" jTitle="验证类型说明:　" jWidth="310">?
-						<span class="c"><span class="note">Basic Auth</span>:便捷，不过用户和密码保存在本地。<br/>
-						<span class="note">oAuth</span>:到授权网站上登陆，更安全，推荐。(本地只保存获取到的授权码) <br/>
-						<span class="note">xAuth</span>:oAuth的简化方式，直接输入用户密码验证，不过用户密码不保存在本地。</span>
+					<span class="jTip" jTitle="" jWidth="310">?
+						<span class="c"><script>_u.wi('sett_jTip_account_auth_type')</script></span>
 					</span>
 				</li>
 				<li class="account-oauth">
-					<label for="account-pin">　授权码：</label>
+					<label for="account-pin"><script>_u.wi('sett_des_account_pin')</script></label>
 					<input type="text" id="account-pin" />
 					<input type="hidden" id="account-request-token-key" />
 					<input type="hidden" id="account-request-token-secret" />
-					<input type="button" id="get-account-pin" value="点此获取授权码" />
+					<input id="get-account-pin" ><script>_u.wi('sett_btn_get_account_pin')</script></button>
 				</li>
 				<li class="account-baseauth">
-					<label for="account-name">　用户名：</label>
+					<label for="account-name"><script>_u.wi('sett_des_account_name')</script></label>
 					<input type="text" id="account-name" />
 					<input type="hidden" id="edit-account-key" />
 				</li>
 				<li class="account-baseauth">
-					<label for="account-pwd">密　　码：</label>
+					<label for="account-pwd"><script>_u.wi('sett_des_account_password')</script></label>
 					<input type="password" id="account-pwd" />
 				</li>
 				<li>
-					<input type="button" id="save-account" value="添加" />   
-					<input type="button" id="cancel-save-account" value="取消" />
+					<button id="save-account" ><script>_u.wi('sett_btn_get_account_save')</script></button>   
+					<button id="cancel-save-account"><script>_u.wi('sett_btn_get_account_cancel')</script></button>
 				</li>
 			<ul>
 		</div>
@@ -161,14 +159,7 @@
 			</ul>
 		</div>-->
 		<h3>用户管理
-			<span class="jTip" jTitle="" jWidth="320">?<span class="c"><span class="note">帐号状态：</span>“启用”的帐号可以查看微博和发送微博。
-			“仅发送”的帐号不可以查看，仅在发送微博的时候可以选择同步发送。
-			“停用”的帐号既不能查看也不可以同步发送，请仅在你暂时不想管理这个帐号的时候将它设为“停用”。<br/>
-			<span class="note">刷新间隔：</span>这里的刷新频率设置会覆盖“<span class="note">基本设置</span>”里面的“获取信息间隔时间”的设置，
-			你可以在这里为特定的账户设置特定的刷新时间间隔，而不影响其他账号使用全局设置。最低可以设置的值为<span class="note">30秒</span>。
-			括号内数字为当前全局设置值，填“0”表示使用全局设置。<br/>
-			<span class="note">帐号排序：</span>直接拖动帐号的头像可以进行拖动排序。<br/>
-			<span class="note">保存：</span>所有操作会在你操作完成后自动保存。
+			<span class="jTip" jTitle="" jWidth="320">?<span class="c"><script>_u.wi('sett_jTip_manage_accounts')</script>
 			</span></span>
 		</h3>
 		<ul id="dnd-account-list"></ul>
@@ -178,101 +169,99 @@
 	<ul id="common_set" class="set_wrap">
 		<li>
 			<p>
-				<label class="title">获取信息间隔时间：</label>
+				<label class="title"><script>_u.wi('sett_itemName_g_refresh_time')</script></label>
 				<span id="gRefreshTimeWrap">
-					首页:<input type="text" id="gRefreshTime_friends_timeline" class="inpRefTime" />秒, 
-					@我:<input type="text" id="gRefreshTime_mentions" class="inpRefTime" />秒, 
-					评论:<input type="text" id="gRefreshTime_comments_timeline" class="inpRefTime" />秒, 
-					私信:<input type="text" id="gRefreshTime_direct_messages" class="inpRefTime" />秒
+					<script>_u.wi('comm_TabName_friends_timeline')</script>:<input type="text" id="gRefreshTime_friends_timeline" class="inpRefTime" /><script>_u.wi('comm_second')</script>, 
+					<script>_u.wi('comm_TabName_mentions')</script>:<input type="text" id="gRefreshTime_mentions" class="inpRefTime" /><script>_u.wi('comm_second')</script>, 
+					<script>_u.wi('comm_TabName_comments_timeline')</script>:<input type="text" id="gRefreshTime_comments_timeline" class="inpRefTime" /><script>_u.wi('comm_second')</script>, 
+					<script>_u.wi('comm_TabName_direct_messages')</script>:<input type="text" id="gRefreshTime_direct_messages" class="inpRefTime" /><script>_u.wi('comm_second')</script>
 				</span>
-				<span class="jTip" jTitle="间隔越短越好吗？:　" jWidth="310">?<span class="c">这里的刷新时间间隔是全局设置，如果你需要对特定的账号进行特定的设置，可以到“<span class="note">账号设置</span>”里面进行“修改用户属性”设置。例如新浪最高可以30秒刷新一次，而Twitter每小时的API请求是150次，所以30秒刷新一次Twitter肯定会超过限制，超过限制则会出错。所以Twitter的账号可以到“<span class="note">账号设置</span>”里面进行自定义的设置。至于各帐号具体的API请求频率限制可以点击“<span class="note">查看API请求数限制状态</span>”查看。最低可以设置的值为<span class="note">30秒</span></span></span>
-				&nbsp;<a href="api_rate_limit.html" target="_blank">查看API请求数限制状态</a>
-				<br/>　　　　　　　　　　(当前设置的刷新间隔每小时产生的请求次数为：<span id="gRefreshTimeHits"></span>请求/每小时)
+				<span class="jTip" jTitle="间隔越短越好吗？:　" jWidth="310">?<span class="c"><script>_u.wi('sett_jTip_g_refresh_time')</script></span></span>
+				&nbsp;<a href="api_rate_limit.html" target="_blank"><script>_u.wi('comm_show_rate_limit_stat')</script></a>
+				<br/><script>_u.wi('sett_des_g_refresh_time_hits')</script>
 			</p>
 		</li>
 		<li>
-			<p id="set_badge_wrap"><label class="title">　　　　未读提示：</label>
-				<input type="checkbox" id="set_badge_friends_timeline" value="1" /><label for="set_badge_friends_timeline">最新微博</label>
-				<input type="checkbox" id="set_badge_mentions" value="1" /><label for="set_badge_mentions">@我的</label>
-				<input type="checkbox" id="set_badge_comments_timeline" value="1" /><label for="set_badge_comments_timeline">评论</label>
-				<input type="checkbox" id="set_badge_direct_messages" value="1" /><label for="set_badge_direct_messages">私信</label>
-				<span class="jTip" jTitle="FaWave(发微)的按钮上未读信息数的提示:　">?
-					<span class="c"><img src="/images/setting/unread.gif" /></span>
-				</span>
-			</p>
-		</li>
-		<li>
-			<p id="set_show_in_page_wrap"><label class="title">在浏览的网页提示：</label>
-				<input type="checkbox" id="set_show_in_page_friends_timeline" /><label for="set_show_in_page_friends_timeline">最新微博</label>
-				<input type="checkbox" id="set_show_in_page_mentions" /><label for="set_show_in_page_mentions">@我的</label>
-				<input type="checkbox" id="set_show_in_page_comments_timeline" /><label for="set_show_in_page_comments_timeline">评论</label>
-				<input type="checkbox" id="set_show_in_page_direct_messages" /><label for="set_show_in_page_direct_messages">私信</label>
-				<span class="jTip" jTitle="在你正在看的网页上提示新信息，5秒钟后自动隐藏:　">?
-					<span class="c"><img src="/images/setting/show_in_page.png" /></span>
+			<p id="set_badge_wrap"><label class="title"><script>_u.wi('sett_itemName_set_badge')</script></label>
+				<input type="checkbox" id="set_badge_friends_timeline" value="1" /><label for="set_badge_friends_timeline"><script>_u.wi('comm_TabName_friends_timeline')</script></label>
+				<input type="checkbox" id="set_badge_mentions" value="1" /><label for="set_badge_mentions"><script>_u.wi('comm_TabName_mentions')</script></label>
+				<input type="checkbox" id="set_badge_comments_timeline" value="1" /><label for="set_badge_comments_timeline"><script>_u.wi('comm_TabName_comments_timeline')</script></label>
+				<input type="checkbox" id="set_badge_direct_messages" value="1" /><label for="set_badge_direct_messages"><script>_u.wi('comm_TabName_direct_messages')</script></label>
+				<span class="jTip" jTitle="">?
+					<span class="c"><script>_u.wi('sett_jTip_set_badge')</script></span>
 				</span>
 			</p>
 		</li>
 		<li>
-			<p id="set_sound_alert_wrap"><label class="title">　　　　声音提示：</label>
-				<input type="checkbox" id="sound_alert_friends_timeline" /><label for="sound_alert_friends_timeline">最新微博</label>
-				<input type="checkbox" id="sound_alert_mentions" /><label for="sound_alert_mentions">@我的</label>
-				<input type="checkbox" id="sound_alert_comments_timeline" /><label for="sound_alert_comments_timeline">评论</label>
-				<input type="checkbox" id="sound_alert_direct_messages" /><label for="sound_alert_direct_messages">私信</label>
-				<span class="jTip" jTitle="声音提示:　" jWidth="300">?<span class="c">有新微博的时候播放声音提醒.<br/>声音文件可以是网络上的文件(http://***等等)，但是为了插件的稳定性，请选择速度快速稳定的链接。默认值为：/sound/d.mp3</span></span>
-				<label for="inpSoundFile">声音文件：</label><input type="text" id="inpSoundFile" />
+			<p id="set_show_in_page_wrap"><label class="title"><script>_u.wi('sett_itemName_show_in_page')</script></label>
+				<input type="checkbox" id="set_show_in_page_friends_timeline" /><label for="set_show_in_page_friends_timeline"><script>_u.wi('comm_TabName_friends_timeline')</script></label>
+				<input type="checkbox" id="set_show_in_page_mentions" /><label for="set_show_in_page_mentions"><script>_u.wi('comm_TabName_mentions')</script></label>
+				<input type="checkbox" id="set_show_in_page_comments_timeline" /><label for="set_show_in_page_comments_timeline"><script>_u.wi('comm_TabName_comments_timeline')</script></label>
+				<input type="checkbox" id="set_show_in_page_direct_messages" /><label for="set_show_in_page_direct_messages"><script>_u.wi('comm_TabName_direct_messages')</script></label>
+				<span class="jTip" jTitle="">?
+					<span class="c"><script>_u.wi('sett_jTip_show_in_page')</script></span>
+				</span>
 			</p>
 		</li>
 		<li>
-			<p id="set_destop_alert_wrap"><label class="title">　　　　桌面提示：</label>
-				<input type="checkbox" id="destop_alert_friends_timeline" /><label for="destop_alert_friends_timeline">最新微博</label>
-				<input type="checkbox" id="destop_alert_mentions" /><label for="destop_alert_mentions">@我的</label>
-				<input type="checkbox" id="destop_alert_comments_timeline" /><label for="destop_alert_comments_timeline">评论</label>
-				<input type="checkbox" id="destop_alert_direct_messages" /><label for="destop_alert_direct_messages">私信</label>
-				<span class="jTip" jTitle="桌面提示:　">?<span class="c">有新微博的时候在桌面提示未读信息数</span></span>
+			<p id="set_sound_alert_wrap"><label class="title"><script>_u.wi('sett_itemName_sound_alert')</script></label>
+				<input type="checkbox" id="sound_alert_friends_timeline" /><label for="sound_alert_friends_timeline"><script>_u.wi('comm_TabName_friends_timeline')</script></label>
+				<input type="checkbox" id="sound_alert_mentions" /><label for="sound_alert_mentions"><script>_u.wi('comm_TabName_mentions')</script></label>
+				<input type="checkbox" id="sound_alert_comments_timeline" /><label for="sound_alert_comments_timeline"><script>_u.wi('comm_TabName_comments_timeline')</script></label>
+				<input type="checkbox" id="sound_alert_direct_messages" /><label for="sound_alert_direct_messages"><script>_u.wi('comm_TabName_direct_messages')</script></label>
+				<span class="jTip" jTitle="" jWidth="300">?<span class="c"><script>_u.wi('sett_jTip_sound_alert')</script></span></span>
+				<label for="inpSoundFile"><script>_u.wi('sett_itemName_sound_file')</script></label><input type="text" id="inpSoundFile" />
+			</p>
+		</li>
+		<li>
+			<p id="set_destop_alert_wrap"><label class="title"><script>_u.wi('sett_itemName_destop_alert')</script></label>
+				<input type="checkbox" id="destop_alert_friends_timeline" /><label for="destop_alert_friends_timeline"><script>_u.wi('comm_TabName_friends_timeline')</script></label>
+				<input type="checkbox" id="destop_alert_mentions" /><label for="destop_alert_mentions"><script>_u.wi('comm_TabName_mentions')</script></label>
+				<input type="checkbox" id="destop_alert_comments_timeline" /><label for="destop_alert_comments_timeline"><script>_u.wi('comm_TabName_comments_timeline')</script></label>
+				<input type="checkbox" id="destop_alert_direct_messages" /><label for="destop_alert_direct_messages"><script>_u.wi('comm_TabName_direct_messages')</script></label>
+				<span class="jTip" jTitle="">?<span class="c"><script>_u.wi('sett_jTip_destop_alert')</script></span></span>
 
-				<label for="inpDesktopNotificationsTimeout">自动关闭延时：</label><input type="text" id="inpDesktopNotificationsTimeout" class="inpRefTime" />秒
+				<label for="inpDesktopNotificationsTimeout"><script>_u.wi('sett_itemName_destop_alert_timeout')</script></label><input type="text" id="inpDesktopNotificationsTimeout" class="inpRefTime" /><script>_u.wi('comm_second')</script>
 			</p>
 		</li>
 		<li>
-			<label class="title">　　　　同步设置：</label>
+			<label class="title"><script>_u.wi('sett_itemName_sync_to_page')</script></label>
 			<span>
-				<input type="checkbox" id="unread_sync_to_page" value="1" /><label for="unread_sync_to_page">同时将新浪微博页面的未读提示置零</label>
+				<input type="checkbox" id="unread_sync_to_page" value="1" /><label for="unread_sync_to_page"><script>_u.wi('sett_itemDes_sync_to_page')</script></label>
 			</span>
-			<span class="jTip" jTitle="未读信息提示同步:　">?
-				<span class="c"><span class="note">暂时只支持新浪微博</span>。如果已经通过FaWave(发微)看过的信息，<br/>则同时将新浪微博的页面提示数置零<br/><br/><img src="/images/setting/page_unread_tip.png" /></span>
+			<span class="jTip" jTitle="">?
+				<span class="c"><script>_u.wi('sett_jTip_sync_to_page')</script></span>
 			</span>
 		</li>
 		<li>
-			<label class="title">多账号发送默认选择</label>
+			<label class="title"><script>_u.wi('sett_itemName_send_select')</script></label>
 			<select id="send_accounts_default_select">
-				<option value="remember">记住上次选择</option>
-				<option value="current">当前账号</option>
-				<option value="all">全部账号</option>
+				<option value="remember"><script>_u.wi('sett_send_select_remember')</script></option>
+				<option value="current"><script>_u.wi('sett_send_select_current')</script></option>
+				<option value="all"><script>_u.wi('sett_send_select_all')</script></option>
 			</select>
-			<span class="jTip" jTitle="" jWidth="330">?<span class="c">当你设置了多个账号，在发送微博的时候可以根据需要选择默认选中的发送账号。
+			<span class="jTip" jTitle="" jWidth="330">?<span class="c"><script>_u.wi('sett_jTip_send_select')</script>
 			</span></span>
 		</li>
 		<li>
-			<label class="title" for="enable_contextmenu">启用右键菜单分享：</label>
+			<label class="title" for="enable_contextmenu"><script>_u.wi('sett_itemName_context_menu')</script></label>
 			<input type="checkbox" id="enable_contextmenu" value="1" />
-			<span class="jTip" jTitle="" jWidth="330">?<span class="c">在你浏览的当前网页的右键菜单中加入“通过FaWave分享”的选项。
+			<span class="jTip" jTitle="" jWidth="330">?<span class="c"><script>_u.wi('sett_jTip_context_menu')</script>
 			</span></span>
 		</li>
 		<li>
 			<p>
-				<label class="title">快捷发微博快捷键：</label>
+				<label class="title"><script>_u.wi('sett_itemName_quick_send_key')</script></label>
 				<input type="hidden" id="set_quick_send_key" value="" />
 				<input type="text" id="set_quick_send_key_inp" value="" />
-				<span class="jTip" jTitle="什么是快捷发微博？　" jWidth="330">?<span class="c">在所有的页面上，你可以使用你设置的快捷键，把发送微博的界面调用出来，快捷、轻便。<span class="note">更改快捷键后请记得保存。更改后快捷键会在页面刷新后生效。</span><br/>
-				小提示:<span class="note">选择页面上的文字，再按快捷键调出快捷发送界面，会自动填充选择文字到输入框。</span><br/>
-				<img src="/images/setting/quick_send.png" />
+				<span class="jTip" jTitle="" jWidth="330">?<span class="c"><script>_u.wi('sett_jTip_quick_send_key')</script>
 				</span></span>
-				<span id="set_quick_send_key_tip">请直接按键</span>
+				<span id="set_quick_send_key_tip"><script>_u.wi('sett_des_quick_send_key')</script></span>
 			</p>
 		</li>
 		<li>
 			<p>
-				<label class="title">　　翻译目标语言：</label>
+				<label class="title"><script>_u.wi('sett_itemName_translate_target')</script></label>
 				<select id="translate_target"></select>
 			</p>
 		</li>
@@ -287,7 +276,7 @@
 						<option value="300">300</option>
 					</select>
 				</span>-->
-				<div><input type="button" id="cleanLocalStorage" value="清空本地缓存数据" /></div>
+				<div><button id="cleanLocalStorage" ><script>_u.wi('sett_btn_clean_local_storage')</script></button></div>
 			</p>
 		</li>
 	</ul>
@@ -295,7 +284,7 @@
 	<ul id="appearance_set" class="set_wrap" style="display:none;">
 		<li>
 			<div>
-				<label class="title">字体设置：</label>
+				<label class="title"><script>_u.wi('sett_itemName_font')</script></label>
 				<span>
 					<select id="selFont">
 						<option value="微软雅黑">微软雅黑</option>
@@ -319,24 +308,24 @@
 		</li>
 		<li>
 			<p>
-				<label class="title">高宽设置：</label>
+				<label class="title"><script>_u.wi('sett_itemName_WH')</script></label>
 				<span>
-					<label for="set_main_height">高度:</label>
+					<label for="set_main_height"><script>_u.wi('sett_itemName_height')</script>:</label>
 					<input type="text" id="set_main_height" value="520" />
-					<span class="jTip" jTitle="高度限制">?<span class="c">高度超过差不多570-580，会导致滚动条失效。</span></span>
-					<label for="set_main_width">宽度:</label>
+					<span class="jTip" jTitle="">?<span class="c"><script>_u.wi('sett_itemName_WH_height_limit')</script></span></span>
+					<label for="set_main_width"><script>_u.wi('sett_itemName_width')</script>:</label>
 					<input type="text" id="set_main_width" value="480" />
-					<span class="jTip" jTitle="宽度限制">?<span class="c">宽度极限是800，再大也不会改变大小。</span></span>
+					<span class="jTip" jTitle="">?<span class="c"><script>_u.wi('sett_jTip_WH_width_limit')</script></span></span>
                     
 				</span>
 			</li>
 			<li>
-				<label class="title">主题选择：</label>
+				<label class="title"><script>_u.wi('sett_itemName_theme')</script></label>
 				<span>
 					<select id="selTheme">
 						<option value="pip_io">Pip.io</option>
-						<option value="default">气泡</option>
-						<option value="simple">简洁</option>
+						<option value="default"><script>_u.wi('sett_themeName_bubble')</script></option>
+						<option value="simple"><script>_u.wi('sett_themeName_simple')</script></option>
 					</select>
 				</span>
 				<div><img id="themePreview" src="/themes/default/theme.png" onclick="popupBox.showImg(this.src);return false;" /></div>
@@ -346,43 +335,39 @@
 	<!-- 高级设置 -->
 	<ul id="advanced_set" class="set_wrap" style="display:none;">
 		<li>
-			<label class="title" for="isGeoEnabled">上报我的地理位置：</label>
+			<label class="title" for="isGeoEnabled"><script>_u.wi('sett_itemName_geo')</script></label>
 			<span>
-				<input type="checkbox" id="isGeoEnabled"><label for="isGeoEnabled">启用</label>
-				<a id="btnShowMyGeo" style="display:none;" href="javascript:" onclick="showMyGeo()">查看我的位置</a>
+				<input type="checkbox" id="isGeoEnabled"><label for="isGeoEnabled"><script>_u.wi('comm_enabled')</script></label>
+				<a id="btnShowMyGeo" style="display:none;" href="javascript:" onclick="showMyGeo()"><script>_u.wi('sett_show_my_geo')</script></a>
 			</span>
-			<span class="jTip" jTitle="位置准吗？　" jWidth="320">?
-				<span class="c">这里获取到的位置不一定准确，所以在启用后最好看下自己的当前位置是否正确。</span>
+			<span class="jTip" jTitle="" jWidth="320">?
+				<span class="c"><script>_u.wi('sett_jTip_geo')</script></span>
 			</span>
 		</li>
 		<li>
-			<label class="title">是否启用平滑滚动：</label>
+			<label class="title"><script>_u.wi('sett_itemName_smooth_scroller')</script></label>
 			<span>
-				<input type="checkbox" id="isSmoothScroller"><label for="isSmoothScroller">启用</label> &nbsp;
-				<label for="tween_type">动画类型:</label><select id="tween_type"></select> &nbsp;
-				<label for="ease_type">缓动类型:</label><select id="ease_type">
+				<input type="checkbox" id="isSmoothScroller"><label for="isSmoothScroller"><script>_u.wi('comm_enabled')</script></label> &nbsp;
+				<label for="tween_type"><script>_u.wi('sett_smooth_scroller_tween')</script>:</label><select id="tween_type"></select> &nbsp;
+				<label for="ease_type"><script>_u.wi('sett_smooth_scroller_ease')</script>:</label><select id="ease_type">
 					<option value="easeIn">easeIn</option>
 					<option value="easeOut">easeOut</option>
 				</select>
 				<span id="tween_demo"><span></span></span>
 			</span>
 		</li>
-		<li><label class="title">　　我正在看模板：</label>
+		<li><label class="title"><script>_u.wi('sett_itemName_shared_template')</script></label>
 			<input type="text" id="tp_looking" value="我正在看: {{title}} {{url}} " style="width:200px;" />
-			<span class="jTip" jTitle="可用参数与说明:　" jWidth="320">?
-				<span class="c">当你使用“我正在看”的功能的时候，会根据该模板生成最终内容。<br/>
-					模板参数必须由"{{}}"包裹起来，可用的参数有：<br/>
-					<p><b>{{url}}</b>: 你当前正在浏览的网页的url</p>
-					<p><b>{{title}}</b>: 你当前正在浏览的网页的标题</p>
-					<img src="/images/setting/looking.png" /></span>
+			<span class="jTip" jTitle="" jWidth="320">?
+				<span class="c"><script>_u.wi('sett_jTip_shared_template')</script></span>
 			</span>
 		</li>
 		<li>
-			<label class="title">是否自动缩短URL：</label>
+			<label class="title"><script>_u.wi('sett_itemName_auto_short_url')</script></label>
 			<span>
-				<input type="checkbox" name="autoShortUrl" value="1" checked="checked" id="autoShortUrl"><label for="autoShortUrl">自动缩短</label>, 
-				<label for="autoShortUrlCount">URL超过多少个字符自动缩短:</label><input type="text" id="autoShortUrlCount" value="15" />
-				缩址服务:
+				<input type="checkbox" name="autoShortUrl" value="1" checked="checked" id="autoShortUrl"><label for="autoShortUrl"><script>_u.wi('sett_des_auto_short_url')</script></label>, 
+				<label for="autoShortUrlCount"><script>_u.wi('sett_des_auto_short_url_words')</script>:</label><input type="text" id="autoShortUrlCount" value="15" />
+				<script>_u.wi('sett_des_shorten_url_service')</script>:
 				<select id="shorten_url_service"></select>
 			</span>
 		</li>
@@ -399,22 +384,22 @@
 	<!-- 关于与感谢 -->
 	<div id="about_me" class="set_wrap" style="display:none;">
 		
-		<h3>作者(Net4 Team)：</h3>
+		<h3><script>_u.wi('sett_title_author')</script>(Net4 Team)：</h3>
 		<div class="clearFix">
 			<span class="author clearFix">
 				<img src="http://tp4.sinaimg.cn/1644902943/50/1279883084/1"/>
 				<a target="_blank" href="http://t.sina.com.cn/qleelulu" >@QLeelulu</a><br/>
-				博客:<a target="_blank" href="http://qleelulu.cnblogs.com" >QLeelulu在博客园</a>
+				Blog:<a target="_blank" href="http://qleelulu.cnblogs.com" >QLeelulu's Blog</a>
 			</span>
 			<span class="author clearFix">
 				<img src="http://tp1.sinaimg.cn/1640328892/50/1288939760/1"/>
 				<a target="_blank" href="http://t.sina.com.cn/imk2" >@Python发烧友</a><br/>
-				博客:<a target="_blank" href="http://fengmk2.cnblogs.com/" >Python发烧友在博客园</a>
+				Blog:<a target="_blank" href="http://fengmk2.cnblogs.com/" >Python发烧友's Blog</a>
 			</span>
 		</div>
 		<!-- <div><a target="_blank" href="http://t.sina.com.cn/qleelulu" ><img style="padding:3px;border:solid 1px #ccc;" src="http://tp4.sinaimg.cn/1644902943/50/1279883084/1" /></a></div> -->
 		<br/><br/>
-		<h3>官方微博：</h3>
+		<h3><script>_u.wi('sett_title_official')</script>：</h3>
 		<span class="author clearFix">
 			<a target="_blank" href="http://t.sina.com.cn/falang" title="FaWave@新浪微博" ><img src="images/blogs/tsina_16.png" /></a>
 			<a target="_blank" href="http://t.qq.com/fawave" title="FaWave@腾讯微博" ><img src="images/blogs/tqq_16.png" /></a>
@@ -430,7 +415,7 @@
 	</div>
 </div>
 <br>
-<input type="button" id="save-all" value="保存所有" style="width:100px;height:40px;margin-left:20px;" />
+<button id="save-all" style="width:100px;height:40px;margin-left:20px;"><script>_u.wi('sett_btn_save_all')</script></button>
 
 <div id="msgInfoWarp"></div>
 
@@ -461,8 +446,8 @@
 	</script>
     <div class="footer">
 		© <a href="http://fawave.net4team.net" target="_blank">Net4 Team</a> Corp All Rights Reserved  
-		<a href="http://www.w3.org/html/logo/">
-			<img src="http://www.w3.org/html/logo/badge/html5-badge-h-connectivity-css3-multimedia-semantics-storage.png" width="130" height="32" alt="HTML5 Powered with Connectivity / Realtime, CSS3 / Styling, Multimedia, Semantics, and Offline &amp; Storage" title="HTML5 Powered with Connectivity / Realtime, CSS3 / Styling, Multimedia, Semantics, and Offline &amp; Storage">
+		<a href="http://www.w3.org/html/logo/" target="_blank">
+			<img src="http://www.w3.org/html/logo/badge/html5-badge-h-connectivity-css3-multimedia-semantics-storage.png" width="130" height="32" alt="HTML5 Powered with Connectivity / Realtime, CSS3 / Styling, Multimedia, Semantics, and Offline &amp; Storage" title="HTML5 Powered with Connectivity / Realtime, CSS3 / Styling, Multimedia, Semantics, and Offline &amp; Storage" />
 		</a>
 	</div>
 </body>

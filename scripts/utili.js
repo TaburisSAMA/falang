@@ -731,7 +731,11 @@ function ubbCode(str)	{
 var _u = {
     //向页面写内容
     w: function(s){
-        return document.write(s);
+        document.write(s);
+    },
+    //向页面写本地化后的内容
+    wi: function(s, e){
+        _u.w(_u.i18n(s, e));
     },
     //获取本地化语言
     i18n: function(s, e){
