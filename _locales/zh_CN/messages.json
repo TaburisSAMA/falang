@@ -232,7 +232,11 @@
 	},
 	
 	//帐号设置
-	"sett_jTip_update_accounts": {
+	"sett_title_account_manage": {
+		"message": "用户管理",
+		"description": "用户管理"
+	},
+    "sett_jTip_update_accounts": {
 		"message": "为了快速启动，用户信息会缓存在本地，如果你修改了用户头像或者其他用户信息，需要手动更新一下。",
 		"description": "更新用户信息的说明"
 	},
