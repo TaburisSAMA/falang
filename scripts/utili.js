@@ -55,8 +55,8 @@ var T_LIST = {
 	'plurk': ['friends_timeline'],
 	'douban': ['friends_timeline', 'direct_messages']
 };
-T_LIST.tsina = T_LIST.tsohu = T_LIST.all;
-T_LIST.t163 = T_LIST.tqq = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.digu;
+T_LIST.t163 = T_LIST.tsina = T_LIST.tsohu = T_LIST.all;
+T_LIST.tqq = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.digu;
 
 var T_NAMES = {
 	'tsina': '新浪微博',
@@ -1168,6 +1168,7 @@ var ShortenUrl = {
 		'goo.gl': {api: 'http://goo.gl/api/url', format: 'json', method: 'post', param_name: 'url', result_name: 'short_url'},
 //		'v.gd':  'http://v.gd/create.php?format=simple&url={{url}}',
 		'is.gd': 'http://is.gd/api.php?longurl={{url}}',
+		's8.hk': 'http://s8.hk/api/s?u={{url}}',
 		'seso.me': 'http://seso.me/api/?longurl={{url}}',
 		'tinyurl.com': 'http://tinyurl.com/api-create.php?url={{url}}',
 		'to.ly': 'http://to.ly/api.php?longurl={{url}}',
@@ -1190,12 +1191,13 @@ var ShortenUrl = {
 	// MAX_INDEX => http://yongwo.de:1235/api?u=http://is.gd/imWyT&cb=foo
 	MAX_INDEX: 46,
 	expand: function(shorturl, callback, context) {
-		var index = Math.floor(Math.random() * (this.MAX_INDEX + 1));
-		if(index == this.MAX_INDEX) {
-			var url = 'http://yongwo.de:1235/api?u=' + shorturl;
-		} else {
-			var url = 'http://urlexpand' + index + '.appspot.com/api?u=' + shorturl;
-		}
+//		var index = Math.floor(Math.random() * (this.MAX_INDEX + 1));
+		var url = 'http://s8.hk/api/e?u=' + shorturl;
+//		if(index == this.MAX_INDEX) {
+//			var url = 'http://s8.hk/api/e?u=' + shorturl;
+//		} else {
+//			var url = 'http://urlexpand' + index + '.appspot.com/api?u=' + shorturl;
+//		}
 		$.ajax({
 			url: url,
 			success: function(data, status, xhr) {
@@ -1791,32 +1793,3 @@ var VideoService = {
     	window.open(url, '_blank', 'left=' + l + ',top=30,' + width_height + ',menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
 	}
 };
-
-// 缓存数据存储器
-//var TweetStorage = {
-//		_get_pre: function(t, unique_key){
-//			return unique_key + '_' + t;
-//	},
-//	
-//	getItems: function(ids, t, unique_key) {
-//		var pre = this._get_pre(t, unique_key);
-//		return $.map(ids, function(id){
-//			var key = pre + '_' + id;
-//			return localStorage.getObject(key);
-//		});
-//	},
-//	
-//	setItems: function(items, t, unique_key) {
-//		var pre = this._get_pre(t, unique_key);
-//		return $.map(items, function(item){
-//			var key = pre + '_' + item.id;
-//			localStorage.setObject(key, item);
-//			return item.id;
-//		});
-//	},
-//	
-//	removeItem: function(id, t, unique_key) {
-//		var key = this._get_pre(t, unique_key)+ '_' + id;
-//		return localStorage.removeItem(key);
-//	}
-//};

@@ -2815,6 +2815,28 @@ $.extend(T163API, {
 			};
 			data.status.user = this.format_result_item(data.status.user, 'user', args);
 			data.status = this.format_result_item(data.status, 'status', args);
+			
+			if(data.root_in_reply_to_status_id && data.root_in_reply_to_status_id != data.in_reply_to_status_id 
+					&& data.root_in_reply_to_status_text) {
+				data.status.retweeted_status = {
+					id: data.root_in_reply_to_status_id,
+					text: data.root_in_reply_to_status_text,
+					comments_count: data.status.comments_count,
+					user: {
+						id: data.root_in_reply_to_user_id,
+						screen_name: data.root_in_reply_to_user_name,
+						name: data.root_in_reply_to_screen_name,
+						profile_image_url: 'http://mimg.126.net/p/butter/1008031648/img/face_big.gif'
+					}
+				};
+				delete data.root_in_reply_to_status_id;
+				delete data.root_in_reply_to_status_text;
+				delete data.root_in_reply_to_user_id;
+				delete data.root_in_reply_to_screen_name;
+				delete data.root_in_reply_to_user_name;
+				data.status.retweeted_status.user = this.format_result_item(data.status.retweeted_status.user, 'user', args);
+				data.status.retweeted_status = this.format_result_item(data.status.retweeted_status, 'status', args);
+			}
 			delete data.in_reply_to_status_id;
 			delete data.in_reply_to_status_text;
 			delete data.in_reply_to_user_id;
