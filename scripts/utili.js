@@ -1,5 +1,17 @@
 // @author qleelulu@gmail.com
 
+//-- 版本号 --
+var VERSION = 20110220;
+function getVersion(){
+    var ver = localStorage.getObject('VERSION');
+    return ver;
+};
+
+function updateVersion(){
+    localStorage.setObject('VERSION', VERSION);
+};
+//<<--
+
 var PAGE_SIZE = 20;
 var COMMENT_PAGE_SIZE = 8;
 var OAUTH_CALLBACK_URL = chrome.extension.getURL('oauth_cb.html');
@@ -184,6 +196,7 @@ function hideLoading(){
 //设置选项
 var Settings = {
     defaults: {
+        twitterEnabled: false,
         globalRefreshTime:{ //全局的刷新间隔时间
             friends_timeline: 90,
             mentions: 120,
@@ -827,6 +840,16 @@ function filterDatasByMaxId(datas, max_id, append) {
     }
     return {news: news, olds: olds};
 };
+
+//检查是否支持Twitter
+function checkTwitterEnabled(){
+    var _sets = localStorage.getObject(SETTINGS_KEY);
+    _sets = _sets || {};
+    if(!_sets.twitterEnabled){
+        delete T_NAMES.twitter;
+    }
+};
+checkTwitterEnabled();
 
 /*
 * 缓动函数
