@@ -496,8 +496,8 @@ function checkSupportedTabs(user){
         	$(checks[key][1]).show();
         }
     }
-    // 如果是t163，则隐藏评论tab，但是它可以评论
-    if(user.blogType == 't163' || user.blogType == 'buzz') {
+    // 如果是buzz，则隐藏评论tab，但是它可以评论
+    if(user.blogType == 'buzz') {
     	$('#tl_tabs .tab-comments_timeline, #comments_timeline_timeline').hide();
     }
 };
@@ -1674,30 +1674,46 @@ function sendRepost(msg, repostTweetId, notSendMord){
     repostTweetId = repostTweetId || $('#repostTweetId').val();
     data = {status: msg, id:repostTweetId};
     var user = getUser();
-    data['user'] = user;
+    var config = tapi.get_config(user);
+    data.user = user;
     btn.attr('disabled','true');
     txt.attr('disabled','true');
-    tapi.repost(data, function(sinaMsg, textStatus){
-        if(sinaMsg.id){
+    // 处理是否评论
+    if(!notSendMord){
+        if($('#chk_sendOneMore').attr("checked") && $('#chk_sendOneMore').val()){ //同时给XXX评论
+            if(config.support_repost_comment) {
+            	data.is_comment = 1;
+            } else {
+            	sendComment(msg, $('#chk_sendOneMore').val(), true);
+            }
+        }
+        if($('#chk_sendOneMore2').attr("checked") && $('#chk_sendOneMore2').val()){ //同时给原作者 XXX评论
+        	if(config.support_repost_comment_to_root) {
+        		data.is_comment_to_root = 1;
+        	} else {
+        		sendComment(msg + '.', $('#chk_sendOneMore2').val(), true);
+        	}
+        }
+    }
+    tapi.repost(data, function(status, textStatus){
+        if(status.id || status.retweeted_status.id){
             hideReplyInput();
             txt.val('');
             setTimeout(callCheckNewMsg, 1000, 'friends_timeline');
             showMsg('转发成功！');
-        }else if(sinaMsg.error){
-//            showMsg('error: ' + sinaMsg.error);
         }
         btn.removeAttr('disabled');
         txt.removeAttr('disabled');
     });
 
-    if(!notSendMord){
-        if($('#chk_sendOneMore').attr("checked") && $('#chk_sendOneMore').val()){ //同时给XXX评论
-            sendComment(msg, $('#chk_sendOneMore').val(), true);
-        }
-        if($('#chk_sendOneMore2').attr("checked") && $('#chk_sendOneMore2').val()){ //同时给XXX评论
-            sendComment(msg, $('#chk_sendOneMore2').val(), true);
-        }
-    }
+//    if(!notSendMord){
+//        if($('#chk_sendOneMore').attr("checked") && $('#chk_sendOneMore').val()){ //同时给XXX评论
+//            sendComment(msg, $('#chk_sendOneMore').val(), true);
+//        }
+//        if($('#chk_sendOneMore2').attr("checked") && $('#chk_sendOneMore2').val()){ //同时给原作者 XXX评论
+//            sendComment(msg, $('#chk_sendOneMore2').val(), true);
+//        }
+//    }
 };
 
 function sendComment(msg, commentTweetId, notSendMord){
@@ -1840,9 +1856,10 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
     	$('#chk_sendOneMore').attr("checked", false).val('').hide();
         $('#txt_sendOneMore').text('').hide();
     }
-    if(config.support_comment && rtUserName && reTweetId){
+    if(config.support_comment &&
+    		rtUserName && rtUserName != userName && reTweetId) {
         $('#chk_sendOneMore2').attr("checked", false).val(reTweetId).show();
-        $('#txt_sendOneMore2').text('同时给 @' + rtUserName + ' 评论').show();
+        $('#txt_sendOneMore2').text('同时给原文作者 @' + rtUserName + ' 评论').show();
     }else{
         $('#chk_sendOneMore2').attr("checked", false).val('').hide();
         $('#txt_sendOneMore2').text('').hide();

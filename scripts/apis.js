@@ -21,6 +21,8 @@ var sinaApi = {
         support_counts: true, // 是否支持批量获取转发和评论数
         support_comment: true, // 判断是否支持评论列表
         support_do_comment: true, // 判断是否支持发送评论
+        support_repost_comment: true, // 判断是否支持转发同时发评论
+        support_repost_comment_to_root: false, // 判断是否支持转发同时给原文作者发评论
 		support_upload: true, // 是否支持上传图片
 		support_repost: true, // 是否支持新浪形式转载
 		repost_pre: '转:', // 转发前缀
@@ -1496,6 +1498,9 @@ $.extend(TSohuAPI, {
         oauth_secret: 'fxZbb-07bCvv-BCA1Qci2lO^7wnl0%pRE$mvG1K#',
         support_max_id: false,
         support_search_max_id: false,
+        support_comment: true,
+        support_repost_comment: false,
+        support_repost_comment_to_root: false,
 //        support_cursor_only: true,
         
         favorites: '/favourites',
@@ -2548,24 +2553,24 @@ $.extend(T163API, {
         oauth_secret: 'KDKVAlZYlx4Yvzwx9BQEbTAVhkdjXQ8I',
         oauth_authorize: '/oauth/authenticate',
         support_counts: false,
-        support_repost: false,
+        support_comment: true,
+        support_repost_comment: true,
+        support_repost_comment_to_root: true,
         support_search_max_id: false,
         support_favorites_max_id: true,
         repost_pre: 'RT', // 转发前缀
-        
+        repost_delimiter: ' ||',
         favorites: '/favorites/{{id}}',
         favorites_create: '/favorites/create/{{id}}',
         search: '/search',
         user_show: '/users/show',
-        repost: '/statuses/update',
+        repost: '/statuses/retweet/{{id}}',
         comments: '/statuses/comments/{{id}}',
-        retweet: '/statuses/retweet/{{id}}', // RT
         friends_timeline: '/statuses/home_timeline',
+        comments_timeline: '/statuses/comments_to_me',
         
         gender_map: {0:'n', 1:'m', 2:'f'}
 	}),
-	
-	retweet: TwitterAPI.retweet,
 	
 	processSearch: DiguAPI.processSearch,
 	
@@ -2666,6 +2671,8 @@ $.extend(T163API, {
 		} else if(args.url == this.config.friendships_destroy || args.url == this.config.friendships_create) {
 			args.data.user_id = args.data.id;
 			delete args.data.id;
+		} else if(args.url == this.config.comments_timeline) {
+			args.data.trim_user = false;
 		}
     },
     
@@ -2795,9 +2802,24 @@ $.extend(T163API, {
 			data.recipient = this.format_result_item(data.recipient, 'user', args);
 		} else if(play_load == 'comment') {
 			data.user = this.format_result_item(data.user, 'user', args);
-			if(data.status) {
-				data.status = this.format_result_item(data.status, 'status', args);
-			}
+			data.status = {
+				id: data.in_reply_to_status_id,
+				text: data.in_reply_to_status_text,
+				comments_count: data.comments_count,
+				user: {
+					id: data.in_reply_to_user_id,
+					screen_name: data.in_reply_to_user_name,
+					name: data.in_reply_to_screen_name,
+					profile_image_url: 'http://mimg.126.net/p/butter/1008031648/img/face_big.gif'
+				}
+			};
+			data.status.user = this.format_result_item(data.status.user, 'user', args);
+			data.status = this.format_result_item(data.status, 'status', args);
+			delete data.in_reply_to_status_id;
+			delete data.in_reply_to_status_text;
+			delete data.in_reply_to_user_id;
+			delete data.in_reply_to_screen_name;
+			delete data.in_reply_to_user_name;
 		}
 		return data;
 	}

@@ -398,6 +398,7 @@
 				<div class="user_info">
 					<div class="userName"><a href="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?></a>
 					<?js if(!user.is_me){ ?>
+					<a class="follow" href="javascript:" onclick="doReply(this, '#{user.screen_name}','#{user.id}')">@</a>
 					<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">私</a>
 						<?js if(support_follow){ ?>
 						<a class="follow" href="javascript:" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">取消关注</a>
