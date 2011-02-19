@@ -1068,7 +1068,7 @@ $(document).keydown( function(e){
         settings.twitterEnabled = true;
         Settings.save();
         T_NAMES['twitter'] = 'Twitter';
-        _showMsg('首先，恭喜你，Twitter支持已经激活。其次，请低调。');
+        _showMsg('首先，恭喜你，Twitter支持已经激活。<br/>其次，请低调。');
 
         // 显示微博选项
         var blogtype_options = '';
