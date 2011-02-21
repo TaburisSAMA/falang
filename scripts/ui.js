@@ -71,7 +71,7 @@ function buildStatusHtml(statuses, t, c_user){
     		BUTTON_TPLS.repostBtn = BUTTON_TPLS.rtRepostBtn = BUTTON_TPLS.rtrtRepostBtn = '';
     }
     if(!config.support_counts) {
-    	BUTTON_TPLS.repostCounts = BUTTON_TPLS.rtRepostCounts = '';
+    	BUTTON_TPLS.repostCounts = BUTTON_TPLS.rtRepostCounts = BUTTON_TPLS.rtrtRepostCounts = '';
     }
     // 不支持删除私信
     if(!config.support_destroy_msg) {
@@ -111,12 +111,13 @@ function buildStatusHtml(statuses, t, c_user){
 	    default:
 	        break;
 	}
-    if(c_user.blogType != 'twitter' && c_user.blogType != 't163') {
+    if(c_user.blogType != 'twitter') {
     	BUTTON_TPLS.rtOretweetBtn = BUTTON_TPLS.oretweetBtn = '';
-    } else if(c_user.blogType == 't163') {
-    	BUTTON_TPLS.rtOretweetBtn = '<a href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'{{retweeted_status.user.screen_name}}\',\'{{retweeted_status.id}}\');" title="163转发">转发</a>';
-    	BUTTON_TPLS.oretweetBtn = '<a href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'{{user.screen_name}}\',\'{{id}}\');" title="163转发">转发({{retweet_count}})</a>';
-    }
+    } 
+//    else if(c_user.blogType == 't163') {
+//    	BUTTON_TPLS.rtOretweetBtn = '<a href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'{{retweeted_status.user.screen_name}}\',\'{{retweeted_status.id}}\');" title="163转发">转发</a>';
+//    	BUTTON_TPLS.oretweetBtn = '<a href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'{{user.screen_name}}\',\'{{id}}\');" title="163转发">转发({{retweet_count}})</a>';
+//    }
 	
 	switch(c_user.blogType){
 	    case 'digu':
@@ -208,18 +209,20 @@ function buildStatusHtml(statuses, t, c_user){
         	buttons.commentBtn = buttons.commentCounts = buttons.rtCommentCounts = buttons.rtCommentBtn = '';
         }
         if(status.retweeted_status && status.retweeted_status.retweeted) {
-        	if(c_user.blogType == 't163') {
-		    	buttons.rtOretweetBtn = '<a href="javascript:void(0);" title="已成功转发">已转发</a>';
-		    } else {
-		    	buttons.rtOretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="已成功锐推"></a>';
-		    }
+//        	if(c_user.blogType == 't163') {
+//		    	buttons.rtOretweetBtn = '<a href="javascript:void(0);" title="已成功转发">已转发</a>';
+//		    } else {
+//		    	buttons.rtOretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="已成功锐推"></a>';
+//		    }
+        	buttons.rtOretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="已成功锐推"></a>';
         }
         if(status.retweeted) {
-        	if(c_user.blogType == 't163') {
-		    	buttons.oretweetBtn = '<a href="javascript:void(0);" title="已成功转发">已转发(' + status.retweet_count + ')</a>';
-		    } else {
-        		buttons.oretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="已成功锐推"></a>';
-		    }
+//        	if(c_user.blogType == 't163') {
+//		    	buttons.oretweetBtn = '<a href="javascript:void(0);" title="已成功转发">已转发(' + status.retweet_count + ')</a>';
+//		    } else {
+//        		buttons.oretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="已成功锐推"></a>';
+//		    }
+        	buttons.oretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="已成功锐推"></a>';
         }
         
         var context = {
