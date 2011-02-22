@@ -239,7 +239,7 @@ var Settings = {
         sendAccountsDefaultSelected: 'current', //多账号发送的时候默认选择的发送账号
         enableContextmenu: true, //启用右键菜单
 
-        font: '微软雅黑', //字体
+        font: 'Tahoma', //字体
         fontSite: 12, //字体大小
         popupWidth: 480, //弹出窗大小
         popupHeight: 520, 
@@ -749,6 +749,9 @@ var _u = {
     //向页面写本地化后的内容
     wi: function(s, e){
         _u.w(_u.i18n(s, e));
+    },
+    wia: function(sel, attr, s, e){
+        $(sel).attr(attr, _u.i18n(s, e));
     },
     //获取本地化语言
     i18n: function(s, e){

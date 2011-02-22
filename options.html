@@ -13,6 +13,9 @@
     <script type="text/javascript" src="scripts/lib/oauth.js" ></script>
 	<script type="text/javascript" src="/scripts/apis.js" ></script>
 	<script type="text/javascript" src="/scripts/options.js" ></script>
+	<script>
+		this.document.title = _u.i18n('comm_setting') + ' -- ' + _u.i18n('defaultTitle');
+	</script>
 </head>
 
 <body>
@@ -101,63 +104,6 @@
 				</li>
 			<ul>
 		</div>
-		<!-- 
-		<div id="user-custom-wrap" style="display:none;">
-			<ul>
-				<li>
-					<label class="title" for="account_only_for_send">不查看，仅用于发送：</label>
-					<span>
-						<input type="checkbox" id="account_only_for_send" />
-					</span>
-					<span class="jTip" jTitle="有何用？:　" jWidth="320">?
-						<span class="c">如果启用，则该帐号不会检查和获取最新微博，仅在发送微博的时候可以选择发送。在你不想查看该微博的信息，而仅仅在发送微博的时候同步发送，则可以开启该选项。</span>
-					</span>
-				</li>
-				<li>
-					<label class="title">　获取信息间隔时间：</label>
-					<span>当前设置产生的每小时请求数: <span id="userRefreshTimeHits"></span>请求/每小时</span>
-					&nbsp;<a href="api_rate_limit.html" target="_blank">查看API请求数限制状态</a><br/>
-					　　　　　　　　　
-					<span class="jTip" jTitle="这里又要设置？:　" jWidth="310">?<span class="c">这里的刷新频率设置会覆盖“<span class="note">基本设置</span>”里面的“获取信息间隔时间”的设置，你可以在这里为特定的账户设置特定的刷新时间间隔，而不影响其他账号使用全局设置。最低可以设置的值为<span class="note">30秒</span></span></span>
-					<span id="userRefreshTimeWrap">
-						首页<span></span>:<input type="text" id="userRefreshTime_friends_timeline" class="inpRefTime" />秒, 
-						@我<span></span>:<input type="text" id="userRefreshTime_mentions" class="inpRefTime" />秒, 
-						<span>评论<span></span>:<input type="text" id="userRefreshTime_comments_timeline" class="inpRefTime" />秒, </span>
-						私信<span></span>:<input type="text" id="userRefreshTime_direct_messages" class="inpRefTime" />秒
-					</span>
-					<br/>　　　　　　　　　　　(注:括号内数字为当前全局设置值，填“0”表示使用全局设置)
-				</li>
-				
-				
-				<li>
-					<p id="user_set_badge_wrap"><label class="title">　　　　未读提示：</label>
-						<input type="checkbox" id="user_set_badge_friends_timeline" /><label for="user_set_badge_friends_timeline">最新微博</label>
-						<input type="checkbox" id="user_set_badge_mentions" /><label for="user_set_badge_mentions">@我的</label>
-						<input type="checkbox" id="user_set_badge_comments_timeline" /><label for="user_set_badge_comments_timeline">评论</label>
-						<input type="checkbox" id="user_set_badge_direct_messages" /><label for="user_set_badge_direct_messages">私信</label>
-						<span class="jTip" jTitle="FaWave(发微)的按钮上未读信息数的提示:　">?
-							<span class="c"><img src="/images/setting/unread.gif" /></span>
-						</span>
-					</p>
-				</li>
-				<li>
-					<p id="user_set_show_in_page_wrap"><label class="title">新消息在页面提示：</label>
-						<input type="checkbox" id="user_set_show_in_page_friends_timeline" /><label for="user_set_show_in_page_friends_timeline">最新微博</label>
-						<input type="checkbox" id="user_set_show_in_page_mentions" /><label for="user_set_show_in_page_mentions">@我的</label>
-						<input type="checkbox" id="user_set_show_in_page_comments_timeline" /><label for="user_set_show_in_page_comments_timeline">评论</label>
-						<input type="checkbox" id="user_set_show_in_page_direct_messages" /><label for="user_set_show_in_page_direct_messages">私信</label>
-						<span class="jTip" jTitle="在你正在看的网页上提示新信息，5秒钟后自动隐藏:　">?
-							<span class="c"><img src="/images/setting/show_in_page.png" /></span>
-						</span>
-					</p>
-				</li>
-				
-				<li>
-					<input type="button" id="save-user-custom" value="保存" class="btn" />   
-					<input type="button" id="cancel-save-user-custom" value="取消" />
-				</li>
-			</ul>
-		</div>-->
 		<h3><script>_u.wi('sett_title_account_manage')</script>
 			<span class="jTip" jTitle="" jWidth="320">?<span class="c"><script>_u.wi('sett_jTip_manage_accounts')</script>
 			</span></span>
@@ -287,11 +233,11 @@
 				<label class="title"><script>_u.wi('sett_itemName_font')</script></label>
 				<span>
 					<select id="selFont">
-						<option value="微软雅黑">微软雅黑</option>
-						<option value="宋体">宋体</option>
 						<option value="Arial">Arial</option>
 						<option value="Tahoma">Tahoma</option>
 						<option value="Lucida Console">Lucida Console</option>
+						<option value="微软雅黑">微软雅黑</option>
+						<option value="宋体">宋体</option>
 					</select>
 				</span>
 				<span>

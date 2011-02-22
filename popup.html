@@ -22,6 +22,8 @@
 		if(window.location.search.indexOf('is_new_win=true')>0){
 			window.is_new_win_popup = true;
 		}
+		
+		this.document.title = _u.i18n('defaultTitle');
 	</script>
 	<script type="text/javascript" src="scripts/lib/sha1.js" ></script>
 	<script type="text/javascript" src="scripts/lib/oauth.js" ></script>
@@ -52,12 +54,21 @@
 			<ul id="accountsForSend"></ul>
 			<textarea id="txtContent" ></textarea>
 			<div class="ctr">
-				<input id="btnSend" type="button" value="发微!" title="ctrl + enter 发送" class="btn send" disabled="disabled" />&nbsp;
-				<a href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');" title="点击添加表情"><img src="images/face.gif" />表情</a>&nbsp;
-				<a href="javascript:void(0);" onclick="openUploadImage();" title="点击上传图片"><img src="images/image.gif" />图片</a>&nbsp;
-				<input type="button" value="清空" onclick="cleanTxtContent();" class="btn"/>
+				<input id="btnSend" type="button" value="发微!" title="ctrl + enter 发送" class="btn send" disabled="disabled" />
+				<script>_u.wia('#btnSend','value','comm_send'); _u.wia('#btnSend','title','comm_send_tip');</script>
+				&nbsp;
+				<a id="btnAddEmotional" href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');" title="点击添加表情">
+					<img src="images/face.gif" />
+					<script>_u.wi('comm_emotional')</script>
+				</a><script>_u.wia('#btnAddEmotional','title','btn_emotional_title');</script>&nbsp;
+				<a id="btnUploadPic" href="javascript:void(0);" onclick="openUploadImage();" title="点击上传图片">
+					<img src="images/image.gif" />
+					<script>_u.wi('comm_pic')</script>
+				</a><script>_u.wia('#btnUploadPic','title','btn_pic_title');</script>&nbsp;
+				<button onclick="cleanTxtContent();" class="btn"><script>_u.wi('comm_clear')</script></button>
 				<span id="doingWarp"></span>
 				<a id="urlShortenBtn" href="javascript:" title="缩短网址" onclick="addShortenUrl()"><img src="images/link_add.png" /></a>
+				<script>_u.wia('#urlShortenBtn','title','comm_url_shorten');</script>
 				<input type="text" id="urlShortenInp" onclick="showAddShortenUrl()" onkeyup="enterAddShortenUrl(event)" />
 				<span id="wordCount">140</span>
 			</div>
@@ -73,31 +84,37 @@
 				</span>
 				<span class="top_btns">
 					<span>
-						<a href="javascript:" class="search" onclick="Search.toggleInput();" title="点击开始搜索"><img src="images/search.png" />搜索</a>
+						<a id="btnShowSearch" href="javascript:" class="search" onclick="Search.toggleInput();" title="点击开始搜索"><img src="images/search.png" /><script>_u.wi('comm_search')</script></a>
+						<script>_u.wia('#btnShowSearch','title','btn_search_title');</script>
 						<span id="searchWrap">
 							<input type="text" id="txtSearch" />
-							<a href="javascript:" class="btnSearch" onclick="Search.search();" title="点击搜索"><img src="images/search.png" /></a>
+							<a id="btnSearch" href="javascript:" class="btnSearch" onclick="Search.search();" title="点击搜索"><img src="images/search.png" /></a>
 							<img class="arrow" src="images/layerArrow.gif"/>
+							<script>_u.wia('#btnSearch','title','btn_search_title');</script>
 						</span>
 					</span>
-					<a href="javascript:" class="quickUpImg" onclick="openUploadImage();" title="点击上传图片"><img src="images/image.gif" />发图</a>
+					<a id="btnQuickUpImg" href="javascript:" class="quickUpImg" onclick="openUploadImage();" title="点击上传图片"><img src="images/image.gif" /><script>_u.wi('comm_pic')</script></a>
+					<script>_u.wia('#btnQuickUpImg','title','btn_pic_title');</script>
 				</span>
-				<a href="javascript:" class="write" onclick="toogleMsgInput(this)">写微博<b></b></a>
+				<a href="javascript:" class="write" onclick="toogleMsgInput(this)"><script>_u.wi('comm_new_tweet')</script><b></b></a>
 			</div>
 			<ul id="tl_tabs" class="tabs">
 				<span class="btns">
 					<a id="doing" href="javascript:" title="分享你正在看的网页"><img src="images/world_link.png" /></a>
-					<a id="btnForceRefresh" href="javascript:" title="点击当前用户马上获取最新" onclick="forceRefresh(this)"><img src="images/refresh.png" /></a>
+					<script>_u.wia('#doing','title','btn_share_title');</script>
+					<a id="btnForceRefresh" href="javascript:" title="点击则当前用户马上获取最新" onclick="forceRefresh(this)"><img src="images/refresh.png" /></a>
+					<script>_u.wia('#btnForceRefresh','title','btn_refresh_title');</script>
 					<a id="btnNewWinPopup" href="javascript:" onclick="openPopupInNewWin()" title="弹出到新窗口"><img src="images/new_win.png" /></a>
+					<script>_u.wia('#btnNewWinPopup','title','btn_new_win_title');</script>
 					<a id="btnAlertMode" href="javascript:" title="" mode="alert" onclick="changeAlertMode()"><img src="images/alert_mode.png" /></a>
 				</span>
-				<li class="tab-friends_timeline active" href="#friends_timeline_timeline">首页<span class="unreadCount"></span></li>
-				<li class="tab-mentions" href="#mentions_timeline">@我<span class="unreadCount"></span></li>
-				<li class="tab-comments_timeline" href="#comments_timeline_timeline">评论<span class="unreadCount"></span></li>
-				<li class="tab-direct_messages" href="#direct_messages_timeline">私信<span class="unreadCount"></span></li>
-				<li class="tab-favorites" href="#favorites_timeline">收藏<span class="unreadCount"></span></li>
-				<li class="tab-followers" href="#followers_timeline">粉丝<span class="unreadCount"></span></li>
-				<li class="tab-user_timeline" href="#user_timeline_timeline">微博<span class="unreadCount"></span></li>
+				<li class="tab-friends_timeline active" href="#friends_timeline_timeline"><script>_u.wi('comm_TabName_friends_timeline')</script><span class="unreadCount"></span></li>
+				<li class="tab-mentions" href="#mentions_timeline"><script>_u.wi('comm_TabName_mentions')</script><span class="unreadCount"></span></li>
+				<li class="tab-comments_timeline" href="#comments_timeline_timeline"><script>_u.wi('comm_TabName_comments_timeline')</script><span class="unreadCount"></span></li>
+				<li class="tab-direct_messages" href="#direct_messages_timeline"><script>_u.wi('comm_TabName_direct_messages')</script><span class="unreadCount"></span></li>
+				<li class="tab-favorites" href="#favorites_timeline"><script>_u.wi('comm_TabName_favorites')</script><span class="unreadCount"></span></li>
+				<li class="tab-followers" href="#followers_timeline"><script>_u.wi('comm_TabName_followers')</script><span class="unreadCount"></span></li>
+				<li class="tab-user_timeline" href="#user_timeline_timeline"><script>_u.wi('comm_TabName_user_timeline')</script><span class="unreadCount"></span></li>
 			</ul>
 			<div class="clearFix"></div>
 		</div>
@@ -135,8 +152,8 @@
 		  <div id="followers_timeline" class="list_p" style="display:none;">
 			<div class="list_warp">
 				<div id="fans_tab" class="tab2"><p>
-					<span class="tab_friends" t="friends"><font>我</font>关注的</span>
-					<span class="active tab_followers" t="followers"><font>我</font>的粉丝</span>
+					<span class="tab_friends" t="friends"><font><script>_u.wi('comm_my')</script></font><script>_u.wi('comm_follow')</script></span>
+					<span class="active tab_followers" t="followers"><font><script>_u.wi('comm_my')</script></font><script>_u.wi('comm_fans')</script></span>
 				</p></div>
 				<ul class="list"></ul>
 				<div id="followers_rm_loading" class="readmore_loading"><img src="images/loading_s.gif" /></div>
@@ -160,6 +177,7 @@
 		  </div><!-- accountListDock END -->
 
 		  <span id="gototop" class="gototop" onclick="setScrollTotop();" title="返回顶部"><img src="/images/go_to_top.png" /></span>
+		  <script>_u.wia('#gototop','title','comm_go_to_top');</script>
 
 		</div><!-- div.wrap END -->
 	</div><!-- wrapper END -->
@@ -169,13 +187,15 @@
 		<div id="ye_dialog_body" >
 			<div class="replyDialog">
 				<textarea class="uTextarea" id="replyTextarea"></textarea><br/>
-				<a href="javascript:void(0);" onclick="fawave.face.show(this, 'replyTextarea');" title="点击添加表情"><img src="images/face.gif" />表情</a>
+				<a id="btnAddReplyEmotional" href="javascript:void(0);" onclick="fawave.face.show(this, 'replyTextarea');" title="点击添加表情"><img src="images/face.gif" /><script>_u.wi('comm_emotional')</script></a>
+				<script>_u.wia('#btnAddReplyEmotional','title','btn_emotional_title');</script>
 				<span id="replyInputCount" class="conTinge">(还可以输入140字)</span>
 				<p>
 					<input type="checkbox" id="chk_sendOneMore" /><label for="chk_sendOneMore" id="txt_sendOneMore"></label><br/>
 					<input type="checkbox" id="chk_sendOneMore2" /><label for="chk_sendOneMore2" id="txt_sendOneMore2"></label>
 				</p>
-				<button id="replySubmit" type="button" title="按 ctrl + enter 发送" class="btn" style="float: right;">发微!</button>
+				<button id="replySubmit" type="button" title="按 ctrl + enter 发送" class="btn" style="float: right;"><script>_u.wi('comm_send')</script></button>
+				<script>_u.wia('#replySubmit','title','comm_send_tip');</script>
 			</div>
 		</div>
 		<input type="hidden" id="actionType" value="" />
@@ -196,7 +216,8 @@
 			<div class="faceItem clearFix">
 				<div class="layerArrow"></div>
 				<div class="layerMedia_close">
-					<a class="close" href="javascript:void(fawave.face.hide())" title="关闭"></a>
+					<a id="btnFaceBoxClose" class="close" href="javascript:void(fawave.face.hide())" title="关闭"></a>
+					<script>_u.wia('#btnFaceBoxClose','title','comm_close');</script>
 				</div>
 				<div class="faceItemPicbg">
 					<ul id="face_icons">
@@ -225,36 +246,36 @@
 					<span class="arrow_r"></span>
 					<div class="userName">
 						<a target="_blank" user_id="#{user.id}" user_screen_name="#{user.screen_name}" href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" rhref="#{user.t_url}" title="#{getUserCountsInfo(user)}">
-							#{user.screen_name}<?js if(user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
+							#{user.screen_name}<?js if(user.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?>
 						</a>
 						<span class="edit">
 							<?js if(tweet.related_dialogue_url){ ?>
-							<a href="#{tweet.related_dialogue_url}" title="查看相关对话" target="_blank"><img src="images/inreply.png" /></a>
+							<a href="#{tweet.related_dialogue_url}" title="#{_u.i18n('comm_show_related_dialogue')}" target="_blank"><img src="images/inreply.png" /></a>
 							<?js } ?>
 							#{ btn.addFavoritesMsgBtn + btn.delFavoritesMsgBtn + btn.replyBtn + btn.retweetBtn + btn.oretweetBtn + btn.repostBtn + btn.repostCounts + btn.commentBtn + btn.commentCounts + btn.new_msgBtn + btn.delTweetBtn + btn.delCommentBtn + btn.delDirectMsgBtn }
-							<a href="javascript:void(0);" onclick="javascript:translate(this);" title="翻译此微博">译</a>
+							<a href="javascript:void(0);" onclick="javascript:translate(this);" title="#{_u.i18n('btn_translate_title')}">#{_u.i18n("btn_translate")}</a>
 						</span>
 					</div>
 					<div class="msg">
 						<div class="tweet">
 							<div class="tweet_text">#{processMsg(account, tweet.text)} #{btn.showMapBtn}
 								<?js if(tweet.crosspostSource) { ?>
-								<a target="_blank" href="#{tweet.crosspostSource}" title="查看原文">查看原文</a>
+								<a target="_blank" href="#{tweet.crosspostSource}" title="#{_u.i18n('comm_show_original')}">#{_u.i18n('comm_show_original')}</a>
 								<?js } ?>
 							</div>
 							<?js if(tweet.thumbnail_pic){ ?>
 							<div>
-								<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.bmiddle_pic}" original="#{tweet.original_pic}" onmousedown="rOpenPic(event, this)" title="右键点击打开原图" class="thumbnail_pic" >
+								<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.bmiddle_pic}" original="#{tweet.original_pic}" onmousedown="rOpenPic(event, this)" title="#{_u.i18n("btn_show_original_pic_title")}" class="thumbnail_pic" >
 									<img class="imgicon pic" src="#{tweet.thumbnail_pic}" />
 								</a>
 							</div>
 							<?js } ?>
 							<?js if(tweet.retweet_me || tweet.retweet_user){ ?>
-						   <div class="retweet_info">由 <?js if(tweet.retweet_me){ ?>
+						   <div class="retweet_info">#{_u.i18n("comm_retweet_by_before")} <?js if(tweet.retweet_me){ ?>
 								<a target="_blank" 
 									href="javascript:getUserTimeline('#{tweet.retweet_me.screen_name}', '#{tweet.retweet_me.id}');" 
 									rhref="#{tweet.retweet_me.t_url}">
-									#{tweet.retweet_me.screen_name}<?js if(tweet.retweet_me.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
+									#{tweet.retweet_me.screen_name}<?js if(tweet.retweet_me.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?>
 								</a>
 							 <?js } ?>
 						     <?js if(tweet.retweet_user){ ?>
@@ -262,9 +283,9 @@
 						     	<a target="_blank" 
 									href="javascript:getUserTimeline('#{tweet.retweet_user.screen_name}', '#{tweet.retweet_user.id}');" 
 									rhref="#{tweet.retweet_user.t_url}">
-									#{tweet.retweet_user.screen_name}<?js if(tweet.retweet_user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
+									#{tweet.retweet_user.screen_name}<?js if(tweet.retweet_user.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?>
 								</a>
-							 <?js } ?> 等转发</div>
+							 <?js } ?> #{_u.i18n("comm_retweet_by_after")}</div>
 						   <?js } ?>
 						</div>
 						<?js if(tweet.retweeted_status && tweet.retweeted_status.text){ ?>
@@ -274,11 +295,11 @@
 						<?js } ?>
 					</div>
 					<div class="comments">
-						<p style="text-align:right;"><a href="javascript:void(0);" onclick="showComments(this, '#{tweet.id}');">隐藏评论</a></p>
+						<p style="text-align:right;"><a href="javascript:void(0);" onclick="showComments(this, '#{tweet.id}');">#{_u.i18n("btn_hide_comments")}</a></p>
 						<ul class="comment_list"></ul>
 						<div class="comment_paging" page="1">
-							<a class="pre_page" href="javascript:void(0);" onclick="commentPage(this, '#{tweet.id}', true);" style="display:none;">《上一页</a>
-							<a class="next_page" href="javascript:void(0);" onclick="commentPage(this, '#{tweet.id}');" style="display:none;">下一页》</a>
+							<a class="pre_page" href="javascript:void(0);" onclick="commentPage(this, '#{tweet.id}', true);" style="display:none;">#{_u.i18n("btn_prev_page")}</a>
+							<a class="next_page" href="javascript:void(0);" onclick="commentPage(this, '#{tweet.id}');" style="display:none;">#{_u.i18n("btn_next_page")}</a>
 						</div>
 						<br />
 					</div>
@@ -289,9 +310,9 @@
 					   <?js } else { ?>
 					   #{new Date(tweet.created_at).format("yyyy-MM-dd hh:mm:ss")}
 					   <?js } ?>
-					   通过 #{tweet.source||'网站'}
+					   #{_u.i18n('comm_post_by')} #{tweet.source|| _u.i18n("comm_web_site")}
 					   <?js if(!tweet.retweeted_status && tweet.in_reply_to_status_id && tweet.in_reply_to_screen_name){ ?>
-					   <a href="javascript:void(0);" class="show_source_status_btn" status_id="#{tweet.in_reply_to_status_id}" title="查看原信息">对 #{tweet.in_reply_to_screen_name} 的回复</a>
+					   <a href="javascript:void(0);" class="show_source_status_btn" status_id="#{tweet.in_reply_to_status_id}" title="#{_u.i18n('comm_show_original_status')}">#{_u.i18n("btn_show_source_status", [tweet.in_reply_to_screen_name])}</a>
 					   <?js } ?>
 					   
 					</div>
@@ -312,29 +333,29 @@
 			<!-- 转发 -->
 			<div class="msg">
 				<div class="tweetItem retweeted commentWrap showCounts_#{tweet.retweeted_status.id} <?js if(is_rt_rt){ ?>rt_retweeted<?js } ?>" id="tweet#{tweet.retweeted_status.id}">
-					<div class="userName"><?js if(is_rt_rt){ ?><a user_id='#{retweeted_status_user.id}' user_screen_name="#{retweeted_status_user.screen_name}" href="javascript:getUserTimeline('#{retweeted_status_user.screen_name}', '#{retweeted_status_user.id}');">@#{retweeted_status_user.screen_name}</a> <?js } ?><?js if(tType=='comments_timeline' && !is_rt_rt){ ?>评<?js }else{ ?>转<?js } ?>
+					<div class="userName"><?js if(is_rt_rt){ ?><a user_id='#{retweeted_status_user.id}' user_screen_name="#{retweeted_status_user.screen_name}" href="javascript:getUserTimeline('#{retweeted_status_user.screen_name}', '#{retweeted_status_user.id}');">@#{retweeted_status_user.screen_name}</a> <?js } ?><?js if(tType=='comments_timeline' && !is_rt_rt){ ?> #{_u.i18n('comm_comment_to_before')} <?js }else{ ?> #{_u.i18n('comm_repost_to_before')} <?js } ?>
 						<span class="showtip">
 							<a target="_blank" 
 								href="javascript:getUserTimeline('#{tweet.retweeted_status.user.screen_name}', '#{tweet.retweeted_status.user.id}');" 
 								rhref="#{tweet.retweeted_status.user.t_url}">
-								@#{tweet.retweeted_status.user.screen_name}<?js if(tweet.retweeted_status.user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
+								@#{tweet.retweeted_status.user.screen_name}<?js if(tweet.retweeted_status.user.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?>
 							</a>
 							#{buildTipboxUserInfo(tweet.retweeted_status.user)}
 						</span>
-						的微博: 
+						#{_u.i18n("comm_repost_to_after")}: 
 						<span class="edit">
 							#{ btn.rtAddFavoritesMsgBtn + btn.rtReplyBtn + btn.rtRetweetBtn + btn.rtRepostBtn + btn.rtRepostCounts + btn.rtOretweetBtn + btn.rtCommentBtn + btn.rtCommentCounts}
-							<a href="javascript:void(0);" onclick="javascript:translate(this);" title="翻译此微博">译</a>
+							<a href="javascript:void(0);" onclick="javascript:translate(this);" title="#{_u.i18n('btn_translate_title')}">#{_u.i18n("btn_translate")}</a>
 						</span>
 					</div>
 					<div class="tweet_text">#{processMsg(account, tweet.retweeted_status.text)} #{btn.rtShowMapBtn}
 						<?js if(tweet.crosspostSource) { ?>
-						<a target="_blank" href="#{tweet.crosspostSource}" title="查看原文">查看原文</a>
+						<a target="_blank" href="#{tweet.crosspostSource}" title="#{_u.i18n('comm_show_original')}">#{_u.i18n('comm_show_original')}</a>
 						<?js } ?>
 					</div>
 					<?js if(tweet.retweeted_status.thumbnail_pic){ ?>
 					<div>
-						<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.retweeted_status.bmiddle_pic}" title="右键点击打开原图" original="#{tweet.retweeted_status.original_pic}" onmousedown="rOpenPic(event, this)" class="thumbnail_pic" >
+						<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.retweeted_status.bmiddle_pic}" title="#{_u.i18n("btn_show_original_pic_title")}" original="#{tweet.retweeted_status.original_pic}" onmousedown="rOpenPic(event, this)" class="thumbnail_pic" >
 						<img class="imgicon pic" src="#{tweet.retweeted_status.thumbnail_pic}" /></a>
 					</div>
 					<?js } ?>
@@ -346,15 +367,15 @@
 						<?js } else { ?>
 						#{new Date(tweet.retweeted_status.created_at).format("yyyy-MM-dd hh:mm:ss")}
 						<?js } ?>
-						通过 #{tweet.retweeted_status.source||'网站'}
+						#{_u.i18n('comm_post_by')} #{tweet.retweeted_status.source|| _u.i18n("comm_web_site")}
 					</div>
 					<?js } ?>
 					<div class="comments">
-						<p style="text-align:right;"><a href="javascript:void(0);" onclick="showComments(this, '#{tweet.retweeted_status.id}');">隐藏评论</a></p>
+						<p style="text-align:right;"><a href="javascript:void(0);" onclick="showComments(this, '#{tweet.retweeted_status.id}');">#{_u.i18n("btn_hide_comments")}</a></p>
 						<ul class="comment_list"></ul>
 						<div class="comment_paging" page="1">
-							<a class="pre_page" href="javascript:void(0);" onclick="commentPage(this, '#{tweet.retweeted_status.id}', true);" style="display:none;">《上一页</a>
-							<a class="next_page" href="javascript:void(0);" onclick="commentPage(this, '#{tweet.retweeted_status.id}');" style="display:none;">下一页》</a>
+							<a class="pre_page" href="javascript:void(0);" onclick="commentPage(this, '#{tweet.retweeted_status.id}', true);" style="display:none;">#{_u.i18n("btn_prev_page")}</a>
+							<a class="next_page" href="javascript:void(0);" onclick="commentPage(this, '#{tweet.retweeted_status.id}');" style="display:none;">#{_u.i18n("btn_next_page")}</a>
 						</div>
 						<br />
 					</div>
@@ -370,22 +391,22 @@
 					<div class="user_info">
 						<p><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" 
 							rhref="#{user.t_url}">#{user.screen_name}
-							<?js if(user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?>
+							<?js if(user.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?>
 						</a></p>
 						<p>
 							<img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 
-								title="<?js if(user.gender == 'm'){ ?>男<?js }else if(user.gender == 'f'){ ?>女<?js }else{ ?>性别未知<?js } ?>" />
+								title="<?js if(user.gender == 'm'){ ?> #{_u.i18n('comm_man')} <?js }else if(user.gender == 'f'){ ?> #{_u.i18n('comm_female')} <?js }else{ ?> #{_u.i18n('comm_gender_unknow')} <?js } ?>" />
 							 <?js if(user.province){ ?>
 							 #{provinces[user.province] ? provinces[user.province].name : user.province}, #{provinces[user.province] ? provinces[user.province]["citys"][user.city]:user.city}
 							 <?js } ?>
 						</p>
-						<p>关注: <span><a href="javascript:showFollowers('friends', '#{user.screen_name}', '#{user.id}');">#{user.friends_count == undefined ? '查看': user.friends_count}</a></span>个　
-							粉丝: <span><a href="javascript:showFollowers('followers', '#{user.screen_name}', '#{user.id}');">#{user.followers_count == undefined ? '查看': user.followers_count}</a></span>个</p>
-						<p>微博: <span><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');">#{user.statuses_count == undefined ? '查看': user.statuses_count}</a></span>条</p>
+						<p>#{_u.i18n("comm_follow")}: <span><a href="javascript:showFollowers('friends', '#{user.screen_name}', '#{user.id}');">#{user.friends_count == undefined ? _u.i18n("comm_view"): user.friends_count}</a></span>　
+							#{_u.i18n("comm_fans")}: <span><a href="javascript:showFollowers('followers', '#{user.screen_name}', '#{user.id}');">#{user.followers_count == undefined ? _u.i18n("comm_view"): user.followers_count}</a></span></p>
+						<p>#{_u.i18n("comm_tweet")}: <span><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');">#{user.statuses_count == undefined ? _u.i18n("comm_view"): user.statuses_count}</a></span></p>
 					</div>
 				</div>
 				<?js if(user.description){ ?>
-				<div class="des">简介：#{user.description}</div>
+				<div class="des">#{_u.i18n("comm_description")}：#{user.description}</div>
 				<?js } ?>
 			</div>
 		</textarea>
@@ -396,33 +417,33 @@
 			<div class="userinfo_detail">
 				<div class="user_head"><img src="#{user.profile_image_url}" /></div>
 				<div class="user_info">
-					<div class="userName"><a href="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?></a>
+					<div class="userName"><a href="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?></a>
 					<?js if(!user.is_me){ ?>
 					<a class="follow" href="javascript:" onclick="doReply(this, '#{user.screen_name}','#{user.id}')">@</a>
-					<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">私</a>
+					<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">#{_u.i18n("abb_direct_message")}</a>
 						<?js if(support_follow){ ?>
-						<a class="follow" href="javascript:" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">取消关注</a>
-						<a class="follow" href="javascript:" onclick="f_create('#{user.id}', this, '#{user.screen_name}')"><span class="plus">+</span>加关注</a>
+						<a class="follow" href="javascript:" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">#{_u.i18n("comm_f_destroy")}</a>
+						<a class="follow" href="javascript:" onclick="f_create('#{user.id}', this, '#{user.screen_name}')"><span class="plus">+</span>#{_u.i18n("comm_f_create")}</a>
 						<?js } ?>
 					<?js } ?>
 					</div>
 					<p>
 						<img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 
-							title="<?js if(user.gender == 'm'){ ?>男<?js }else if(user.gender == 'f'){ ?>女<?js }else{ ?>性别未知<?js } ?>" />
+							title="<?js if(user.gender == 'm'){ ?> #{_u.i18n('comm_man')} <?js }else if(user.gender == 'f'){ ?> #{_u.i18n('comm_female')} <?js }else{ ?> #{_u.i18n('comm_gender_unknow')} <?js } ?>" />
 					      <?js if(user.province){ ?>
 	                      #{provinces[user.province] ? provinces[user.province].name : user.province}, 
 	                      #{provinces[user.province] ? provinces[user.province]["citys"][user.city] : user.city}
 	                      <?js } ?>
 	                </p>
-					<p>关注: <span><a href="javascript:showFollowers('friends', '#{user.screen_name}', '#{user.id}');">#{user.friends_count == undefined ? '查看': user.friends_count}</a></span>个　
-						粉丝: <span><a href="javascript:showFollowers('followers', '#{user.screen_name}', '#{user.id}');">#{user.followers_count == undefined ? '查看': user.followers_count}</a></span>个　
-						微博: <span><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');">#{user.statuses_count == undefined ? '查看': user.statuses_count}</a></span>条</p>
+					<p>#{_u.i18n("comm_follow")}: <span><a href="javascript:showFollowers('friends', '#{user.screen_name}', '#{user.id}');">#{user.friends_count == undefined ? _u.i18n("comm_view"): user.friends_count}</a></span>　
+						#{_u.i18n("comm_fans")}: <span><a href="javascript:showFollowers('followers', '#{user.screen_name}', '#{user.id}');">#{user.followers_count == undefined ? _u.i18n("comm_view"): user.followers_count}</a></span>　
+						#{_u.i18n("comm_tweet")}: <span><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');">#{user.statuses_count == undefined ? _u.i18n("comm_view"): user.statuses_count}</a></span></p>
 					<?js if(user.url && user.url != 'http://1'){ ?>
-					<p>博客：<a href="#{user.url}">#{user.url}</a></p>
+					<p>#{_u.i18n("comm_blog")}：<a href="#{user.url}">#{user.url}</a></p>
 					<?js } ?>
 				</div>
 				<?js if(user.description){ ?>
-				<div class="des">简介：#{user.description}</div>
+				<div class="des">#{_u.i18n("comm_description")}：#{user.description}</div>
 				<?js } ?>
 			</div>
 		</textarea>
@@ -432,18 +453,18 @@
 				<div class="user_head"><img src="#{user.profile_image_url}" /></div>
 				<div class="user_info" did="#{user.id}">
 					<div class="userName"><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" 
-							rhref="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="认证用户" src="/images/verified.gif" /><?js } ?></a>
+							rhref="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?></a>
 						<a class="follow" href="javascript:" onclick="doReply(this, '#{user.screen_name}', '')">@</a>
-						<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">私</a>
+						<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">#{_u.i18n("abb_direct_message")}</a>
 						<?js if(support_follow && user.unfollow === undefined && tType =='friends'){ ?>
-						<a class="follow" href="javascript:" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">取消关注</a>
+						<a class="follow" href="javascript:" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">#{_u.i18n("comm_f_destroy")}</a>
 						<?js }else if(support_follow){ ?>
-						<a class="follow" href="javascript:" onclick="f_create('#{user.id}', this, '#{user.screen_name}')"><span class="plus">+</span>加关注</a>
+						<a class="follow" href="javascript:" onclick="f_create('#{user.id}', this, '#{user.screen_name}')"><span class="plus">+</span>#{_u.i18n("comm_f_create")}</a>
 						<?js } ?>
 					</div>
 					<p>
 				     <img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 
-							title="<?js if(user.gender == 'm'){ ?>男<?js }else if(user.gender == 'f'){ ?>女<?js }else{ ?>性别未知<?js } ?>" />
+							title="<?js if(user.gender == 'm'){ ?> #{_u.i18n('comm_man')} <?js }else if(user.gender == 'f'){ ?> #{_u.i18n('comm_female')} <?js }else{ ?> #{_u.i18n('comm_gender_unknow')} <?js } ?>" />
 					 <?js if(user.province){ ?>
                           #{provinces[user.province] ? provinces[user.province].name : user.province}, 
                           #{provinces[user.province] ? provinces[user.province]["citys"][user.city] : user.city}
@@ -451,15 +472,15 @@
                      	#{user.location}
                      <?js } ?>
                     </p>
-					<p>关注: <span><a href="javascript:showFollowers('friends', '#{user.screen_name}', '#{user.id}');">#{user.friends_count == undefined ? '查看': user.friends_count}</a></span>个　
-						粉丝: <span><a href="javascript:showFollowers('followers', '#{user.screen_name}', '#{user.id}');">#{user.followers_count == undefined ? '查看': user.followers_count}</a></span>个　
-						微博: <span><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');">#{user.statuses_count == undefined ? '查看': user.statuses_count}</a></span>条</p>
+					<p>#{_u.i18n("comm_follow")}: <span><a href="javascript:showFollowers('friends', '#{user.screen_name}', '#{user.id}');">#{user.friends_count == undefined ? _u.i18n("comm_view"): user.friends_count}</a></span>　
+						#{_u.i18n("comm_fans")}: <span><a href="javascript:showFollowers('followers', '#{user.screen_name}', '#{user.id}');">#{user.followers_count == undefined ? _u.i18n("comm_view"): user.followers_count}</a></span>　
+						#{_u.i18n("comm_tweet")}: <span><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');">#{user.statuses_count == undefined ? _u.i18n("comm_view"): user.statuses_count}</a></span></p>
 					<?js if(user.url && user.url != 'http://1'){ ?>
-					<p>博客：<a href="#{user.url}">#{user.url}</a></p>
+					<p>#{_u.i18n("comm_blog")}：<a href="#{user.url}">#{user.url}</a></p>
 					<?js } ?>
 				</div>
 				<?js if(user.description){ ?>
-				<div class="des">简介：#{user.description}</div>
+				<div class="des">#{_u.i18n("comm_description")}：#{user.description}</div>
 				<?js } ?>
 			</div>
 		</textarea>

@@ -1,6 +1,6 @@
 {
 	"defaultTitle": {
-		"message": "FaWave(发微) 多微博无缝切换",
+		"message": "FaWave(发微) 多微博无缝切换插件",
 		"description": "default title"
 	},
 	"extName": {
@@ -13,26 +13,147 @@
 	},
 	
 	//通用的
-	"comm_second": {
-		"message": "秒",
-		"description": "秒"
+	"comm_blog": {
+		"message": "博客",
+		"description": "博客"
 	},
-	"comm_enabled": {
-		"message": "启用",
-		"description": "启用"
+	"comm_clear": {
+		"message": "清空",
+		"description": "清空"
+	},
+	"comm_close": {
+		"message": "关闭",
+		"description": "关闭"
+	},
+	"comm_description": {
+		"message": "简介",
+		"description": "简介"
 	},
 	"comm_disabled": {
 		"message": "禁用",
 		"description": "禁用"
 	},
-	"comm_width": {
-		"message": "宽度",
-		"description": "宽度"
+	"comm_emotional": {
+		"message": "表情",
+		"description": "表情"
+	},
+	"comm_enabled": {
+		"message": "启用",
+		"description": "启用"
+	},
+	"comm_fans": {
+		"message": "粉丝",
+		"description": "粉丝"
+	},
+	"comm_follow": {
+		"message": "关注",
+		"description": "关注"
+	},
+	"comm_female": {
+		"message": "女",
+		"description": "女"
+	},
+	"comm_f_create": {
+		"message": "加关注",
+		"description": "加关注"
+	},
+	"comm_f_destroy": {
+		"message": "取消关注",
+		"description": "取消关注"
+	},
+	"comm_gender_unknow": {
+		"message": "性别未知",
+		"description": "性别未知"
+	},
+	"comm_go_to_top": {
+		"message": "返回顶部",
+		"description": "返回顶部"
 	},
 	"comm_height": {
 		"message": "高度",
 		"description": "高度"
 	},
+	"comm_man": {
+		"message": "男",
+		"description": "男"
+	},
+	"comm_me": {
+		"message": "我",
+		"description": "我"
+	},
+	"comm_my": {
+		"message": "我的",
+		"description": "我的"
+	},
+	"comm_new_tweet": {
+		"message": "写微博",
+		"description": "写微博"
+	},
+	"comm_pic": {
+		"message": "发图",
+		"description": "发图"
+	},
+	"comm_post_by": {
+		"message": "通过",
+		"description": "通过"
+	},
+	"comm_search": {
+		"message": "搜索",
+		"description": "搜索"
+	},
+	"comm_setting": {
+		"message": "设置",
+		"description": "设置"
+	},
+	"comm_send": {
+		"message": "发微！",
+		"description": "发送"
+	},
+	"comm_send_tip": {
+		"message": "ctrl + enter 发送",
+		"description": "ctrl + enter 发送"
+	},
+	"comm_second": {
+		"message": "秒",
+		"description": "秒"
+	},
+	"comm_show_related_dialogue": {
+		"message": "查看相关对话",
+		"description": "查看相关对话"
+	},
+	"comm_show_original": {
+		"message": "查看原文",
+		"description": "查看原文"
+	},
+	"comm_show_original_status": {
+		"message": "查看原信息",
+		"description": "查看原信息"
+	},
+	"comm_tweet": {
+		"message": "微博",
+		"description": "微博"
+	},
+	"comm_url_shorten": {
+		"message": "缩短网址",
+		"description": "缩短网址"
+	},
+	"comm_verified": {
+		"message": "认证用户",
+		"description": "认证用户"
+	},
+	"comm_view": {
+		"message": "查看",
+		"description": "查看"
+	},
+	"comm_web_site": {
+		"message": "网站",
+		"description": "网站"
+	},
+	"comm_width": {
+		"message": "宽度",
+		"description": "宽度"
+	},
+	
 	"comm_TabName_friends_timeline": {
 		"message": "首页",
 		"description": "首页时间线（跟随的人）的tab标签上显示的名称"
@@ -64,6 +185,100 @@
 	"comm_show_rate_limit_stat": {
 		"message": "查看API请求数限制状态",
 		"description": "查看API请求数限制状态"
+	},
+	"comm_retweet_by_before": {
+		"message": "由",
+		"description": "由 *** 转发的前半部分"
+	},
+	"comm_retweet_by_after": {
+		"message": "等转发",
+		"description": "由 *** 转发的后半部分"
+	},
+	"comm_repost_to_before": {
+		"message": "转",
+		"description": "转 *** 的微博 的前半部分"
+	},
+	"comm_repost_to_after": {
+		"message": "的微博",
+		"description": "转 *** 的微博 的后半部分"
+	},
+	"comm_comment_to_before": {
+		"message": "评",
+		"description": "评 *** 的微博 的前半部分，后半部分同comm_repost_to_after"
+	},
+	
+	//abbreviation
+	"abb_comment": {
+		"message": "评",
+		"description": "评论的简称"
+	},
+	"abb_direct_message": {
+		"message": "私",
+		"description": "私信的简称"
+	},
+	"abb_repost": {
+		"message": "转",
+		"description": "转发的简称"
+	},
+	
+	//btn
+	"btn_hide_comments": {
+	    "message": "隐藏评论",
+		"description": "隐藏评论"
+	},
+	"btn_prev_page": {
+	    "message": "《上一页",
+		"description": "上一页"
+	},
+	"btn_next_page": {
+	    "message": "下一页》",
+		"description": "下一页"
+	},
+	"btn_translate": {
+	    "message": "译",
+		"description": "译"
+	},
+	"btn_translate_title": {
+	    "message": "翻译此微博",
+		"description": "翻译此微博"
+	},
+	"btn_emotional_title": {
+	    "message": "点击添加表情",
+		"description": "点击添加表情"
+	},
+	"btn_pic_title": {
+	    "message": "点击上传图片",
+		"description": "点击上传图片"
+	},
+	"btn_search_title": {
+	    "message": "点击开始搜索",
+		"description": "点击开始搜索"
+	},
+	"btn_share_title": {
+	    "message": "分享你正在看的网页",
+		"description": "分享你正在看的网页"
+	},
+	"btn_show_source_status": {
+		"message": "对 $name$ 的回复",
+		"description": "对 *** 的回复,点击显示回复的tweet内容",
+		"placeholders": {
+            "name": {
+              "content": "$1",
+              "description": "用户名"
+            }
+		}
+	},
+	"btn_refresh_title": {
+	    "message": "点击则当前用户马上获取最新",
+		"description": "点击则当前用户马上获取最新"
+	},
+	"btn_new_win_title": {
+	    "message": "弹出到新窗口",
+		"description": "弹出到新窗口"
+	},
+	"btn_show_original_pic_title": {
+	    "message": "右键点击打开原图",
+		"description": "右键点击打开原图"
 	},
 	
 	//设置页面
