@@ -2340,7 +2340,7 @@ $.extend(TwitterAPI, {
 	}),
        
     processSearch: function (str) {
-        str = str.replace(/(^|&lt;|a-zA-Z_0-9|\s)(#|$)([\w\u4e00-\u9fa5|\_]*|$)/g,' <a class="tag" title="$3" href="http://twitter.com/search?q=%23$3" target="_blank">$2$3</a>');
+        str = str.replace(/(^|&lt;|a-zA-Z_0-9|\s)(#|$)([\w\u4e00-\u9fa5|\_]*|$)/g,'$1<a class="tag" title="$3" href="http://twitter.com/search?q=%23$3" target="_blank">$2$3</a>');
         //str = str.replace(/[^\w]#([\w\u4e00-\u9fa5|\_]+)/g, ' <a target="_blank" href="'+ this.config.search_url +'%23$1" title="Search #$1">#$1</a>');
         return str;
     },
