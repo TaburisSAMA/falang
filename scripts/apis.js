@@ -163,9 +163,9 @@ var sinaApi = {
         
         str = this.processAt(str); //@***
 
-        str = this.processSearch(str);
-       
         str = this.processEmotional(str);
+
+        str = this.processSearch(str);
 
         str = str.replace( /([\uE001-\uE537])/gi, this.getIphoneEmoji );
         
@@ -1284,7 +1284,7 @@ $.extend(TQQAPI, {
     },
     
     processAt: function (str) { //@***
-        str = str.replace(/[^#]?@([\w\-\_]+)/g, '<a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$1" title="左键查看微薄，右键打开主页">@$1</a>');
+        str = str.replace(/([^#])?@([\w\-\_]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$2" title="左键查看微薄，右键打开主页">@$2</a>');
 //        str = str.replace(/([^#])@([\w\-\_]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ this.config.user_home_url +'$2" title="左键查看微薄，右键打开主页">@$2</a>');
         return str;
     },
