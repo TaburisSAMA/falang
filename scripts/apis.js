@@ -124,7 +124,7 @@ var sinaApi = {
 		    		detectedSourceLanguage = 'zh';
 		    	}
 				if(detectedSourceLanguage == target) {
-					showMsg('无需翻译');
+					showMsg(_u.i18n("comm_not_need_tran"));
 					callback(null);
 				} else {
 					callback(tran.translatedText);
@@ -137,9 +137,9 @@ var sinaApi = {
 		  		} catch(e) {
 		  		}
 		  		if(error.message == 'The source language could not be detected') {
-		  			showMsg('无需翻译');
+		  			showMsg(_u.i18n("comm_not_need_tran"));
 		  		} else {
-		  			showMsg('暂时无法翻译, ' + error.message);
+		  			showMsg(_u.i18n("comm_could_not_tran") + error.message);
 		  		}
 		  		callback(null);
 		  	}
@@ -184,7 +184,7 @@ var sinaApi = {
         return str;
     },
     processAt: function (str) { //@*** u4e00-\u9fa5:中文字符 \u2E80-\u9FFF:中日韩字符
-        str = str.replace(/@([\w\-\u2E80-\u9FFF\_]+)/g, '<a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$1" title="左键查看微薄，右键打开主页">@$1</a>');
+        str = str.replace(/@([\w\-\u2E80-\u9FFF\_]+)/g, '<a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$1" title="'+ _u.i18n("btn_show_user_title") +'">@$1</a>');
 //        str = str.replace(/([^#])@([\w\-\u4e00-\u9fa5\_]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ this.config.user_home_url +'$2" title="左键查看微薄，右键打开主页">@$2</a>');
         
         return str;
@@ -722,8 +722,9 @@ var sinaApi = {
 	                data = JSON.parse(data);
 	            }
 	            catch(err){
+	                log(data);
 	                //data = null;
-	                data = {error:'服务器返回结果错误，本地解析错误。', error_code:500};
+	                data = {error: _u.i18n("comm_error_return"), error_code:500};
 	                textStatus = 'error';
 	            }
 	            var error_code = null;
@@ -1086,7 +1087,8 @@ var sinaApi = {
                     		if(data.indexOf('{"wrong":"no data"}') > -1 || data == '' || data.toLowerCase() == 'ok'){
                         		data = [];
                         	} else {
-                                data = {error: callmethod + ' 服务器返回结果错误，本地解析错误。' + err, error_code:500};
+                        	    log(data);
+                                data = {error: callmethod + ' ' + _u.i18n("comm_error_return") + err, error_code:500};
                                 textStatus = 'error';
                         	}
                     	}
@@ -1284,7 +1286,7 @@ $.extend(TQQAPI, {
     },
     
     processAt: function (str) { //@***
-        str = str.replace(/([^#])?@([\w\-\_]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$2" title="左键查看微薄，右键打开主页">@$2</a>');
+        str = str.replace(/([^#])?@([\w\-\_]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ this.config.user_home_url +'$2" title="左键查看微薄，右键打开主页">@$2</a>');
 //        str = str.replace(/([^#])@([\w\-\_]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ this.config.user_home_url +'$2" title="左键查看微薄，右键打开主页">@$2</a>');
         return str;
     },
@@ -1295,7 +1297,7 @@ $.extend(TQQAPI, {
 	},
 	
 	rate_limit_status: function(data, callback){
-        callback({error:'没有提供接口'});
+        callback({error: _u.i18n("comm_no_api")});
     },
 
     //TODO: 腾讯是有提供重置未读数的接口的，后面加
@@ -1716,7 +1718,7 @@ $.extend(DiguAPI, {
     },
 
     rate_limit_status: function(data, callback){
-        callback({error:'没有提供接口'});
+        callback({error: _u.i18n("comm_no_api")});
     },
     
     reset_count: function(data, callback) {
@@ -2063,7 +2065,7 @@ $.extend(LeiHouAPI, {
 	},
 
     rate_limit_status: function(data, callback){
-        callback({error:'没有提供接口'});
+        callback({error: _u.i18n("comm_no_api")});
     },
 	
 	comments_timeline: function(data, callback) {
@@ -2206,7 +2208,7 @@ $.extend(Follow5API, {
 	},
 
     rate_limit_status: function(data, callback){
-        callback({error:'没有提供接口'});
+        callback({error: _u.i18n("comm_no_api")});
     },
 	
 //	comments_timeline: function(data, callback) {
@@ -2441,8 +2443,8 @@ $.extend(FanfouAPI, {
 	},
     
     processAt: function (str) { //@*** ,饭否的用户名支持“.”
-        str = str.replace(/^@([\w\-\u4e00-\u9fa5|\_\.]+)/g, ' <a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$1" title="左键查看微薄，右键打开主页">@$1</a>');
-        str = str.replace(/([^\w#])@([\w\-\u4e00-\u9fa5|\_\.]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ this.config.user_home_url +'$2" title="左键查看微薄，右键打开主页">@$2</a>');
+        str = str.replace(/^@([\w\-\u4e00-\u9fa5|\_\.]+)/g, ' <a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$1" title="'+ _u.i18n("btn_show_user_title") +'">@$1</a>');
+        str = str.replace(/([^\w#])@([\w\-\u4e00-\u9fa5|\_\.]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ this.config.user_home_url +'$2" title="'+ _u.i18n("btn_show_user_title") +'">@$2</a>');
         
         return str;
     },
@@ -2583,7 +2585,7 @@ $.extend(T163API, {
 	},
 
     rate_limit_status: function(data, callback){
-        callback({error:'没有提供接口'});
+        callback({error: _u.i18n("comm_no_api")});
     },
     
     // 先获取用户信息 user_show
@@ -2896,7 +2898,7 @@ $.extend(RenjianAPI, {
 	},
 	
 	rate_limit_status: function(data, callback){
-        callback({error:'没有提供接口'});
+        callback({error: _u.i18n("comm_no_api")});
     },
 	
 	reset_count: function(data, callback) {
@@ -3082,7 +3084,7 @@ $.extend(BuzzAPI, {
 	},
 
     rate_limit_status: function(data, callback){
-        callback({error:'没有提供接口'});
+        callback({error: _u.i18n("comm_no_api")});
     },
 	
 	counts: function(data, callback) {
@@ -3316,7 +3318,7 @@ $.extend(DoubanAPI, {
 	},
 
     rate_limit_status: function(data, callback){
-        callback({error:'没有提供接口'});
+        callback({error: _u.i18n("comm_no_api")});
     },
 	
 	MSG_TPL: '<?xml version="1.0" encoding="UTF-8"?><entry xmlns="http://www.w3.org/2005/Atom" xmlns:db="http://www.douban.com/xmlns/" xmlns:gd="http://schemas.google.com/g/2005" xmlns:opensearch="http://a9.com/-/spec/opensearchrss/1.0/"><db:entity name="receiver"><uri>http://api.douban.com/people/{{id}}</uri></db:entity><content>{{text}}</content><title>{{text}}</title></entry>',
@@ -3480,7 +3482,7 @@ $.extend(DoubanAPI, {
 			data.id = data.id['$t'];
 			data.id = data.id.substring(data.id.lastIndexOf('/doumail/') + 9, data.id.length);
 			data.t_url = data.link[1]['@href'];
-			data.text += ' <a href="{{t_url}}">查看</a>'.format(data);
+			data.text += ' <a href="{{t_url}}">'+ _u.i18n("comm_view") +'</a>'.format(data);
 			delete data.title;
 		}
 		if(data.published) {

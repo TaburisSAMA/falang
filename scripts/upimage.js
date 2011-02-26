@@ -35,12 +35,12 @@ function sendMsg(){ //覆盖popup.js的同名方法
     var check = true;
     var c_user = getUser();
     if(!c_user){
-        _showMsg('用户未指定，请在选项里面添加');
+        _showMsg(_u.i18n("msg_need_add_account"));
         check = false;
     }
     var msg = $.trim($("#txtContent").val());
     if(!msg){
-        _showMsg('请填写内容。');
+        _showMsg(_u.i18n("msg_need_content"));
         check = false;
     }
     var file = $("#imageFile")[0].files[0];
@@ -62,7 +62,7 @@ function sendMsg(){ //覆盖popup.js的同名方法
     }else if(!$("#accountsForSend li").length){
         users.push(c_user);
     }else{
-        _showMsg('请选择要发送的账号');
+        _showMsg(_u.i18n("msg_need_select_account"));
         return;
     }
     var upInfo = $("#uploadinfo").html(''), stat = {uploaded:[]};
@@ -95,13 +95,13 @@ function _uploadWrap(user, data, pic, stat, selLi){
             if(textStatus != 'error' && data && !data.error){
                 stat.successCount++;
                 $("#accountsForSend li[uniquekey=" + user.uniqueKey +"]").removeClass('sel');
-                $("#u_uploadinfo_" + user.uniqueKey).find('.progressInfo').append(' (<span>成功</span>)');
+                $("#u_uploadinfo_" + user.uniqueKey).find('.progressInfo').append(' (<span>'+ _u.i18n("comm_success") +'</span>)');
             }else if(data.error){
                 _showMsg('error: ' + data.error);
-                $("#u_uploadinfo_" + user.uniqueKey).addClass('error').find('.progressInfo').append(' (<span style="color:red">失败</span>)');
+                $("#u_uploadinfo_" + user.uniqueKey).addClass('error').find('.progressInfo').append(' (<span style="color:red">'+ _u.i18n("comm_fail") +'</span>)');
             }
             if(stat.successCount >= stat.userCount){//全部发送成功
-                _showMsg('发送成功');
+                _showMsg(_u.i18n("msg_send_success"));
                 selLi.addClass('sel');
                 var ifw = $("#imageFileWrap");
                 ifw.html(ifw.html());
@@ -119,7 +119,7 @@ function _uploadWrap(user, data, pic, stat, selLi){
                     setTimeout(callCheckNewMsg, 1000);
                     var failCount = stat.userCount - stat.successCount;
                     if(stat.userCount > 1 && failCount > 0){ //多个用户的
-                        _showMsg(stat.successCount + '发送成功，' + failCount + '失败。');
+                        _showMsg(_u.i18n("msg_send_complete").format({successCount:successCount, errorCount:failCount}));
                     }
                 }
             }
@@ -127,22 +127,22 @@ function _uploadWrap(user, data, pic, stat, selLi){
     );
 };
 
-var FILECHECK = {maxFileSize: 1024000,
+var FILECHECK = {maxFileSize: 2*1024000,
                  fileTypes: '__image/gif__image/jpeg__image/jpg__image/png__'
                 };
 function checkFile(file){
     var check = true;
     if(file){
         if(file.size > FILECHECK.maxFileSize){
-            _showMsg('文件太大，请选择小于1M的文件。');
+            _showMsg(_u.i18n("msg_file_too_large"));
             check = false;
         }
         if(FILECHECK.fileTypes.indexOf('__'+file.type+'__') < 0){
-            _showMsg('文件类型不正确，仅支持JPEG,GIF,PNG图片。');
+            _showMsg(_u.i18n("msg_pic_type_error"));
             check = false;
         }
     }else{
-        _showMsg('请选择要上传的图片。');
+        _showMsg(_u.i18n("msg_need_pic"));
         check = false;
     }
     return check;

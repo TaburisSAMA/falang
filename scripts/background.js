@@ -60,7 +60,7 @@ var friendships = {
             	if(user_info.screen_name) {
             		screen_name = user_info.screen_name;
             	}
-                showMsg('跟随 "' + screen_name + '" 成功');
+                showMsg(_u.i18n("msg_f_create_success").format({name: screen_name}));
             } else {
             	user_info = null;
             }
@@ -76,7 +76,7 @@ var friendships = {
             	if(user_info.screen_name) {
             		screen_name = user_info.screen_name;
             	}
-                showMsg('你已经取消跟随 "' + screen_name + '"');
+                showMsg(_u.i18n("msg_f_destroy_success").format({name: screen_name}));
             } else {
             	user_info = null;
             }
@@ -188,7 +188,7 @@ function checkTimeline(t, p, user_uniqueKey){
                     popupView.updateDockUserUnreadCount(user_uniqueKey);
                 } else {
                     if(current_user.uniqueKey == user_uniqueKey){
-                        popupView._showMsg('有新微博');
+                        popupView._showMsg(_u.i18n("msg_has_new_tweet"));
                     } else {
                     	setUnreadTimelineCount(_unreadCount, t, user_uniqueKey);
                     	popupView.updateDockUserUnreadCount(user_uniqueKey);
@@ -234,7 +234,7 @@ function getTimelinePage(user_uniqueKey, t, p){
     if(!c_user){
         return;
     }
-    if(t == 'followers'){ log('错误分页获取' + t);return; } //忽略粉丝列表
+    if(t == 'followers'){ log('The Wrong Page Fetch: ' + t);return; } //忽略粉丝列表
     if(isDoChecking(user_uniqueKey, t, 'paging')){ return; }
     var t_key = user_uniqueKey + t + '_tweets';
     if(!tweets[t_key]) {
@@ -405,8 +405,8 @@ var NotificationsManager = {
             <div class="usericon"><img src="{{user.profile_image_url}}" class="face"/><img src="images/blogs/{{user.blogType}}_16.png" class="blogType"/></div>\
             <div class="info"><span class="username">{{user.screen_name}}</span><br/>\
                 <span class="unreads">\
-                    <span id="unr_friends_timeline"><span>{{unreads.friends_timeline}}</span>新</span> &nbsp;&nbsp; <span id="unr_mentions"><span>{{unreads.mentions}}</span>@</span> <br/>\
-                    <span id="unr_comments_timeline"><span>{{unreads.comments_timeline}}</span>评</span> &nbsp;&nbsp; <span id="unr_direct_messages"><span>{{unreads.direct_messages}}</span>私</span> \
+                    <span id="unr_friends_timeline"><span>{{unreads.friends_timeline}}</span>'+ _u.i18n("abb_friends_timeline") +'</span> &nbsp;&nbsp; <span id="unr_mentions"><span>{{unreads.mentions}}</span>@</span> <br/>\
+                    <span id="unr_comments_timeline"><span>{{unreads.comments_timeline}}</span>'+ _u.i18n("abb_comment") +'</span> &nbsp;&nbsp; <span id="unr_direct_messages"><span>{{unreads.direct_messages}}</span>'+ _u.i18n("abb_direct_message") +'</span> \
                 </span>\
             </div>\
         </div>\
@@ -603,7 +603,7 @@ try{
 var sharedContextmenuId = null;
 function createSharedContextmenu(){
     if(!sharedContextmenuId){
-        sharedContextmenuId = chrome.contextMenus.create({"title": "通过FaWave分享", 
+        sharedContextmenuId = chrome.contextMenus.create({"title": _u.i18n("comm_share_whit_fawave"), 
             "contexts": ['all'],
             "onclick": function(info, tab) {
                 var text = info.selectionText;

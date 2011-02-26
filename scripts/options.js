@@ -22,8 +22,8 @@ var SUPPORT_AUTH_TYPES = {
 
 var AUTH_TYPE_NAME = {
     'baseauth': 'Basic Auth',
-    'oauth': 'oAuth(更安全)',
-    'xauth': 'xAuth(oAuth的简化)'
+    'oauth': _u.i18n("comm_oauth_name"),
+    'xauth': _u.i18n("comm_xauth_name")
 };
 
 var TWEEN_TYPES = ['Quad', 'Cubic', 'Quart', 'Quint', 'Sine', 'Expo', 'Circ', 'Elastic', 'Back', 'Bounce'];
@@ -40,7 +40,7 @@ $(function(){
     });
 
     $("#show-new-account").click(function(){
-        $("#save-account").val('添加');
+        $("#save-account").val(_u.i18n("comm_add"));
         $("#account-name").val('');
         $("#account-pwd").val('');
         $("#edit-account-key").val('');
@@ -78,7 +78,7 @@ $(function(){
     });
 
     $("#cleanLocalStorage").click(function(){
-        if(confirm('你确定要清空本地缓存数据吗？')){
+        if(confirm(_u.i18n("confirm_clean_local_storage"))){
             cleanLocalStorageData();
         }
     });
@@ -212,7 +212,7 @@ function checkUserRefreshTimeHitsAndSave(inp){
     if(b_view){
         b_view.RefreshManager.restart();
     }
-    _showMsg('刷新间隔已更新');
+    _showMsg(_u.i18n("msg_interval_update_success"));
 };
 var curthas = checkUserRefreshTimeHitsAndSave;
 
@@ -231,15 +231,15 @@ function showDndAccountList(bindDnd){
                 '<div class="detail">' +
                 '   <div class="item"><span class="userName">{{screen_name}}</span>({{blogTypeName}})' +
                 '       <div class="stat"><span class="statName">{{statName}}</span><span class="nav-arrow">&nbsp;</span>' +
-                '           <div><ul><li class="enabled" onclick="changeAccountStatus(\'{{uniqueKey}}\', \'enabled\')">启用</li>' +
-                '               <li class="onlysend" onclick="changeAccountStatus(\'{{uniqueKey}}\', \'onlysend\')">仅发送</li>' +
-                '               <li class="disabled" onclick="changeAccountStatus(\'{{uniqueKey}}\', \'disabled\')">停用</li></ul>' +
+                '           <div><ul><li class="enabled" onclick="changeAccountStatus(\'{{uniqueKey}}\', \'enabled\')">'+ _u.i18n("comm_enabled") +'</li>' +
+                '               <li class="onlysend" onclick="changeAccountStatus(\'{{uniqueKey}}\', \'onlysend\')">'+ _u.i18n("comm_send_only") +'</li>' +
+                '               <li class="disabled" onclick="changeAccountStatus(\'{{uniqueKey}}\', \'disabled\')">'+ _u.i18n("comm_disabled") +'</li></ul>' +
                 '           </div>' +
                 '       </div>' +
-                '       <span class="edit"><button onclick="delAccount(\'{{uniqueKey}}\')"><img src="images/delete.png">删除用户</button></span>' +
+                '       <span class="edit"><button onclick="delAccount(\'{{uniqueKey}}\')"><img src="images/delete.png">'+ _u.i18n("comm_del_user") +'</button></span>' +
                 '   </div>' +
                 '   <div class="item item2">' +
-                '       <span><span>刷新间隔:  </span><span class="userRefreshTimeWrap">{{refTimeHtml}}</span></span>' +
+                '       <span><span>'+ _u.i18n("sett_refresh_interval") +':  </span><span class="userRefreshTimeWrap">{{refTimeHtml}}</span></span>' +
                 '   </div>' +
                 '</div>' +
                 '</li>';
@@ -250,7 +250,7 @@ function showDndAccountList(bindDnd){
                 needRefresh = true;
             } else {
             	user.blogTypeName = T_NAMES[user.blogType];
-                user.statName = user.disabled ? '停用' : (user.only_for_send ? '仅发送' : '启用');
+                user.statName = user.disabled ? _u.i18n("comm_disabled") : (user.only_for_send ? _u.i18n("comm_send_only") : _u.i18n("comm_enabled"));
                 user.stat = user.disabled ? 'disabled' : (user.only_for_send ? 'onlysend' : 'enabled');
                 
                 //绑定用户自定刷新时间
@@ -264,9 +264,9 @@ function showDndAccountList(bindDnd){
                     }else{
                         refTime = 0;
                     }
-                    c_html += '<input type="text" t="' + timelimes[i] + '" value="' + refTime +'" class="inpRefTime" onchange="curthas(this)" />秒';
+                    c_html += '<input type="text" t="' + timelimes[i] + '" value="' + refTime +'" class="inpRefTime" onchange="curthas(this)" />' + _u.i18n("comm_second");
                 }
-                c_html += '(<span class="refHits">' + calculateUserRefreshTimeHits(user) + '</span>请求/每小时)';
+                c_html += '(<span class="refHits">' + calculateUserRefreshTimeHits(user) + '</span>'+ _u.i18n("comm_request") +'/'+ _u.i18n("comm_per_hour") +')';
                 user.refTimeHtml = c_html;
                 
             	op += tpl.format(user);
@@ -356,8 +356,8 @@ function changeAccountStatus(uniqueKey, stat){
     if(b_view){
         b_view.RefreshManager.restart();
     }
-    var statName = user.disabled ? '停用' : (user.only_for_send ? '仅发送' : '启用');
-    _showMsg(user.screen_name + ' 的状态修改为: ' + statName);
+    var statName = user.disabled ? _u.i18n("comm_disabled") : (user.only_for_send ? _u.i18n("comm_send_only") : _u.i18n("comm_enabled"));
+    _showMsg(_u.i18n("msg_stat_change_success").format({username:user.screen_name, stat:statName}));
     
     _li.removeClass(_li.attr('stat')).addClass(stat).attr('stat', stat);
     _li.find('.detail .stat .statName').html(statName);
@@ -370,7 +370,7 @@ function showMyGeo(){
     if(geoPosition){
         popupBox.showMap('icons/icon48.png', geoPosition.latitude, geoPosition.longitude);
     }else{
-        _showMsg('没有可用的地理位置信息');
+        _showMsg(_u.i18n("msg_no_geo_info"));
     }
 };
 
@@ -419,12 +419,12 @@ function init(){
                 $("#btnShowMyGeo").show();
             }, function(msg){
                 //error
-                _showMsg('启用地理位置定位失败。' + (typeof msg == 'string' ? msg : ""));
+                _showMsg(_u.i18n("msg_enabled_geo_false") + (typeof msg == 'string' ? msg : ""));
                 $("#save-all").removeAttr('disabled');
                 $("#isGeoEnabled").attr('checked', false);
             });
         } else {
-            _showMsg('浏览器不支持地理位置定位');
+            _showMsg(_u.i18n("msg_not_support_geo"));
         }
     });
 
@@ -578,7 +578,7 @@ function initQuickSendHotKey(){
 
 function _verify_credentials(user) {
 	if(!user) {
-		_showMsg('用户名或者密码不正确，请修改');
+		_showMsg(_u.i18n("msg_not_support_geo"));
 		$('#save-account').removeAttr('disabled');
 		return;
 	}
@@ -586,13 +586,13 @@ function _verify_credentials(user) {
 		$('#save-account').removeAttr('disabled');
         if(!data || !data.id || errorCode || textStatus=='error'){
             if(errorCode==400||errorCode==401||errorCode==403){
-                _showMsg('用户名或者密码不正确，请修改');
+                _showMsg(_u.i18n("msg_not_support_geo"));
             }else{
                 var err_msg = '';
                 if(data.error){
                     err_msg = 'error: ' + data.error;
                 }
-                _showMsg('出现错误，保存失败。' + err_msg);
+                _showMsg(_u.i18n("msg_user_save_error") + err_msg);
             }
         } else {
         	var userList = getUserList('all');
@@ -624,7 +624,7 @@ function _verify_credentials(user) {
             $("#account-name").val('');
             $("#account-pwd").val('');
             $("#account-pin").val('');
-            _showMsg(btnVal + '用户"' + data.screen_name + '"成功！');
+            _showMsg(_u.i18n("msg_edit_user_success").format({edit:btnVal, username:data.screen_name}));
 
             var b_view = getBackgroundView();
             if(b_view){
@@ -700,7 +700,7 @@ function saveAccount(){
     		});
     	}
     } else {
-        _showMsg('请输入用户名和密码！');
+        _showMsg(_u.i18n("msg_need_username_and_pwd"));
     }
 };
 
@@ -753,13 +753,13 @@ function showEditAccount(uniqueKey){
             $("#account-name").val(user.userName || '');
             $("#account-pwd").val(user.password || '');
             $("#account-proxy-api").val(user.apiProxy || '');
-            $("#save-account").val('保存');
+            $("#save-account").val(_u.i18n("comm_save"));
         }
     }
 };
 
 function delAccount(uniqueKey){
-    if(!confirm('你确定要删除该账号吗？')){ return; }
+    if(!confirm(_u.i18n("confirm_del_account"))){ return; }
 	//$("#account-list option:selected").remove();
 	$("#dnd_a_"+uniqueKey).remove();
     var userList = getUserList('all');
@@ -794,7 +794,7 @@ function delAccount(uniqueKey){
     if(b_view){
         b_view.RefreshManager.restart();
     }
-    _showMsg('成功删除账号 (' + T_NAMES[delete_user.blogType] + ')' + delete_user.screen_name + '！');
+    _showMsg(_u.i18n("msg_del_account_success").format({blogname:T_NAMES[delete_user.blogType], username:delete_user.screen_name}));
 };
 
 function saveAll(){
@@ -930,7 +930,7 @@ function saveAll(){
 
     Settings.save();
 
-    _showMsg('保存成功！');
+    _showMsg(_u.i18n("msg_save_success"));
 };
 
 //平滑滚动
@@ -982,9 +982,9 @@ function refreshAccountWarp(user, stat){
         var blogName = T_NAMES[user.blogType];
         if(errorCode){
             if(errorCode==400){
-                _showMsg('刷新(' + blogName + ')' + user.screen_name + ' 的信息失败，原因：用户名或者密码不正确，请修改。');
+                _showMsg(_u.i18n("msg_update_accounts_info_false").format({blogname:blogName, username:user.screen_name}));
             } else {
-                _showMsg('刷新(' + blogName + + ')' + user.screen_name + ' 的信息失败，原因：出现未知错误。errorCode: ' + errorCode);
+                _showMsg(_u.i18n("msg_update_accounts_info_unknow_error").format({blogname:blogName, username:user.screen_name, errorcode:errorCode}));
             }
 //            userList[user.uniqueKey] = user;
             stat.errorCount++;
@@ -994,7 +994,7 @@ function refreshAccountWarp(user, stat){
 //            stat.userList[i] = user;
 //            userList[data.uniqueKey] = data;
             stat.successCount++;
-            _showMsg('成功刷新(' + blogName + ')' + user.screen_name + ' 的信息');
+            _showMsg(_u.i18n("msg_update_account_info_success"));
         }
         if((stat.errorCount + stat.successCount) == stat.userList.length){
         	// 全部刷新完，更新
@@ -1013,7 +1013,7 @@ function refreshAccountWarp(user, stat){
 //                c_user = userList[c_user.uniqueKey.toLowerCase()];
                 setUser(c_user);
             }
-            _showMsg('刷新用户信息完成。成功' + stat.successCount + '个，失败' + stat.errorCount + '个。');
+            _showMsg(_u.i18n("msg_update_accounts_info_complete").format({successCount:successCount, errorCount:errorCount}));
             $("#refresh-account").removeAttr("disabled");
             if($("#needRefresh").css('display') != 'none'){ //如果是强制需要刷新用户信息的，则在刷新后刷新页面
                 window.location.reload(); //TODO: 修改为不用刷新页面的

@@ -161,9 +161,6 @@ function initTabs(){
 
 function initOnUnload(){
     var c = $("#txtContent").val();
-    if(c=='     点此输入您要分享的内容'){
-        c='';
-    }
     localStorage.setObject(UNSEND_TWEET_KEY, c||'');
 
     if(Settings.get().sendAccountsDefaultSelected == 'remember'){
@@ -199,7 +196,7 @@ function initTxtContentEven(){
             if(c){
                 sendMsg(c);
             }else{
-                showMsg('请输入要发送的内容');
+                showMsg(_u.i18n("msg_need_content"));
             }
             return false;
         }
@@ -211,7 +208,7 @@ function initTxtContentEven(){
         if(c){
             sendMsg(c);
         }else{
-            showMsg('请输入要发送的内容');
+            showMsg(_u.i18n("msg_need_content"));
         }
     });
 //>>>发送微博事件初始化 结束<<<
@@ -254,10 +251,10 @@ function sendMsgByActionType(c){//c:要发送的内容
                 sendReplyMsg(c);
                 break;
             default:
-                showMsg('检查发送类型出错。');
+                showMsg('Wrong Send Type');
         }
     }else{
-        showMsg('请输入要发送的内容');
+        showMsg(_u.i18n("msg_need_content"));
     }
 };
 
@@ -277,9 +274,9 @@ function countReplyText(){
     var c = $("#replyTextarea").val();
     var len = 140 - c.len();
     if(len > 0){
-        len = '(你还可以输入' + len + '字)';
+        len = _u.i18n("msg_word_count").format({len:len});
     }else{
-        len = '(<em style="color:red;">已超出' + (-len) + '字</em>)';
+        len = '(<em style="color:red;">'+ _u.i18n("msg_word_overstep") +'</em>)';
     }
     $("#replyInputCount").html(len);
 };
@@ -306,7 +303,7 @@ function addShortenUrl(){
     var status = btn.data('status');
     switch(status){
         case 'shorting':
-            showMsg('正在努力缩短中，请稍后');
+            showMsg(_u.i18n("msg_shorting_and_wait"));
             break;
         case 'opened':
             var long_url = $("#urlShortenInp").val();
@@ -314,14 +311,14 @@ function addShortenUrl(){
                 return;
             }
             btn.data('status', 'shorting');
-            $("#urlShortenInp").val('正在缩短...').attr('disabled', true);
+            $("#urlShortenInp").val(_u.i18n("msg_shorting")).attr('disabled', true);
             ShortenUrl.short(long_url, function(shorturl){
                 if(shorturl){
                     $("#txtContent").val($("#txtContent").val() + ' ' + shorturl + ' ');
                     $("#urlShortenInp").removeClass('long').val('');
                     btn.data('status', ''); 
                 }else{
-                    showMsg('缩短网址失败');
+                    showMsg(_u.i18n("msg_shorten_fail"));
                     $("#urlShortenInp").val(long_url);
                     btn.data('status', 'opened'); //失败，仍然标记为打开的
                 }
@@ -364,7 +361,7 @@ function initIamDoing(){
 		            }
 		        });
             } else {
-                showMsg('当前页面的URL不正确。');
+                showMsg(_u.i18n("msg_wrong_page_url"));
             }
         });
     });
@@ -637,7 +634,7 @@ function initSelectSendAccounts(is_upload){
         }
         li.push(li_tp.format(user));
     }
-    afs.html('TO(<a class="all" href="javascript:" onclick="toggleSelectAllSendAccount()">全</a>): ' + li.join(''));
+    afs.html('TO(<a class="all" href="javascript:" onclick="toggleSelectAllSendAccount()">'+ _u.i18n("abb_all") +'</a>): ' + li.join(''));
     afs.data('inited', 'true');
     shineSelectedSendAccounts();
 };
@@ -850,7 +847,7 @@ function _getFansList(to_t, read_more){
     	screen_name = c_user.screen_name;
     	user_id = c_user.id;
     	get_c_user_fans = true;
-    	$("#fans_tab span font").html('我');
+    	$("#fans_tab span font").html(_u.i18n("comm_me"));
     }
     if(!get_c_user_fans) {
     	$("#fans_tab span font").html(screen_name);
@@ -1213,7 +1210,7 @@ function showCounts(t, ids){
                             _edit.find('.repostCounts').html('('+ counts[i].rt +')');
                             var _comm_txt = '(0)';
                             if(counts[i].comments > 0){
-                                _comm_txt = '(<a href="javascript:void(0);" title="点击查看评论" onclick="showComments(this,' + counts[i].id + ');">' +counts[i].comments + '</a>)';
+                                _comm_txt = '(<a href="javascript:void(0);" title="'+ _u.i18n("comm_show_comments") +'" onclick="showComments(this,' + counts[i].id + ');">' +counts[i].comments + '</a>)';
                             }
                             _edit.find('.commentCounts').html(_comm_txt);
                         }
@@ -1561,7 +1558,7 @@ function sendReplyMsg(msg){
             hideReplyInput();
             txt.val('');
             setTimeout(callCheckNewMsg, 1000, 'friends_timeline');
-            showMsg(userName + ' 成功！');
+            showMsg(userName + ' ' + _u.i18n("comm_success"));
         }else if(sinaMsg.error){
 //            showMsg('error: ' + sinaMsg.error);
         }
@@ -1591,7 +1588,7 @@ function sendMsg(msg){
     }else if(!$("#accountsForSend li").length){
         users.push(getUser());
     }else{
-        showMsg('请选择要发送的账号');
+        showMsg(_u.i18n("msg_need_select_account"));
         btn.removeAttr('disabled');
         txt.removeAttr('disabled');
         return;
@@ -1621,7 +1618,7 @@ function _sendMsgWraper(msg, user, stat, selLi){
             hideMsgInput();
             selLi.addClass('sel');
             $("#txtContent").val('');
-            showMsg('发送成功！');
+            showMsg(_u.i18n("msg_send_success"));
         }
         if(stat.sendedCount >= stat.userCount){//全部发送完成
             selLi = null;
@@ -1631,7 +1628,7 @@ function _sendMsgWraper(msg, user, stat, selLi){
                 setTimeout(callCheckNewMsg, 1000, 'friends_timeline');
                 var failCount = stat.userCount - stat.successCount;
                 if(stat.userCount > 1 && failCount > 0){ //多个用户，并且有发送失败才显示
-                    showMsg(stat.successCount + '发送成功，' + failCount + '失败。');
+                    showMsg(_u.i18n("msg_send_complete").format({successCount:successCount, errorCount:failCount}));
                 }
             }
         }
@@ -1658,7 +1655,7 @@ function sendWhisper(msg){
         if(sinaMsg === true || sinaMsg.id){
             hideReplyInput();
             txt.val('');
-            showMsg('发送成功！');
+            showMsg(_u.i18n("msg_send_success"));
         } else if (sinaMsg.error){
 //            showMsg('error: ' + sinaMsg.error);
         }
@@ -1700,7 +1697,7 @@ function sendRepost(msg, repostTweetId, notSendMord){
             hideReplyInput();
             txt.val('');
             setTimeout(callCheckNewMsg, 1000, 'friends_timeline');
-            showMsg('转发成功！');
+            showMsg(_u.i18n("msg_repost_success"));
         }
         btn.removeAttr('disabled');
         txt.removeAttr('disabled');
@@ -1736,7 +1733,7 @@ function sendComment(msg, commentTweetId, notSendMord){
     if(cid){ //如果是回复别人的微博
     	m = 'reply';
     	data.cid = cid;
-        data.comment = data.comment.replace('回复 @'+ $('#replyUserName').val() +':', '');
+        data.comment = data.comment.replace(_u.i18n("comm_reply") + ' @'+ $('#replyUserName').val() +':', '');
     	var reply_user_id = $('#replyUserId').val();
     	data.reply_user_id = reply_user_id;
     } 
@@ -1744,7 +1741,7 @@ function sendComment(msg, commentTweetId, notSendMord){
         if(sinaMsg === true || sinaMsg.id){
             hideReplyInput();
             txt.val('');
-            showMsg('发送评论成功！');
+            showMsg(_u.i18n("msg_comment_success"));
         }else if(sinaMsg.error){
 //            showMsg('error: ' + sinaMsg.error);
         }
@@ -1848,10 +1845,10 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
     $('#actionType').val('repost');
     $('#repostTweetId').val(tweetId);
     $('#replyUserName').val(userName);
-    $('#ye_dialog_title').html('转发@' + userName + ' 的信息');
+    $('#ye_dialog_title').html(_u.i18n("msg_repost_who").format({username:userName}));
     if(config.support_comment) {
     	$('#chk_sendOneMore').attr("checked", false).val(tweetId).show();
-        $('#txt_sendOneMore').text('同时给 @' + userName + ' 评论').show();
+        $('#txt_sendOneMore').text(_u.i18n("msg_comment_too").format({username:userName})).show();
     } else { // 不支持repost，则屏蔽
     	$('#chk_sendOneMore').attr("checked", false).val('').hide();
         $('#txt_sendOneMore').text('').hide();
@@ -1859,7 +1856,7 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
     if(config.support_comment &&
     		rtUserName && rtUserName != userName && reTweetId) {
         $('#chk_sendOneMore2').attr("checked", false).val(reTweetId).show();
-        $('#txt_sendOneMore2').text('同时给原文作者 @' + rtUserName + ' 评论').show();
+        $('#txt_sendOneMore2').text(_u.i18n("msg_comment_original_too").format({username:rtUserName})).show();
     }else{
         $('#chk_sendOneMore2').attr("checked", false).val('').hide();
         $('#txt_sendOneMore2').text('').hide();
@@ -1889,11 +1886,11 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
         }
         v = config.repost_delimiter + '@' + userName + ':' + d.text;
     } else {
-    	v = '转发微博.';
+    	v = _u.i18n("comm_repost_default");
     }
 	// 光标在前
 	t.val(v).focus();
-    if(v=='转发微博.'){t.select();}
+    if(v== _u.i18n("comm_repost_default")){t.select();}
     countReplyText();
 };
 
@@ -1904,14 +1901,14 @@ function doComment(ele, userName, userId, tweetId, replyUserName, replyUserId, c
     $('#replyUserName').val(replyUserName);
     $('#replyUserId').val(replyUserId || '');
     $('#commentCommentId').val(cid||'');
-    $('#ye_dialog_title').html('评论@' + userName + ' 的信息');
+    $('#ye_dialog_title').html(_u.i18n("msg_comment_who").format({username:userName}));
     $('#ye_dialog_window').show();
-    var _txt = replyUserName ? ('回复 @'+replyUserName+':') : '';
+    var _txt = replyUserName ? (_u.i18n("msg_comment_reply_default").format({username:replyUserName})) : '';
     var user = getUser();
 	var config = tapi.get_config(user);
 	if(config.support_repost) { // 支持repost才显示
 		$('#chk_sendOneMore').attr("checked", false).val(tweetId).show();
-    	$('#txt_sendOneMore').text('同时转发一条微博').show();
+    	$('#txt_sendOneMore').text(_u.i18n("msg_repost_too")).show();
 	} else {
 		$('#chk_sendOneMore').val('').hide();
     	$('#txt_sendOneMore').text('').hide();
@@ -1927,7 +1924,7 @@ function doNewMessage(ele, userName, toUserId){//悄悄话
     $('#actionType').val('newmsg');
     $('#whisperToUserId').val(toUserId);
     $('#replyUserName').val(userName);
-    $('#ye_dialog_title').html('给@' + userName + ' 发送私信');
+    $('#ye_dialog_title').html(_u.i18n("msg_direct_message_who").format({username:userName}));
 
     $('#chk_sendOneMore').attr("checked", false).val('').hide();
     $('#txt_sendOneMore').text('').hide();
@@ -2011,9 +2008,9 @@ function doDelTweet(tweetId, ele){//删除自己的微博
         if(textStatus != 'error' && data && !data.error){
         	$(ele).closest('li').remove();
             _delCache(tweetId, t, user.uniqueKey);
-            showMsg('删除成功');
+            showMsg(_u.i18n("msg_delete_success"));
         }else{
-            showMsg('删除失败');
+            showMsg(_u.i18n("msg_delete_fail"));
         }
     });
 };
@@ -2026,9 +2023,9 @@ function doDelComment(ele, screen_name, tweetId){//删除评论
         if(textStatus != 'error' && data && !data.error){
         	$(ele).closest('li').remove();
             _delCache(tweetId, t, user.uniqueKey);
-            showMsg('删除成功');
+            showMsg(_u.i18n("msg_delete_success"));
         }else{
-            showMsg('删除失败');
+            showMsg(_u.i18n("msg_delete_fail"));
         }
     });
 };
@@ -2041,9 +2038,9 @@ function delDirectMsg(ele, screen_name, tweetId){//删除私信
         if(textStatus != 'error' && data && !data.error){
         	$(ele).closest('li').remove();
             _delCache(tweetId, t, user.uniqueKey);
-            showMsg('删除成功');
+            showMsg(_u.i18n("msg_delete_success"));
         }else{
-            showMsg('删除失败');
+            showMsg(_u.i18n("msg_delete_fail"));
         }
     });
 };
@@ -2059,7 +2056,7 @@ function addFavorites(ele, screen_name, tweetId){//添加收藏
         if(textStatus != 'error' && data && !data.error){
             _a.after(_aHtml.replace('addFavorites','delFavorites')
                             .replace('favorites_2.gif','favorites.gif')
-                            .replace('点击收藏','点击取消收藏'));
+                            .replace(_u.i18n("btn_add_favorites_title"), _u.i18n("btn_del_favorites_title")));
             _a.remove();
 //            var item = TweetStorage.getItems([tweetId], t, user.uniqueKey)[0];
 //            item.favorited = True;
@@ -2076,9 +2073,9 @@ function addFavorites(ele, screen_name, tweetId){//添加收藏
                     }
                 }
             }
-            showMsg('成功收藏');
+            showMsg(_u.i18n("msg_add_favorites_success"));
         }else{
-            showMsg('收藏失败');
+            showMsg(_u.i18n("msg_add_favorites_fail"));
             _a.show();
         }
     });
@@ -2095,7 +2092,7 @@ function delFavorites(ele, screen_name, tweetId){//删除收藏
         if(textStatus != 'error' && data && !data.error){
             _a.after(_aHtml.replace('delFavorites','addFavorites')
                             .replace('favorites.gif','favorites_2.gif')
-                            .replace('点击取消收藏','点击收藏'));
+                            .replace(_u.i18n("btn_del_favorites_title"), _u.i18n("btn_add_favorites_title")));
             _a.remove();
 //            var item = TweetStorage.getItems([tweetId], t, user.uniqueKey)[0];
 //            item.favorited = True;
@@ -2112,9 +2109,9 @@ function delFavorites(ele, screen_name, tweetId){//删除收藏
                     }
                 }
             }
-            showMsg('成功取消收藏');
+            showMsg(_u.i18n("msg_del_favorites_success"));
         }else{
-            showMsg('取消收藏失败');
+            showMsg(_u.i18n("msg_del_favorites_fail"));
             _a.show();
         }
     });
@@ -2131,12 +2128,12 @@ function sendOretweet(ele, screen_name, tweetId){//twitter锐推
     var title = _a.attr('title');
     tapi.retweet({id:tweetId, user:user}, function(data, textStatus){
         if(textStatus != 'error' && data && !data.error){
-            _a.removeAttr('onclick').attr('title', '已成功').show();
+            _a.removeAttr('onclick').attr('title', _u.i18n("comm_success")).show();
 			if(_a.hasClass('ort')) {
 				_a.addClass('orted');
 			}
 			if(_a.html()) {
-				_a.html('已' + _a.html());
+				_a.html(_u.i18n("comm_has") + _a.html());
 			}
             var c_user = getUser();
             var cacheKey = c_user.uniqueKey + t + '_tweets';
@@ -2154,9 +2151,9 @@ function sendOretweet(ele, screen_name, tweetId){//twitter锐推
                 }
             }
 
-            showMsg(title + '成功');
+            showMsg(title + _u.i18n("comm_success"));
         }else{
-            showMsg(title + '失败');
+            showMsg(title + _u.i18n("comm_fail"));
             _a.show();
         }
     });
@@ -2181,7 +2178,7 @@ function showGeoMap(user_img, latitude, longitude){
     if(google && google.maps){
         popupBox.showMap(user_img, latitude, longitude);
     }else{
-        showMsg('地图API正在载入中，请稍后再试');
+        showMsg(_u.i18n("msg_loading_map"));
     }
 };
 
@@ -2219,7 +2216,7 @@ function changeAlertMode(to_mode){
         to_mode = (mode == 'alert') ? 'dnd' : 'alert';
     }
     setAlertMode(to_mode);
-    var tip = (to_mode=='alert') ? '提示模式。点击切换到免打扰模式' : '已开启免打扰模式。点击切换到提示模式';
+    var tip = (to_mode=='alert') ? _u.i18n("btn_alert_mode_title") : _u.i18n("btn_dnd_mode_title");
     btn.attr('mode', to_mode).attr('title', tip).find('img').attr('src', 'images/' + to_mode + '_mode.png');
     setUnreadTimelineCount(0, 'friends_timeline');
 };

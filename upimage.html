@@ -20,6 +20,8 @@
 	<script type="text/javascript" src="scripts/upimage.js" ></script>
 	<style id="styleCustom" ></style>
 	<script>
+		this.document.title = _u.i18n('comm_pic') + ' -- ' + _u.i18n('defaultTitle');
+		
 		var wh_css = 'body{font-family:"'+ Settings.get().font +'";font-size:'+ Settings.get().fontSite +'px;}';
 		$("#styleCustom").html(wh_css);
 	</script>
@@ -32,10 +34,12 @@
 		<ul id="accountsForSend"></ul>
 		<textarea id="txtContent" ></textarea>
 		<div class="ctr">
-			<input id="btnSend" type="button" value="发微!" title="ctrl + enter 发送" class="btn send" disabled="disabled" />&nbsp;
-			<a href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');" title="点击添加表情"><img src="images/face.gif" />表情</a>&nbsp;
-			<input type="button" value="清空" onclick="cleanTxtContent();" class="btn"/>&nbsp;
-			<input type="button" value="关闭" onclick="window.close();" class="btn"/>&nbsp;
+			<input id="btnSend" type="button" value="发微!" title="ctrl + enter 发送" class="btn send" disabled="disabled" />
+			<script>_u.wia('#btnSend','value','comm_send'); _u.wia('#btnSend','title','comm_send_tip');</script>&nbsp;
+			<a href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');" title="点击添加表情"><img src="images/face.gif" /><script>_u.wi('comm_emotional')</script></a>
+			<script>_u.wia('#btnAddEmotional','title','btn_emotional_title');</script>&nbsp;
+			<button onclick="cleanTxtContent();" class="btn"><script>_u.wi('comm_clear')</script></button>&nbsp;
+			<button onclick="window.close();" class="btn"><script>_u.wi('comm_close')</script></button>&nbsp;
 			<span id="wordCount">140</span>
 		</div>
 	  </div>
@@ -46,7 +50,7 @@
 		</ul>
 		<div class="fileSel graph">
 			<strong id="progressBar" class="bar" style="width: 0%;"><span></span></strong>
-			<div class="selTip">点此选择文件或者将文件拖放至此</div>
+			<div class="selTip"><script>_u.wi('btn_select_pic_title')</script></div>
 		</div>
 		<span id="imageFileWrap" style="display:block;">
 			<input type="file" value="选择图片" id="imageFile" onchange="selectFile(this)" />
@@ -63,7 +67,7 @@
 	<div class="faceItem clearFix">
 	<div class="layerArrow"></div>
 	<div class="layerMedia_close">
-	<a class="close" href="javascript:void(fawave.face.hide())" title="关闭"></a>
+	<a class="close" href="javascript:void(fawave.face.hide())" title="Close"></a>
 	</div>
 	<div class="faceItemPicbg">
 	<ul id="face_icons"></ul>

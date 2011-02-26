@@ -12,6 +12,29 @@ function updateVersion(){
 };
 //<<--
 
+var _u = {
+    //向页面写内容
+    w: function(s){
+        document.write(s);
+    },
+    //向页面写本地化后的内容
+    wi: function(s, e){
+        _u.w(_u.i18n(s, e));
+    },
+    wia: function(sel, attr, s, e){
+        $(sel).attr(attr, _u.i18n(s, e));
+    },
+    //获取本地化语言
+    i18n: function(s, e){
+        var re = chrome.i18n.getMessage(s, e);
+        if(re){
+            return re;
+        }else{
+            return s;
+        }
+    }
+};
+
 var PAGE_SIZE = 20;
 var COMMENT_PAGE_SIZE = 8;
 var OAUTH_CALLBACK_URL = chrome.extension.getURL('oauth_cb.html');
@@ -60,20 +83,20 @@ T_LIST.tqq = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_
 
 var T_NAMES = {
 	'tsina': '新浪微博',
-	'digu': '嘀咕',
 	'tqq': '腾讯微博',
-	'fanfou': '饭否',
 	'tsohu': '搜狐微博',
 	't163': '网易微博',
+	'douban': '豆瓣',
+	'fanfou': '饭否',
+	'digu': '嘀咕',
 	'zuosa': '做啥',
+	'leihou': '雷猴',
+	'renjian': '人间网',
 //	'follow5': 'Follow5',
 	'twitter': 'Twitter',
 //	'facebook': 'Facebook',
 	'plurk': 'Plurk',
-	'renjian': '人间网',
-	'douban': '豆瓣',
-	'buzz': 'Google Buzz',
-	'leihou': '雷猴'
+	'buzz': 'Google Buzz'
 };
 
 var Languages = {
@@ -132,17 +155,17 @@ var Languages = {
 };
 
 var unreadDes = {
-    'friends_timeline': '新', 
+    'friends_timeline': _u.i18n('abb_friends_timeline'), 
     'mentions': '@', 
-    'comments_timeline': '评', 
-    'direct_messages': '私'
+    'comments_timeline': _u.i18n('abb_comments_timeline'), 
+    'direct_messages': _u.i18n('abb_direct_message')
 };
 
 var tabDes = {
-    'friends_timeline': '首页', 
-    'mentions': '@我', 
-    'comments_timeline': '评论', 
-    'direct_messages': '私信'
+    'friends_timeline': _u.i18n('comm_TabName_friends_timeline'), 
+    'mentions': _u.i18n('comm_TabName_mentions'), 
+    'comments_timeline': _u.i18n('comm_TabName_comments_timeline'), 
+    'direct_messages': _u.i18n('comm_TabName_direct_messages')
 };
 
 //刷新时间限制
@@ -251,7 +274,7 @@ var Settings = {
         isGeoEnabled: false, //默认不开启上报地理位置信息
         geoPosition: null, //获取到的地理位置信息，默认为空
 
-        lookingTemplate: '我正在看: {{title}} {{url}} '
+        lookingTemplate: _u.i18n('sett_shared_template')
     },
     init: function(){ //只在background载入的时候调用一次并给 _settings 赋值就可以
         var _sets = localStorage.getObject(SETTINGS_KEY);
@@ -508,7 +531,7 @@ function syncUnreadCountToSinaPage(t, user_uniqueKey){
 //获取在插件icon上显示的tooltip内容
 function getTooltip(){
     if(getAlertMode()=='dnd'){
-        return 'FaWave(发微): 免打扰模式';
+        return _u.i18n("comm_dnd_tooltip");
     }
     var tip = '', _new=0, _mention=0, _comment=0, _direct=0;
     var userList = getUserList();
@@ -519,18 +542,18 @@ function getTooltip(){
         _comment = getUnreadTimelineCount('comments_timeline', user.uniqueKey);
         _direct = getUnreadTimelineCount('direct_messages', user.uniqueKey);
         var u_tip = '';
-        if(_new){ u_tip += _new + '新'; }
+        if(_new){ u_tip += _new + _u.i18n("abb_friends_timeline"); }
         if(_mention){
             u_tip = u_tip ? u_tip + ',  ' : u_tip;
             u_tip += _mention + '@';
         }
         if(_comment){
             u_tip = u_tip ? u_tip + ',  ' : u_tip;
-            u_tip += _comment + '评';
+            u_tip += _comment + _u.i18n("abb_comments_timeline");
         }
         if(_direct){
             u_tip = u_tip ? u_tip + ',  ' : u_tip;
-            u_tip += _direct + '私';
+            u_tip += _direct + _u.i18n("abb_direct_message");
         }
         if(u_tip){
             u_tip = '(' + T_NAMES[user.blogType] + ')' + user.screen_name + ': ' + u_tip;
@@ -739,29 +762,6 @@ function ubbCode(str)	{
     reg = null;
     reg2 = null;
     return result;
-};
-
-var _u = {
-    //向页面写内容
-    w: function(s){
-        document.write(s);
-    },
-    //向页面写本地化后的内容
-    wi: function(s, e){
-        _u.w(_u.i18n(s, e));
-    },
-    wia: function(sel, attr, s, e){
-        $(sel).attr(attr, _u.i18n(s, e));
-    },
-    //获取本地化语言
-    i18n: function(s, e){
-        var re = chrome.i18n.getMessage(s, e);
-        if(re){
-            return re;
-        }else{
-            return s;
-        }
-    }
 };
 
 //在Chrome上输出log信息，用于调试
@@ -1037,7 +1037,7 @@ function getPageHeight() {
 //浮动层
 var popupBox = {
     tp: '<div id="popup_box">\
-            <div class="pb_title clearFix"><span class="t"></span><a href="javascript:" onclick="popupBox.close()" class="pb_close">关闭</a></div>\
+            <div class="pb_title clearFix"><span class="t"></span><a href="javascript:" onclick="popupBox.close()" class="pb_close">'+ _u.i18n("comm_close") +'</a></div>\
             <div class="pb_content"></div>\
         </div>\
         <div id="popup_box_overlay"></di>',
@@ -1079,7 +1079,7 @@ var popupBox = {
         image.onload = function() {
             popupBox.showOverlay();
             if(original){
-                popupBox.box.find('.pb_title .t, .pb_footer .t').html('<a target="_blank" href="' + original +'">查看原图</a>');
+                popupBox.box.find('.pb_title .t, .pb_footer .t').html('<a target="_blank" href="' + original +'">'+ _u.i18n("comm_show_original_pic") +'</a>');
             }else{
                 popupBox.box.find('.pb_title .t, .pb_footer .t').html('');
             }
@@ -1140,7 +1140,7 @@ var popupBox = {
     },
     showVideo: function(url, playcode) {
         this.checkBox();
-        popupBox.box.find('.pb_title .t, .pb_footer .t').html('<a target="_blank" href="' + url +'">查看原视频</a>');
+        popupBox.box.find('.pb_title .t, .pb_footer .t').html('<a target="_blank" href="' + url +'">'+ _u.i18n("comm_show_original_vedio") +'</a>');
         popupBox.box.find('.pb_content').html(playcode);
         popupBox.show();
     }
@@ -1215,7 +1215,7 @@ var ShortenUrl = {
 	expandAll: function() {
 		var b_view = getBackgroundView();
 		var cache = b_view.SHORT_URLS;
-		$('a.link:not([title*="右键直接打开"],[videotype])').each(function() {
+		$('a.link:not([title*="'+ _u.i18n("comm_mbright_to_open") +'"],[videotype])').each(function() {
 			var url = $(this).attr('href');
 			if(url.indexOf('javascript:') == 0) {
 				return;
@@ -1228,7 +1228,7 @@ var ShortenUrl = {
 				return;
 			}
 			if(cache[url]) {
-				$(this).attr('title', '右键直接打开 ' + cache[url]).attr('rhref', cache[url]);
+				$(this).attr('title', _u.i18n("comm_mbright_to_open") + ' ' + cache[url]).attr('rhref', cache[url]);
                 UrlUtil.showFaviconBefore(this, cache[url]);
 				if(!VideoService.attempt(cache[url], this)) {
                 	ImageService.attempt(cache[url], this);
@@ -1236,7 +1236,7 @@ var ShortenUrl = {
 			} else {
 				ShortenUrl.expand(url, function(longurl) {
 					if(longurl) {
-						$(this).attr('title', '右键直接打开 ' + longurl).attr('rhref', longurl).addClass('longurl');
+						$(this).attr('title', _u.i18n("comm_mbright_to_open") + ' ' + longurl).attr('rhref', longurl).addClass('longurl');
 						cache[$(this).attr('href')] = longurl;
                         UrlUtil.showFaviconBefore(this, longurl);
 						if(!VideoService.attempt(longurl, this)) {
@@ -1575,6 +1575,7 @@ var Imgur = {
 	            }
 	            catch(err){
 	                //data = null;
+	                log(data);
 	                data = {error:'服务器返回结果错误，本地解析错误。', error_code:500};
 	                textStatus = 'error';
 	            }
@@ -1636,7 +1637,7 @@ var ImageService = {
 			var item = this.services[name];
 			if(item.url_re.test(url)) {
 				var old_title = $(ele).attr('title');
-				var title = '左键点击预览';
+				var title = _u.i18n("comm_mbleft_to_preview");
 				if(old_title) {
 					title += ', ' + old_title;
 				}
@@ -1654,7 +1655,7 @@ var ImageService = {
 			if(!pics) {
 				return;
 			}
-			var tpl = '<div><a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="{{bmiddle_pic}}" original="{{original_pic}}" onmousedown="rOpenPic(event, this)" title="右键点击打开原图"><img class="imgicon pic" src="{{thumbnail_pic}}"></a></div>';
+			var tpl = '<div><a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="{{bmiddle_pic}}" original="{{original_pic}}" onmousedown="rOpenPic(event, this)" title="'+ _u.i18n("comm_mbright_to_open_pic") +'"><img class="imgicon pic" src="{{thumbnail_pic}}"></a></div>';
 			$(ele).hide().parent().after(tpl.format(pics));
 		}, ele);
 	},
@@ -1759,7 +1760,7 @@ var VideoService = {
 					}
 				} else {
 					var old_title = $(ele).attr('title');
-					var title = '左键点击预览';
+					var title = _u.i18n("comm_mbleft_to_preview");
 					if(old_title) {
 						title += ', ' + old_title;
 					}
@@ -1767,7 +1768,7 @@ var VideoService = {
 						VideoService.show($(this).attr('videoType'), $(this).attr('rhref'), this);
 					});
 				}
-				$(ele).attr('videoType', name).after(' [<a onclick="VideoService.popshow(this);" href="javascript:void(0);" title="弹出独立窗口播放" class="external_link">播</a>]');
+				$(ele).attr('videoType', name).after(' [<a onclick="VideoService.popshow(this);" href="javascript:void(0);" title="'+ _u.i18n("comm_popup_play") +'" class="external_link">'+ _u.i18n("abb_play") +'</a>]');
 				return true;
 			}
 		}

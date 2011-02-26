@@ -2,6 +2,29 @@
 
 var FAWAVE_BASE_URL = chrome.extension.getURL("");
 
+var _u = {
+    //向页面写内容
+    w: function(s){
+        document.write(s);
+    },
+    //向页面写本地化后的内容
+    wi: function(s, e){
+        _u.w(_u.i18n(s, e));
+    },
+    wia: function(sel, attr, s, e){
+        $(sel).attr(attr, _u.i18n(s, e));
+    },
+    //获取本地化语言
+    i18n: function(s, e){
+        var re = chrome.i18n.getMessage(s, e);
+        if(re){
+            return re;
+        }else{
+            return s;
+        }
+    }
+};
+
 /* 在页面上显示新信息 */
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
     if(request.method){
@@ -51,8 +74,8 @@ var methodManager = {
             if(msg_wrap.length < 1){
                 msg_wrap = $('<div id="fa_wave_msg_wrap">\
                                 <div class="fawave_btns fawave_clearFix">\
-	                                <a href="javascript:void(0)" class="fawave_but fawave_logo fawave_not_alert"><img src="' + chrome.extension.getURL("icons/icon48.png") + '" />本页不再提示</a>\
-                                    <a href="javascript:void(0)" class="close_fawave_remind fawave_but fawave_fr">关闭</a>\
+	                                <a href="javascript:void(0)" class="fawave_but fawave_logo fawave_not_alert"><img src="' + chrome.extension.getURL("icons/icon48.png") + '" />'+ _u.i18n("comm_not_alert_this_page") +'</a>\
+                                    <a href="javascript:void(0)" class="close_fawave_remind fawave_but fawave_fr">'+ _u.i18n("comm_close") +'</a>\
                                 </div><div class="fa_wave_list"></div></div>').appendTo('body');
                 msg_wrap.find('.close_fawave_remind').click(function(){ close_fawave_remind(); });
                 msg_wrap.find('.fawave_not_alert').click(function(){ window.fawave_not_alert = true; close_fawave_remind(); });
@@ -205,22 +228,20 @@ String.prototype.remove_html_tag = function() {
 var QUICK_SEND_TEMPLATE = ' \
     <div id="fawaveSendMsgWrap" style="display:none;"> \
         <div class="fawave-model-container">\
-            <div class="modal-title" id="modalTitle">快捷发送微博--FaWave(发微)</div> \
+            <div class="modal-title" id="modalTitle">'+ _u.i18n("comm_quick_send") +'--'+ _u.i18n("extName") +'</div> \
             <div class="close"><a href="javascript:" class="fawavemodal-close">x</a></div> \
             <div class="modal-data"> \
                 <div>\
-                    <input type="checkbox" id="fawave-share-page-chk" /><label for="fawave-share-page-chk">分享当前网页</label>\
+                    <input type="checkbox" id="fawave-share-page-chk" /><label for="fawave-share-page-chk">'+ _u.i18n("comm_share_this_page") +'</label>\
                     <span class="fawave-wordCount">140</span>\
                     <textarea id="fawaveTxtContentInp" style="width:100%;" rows="5" ></textarea>\
                 </div>\
                 <ul id="fawave_accountsForSend"></ul>\
                 <div class="fawaveSubmitWarp">\
-                    <button id="btnFawaveQuickSend" class="btn-positive" title="Ctrl + 回车 发送">\
-                        <img src="/images/tick.png" alt="">发微\
-                    </button>\
+                    <button id="btnFawaveQuickSend" class="btn-positive" title="'+ _u.i18n("comm_send_tip") +'">\
+                        <img src="/images/tick.png" alt="">'+ _u.i18n("comm_send") +'</button>\
                     <button class="btn-negative">\
-                        <img src="/images/cross.png" alt="">取消\
-                    </button>\
+                        <img src="/images/cross.png" alt="">'+ _u.i18n("comm_cancel") +'</button>\
                     <span class="fawaveQuickSendTip"></span>\
                 </div>\
                 <span class="fawaveUserInfo">\
@@ -340,7 +361,7 @@ function initSelectSendAccounts(is_upload){
         }
         li.push(fawaveFormatText(li_tp, user));
     }
-    afs.html('TO:(<a class="all" href="javascript:" id="fawave_toggleSelectAllSendAccount">全</a>) ' + li.join(''));
+    afs.html('TO:(<a class="all" href="javascript:" id="fawave_toggleSelectAllSendAccount">'+ _u.i18n("abb_all") +'</a>) ' + li.join(''));
     afs.data('inited', 'true');
     afs.find('li').click(function(){ toggleSelectSendAccount(this); });
     $("#fawave_toggleSelectAllSendAccount").click(function(){ toggleSelectAllSendAccount(); });
@@ -392,7 +413,7 @@ function fawaveToggleLooking(ele){
 function sendFawaveMsg(){
     var msg = $.trim($("#fawaveTxtContentInp").val());
     if(!msg){
-        showFawaveSendMsg('请输入内容');
+        showFawaveSendMsg(_u.i18n("msg_need_content"));
         return;
     }
     var users = [], selLi = $("#fawave_accountsForSend .sel");
@@ -409,7 +430,7 @@ function sendFawaveMsg(){
     }else if(!$("#fawave_accountsForSend li").length){
         users.push(CURRENT_USER);
     }else{
-        showFawaveSendMsg('请选择要发送的账号');
+        showFawaveSendMsg(_u.i18n("msg_need_select_account"));
         return;
     }
     var stat = {};
@@ -433,7 +454,7 @@ function _sendFawaveMsgWrap(msg, user, stat, selLi){
             showFawaveSendMsg('error: ' + msg.error);
         }
         else{
-            showFawaveSendMsg(user.screen_name + ' 发送出错.');
+            showFawaveSendMsg(_u.i18n("msg_send_error").format({username:user.screen_name}));
         }
         if(stat.successCount >= stat.userCount){//全部发送成功
             selLi.addClass('sel');
@@ -446,7 +467,7 @@ function _sendFawaveMsgWrap(msg, user, stat, selLi){
                 chrome.extension.sendRequest({method:'notifyCheckNewMsg'}, function(response){});
                 
                 if(stat.userCount > 1){ //多个用户的
-                    showFawaveSendMsg(stat.successCount + '发送成功，' + (stat.userCount - stat.successCount) + '失败。');
+                    showFawaveSendMsg(_u.i18n("msg_send_complete").format({successCount:successCount, errorCount:(stat.userCount - stat.successCount)}));
                 }
             }
         }

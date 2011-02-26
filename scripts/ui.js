@@ -23,41 +23,41 @@ function buildStatusHtml(statuses, t, c_user){
  	var support_do_comment = config.support_do_comment;
  	var support_do_favorite = config.support_do_favorite;
  	var BUTTON_TPLS = {
-        showMapBtn: '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'{{user.profile_image_url}}\', {{geo.coordinates[0]}}, {{geo.coordinates[1]}});" title="点击查看地理位置信息"><img src="images/mapspin2a.png"/></a>',
-        delTweetBtn: '<a class="deltweet" href="javascript:void(0);" onclick="doDelTweet(\'{{id}}\', this);" title="点击删除微博">删</a>',
-        replyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'{{user.screen_name}}\',\'{{id}}\');" title="进行@回复">@</a>',
-        oretweetBtn: '<a class="oretweet ort" href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'{{user.screen_name}}\',\'{{id}}\');" title="Twitter锐推"></a>',
-        retweetBtn: '<a class="rtweet" href="javascript:void(0);" onclick="doRT(this);" title="Twitter式转发">RT</a>',
-        repostBtn: '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'{{user.screen_name}}\',\'{{id}}\',\'{{retweeted_status_screen_name}}\',\'{{retweeted_status_id}}\');" title="转发这条微博">转</a>',
+        showMapBtn: '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'{{user.profile_image_url}}\', {{geo.coordinates[0]}}, {{geo.coordinates[1]}});" title="'+ _u.i18n("btn_geo_title") +'"><img src="images/mapspin2a.png"/></a>',
+        delTweetBtn: '<a class="deltweet" href="javascript:void(0);" onclick="doDelTweet(\'{{id}}\', this);" title="'+ _u.i18n("btn_del_tweet_title") +'">'+ _u.i18n("abb_delete") +'</a>',
+        replyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'{{user.screen_name}}\',\'{{id}}\');" title="'+ _u.i18n("btn_mention_title") +'">@</a>',
+        oretweetBtn: '<a class="oretweet ort" href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'{{user.screen_name}}\',\'{{id}}\');" title="'+ _u.i18n("btn_rt_title") +'"></a>',
+        retweetBtn: '<a class="rtweet" href="javascript:void(0);" onclick="doRT(this);" title="'+ _u.i18n("btn_old_rt_title") +'">RT</a>',
+        repostBtn: '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'{{user.screen_name}}\',\'{{id}}\',\'{{retweeted_status_screen_name}}\',\'{{retweeted_status_id}}\');" title="'+ _u.i18n("btn_repost_title") +'">'+ _u.i18n("abb_repost") +'</a>',
         repostCounts: '<span class="repostCounts">({{repost_count}})</span>',
-        commentBtn: '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{user.screen_name}}\', \'{{user.id}}\', \'{{id}}\');" title="点击添加评论">评</a>',
+        commentBtn: '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{user.screen_name}}\', \'{{user.id}}\', \'{{id}}\');" title="'+ _u.i18n("btn_comment_title") +'">'+ _u.i18n("abb_comment") +'</a>',
         commentCounts: '<span class="commentCounts">({{comments_btn}})</span>',
-        delCommentBtn: '<a class="delcommenttweet" href="javascript:void(0);" onclick="javascript:doDelComment(this,\'{{user.screen_name}}\',\'{{id}}\');" title="点击删除评论">删</a>',
-        new_msgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="doNewMessage(this,\'{{user.screen_name}}\',\'{{user.id}}\');" title="发送私信">私</a>',
-        delDirectMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="delDirectMsg(this,\'{{user.screen_name}}\',\'{{id}}\');" title="点击删除私信">删</a>',
-        addFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'{{user.screen_name}}\',\'{{id}}\');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>',
-        delFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="delFavorites(this,\'{{user.screen_name}}\',\'{{id}}\');" title="点击取消收藏"><img width="11px" src="/images/favorites.gif"/></a>',
+        delCommentBtn: '<a class="delcommenttweet" href="javascript:void(0);" onclick="javascript:doDelComment(this,\'{{user.screen_name}}\',\'{{id}}\');" title="'+ _u.i18n("btn_del_comment_title") +'">'+ _u.i18n("abb_delete") +'</a>',
+        new_msgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="doNewMessage(this,\'{{user.screen_name}}\',\'{{user.id}}\');" title="'+ _u.i18n("btn_direct_message_title") +'">'+ _u.i18n("abb_send_direct_message") +'</a>',
+        delDirectMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="delDirectMsg(this,\'{{user.screen_name}}\',\'{{id}}\');" title="'+ _u.i18n("btn_del_direct_message_title") +'">'+ _u.i18n("abb_delete") +'</a>',
+        addFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'{{user.screen_name}}\',\'{{id}}\');" title="'+ _u.i18n("btn_add_favorites_title") +'"><img width="11px" src="/images/favorites_2.gif"/></a>',
+        delFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="delFavorites(this,\'{{user.screen_name}}\',\'{{id}}\');" title="'+ _u.i18n("btn_del_favorites_title") +'"><img width="11px" src="/images/favorites.gif"/></a>',
         
         // rt
-        rtShowMapBtn: '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'{{retweeted_status.user.profile_image_url}}\', {{retweeted_status.geo.coordinates[0]}}, {{retweeted_status.geo.coordinates[1]}});" title="点击查看地理位置信息"><img src="images/mapspin2a.png"/></a>',
-        rtRepostBtn: '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'{{retweeted_status.user.screen_name}}\',\'{{retweeted_status.id}}\');" title="转发这条微博">转</a>',
-        rtRetweetBtn: '<a class="rtweet" href="javascript:void(0);" onclick="doRT(this, true);" title="Twitter式转发">RT</a>',
-        rtOretweetBtn: '<a class="oretweet ort" href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'{{retweeted_status.user.screen_name}}\',\'{{retweeted_status.id}}\');" title="Twitter锐推"></a>',
-        rtCommentBtn: '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{retweeted_status.user.screen_name}}\', \'{{retweeted_status.user.id}}\', \'{{retweeted_status.id}}\');" title="点击添加评论">评</a>',
+        rtShowMapBtn: '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'{{retweeted_status.user.profile_image_url}}\', {{retweeted_status.geo.coordinates[0]}}, {{retweeted_status.geo.coordinates[1]}});" title="'+ _u.i18n("btn_geo_title") +'"><img src="images/mapspin2a.png"/></a>',
+        rtRepostBtn: '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'{{retweeted_status.user.screen_name}}\',\'{{retweeted_status.id}}\');" title="'+ _u.i18n("btn_repost_title") +'">'+ _u.i18n("abb_repost") +'</a>',
+        rtRetweetBtn: '<a class="rtweet" href="javascript:void(0);" onclick="doRT(this, true);" title="'+ _u.i18n("btn_old_rt_title") +'">RT</a>',
+        rtOretweetBtn: '<a class="oretweet ort" href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'{{retweeted_status.user.screen_name}}\',\'{{retweeted_status.id}}\');" title="'+ _u.i18n("btn_rt_title") +'"></a>',
+        rtCommentBtn: '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{retweeted_status.user.screen_name}}\', \'{{retweeted_status.user.id}}\', \'{{retweeted_status.id}}\');" title="'+ _u.i18n("btn_comment_title") +'">'+ _u.i18n("abb_comment") +'</a>',
         rtCommentCounts: '<span class="commentCounts">({{rt_comments_count}})</span>',
-        rtReplyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'{{retweeted_status.user.screen_name}}\',\'{{retweeted_status.id}}\');" title="进行@回复">@</a>',
-        rtAddFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'{{retweeted_status.user.screen_name}}\',\'{{retweeted_status.id}}\');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>',
+        rtReplyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'{{retweeted_status.user.screen_name}}\',\'{{retweeted_status.id}}\');" title="'+ _u.i18n("btn_mention_title") +'">@</a>',
+        rtAddFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'{{retweeted_status.user.screen_name}}\',\'{{retweeted_status.id}}\');" title="'+ _u.i18n("btn_add_favorites_title") +'"><img width="11px" src="/images/favorites_2.gif"/></a>',
         rtRepostCounts: '<span class="repostCounts">({{retweeted_status.repost_count}})</span>',
         
         // rt rt
-        rtrtShowMapBtn: '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'{{retweeted_status.retweeted_status.user.profile_image_url}}\', {{retweeted_status.retweeted_status.geo.coordinates[0]}}, {{retweeted_status.retweeted_status.geo.coordinates[1]}});" title="点击查看地理位置信息"><img src="images/mapspin2a.png"/></a>',
+        rtrtShowMapBtn: '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'{{retweeted_status.retweeted_status.user.profile_image_url}}\', {{retweeted_status.retweeted_status.geo.coordinates[0]}}, {{retweeted_status.retweeted_status.geo.coordinates[1]}});" title="'+ _u.i18n("btn_geo_title") +'"><img src="images/mapspin2a.png"/></a>',
         rtrtOretweetBtn: '',
-        rtrtRetweetBtn: '<a class="rtweet" href="javascript:void(0);" onclick="doRT(this, false, true);" title="Twitter式转发">RT</a>',
-        rtrtRepostBtn: '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\',\'{{retweeted_status.retweeted_status.id}}\');" title="转发这条微博">转</a>',
-        rtrtCommentBtn: '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\', \'{{retweeted_status.retweeted_status.user.id}}\', ,\'{{retweeted_status.retweeted_status.id}}\');" title="点击添加评论">评</a>',
+        rtrtRetweetBtn: '<a class="rtweet" href="javascript:void(0);" onclick="doRT(this, false, true);" title="'+ _u.i18n("btn_old_rt_title") +'">RT</a>',
+        rtrtRepostBtn: '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\',\'{{retweeted_status.retweeted_status.id}}\');" title="'+ _u.i18n("btn_repost_title") +'">'+ _u.i18n("abb_repost") +'</a>',
+        rtrtCommentBtn: '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\', \'{{retweeted_status.retweeted_status.user.id}}\', ,\'{{retweeted_status.retweeted_status.id}}\');" title="'+ _u.i18n("btn_comment_title") +'">'+ _u.i18n("abb_comment") +'</a>',
         rtrtCommentCounts: '<span class="commentCounts">({{rtrt_comments_count}})</span>',
-        rtrtReplyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\',\'{{retweeted_status.retweeted_status.id}}\');" title="进行@回复">@</a>',
-        rtrtAddFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\',\'{{retweeted_status.retweeted_status.id}}\');" title="点击收藏"><img width="11px" src="/images/favorites_2.gif"/></a>',
+        rtrtReplyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\',\'{{retweeted_status.retweeted_status.id}}\');" title="'+ _u.i18n("btn_mention_title") +'">@</a>',
+        rtrtAddFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\',\'{{retweeted_status.retweeted_status.id}}\');" title="'+ _u.i18n("btn_add_favorites_title") +'"><img width="11px" src="/images/favorites_2.gif"/></a>',
         rtrtRepostCounts: '<span class="repostCounts">({{retweeted_status.retweeted_status.repost_count}})</span>'
     };
  	
@@ -97,7 +97,7 @@ function buildStatusHtml(statuses, t, c_user){
 	    case 'comments_timeline':
 	    	BUTTON_TPLS.repostBtn = BUTTON_TPLS.repostCounts = BUTTON_TPLS.commentCounts = BUTTON_TPLS.delTweetBtn = 
 	    		BUTTON_TPLS.delDirectMsgBtn = BUTTON_TPLS.addFavoritesMsgBtn = BUTTON_TPLS.delFavoritesMsgBtn = '';
-	    	BUTTON_TPLS.commentBtn = '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{status.user.screen_name}}\', \'{{status.user.id}}\', \'{{status.id}}\',\'{{user.screen_name}}\', \'{{user.id}}\',\'{{id}}\');" title="点击回复评论">回复</a>';
+	    	BUTTON_TPLS.commentBtn = '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{status.user.screen_name}}\', \'{{status.user.id}}\', \'{{status.id}}\',\'{{user.screen_name}}\', \'{{user.id}}\',\'{{id}}\');" title="'+ _u.i18n("btn_reply_comment_title") +'">'+ _u.i18n("abb_reply") +'</a>';
 	        break;
 	    case 'comments_by_me':
 	    	BUTTON_TPLS.delDirectMsgBtn = BUTTON_TPLS.addFavoritesMsgBtn = BUTTON_TPLS.delFavoritesMsgBtn = '';
@@ -105,8 +105,8 @@ function buildStatusHtml(statuses, t, c_user){
 	    case 'direct_messages':
 	    	BUTTON_TPLS.repostBtn = BUTTON_TPLS.oretweetBtn = BUTTON_TPLS.repostCounts = BUTTON_TPLS.commentBtn = BUTTON_TPLS.commentCounts = 
 	    		BUTTON_TPLS.delCommentBtn = BUTTON_TPLS.delTweetBtn = BUTTON_TPLS.addFavoritesMsgBtn = BUTTON_TPLS.delFavoritesMsgBtn = '';
-	    	BUTTON_TPLS.new_msgBtn = BUTTON_TPLS.new_msgBtn.replace('>私<', '>回复<');
-	    	BUTTON_TPLS.replyBtn = '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'{{user.screen_name}}\',\'\');" title="进行@回复">@</a>';
+	    	BUTTON_TPLS.new_msgBtn = BUTTON_TPLS.new_msgBtn.replace('>'+ _u.i18n("abb_send_direct_message") +'<', '>'+ _u.i18n("abb_reply") +'<');
+	    	BUTTON_TPLS.replyBtn = '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'{{user.screen_name}}\',\'\');" title="'+ _u.i18n("btn_mention_title") +'">@</a>';
 	        break;
 	    default:
 	        break;
@@ -122,7 +122,7 @@ function buildStatusHtml(statuses, t, c_user){
 	switch(c_user.blogType){
 	    case 'digu':
             if(t=='mentions'){
-	    	    BUTTON_TPLS.replyBtn = BUTTON_TPLS.replyBtn.replace('>@<', '>回复<');
+	    	    BUTTON_TPLS.replyBtn = BUTTON_TPLS.replyBtn.replace('>@<', '>'+ _u.i18n("abb_reply") +'<');
             }
 	        break;
 	    case 'renjian':
@@ -146,10 +146,10 @@ function buildStatusHtml(statuses, t, c_user){
          */
     	status.retweeted_status = status.retweeted_status || status.status;
     	
-    	var comments_btn = '<a href="javascript:void(0);" title="点击查看评论" onclick="showComments(this, \'{{id}}\');">看</a>'.format(status);;
+    	var comments_btn = '<a href="javascript:void(0);" title="'+ _u.i18n("btn_show_comments_title") +'" onclick="showComments(this, \'{{id}}\');">'+ _u.i18n("abb_show") +'</a>'.format(status);;
      	if(status.comments_count !== undefined) {
      		if(String(status.comments_count) != '0') {
-     			comments_btn = '<a href="javascript:void(0);" title="点击查看评论" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>'.format(status);
+     			comments_btn = '<a href="javascript:void(0);" title="'+ _u.i18n("btn_show_comments_title") +'" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>'.format(status);
      		}
      	}
      	status.comments_btn = comments_btn;
@@ -159,11 +159,11 @@ function buildStatusHtml(statuses, t, c_user){
      		status.retweeted_status_screen_name = status.retweeted_status.user.screen_name;
      		status.retweeted_status_id = status.retweeted_status.id;
      		if(status.retweeted_status.rt_comments_count !== undefined) {
-     			status.rt_comments_count = '<a href="javascript:void(0);" title="点击查看评论" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>'.format(status.retweeted_status);
+     			status.rt_comments_count = '<a href="javascript:void(0);" title="'+ _u.i18n("btn_show_comments_title") +'" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>'.format(status.retweeted_status);
      		}
      		if(status.retweeted_status.retweeted_status && status.retweeted_status.retweeted_status.user) {
      			if(status.retweeted_status.retweeted_status.rt_comments_count !== undefined) {
-         			status.rtrt_comments_count = '<a href="javascript:void(0);" title="点击查看评论" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>'.format(status.retweeted_status.retweeted_status);
+         			status.rtrt_comments_count = '<a href="javascript:void(0);" title="'+ _u.i18n("btn_show_comments_title") +'" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>'.format(status.retweeted_status.retweeted_status);
          		}
      		}
      	} else {
@@ -214,7 +214,7 @@ function buildStatusHtml(statuses, t, c_user){
 //		    } else {
 //		    	buttons.rtOretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="已成功锐推"></a>';
 //		    }
-        	buttons.rtOretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="已成功锐推"></a>';
+        	buttons.rtOretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="'+ _u.i18n("btn_rted_title") +'"></a>';
         }
         if(status.retweeted) {
 //        	if(c_user.blogType == 't163') {
@@ -222,7 +222,7 @@ function buildStatusHtml(statuses, t, c_user){
 //		    } else {
 //        		buttons.oretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="已成功锐推"></a>';
 //		    }
-        	buttons.oretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="已成功锐推"></a>';
+        	buttons.oretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="'+ _u.i18n("btn_rted_title") +'"></a>';
         }
         
         var context = {
@@ -337,7 +337,7 @@ function buildComment(comment, status_id, status_user_screen_name, status_user_i
     		status_user_id = comment.status.user.id;
     	}
     }
-    var commentBtn = '<a class="replyComment" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{status_user_screen_name}}\',\'{{status_user_id}}\',\'{{status_id}}\',\'{{comment_user_screen_name}}\',\'{{comment_user_id}}\',\'{{comment_id}}\');" title="评论回复">回复</a>'.format({
+    var commentBtn = '<a class="replyComment" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{status_user_screen_name}}\',\'{{status_user_id}}\',\'{{status_id}}\',\'{{comment_user_screen_name}}\',\'{{comment_user_id}}\',\'{{comment_id}}\');" title="'+ _u.i18n("btn_reply_comment_title") +'">'+ _u.i18n("abb_reply") +'</a>'.format({
     	status_id: status_id,
     	status_user_screen_name: status_user_screen_name,
     	status_user_id: status_user_id,
@@ -346,11 +346,11 @@ function buildComment(comment, status_id, status_user_screen_name, status_user_i
     	comment_user_id: comment.user.id
     });
     if(comment.user.verified) {
-    	comment.user.verified = '<img title="认证用户" src="/images/verified.gif" />';
+    	comment.user.verified = '<img title="'+ _u.i18n("comm_verified") +'" src="/images/verified.gif" />';
     } else {
     	comment.user.verified = '';
     }
-    var reply_user = '<a target="_blank" href="javascript:getUserTimeline(\'{{screen_name}}\', \'{{id}}\');" rhref="{{t_url}}" title="左键查看微薄，右键打开主页">@{{screen_name}}{{verified}}</a>'.format(comment.user);
+    var reply_user = '<a target="_blank" href="javascript:getUserTimeline(\'{{screen_name}}\', \'{{id}}\');" rhref="{{t_url}}" title="'+ _u.i18n("btn_show_user_title") +'">@{{screen_name}}{{verified}}</a>'.format(comment.user);
     var tp = '<li>' 
             + reply_user + ': ' + tapi.processMsg(c_user, HTMLEnCode(comment.text), true) 
             + '<span class="msgInfo">(' + new Date(comment.created_at).format("yyyy-MM-dd hh:mm:ss") + ')</span>'
@@ -361,8 +361,8 @@ function buildComment(comment, status_id, status_user_screen_name, status_user_i
 
 function getUserCountsInfo(user){
 	if(user.statuses_count == undefined) return '';
-    tp = '关注：' + user.friends_count + '个\r\n'
-           + '粉丝：' + user.followers_count + '个\r\n'
-           + '微博：' + user.statuses_count + '条';
+    tp = _u.i18n("comm_follow") + '：' + user.friends_count + '\r\n'
+           + _u.i18n("comm_fans") + '：' + user.followers_count + '\r\n'
+           + _u.i18n("comm_tweet") + '：' + user.statuses_count + '';
     return tp;
 }

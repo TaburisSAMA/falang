@@ -13,9 +13,21 @@
 	},
 	
 	//通用的
+	"comm_add": {
+		"message": "添加",
+		"description": "添加"
+	},
 	"comm_blog": {
 		"message": "博客",
 		"description": "博客"
+	},
+	"comm_mblog_type": {
+		"message": "微博类型",
+		"description": "微博类型"
+	},
+	"comm_cancel": {
+		"message": "取消",
+		"description": "取消"
 	},
 	"comm_clear": {
 		"message": "清空",
@@ -25,13 +37,17 @@
 		"message": "关闭",
 		"description": "关闭"
 	},
+	"comm_del_user": {
+		"message": "删除用户",
+		"description": "删除用户"
+	},
 	"comm_description": {
 		"message": "简介",
 		"description": "简介"
 	},
 	"comm_disabled": {
-		"message": "禁用",
-		"description": "禁用"
+		"message": "停用",
+		"description": "停用"
 	},
 	"comm_emotional": {
 		"message": "表情",
@@ -40,6 +56,14 @@
 	"comm_enabled": {
 		"message": "启用",
 		"description": "启用"
+	},
+	"comm_error_return": {
+		"message": "服务器返回结果错误，本地解析错误。",
+		"description": "服务器返回结果错误，本地解析错误。"
+	},
+	"comm_fail": {
+		"message": "失败",
+		"description": "失败"
 	},
 	"comm_fans": {
 		"message": "粉丝",
@@ -69,6 +93,10 @@
 		"message": "返回顶部",
 		"description": "返回顶部"
 	},
+	"comm_has": {
+		"message": "已",
+		"description": "已经"
+	},
 	"comm_height": {
 		"message": "高度",
 		"description": "高度"
@@ -76,6 +104,18 @@
 	"comm_man": {
 		"message": "男",
 		"description": "男"
+	},
+	"comm_mbright_to_open": {
+		"message": "右键直接打开",
+		"description": "右键直接打开"
+	},
+	"comm_mbright_to_open_pic": {
+		"message": "右键打开原图",
+		"description": "右键打开原图"
+	},
+	"comm_mbleft_to_preview": {
+		"message": "左键点击预览",
+		"description": "左键点击预览"
 	},
 	"comm_me": {
 		"message": "我",
@@ -85,17 +125,93 @@
 		"message": "我的",
 		"description": "我的"
 	},
+	"comm_no_api": {
+		"message": "没有提供接口",
+		"description": "没有提供接口"
+	},
+	"comm_not_alert_this_page": {
+		"message": "本页不再提示",
+		"description": "本页不再提示"
+	},
+	"comm_not_need_tran": {
+		"message": "无需翻译",
+		"description": "无需翻译"
+	},
+	"comm_could_not_tran": {
+		"message": "暂时无法翻译, ",
+		"description": "暂时无法翻译"
+	},
 	"comm_new_tweet": {
 		"message": "写微博",
 		"description": "写微博"
+	},
+	"comm_oauth_name": {
+		"message": "oAuth(更安全)",
+		"description": "oAuth(更安全)"
+	},
+	"comm_xauth_name": {
+		"message": "xAuth(oAuth的简化)",
+		"description": "xAuth(oAuth的简化)"
+	},
+	"comm_per_hour": {
+		"message": "每小时",
+		"description": "每小时"
 	},
 	"comm_pic": {
 		"message": "发图",
 		"description": "发图"
 	},
+	"comm_player": {
+		"message": "播放器",
+		"description": "播放器"
+	},
 	"comm_post_by": {
 		"message": "通过",
 		"description": "通过"
+	},
+	"comm_popup_play": {
+		"message": "弹出独立窗口播放",
+		"description": "弹出独立窗口播放"
+	},
+	"comm_quick_send": {
+		"message": "快捷发送微博",
+		"description": "快捷发送微博"
+	},
+	"comm_rate_limit": {
+		"message": "API访问频率限制",
+		"description": "API访问频率限制"
+	},
+	"comm_rate_limit_per_hour": {
+		"message": "每小时请求限制",
+		"description": "每小时请求限制"
+	},
+	"comm_refresh": {
+		"message": "刷新",
+		"description": "刷新"
+	},
+	"comm_request": {
+		"message": "请求",
+		"description": "请求"
+	},
+	"comm_reply": {
+		"message": "回复",
+		"description": "回复"
+	},
+	"comm_repost_default": {
+		"message": "转发微博.",
+		"description": "转发微博的时候在输入框的默认文字"
+	},
+	"comm_reset_time": {
+		"message": "重置时间",
+		"description": "重置时间"
+	},
+	"comm_remainder": {
+		"message": "剩余数",
+		"description": "剩余数"
+	},
+	"comm_save": {
+		"message": "保存",
+		"description": "保存"
 	},
 	"comm_search": {
 		"message": "搜索",
@@ -113,9 +229,21 @@
 		"message": "ctrl + enter 发送",
 		"description": "ctrl + enter 发送"
 	},
+	"comm_send_only": {
+		"message": "仅发送",
+		"description": "仅发送：帐号的启用状态"
+	},
 	"comm_second": {
 		"message": "秒",
 		"description": "秒"
+	},
+	"comm_share_whit_fawave": {
+		"message": "通过FaWave分享",
+		"description": "通过FaWave分享"
+	},
+	"comm_share_this_page": {
+		"message": "分享当前网页",
+		"description": "分享当前网页"
 	},
 	"comm_show_related_dialogue": {
 		"message": "查看相关对话",
@@ -125,9 +253,29 @@
 		"message": "查看原文",
 		"description": "查看原文"
 	},
+	"comm_show_comments": {
+		"message": "查看评论",
+		"description": "查看评论"
+	},
 	"comm_show_original_status": {
 		"message": "查看原信息",
 		"description": "查看原信息"
+	},
+	"comm_show_original_pic": {
+		"message": "查看原图",
+		"description": "查看原图"
+	},
+	"comm_show_original_vedio": {
+		"message": "查看原视频",
+		"description": "查看原视频"
+	},
+	"comm_success": {
+		"message": "成功",
+		"description": "成功"
+	},
+	"comm_total": {
+		"message": "总数",
+		"description": "总数"
 	},
 	"comm_tweet": {
 		"message": "微博",
@@ -136,6 +284,10 @@
 	"comm_url_shorten": {
 		"message": "缩短网址",
 		"description": "缩短网址"
+	},
+	"comm_user": {
+		"message": "用户",
+		"description": "用户"
 	},
 	"comm_verified": {
 		"message": "认证用户",
@@ -206,25 +358,109 @@
 		"message": "评",
 		"description": "评 *** 的微博 的前半部分，后半部分同comm_repost_to_after"
 	},
+	"comm_dnd_tooltip": {
+		"message": "FaWave(发微): 免打扰模式",
+		"description": "开启免打扰模式后显示的提示语"
+	},
 	
 	//abbreviation
-	"abb_comment": {
+	"abb_all": {
+		"message": "全",
+		"description": "全部（全选）的缩写"
+	},
+	"abb_comments_timeline": {
 		"message": "评",
-		"description": "评论的简称"
+		"description": "评论Timeline的简称"
 	},
 	"abb_direct_message": {
 		"message": "私",
 		"description": "私信的简称"
 	},
+	"abb_send_direct_message": {
+		"message": "私",
+		"description": "发送私信的简称"
+	},
+	"abb_friends_timeline": {
+		"message": "新",
+		"description": "我关注的人的Timeline的简称"
+	},
+	"abb_comment": {
+		"message": "评",
+		"description": "评论的简称"
+	},
 	"abb_repost": {
 		"message": "转",
 		"description": "转发的简称"
 	},
+	"abb_play": {
+		"message": "播",
+		"description": "播放的简称"
+	},
+	"abb_delete": {
+		"message": "删",
+		"description": "删除的简称"
+	},
+	"abb_reply": {
+		"message": "回复",
+		"description": "回复评论或者回复私信的简称"
+	},
+	"abb_show": {
+		"message": "看",
+		"description": "查看评论或者其他的简称"
+	},
 	
 	//btn
+	"btn_alert_mode_title": {
+	    "message": "提示模式。点击切换到免打扰模式",
+		"description": "提示模式。点击切换到免打扰模式"
+	},
+	"btn_dnd_mode_title": {
+	    "message": "已开启免打扰模式。点击切换到提示模式",
+		"description": "已开启免打扰模式。点击切换到提示模式"
+	},
+	"btn_add_favorites_title": {
+	    "message": "点击收藏",
+		"description": "点击收藏"
+	},
+	"btn_del_favorites_title": {
+	    "message": "点击取消收藏",
+		"description": "点击取消收藏"
+	},
+	"btn_comment_title": {
+	    "message": "点击添加评论",
+		"description": "点击添加评论"
+	},
+	"btn_reply_comment_title": {
+	    "message": "点击回复评论",
+		"description": "点击回复评论"
+	},
+	"btn_direct_message_title": {
+	    "message": "点击发送私信",
+		"description": "点击发送私信"
+	},
+	"btn_del_tweet_title": {
+	    "message": "点击删除微博",
+		"description": "点击删除微博"
+	},
+	"btn_del_comment_title": {
+	    "message": "点击删除评论",
+		"description": "点击删除评论"
+	},
+	"btn_del_direct_message_title": {
+	    "message": "点击删除私信",
+		"description": "点击删除私信"
+	},
+	"btn_geo_title": {
+	    "message": "点击查看地理位置信息",
+		"description": "点击查看地理位置信息"
+	},
 	"btn_hide_comments": {
 	    "message": "隐藏评论",
 		"description": "隐藏评论"
+	},
+	"btn_show_comments_title": {
+	    "message": "点击查看评论",
+		"description": "点击查看评论"
 	},
 	"btn_prev_page": {
 	    "message": "《上一页",
@@ -233,6 +469,10 @@
 	"btn_next_page": {
 	    "message": "下一页》",
 		"description": "下一页"
+	},
+	"btn_mention_title": {
+	    "message": "进行@回复",
+		"description": "进行@回复"
 	},
 	"btn_translate": {
 	    "message": "译",
@@ -249,6 +489,22 @@
 	"btn_pic_title": {
 	    "message": "点击上传图片",
 		"description": "点击上传图片"
+	},
+	"btn_rt_title": {
+	    "message": "Twitter锐推",
+		"description": "Twitter锐推"
+	},
+	"btn_rted_title": {
+	    "message": "已成功锐推",
+		"description": "已成功锐推"
+	},
+	"btn_old_rt_title": {
+	    "message": "Twitter式转发",
+		"description": "Twitter式转发"
+	},
+	"btn_repost_title": {
+	    "message": "转发这条微博",
+		"description": "转发这条微博"
 	},
 	"btn_search_title": {
 	    "message": "点击开始搜索",
@@ -279,6 +535,14 @@
 	"btn_show_original_pic_title": {
 	    "message": "右键点击打开原图",
 		"description": "右键点击打开原图"
+	},
+	"btn_select_pic_title": {
+	    "message": "点此选择文件或者将文件拖放至此",
+		"description": "点此选择文件或者将文件拖放至此"
+	},
+	"btn_show_user_title": {
+	    "message": "左键查看微薄，右键打开主页",
+		"description": "左键查看微薄，右键打开主页"
 	},
 	
 	//设置页面
@@ -335,6 +599,10 @@
 	"sett_des_g_refresh_time_hits": {
 		"message": "　　　　　　　　　　(当前设置的刷新间隔每小时产生的请求次数为：<span id=\"gRefreshTimeHits\"></span>请求/每小时)",
 		"description": "全局设置的刷新间隔每小时产生的请求次数"
+	},
+	"sett_refresh_interval": {
+		"message": "刷新间隔",
+		"description": "刷新间隔"
 	},
 	
 	"sett_itemName_set_badge": {
@@ -583,6 +851,10 @@
 		"message": "　分享网页的模板：",
 		"description": "分享网页的模板"
 	},
+	"sett_shared_template": {
+		"message": "我正在看: {{title}} {{url}} ",
+		"description": "分享正在看的网页时的模板"
+	},
 	"sett_jTip_shared_template": {
 	    /*
 	        <b>可用参数与说明:　</b><br/>
@@ -623,18 +895,212 @@
 		"description": "官方微博"
 	},
 	
-	"sett_itemName": {
-		"message": "",
-		"description": ""
+	//message
+	"msg_interval_update_success": {
+		"message": "刷新间隔已更新",
+		"description": "刷新间隔已更新"
 	},
-	"sett_itemName": {
-		"message": "",
-		"description": ""
+	"msg_word_count": {
+		"message": "(你还可以输入{{len}}字)",
+		"description": "(你还可以输入{{len}}字)"
 	},
-	"sett_itemName": {
-		"message": "",
-		"description": ""
+	"msg_word_overstep": {
+		"message": "已超出{{len}}字",
+		"description": "已超出{{len}}字"
 	},
+	"msg_file_too_large": {
+		"message": "文件太大，请选择小于2M的文件。",
+		"description": "文件太大，请选择小于2M的文件。"
+	},
+	"msg_pic_type_error": {
+		"message": "文件类型不正确，仅支持JPEG,GIF,PNG图片。",
+		"description": "文件类型不正确，仅支持JPEG,GIF,PNG图片。"
+	},
+	"msg_f_create_success": {
+		"message": "跟随 '{{name}}' 成功",
+		"description": "跟随 '{{name}}' 成功"
+	},
+	"msg_f_destroy_success": {
+		"message": "你已取消跟随 '{{name}}'",
+		"description": "你已取消跟随 '{{name}}'"
+	},
+	"msg_has_new_tweet": {
+		"message": "有新微博",
+		"description": "有新微博"
+	},
+	"msg_no_geo_info": {
+		"message": "没有可用的地理位置信息",
+		"description": "没有可用的地理位置信息"
+	},
+	"msg_enabled_geo_false": {
+		"message": "启用地理位置定位失败。",
+		"description": "启用地理位置定位失败。"
+	},
+	"msg_not_support_geo": {
+		"message": "浏览器不支持地理位置定位",
+		"description": "浏览器不支持地理位置定位"
+	},
+	"msg_wrong_name_or_pwd": {
+		"message": "用户名或者密码不正确，请修改",
+		"description": "用户名或者密码不正确，请修改"
+	},
+	"msg_user_save_error": {
+		"message": "出现错误，保存失败。",
+		"description": "出现错误，保存失败。"
+	},
+	"msg_edit_user_success": {
+		"message": "{{edit}}用户'{{username}}'成功！",
+		"description": "{{edit}}用户'{{username}}'成功！"
+	},
+	"msg_need_username_and_pwd": {
+		"message": "请输入用户名和密码！",
+		"description": "请输入用户名和密码！"
+	},
+	"msg_need_content": {
+		"message": "请输入要发送的内容！",
+		"description": "请输入要发送的内容！"
+	},
+	"msg_need_select_account": {
+		"message": "请选择要发送的帐号！",
+		"description": "请选择要发送的帐号！"
+	},
+	"msg_need_add_account": {
+		"message": "用户未指定，请在选项里面添加！",
+		"description": "用户未指定，请在选项里面添加！"
+	},
+	"msg_need_pic": {
+		"message": "请选择要上传的图片。",
+		"description": "请选择要上传的图片。"
+	},
+	"msg_send_error": {
+		"message": "{{username}} 发送出错.",
+		"description": "{{username}} 发送出错."
+	},
+	"msg_send_success": {
+		"message": "发送成功！",
+		"description": "发送成功"
+	},
+	"msg_repost_success": {
+		"message": "转发成功！",
+		"description": "转发成功"
+	},
+	"msg_comment_success": {
+		"message": "发送评论成功！",
+		"description": "发送评论成功"
+	},
+	"msg_send_complete": {
+		"message": "{{successCount}}发送成功，{{errorCount}}失败。",
+		"description": "{{successCount}}发送成功，{{errorCount}}失败。"
+	},
+	"msg_stat_change_success": {
+		"message": "{{username}} 的状态修改为: {{stat}}",
+		"description": "{{username}} 的状态修改为: {{stat}}"
+	},
+	"msg_del_account_success": {
+		"message": "成功删除账号({{blogname}}) {{username}}",
+		"description": "成功删除账号({{blogname}}) {{username}}"
+	},
+	"msg_save_success": {
+		"message": "保存成功",
+		"description": "保存成功"
+	},
+	"msg_update_accounts_info_false": {
+		"message": "刷新({{blogname}}) {{username}} 的信息失败，原因：用户名或者密码不正确，请修改。",
+		"description": "刷新({{blogname}}) {{username}} 的信息失败，原因：用户名或者密码不正确，请修改。"
+	},
+	"msg_update_accounts_info_unknow_error": {
+		"message": "刷新({{blogname}}) {{username}} 的信息失败，原因：出现未知错误。errorCode: {{errorcode}}",
+		"description": "刷新({{blogname}}) {{username}} 的信息失败，原因：出现未知错误。errorCode: {{errorcode}}"
+	},
+	"msg_update_account_info_success": {
+		"message": "成功刷新({{blogname}}) {{username}} 的信息",
+		"description": "成功刷新({{blogname}}) {{username}} 的信息"
+	},
+	"msg_update_accounts_info_complete": {
+		"message": "刷新用户信息完成。成功{{successCount}}个，失败{{errorCount}}个。",
+		"description": "刷新用户信息完成。成功{{successCount}}个，失败{{errorCount}}个。"
+	},
+	"msg_shorting_and_wait": {
+		"message": "正在努力缩短中，请稍后",
+		"description": "正在努力缩短中，请稍后"
+	},
+	"msg_shorting": {
+		"message": "正在缩短...",
+		"description": "正在缩短..."
+	},
+	"msg_shorten_fail": {
+		"message": "缩短网址失败",
+		"description": "缩短网址失败"
+	},
+	"msg_wrong_page_url": {
+		"message": "当前页面的URL不正确。",
+		"description": "当前页面的URL不正确。"
+	},
+	"msg_repost_who": {
+		"message": "转发@{{username}} 的信息",
+		"description": "转发@{{username}} 的信息"
+	},
+	"msg_direct_message_who": {
+		"message": "给@{{username}} 发送私信",
+		"description": "给@{{username}} 发送私信"
+	},
+	"msg_comment_who": {
+		"message": "评论@{{username}} 的信息",
+		"description": "评论@{{username}} 的信息"
+	},
+	"msg_comment_reply_default": {
+		"message": "回复 @{{username}}:",
+		"description": "回复评论的时候，输入框默认的文字"
+	},
+	"msg_comment_too": {
+		"message": "同时给 @{{username}} 评论",
+		"description": "同时给 @{{username}} 评论"
+	},
+	"msg_comment_original_too": {
+		"message": "同时给原文作者 @{{username}} 评论",
+		"description": "同时给原文作者 @{{username}} 评论"
+	},
+	"msg_repost_too": {
+		"message": "同时转发一条微博",
+		"description": "同时转发一条微博"
+	},
+	"msg_delete_success": {
+		"message": "删除成功",
+		"description": "删除成功"
+	},
+	"msg_delete_fail": {
+		"message": "删除失败",
+		"description": "删除失败"
+	},
+	"msg_add_favorites_success": {
+		"message": "收藏成功",
+		"description": "收藏成功"
+	},
+	"msg_add_favorites_fail": {
+		"message": "收藏失败",
+		"description": "收藏失败"
+	},
+	"msg_del_favorites_success": {
+		"message": "成功取消收藏",
+		"description": "成功取消收藏"
+	},
+	"msg_del_favorites_fail": {
+		"message": "取消收藏失败",
+		"description": "取消收藏失败"
+	},
+	"msg_loading_map": {
+		"message": "地图API正在载入中，请稍后再试",
+		"description": "地图API正在载入中，请稍后再试"
+	},
+	"confirm_clean_local_storage": {
+		"message": "你确定要清空本地缓存数据吗？",
+		"description": "你确定要清空本地缓存数据吗？"
+	},
+	"confirm_del_account": {
+		"message": "你确定要删除该账号吗？",
+		"description": "你确定要删除该账号吗？"
+	},
+	
 	"sett_itemName": {
 		"message": "",
 		"description": ""
