@@ -114,6 +114,9 @@ function checkTimeline(t, p, user_uniqueKey){
     var last_id = getLastMsgId(t, user_uniqueKey);
 //    log(user_uniqueKey + ' : ' +t + ' last id: ' + last_id);
     if(last_id){
+        if(c_user.blogType == 'tqq' && !tweets[user_uniqueKey + t + '_tweets']){ //腾讯微博的第一次获取加pageflag=0，获取第一页
+           params['pageflag'] = 0;
+        }
         params['since_id'] = last_id;
     }
     $.extend(params, p);
