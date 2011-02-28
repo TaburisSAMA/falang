@@ -578,7 +578,7 @@ function initQuickSendHotKey(){
 
 function _verify_credentials(user) {
 	if(!user) {
-		_showMsg(_u.i18n("msg_not_support_geo"));
+		_showMsg(_u.i18n("msg_wrong_name_or_pwd"));
 		$('#save-account').removeAttr('disabled');
 		return;
 	}
@@ -586,7 +586,7 @@ function _verify_credentials(user) {
 		$('#save-account').removeAttr('disabled');
         if(!data || !data.id || errorCode || textStatus=='error'){
             if(errorCode==400||errorCode==401||errorCode==403){
-                _showMsg(_u.i18n("msg_not_support_geo"));
+                _showMsg(_u.i18n("msg_wrong_name_or_pwd"));
             }else{
                 var err_msg = '';
                 if(data.error){
