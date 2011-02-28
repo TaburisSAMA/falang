@@ -262,7 +262,7 @@ var Settings = {
         sendAccountsDefaultSelected: 'current', //多账号发送的时候默认选择的发送账号
         enableContextmenu: true, //启用右键菜单
 
-        font: 'Tahoma', //字体
+        font: 'Arial', //字体
         fontSite: 12, //字体大小
         popupWidth: 480, //弹出窗大小
         popupHeight: 520, 

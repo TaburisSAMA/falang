@@ -11,7 +11,7 @@
 		"message": "FaWave, is a Chrome extension supporting multiple microblogging, which can make all microblogs synchronously updating, work seamlessly across multiple microblogs when you switch between them. Feedback to @QLeelulu .",
 		"description": "该插件的简单描述"
 	},
-	
+
 	//通用的
 	"comm_add": {
 		"message": "Add",
@@ -22,7 +22,7 @@
 		"description": "博客"
 	},
 	"comm_mblog_type": {
-		"message": "Type of microblogging",
+		"message": "Type Of Blog",
 		"description": "微博类型"
 	},
 	"comm_cancel": {
@@ -42,7 +42,7 @@
 		"description": "删除用户"
 	},
 	"comm_description": {
-		"message": "Introduction",
+		"message": "Des",
 		"description": "简介"
 	},
 	"comm_disabled": {
@@ -66,11 +66,11 @@
 		"description": "失败"
 	},
 	"comm_fans": {
-		"message": "follower",
+		"message": "Followers",
 		"description": "粉丝"
 	},
 	"comm_follow": {
-		"message": "Follow",
+		"message": "Following",
 		"description": "关注"
 	},
 	"comm_female": {
@@ -122,11 +122,11 @@
 		"description": "我"
 	},
 	"comm_my": {
-		"message": "my",
+		"message": "My",
 		"description": "我的"
 	},
 	"comm_no_api": {
-		"message": "Did not provide the interface",
+		"message": "Did not provide the API",
 		"description": "没有提供接口"
 	},
 	"comm_not_alert_this_page": {
@@ -166,7 +166,7 @@
 		"description": "播放器"
 	},
 	"comm_post_by": {
-		"message": "By",
+		"message": "via",
 		"description": "通过"
 	},
 	"comm_popup_play": {
@@ -178,7 +178,7 @@
 		"description": "快捷发送微博"
 	},
 	"comm_rate_limit": {
-		"message": "API access frequency limit",
+		"message": "API access rate limit",
 		"description": "API访问频率限制"
 	},
 	"comm_rate_limit_per_hour": {
@@ -206,7 +206,7 @@
 		"description": "重置时间"
 	},
 	"comm_remainder": {
-		"message": "Residue number",
+		"message": "Residue",
 		"description": "剩余数"
 	},
 	"comm_save": {
@@ -222,15 +222,15 @@
 		"description": "设置"
 	},
 	"comm_send": {
-		"message": "Update！",
+		"message": "Tweet!",
 		"description": "发送"
 	},
 	"comm_send_tip": {
-		"message": "ctrl + enter Update",
+		"message": "ctrl + enter to send",
 		"description": "ctrl + enter 发送"
 	},
 	"comm_send_only": {
-		"message": "Only Update",
+		"message": "Only For Send",
 		"description": "仅发送：帐号的启用状态"
 	},
 	"comm_second": {
@@ -298,14 +298,14 @@
 		"description": "查看"
 	},
 	"comm_web_site": {
-		"message": "Site",
+		"message": "Web",
 		"description": "网站"
 	},
 	"comm_width": {
 		"message": "Width",
 		"description": "宽度"
 	},
-	
+
 	"comm_TabName_friends_timeline": {
 		"message": "Home",
 		"description": "首页时间线（跟随的人）的tab标签上显示的名称"
@@ -315,89 +315,89 @@
 		"description": "@我的时间线的tab标签上显示的名称"
 	},
 	"comm_TabName_comments_timeline": {
-		"message": "Comments",
+		"message": "Coms",
 		"description": "评论时间线的tab标签上显示的名称"
 	},
 	"comm_TabName_direct_messages": {
-		"message": "DM",
+		"message": "DMs",
 		"description": "私信时间线的tab标签上显示的名称"
 	},
 	"comm_TabName_favorites": {
-		"message": "Favorites",
+		"message": "Favs",
 		"description": "收藏时间线的tab标签上显示的名称"
 	},
 	"comm_TabName_followers": {
-		"message": "followers",
+		"message": "Fols",
 		"description": "粉丝时间线的tab标签上显示的名称"
 	},
 	"comm_TabName_user_timeline": {
-		"message": "Listed",
+		"message": "Twes",
 		"description": "用户自己的微博的时间线的tab标签上显示的名称"
 	},
 	"comm_show_rate_limit_stat": {
-		"message": "View API request limit state",
+		"message": "View API rate limit state",
 		"description": "查看API请求数限制状态"
 	},
 	"comm_retweet_by_before": {
-		"message": "由",
+		"message": "Fw by",
 		"description": "由 *** 转发的前半部分"
 	},
 	"comm_retweet_by_after": {
-		"message": "等转发",
+		"message": "and more",
 		"description": "由 *** 转发的后半部分"
 	},
 	"comm_repost_to_before": {
-		"message": "转",
+		"message": "Fw",
 		"description": "转 *** 的微博 的前半部分"
 	},
 	"comm_repost_to_after": {
-		"message": "的微博",
+		"message": "'s tweet",
 		"description": "转 *** 的微博 的后半部分"
 	},
 	"comm_comment_to_before": {
-		"message": "评",
+		"message": "Comment",
 		"description": "评 *** 的微博 的前半部分，后半部分同comm_repost_to_after"
 	},
 	"comm_dnd_tooltip": {
 		"message": "FaWave: Non-disturbed mode",
 		"description": "开启免打扰模式后显示的提示语"
 	},
-	
+
 	//abbreviation
 	"abb_all": {
 		"message": "All",
 		"description": "全部（全选）的缩写"
 	},
 	"abb_comments_timeline": {
-		"message": "评",
+		"message": "Cm",
 		"description": "评论Timeline的简称"
 	},
 	"abb_direct_message": {
-		"message": "私",
+		"message": "Dm",
 		"description": "私信的简称"
 	},
 	"abb_send_direct_message": {
-		"message": "私",
+		"message": "Dm",
 		"description": "发送私信的简称"
 	},
 	"abb_friends_timeline": {
-		"message": "新",
+		"message": "New",
 		"description": "我关注的人的Timeline的简称"
 	},
 	"abb_comment": {
-		"message": "评",
+		"message": "Cm",
 		"description": "评论的简称"
 	},
 	"abb_repost": {
-		"message": "转",
+		"message": "Fw",
 		"description": "转发的简称"
 	},
 	"abb_play": {
-		"message": "播",
+		"message": "Play",
 		"description": "播放的简称"
 	},
 	"abb_delete": {
-		"message": "删",
+		"message": "Del",
 		"description": "删除的简称"
 	},
 	"abb_reply": {
@@ -405,10 +405,10 @@
 		"description": "回复评论或者回复私信的简称"
 	},
 	"abb_show": {
-		"message": "看",
+		"message": "View",
 		"description": "查看评论或者其他的简称"
 	},
-	
+
 	//btn
 	"btn_alert_mode_title": {
 	    "message": "Prompt mode. Click to switch to Non-disturbed mode",
@@ -475,11 +475,11 @@
 		"description": "进行@回复"
 	},
 	"btn_translate": {
-	    "message": "译",
+	    "message": "Tr",
 		"description": "译"
 	},
 	"btn_translate_title": {
-	    "message": "Translate this microblogging",
+	    "message": "Translate this tweet",
 		"description": "翻译此微博"
 	},
 	"btn_emotional_title": {
@@ -499,11 +499,11 @@
 		"description": "已成功锐推"
 	},
 	"btn_old_rt_title": {
-	    "message": "Twitter式转发",
+	    "message": "Retweet like old twitter",
 		"description": "Twitter式转发"
 	},
 	"btn_repost_title": {
-	    "message": "Forward this microblogging",
+	    "message": "Forward this tweet",
 		"description": "转发这条微博"
 	},
 	"btn_search_title": {
@@ -511,11 +511,11 @@
 		"description": "点击开始搜索"
 	},
 	"btn_share_title": {
-	    "message": "Share the current page",
+	    "message": "Share current page",
 		"description": "分享你正在看的网页"
 	},
 	"btn_show_source_status": {
-		"message": "Reply to the $name$",
+		"message": "Reply to $name$",
 		"description": "对 *** 的回复,点击显示回复的tweet内容",
 		"placeholders": {
             "name": {
@@ -544,7 +544,7 @@
 	    "message": "左键查看微薄，右键打开主页",
 		"description": "左键查看微薄，右键打开主页"
 	},
-	
+
 	//设置页面
 	//tab
 	"sett_TabName_common_set": {
@@ -567,7 +567,7 @@
 		"message": "关于",
 		"description": "设置页面关于tab的名称"
 	},
-	
+
 	//btn
 	"sett_btn_save_all": {
 		"message": "保存所有",
@@ -581,13 +581,13 @@
 		"message": "更新用户信息",
 		"description": "更新用户信息"
 	},
-	
+
 	//基本设置
 	"sett_btn_clean_local_storage": {
 		"message": "清空本地缓存数据",
 		"description": "清空本地缓存数据的按钮上的文字"
 	},
-	
+
 	"sett_itemName_g_refresh_time": {
 		"message": "获取信息间隔时间：",
 		"description": "全局的获取信息间隔时间"
@@ -604,7 +604,7 @@
 		"message": "刷新间隔",
 		"description": "刷新间隔"
 	},
-	
+
 	"sett_itemName_set_badge": {
 		"message": "　　　　未读提示：",
 		"description": "未读微博是否提示选项"
@@ -613,7 +613,7 @@
 		"message": "<b>FaWave(发微)的按钮上未读信息数的提示:　</b><br/><img src=\"/images/setting/unread.gif\" />",
 		"description": "未读微博是否提示选项的说明"
 	},
-	
+
 	"sett_itemName_show_in_page": {
 		"message": "在浏览的网页提示：",
 		"description": "在浏览的网页提示"
@@ -622,7 +622,7 @@
 		"message": "<b>在你正在看的网页上提示新信息，5秒钟后自动隐藏:　</b><br/><img src=\"/images/setting/show_in_page.png\" />",
 		"description": "在浏览的网页提示的说明问题"
 	},
-	
+
 	"sett_itemName_sound_alert": {
 		"message": "　　　　声音提示：",
 		"description": "未读微博是否播放声音提示的选项名称"
@@ -635,7 +635,7 @@
 		"message": "有新微博的时候播放声音提醒.<br/>声音文件可以是网络上的文件(http://***等等)，但是为了插件的稳定性，请选择速度快速稳定的链接。默认值为：/sound/d.mp3",
 		"description": "未读微博是否播放声音提示的说明"
 	},
-	
+
 	"sett_itemName_destop_alert": {
 		"message": "　　　　桌面提示：",
 		"description": "未读微博是否桌面弹出窗提示的选项名"
@@ -648,7 +648,7 @@
 		"message": "有新微博的时候在桌面提示未读信息数",
 		"description": "未读微博是否桌面弹出窗提示的说明"
 	},
-	
+
 	"sett_itemName_sync_to_page": {
 		"message": "　　　　同步设置：",
 		"description": "已读数是否同步到相应的微博"
@@ -661,7 +661,7 @@
 		"message": "<span class=\"note\">暂时只支持新浪微博</span>。如果已经通过FaWave(发微)看过的信息，<br/>则同时将新浪微博的页面提示数置零<br/><br/><img src=\"/images/setting/page_unread_tip.png\" />",
 		"description": "同时将新浪微博页面的未读提示置零的说明"
 	},
-	
+
 	"sett_itemName_send_select": {
 		"message": "多账号发送默认选择",
 		"description": "多账号发送试默认选择以何种方式选项帐号(全部、当前、记住上次)"
@@ -682,7 +682,7 @@
 		"message": "当你设置了多个账号，在发送微博的时候可以根据需要选择默认选中的发送账号。",
 		"description": "多账号发送试默认选择以何种方式选项帐号(全部、当前、记住上次)的说明"
 	},
-	
+
 	"sett_itemName_context_menu": {
 		"message": "启用右键菜单分享：",
 		"description": "启用右键菜单分享"
@@ -691,7 +691,7 @@
 		"message": "在你浏览的当前网页的右键菜单中加入“通过FaWave分享”的选项。：",
 		"description": "启用右键菜单分享的说明"
 	},
-	
+
 	"sett_itemName_quick_send_key": {
 		"message": "快捷发微博快捷键：",
 		"description": "唤出快速发送微博界面的快捷键"
@@ -704,7 +704,7 @@
 		"message": "请直接按键",
 		"description": "唤出快速发送微博界面的快捷键的提示"
 	},
-	
+
 	"sett_itemName_translate_target": {
 		"message": "　　翻译目标语言：",
 		"description": "翻译目标语言"
@@ -713,7 +713,7 @@
 		"message": "清空本地缓存数据",
 		"description": "清空本地缓存数据"
 	},
-	
+
 	//帐号设置
 	"sett_title_account_manage": {
 		"message": "用户管理",
@@ -787,13 +787,13 @@
 		"message": "<span class=\"note\">帐号状态：</span>“启用”的帐号可以查看微博和发送微博。“仅发送”的帐号不可以查看，仅在发送微博的时候可以选择同步发送。“停用”的帐号既不能查看也不可以同步发送，请仅在你暂时不想管理这个帐号的时候将它设为“停用”。<br/><span class=\"note\">刷新间隔：</span>这里的刷新频率设置会覆盖“<span class=\"note\">基本设置</span>”里面的“获取信息间隔时间”的设置，你可以在这里为特定的账户设置特定的刷新时间间隔，而不影响其他账号使用全局设置。最低可以设置的值为<span class=\"note\">30秒</span>。括号内数字为当前全局设置值，填“0”表示使用全局设置。<br/><span class=\"note\">帐号排序：</span>直接拖动帐号的头像可以进行拖动排序。<br/><span class=\"note\">保存：</span>所有操作会在你操作完成后自动保存。",
 		"description": "更新用户信息的说明"
 	},
-	
+
 	//外观设置
 	"sett_itemName_font": {
 		"message": "字体设置：",
 		"description": "字体设置"
 	},
-	
+
 	"sett_itemName_WH": {
 		"message": "高宽设置：",
 		"description": "高宽设置"
@@ -806,7 +806,7 @@
 		"message": "<b>高度限制:</b>高度超过差不多570-580，会导致滚动条失效。",
 		"description": "高度设置"
 	},
-	
+
 	"sett_itemName_theme": {
 		"message": "主题选择：",
 		"description": "主题选择"
@@ -819,7 +819,7 @@
 		"message": "简洁",
 		"description": "简洁主题的名称"
 	},
-	
+
 	//高级设置
 	"sett_itemName_geo": {
 		"message": "上报我的地理位置：",
@@ -833,7 +833,7 @@
 		"message": "这里获取到的位置不一定准确，所以在启用后最好看下自己的当前位置是否正确。",
 		"description": "上报地理位置的说明"
 	},
-	
+
 	"sett_itemName_smooth_scroller": {
 		"message": "是否启用平滑滚动：",
 		"description": "是否启用平滑滚动"
@@ -846,7 +846,7 @@
 		"message": "缓动类型",
 		"description": "是否启用平滑滚动"
 	},
-	
+
 	"sett_itemName_shared_template": {
 		"message": "　分享网页的模板：",
 		"description": "分享网页的模板"
@@ -867,7 +867,7 @@
 		"message": "<b>可用参数与说明:　</b><br/>当你使用“我正在看”的功能的时候，会根据该模板生成最终内容。<br/>模板参数必须由\"{{}}\"包裹起来，可用的参数有：<br/><p><b>{{url}}</b>: 你当前正在浏览的网页的url</p><p><b>{{title}}</b>: 你当前正在浏览的网页的标题</p><img src=\"/images/setting/looking.png\" />",
 		"description": "分享网页的模板的设置说明"
 	},
-	
+
 	"sett_itemName_auto_short_url": {
 		"message": "是否自动缩短URL：",
 		"description": "是否自动缩短URL"
@@ -884,7 +884,7 @@
 		"message": "缩址服务",
 		"description": "缩址服务"
 	},
-	
+
 	//关于
 	"sett_title_author": {
 		"message": "作者",
@@ -894,7 +894,7 @@
 		"message": "官方微博",
 		"description": "官方微博"
 	},
-	
+
 	//message
 	"msg_interval_update_success": {
 		"message": "刷新间隔已更新",
@@ -1100,11 +1100,11 @@
 		"message": "你确定要删除该账号吗？",
 		"description": "你确定要删除该账号吗？"
 	},
-	
+
 	"sett_itemName": {
 		"message": "",
 		"description": ""
 	}
-	
-	
+
+
 }
