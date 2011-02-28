@@ -146,10 +146,10 @@ function buildStatusHtml(statuses, t, c_user){
          */
     	status.retweeted_status = status.retweeted_status || status.status;
     	
-    	var comments_btn = '<a href="javascript:void(0);" title="'+ _u.i18n("btn_show_comments_title") +'" onclick="showComments(this, \'{{id}}\');">'+ _u.i18n("abb_show") +'</a>'.format(status);;
+    	var comments_btn = ('<a href="javascript:void(0);" title="'+ _u.i18n("btn_show_comments_title") +'" onclick="showComments(this, \'{{id}}\');">'+ _u.i18n("abb_show") +'</a>').format(status);;
      	if(status.comments_count !== undefined) {
      		if(String(status.comments_count) != '0') {
-     			comments_btn = '<a href="javascript:void(0);" title="'+ _u.i18n("btn_show_comments_title") +'" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>'.format(status);
+     			comments_btn = ('<a href="javascript:void(0);" title="'+ _u.i18n("btn_show_comments_title") +'" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>').format(status);
      		}
      	}
      	status.comments_btn = comments_btn;
@@ -159,11 +159,11 @@ function buildStatusHtml(statuses, t, c_user){
      		status.retweeted_status_screen_name = status.retweeted_status.user.screen_name;
      		status.retweeted_status_id = status.retweeted_status.id;
      		if(status.retweeted_status.rt_comments_count !== undefined) {
-     			status.rt_comments_count = '<a href="javascript:void(0);" title="'+ _u.i18n("btn_show_comments_title") +'" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>'.format(status.retweeted_status);
+     			status.rt_comments_count = ('<a href="javascript:void(0);" title="'+ _u.i18n("btn_show_comments_title") +'" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>').format(status.retweeted_status);
      		}
      		if(status.retweeted_status.retweeted_status && status.retweeted_status.retweeted_status.user) {
      			if(status.retweeted_status.retweeted_status.rt_comments_count !== undefined) {
-         			status.rtrt_comments_count = '<a href="javascript:void(0);" title="'+ _u.i18n("btn_show_comments_title") +'" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>'.format(status.retweeted_status.retweeted_status);
+         			status.rtrt_comments_count = ('<a href="javascript:void(0);" title="'+ _u.i18n("btn_show_comments_title") +'" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>').format(status.retweeted_status.retweeted_status);
          		}
      		}
      	} else {
@@ -337,7 +337,7 @@ function buildComment(comment, status_id, status_user_screen_name, status_user_i
     		status_user_id = comment.status.user.id;
     	}
     }
-    var commentBtn = '<a class="replyComment" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{status_user_screen_name}}\',\'{{status_user_id}}\',\'{{status_id}}\',\'{{comment_user_screen_name}}\',\'{{comment_user_id}}\',\'{{comment_id}}\');" title="'+ _u.i18n("btn_reply_comment_title") +'">'+ _u.i18n("abb_reply") +'</a>'.format({
+    var commentBtn = ('<a class="replyComment" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{status_user_screen_name}}\',\'{{status_user_id}}\',\'{{status_id}}\',\'{{comment_user_screen_name}}\',\'{{comment_user_id}}\',\'{{comment_id}}\');" title="'+ _u.i18n("btn_reply_comment_title") +'">'+ _u.i18n("abb_reply") +'</a>').format({
     	status_id: status_id,
     	status_user_screen_name: status_user_screen_name,
     	status_user_id: status_user_id,
@@ -350,7 +350,7 @@ function buildComment(comment, status_id, status_user_screen_name, status_user_i
     } else {
     	comment.user.verified = '';
     }
-    var reply_user = '<a target="_blank" href="javascript:getUserTimeline(\'{{screen_name}}\', \'{{id}}\');" rhref="{{t_url}}" title="'+ _u.i18n("btn_show_user_title") +'">@{{screen_name}}{{verified}}</a>'.format(comment.user);
+    var reply_user = ('<a target="_blank" href="javascript:getUserTimeline(\'{{screen_name}}\', \'{{id}}\');" rhref="{{t_url}}" title="'+ _u.i18n("btn_show_user_title") +'">@{{screen_name}}{{verified}}</a>').format(comment.user);
     var tp = '<li>' 
             + reply_user + ': ' + tapi.processMsg(c_user, HTMLEnCode(comment.text), true) 
             + '<span class="msgInfo">(' + new Date(comment.created_at).format("yyyy-MM-dd hh:mm:ss") + ')</span>'
