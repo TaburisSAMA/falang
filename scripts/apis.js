@@ -1328,7 +1328,7 @@ $.extend(TQQAPI, {
 		}
         if(args.data.since_id) {
 			args.data.pagetime = args.data.since_id;
-            args.data.pageflag = args.data.pageflag || 2;
+            args.data.pageflag = args.data.pageflag === undefined ? 2 : args.data.pageflag;
 			delete args.data.since_id;
 		}
         if(args.data.max_id) {
