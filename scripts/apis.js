@@ -1418,6 +1418,9 @@ $.extend(TQQAPI, {
 	    		items[i] = this.format_result_item(items[i], play_load, args);
 	    	}
 	    	data.items = items;
+            if(data.user && !data.user.id){
+                delete data.user;
+            }
 	    	if(args.url == this.config.followers || args.url == this.config.friends) {
 	    		if(data.items.length >= parseInt(args.data.reqnum)) {
 	    			var start_index = parseInt(args.data.startindex || '0');
