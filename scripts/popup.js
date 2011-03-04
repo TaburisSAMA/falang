@@ -276,7 +276,7 @@ function countReplyText(){
     if(len > 0){
         len = _u.i18n("msg_word_count").format({len:len});
     }else{
-        len = '(<em style="color:red;">'+ _u.i18n("msg_word_overstep") +'</em>)';
+        len = '(<em style="color:red;">'+ _u.i18n("msg_word_overstep").format({len:len}) +'</em>)';
     }
     $("#replyInputCount").html(len);
 };
