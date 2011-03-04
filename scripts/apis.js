@@ -2404,7 +2404,7 @@ $.extend(TwitterAPI, {
 		if(play_load == 'status' && data.id) {
             data.id = data.id_str || data.id;
             data.in_reply_to_status_id = data.in_reply_to_status_id_str || data.in_reply_to_status_id;
-			var tpl = 'http://twitter.com/{{user.screen_name}}/status/{{id}}';
+			var tpl = this.config.user_home_url + '{{user.screen_name}}/status/{{id}}';
 			data.t_url = tpl.format(data);
 			this.format_result_item(data.user, 'user', args);
 			if(data.retweeted_status) {
@@ -2413,11 +2413,59 @@ $.extend(TwitterAPI, {
 				this.format_result_item(data.retweeted_status.user, 'user', args);
 			}
 		} else if(play_load == 'user' && data && data.id) {
-			data.t_url = 'http://twitter.com/' + (data.screen_name || data.id);
+			data.t_url = this.config.user_home_url + (data.screen_name || data.id);
 		}
 		return data;
 	}
 });
+
+//identi.ca
+var StatusNetAPI = $.extend({}, TwitterAPI);
+
+$.extend(StatusNetAPI, {
+	
+	// 覆盖不同的参数
+	config: $.extend({}, sinaApi.config, {
+		host: 'http://identi.ca/api',
+        user_home_url: 'http://identi.ca/',
+        search_url: 'http://identi.ca/tag/',
+		source: 'FaWave', //Basic Auth 会显示这个，不过显示不了链接
+        oauth_key: 'c71100649f6c6cfb4eebbacca18de8f6',
+        oauth_secret: 'f3ef411594e624f7eda7e1c0ae6b9029',
+        repost_pre: 'RT',
+	    support_comment: false,
+	    support_do_comment: false,
+	    support_repost: false,
+	    support_upload: false,
+	    oauth_callback: 'oob',
+	    search: '/search_statuses',
+	    repost: '/statuses/update',
+        retweet: '/statuses/retweet/{{id}}',
+        favorites_create: '/favorites/create/{{id}}',
+        friends_timeline: '/statuses/home_timeline',
+        search: '/search.json?q='
+	}),
+    
+    format_result_item: function(data, play_load, args) {
+		if(play_load == 'user' && data && data.id) {
+			//data.t_url = ;
+		} else if(play_load == 'status') {
+			if(!data.user) { // search data
+				data.user = {
+					screen_name: data.from_user,
+					profile_image_url: data.profile_image_url,
+					id: data.from_user_id
+				};
+				delete data.profile_image_url;
+				delete data.from_user;
+				delete data.from_user_id;
+			}
+		}
+
+		return TwitterAPI.format_result_item.apply(this, [data, play_load, args]);
+	},
+});
+
 
 var FanfouAPI = $.extend({}, sinaApi);
 
@@ -3989,6 +4037,7 @@ var T_APIS = {
 	'buzz': BuzzAPI,
 	'facebook': FacebookAPI,
 	'plurk': PlurkAPI,
+    'identi_ca': StatusNetAPI,
 	'twitter': TwitterAPI // fxxx gxfxw first.
 };
 

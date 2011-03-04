@@ -111,7 +111,7 @@ function buildStatusHtml(statuses, t, c_user){
 	    default:
 	        break;
 	}
-    if(c_user.blogType != 'twitter') {
+    if(c_user.blogType != 'twitter' && c_user.blogType != 'identi_ca') {
     	BUTTON_TPLS.rtOretweetBtn = BUTTON_TPLS.oretweetBtn = '';
     } 
 //    else if(c_user.blogType == 't163') {

@@ -17,7 +17,8 @@ var SUPPORT_AUTH_TYPES = {
 	'douban': ['oauth'],
 	'buzz': ['oauth'],
 	'facebook': ['oauth'],
-	'plurk': ['baseauth']
+	'plurk': ['baseauth'],
+    'identi_ca': ['oauth', 'baseauth']
 };
 
 var AUTH_TYPE_NAME = {

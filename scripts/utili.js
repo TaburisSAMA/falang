@@ -79,7 +79,7 @@ var T_LIST = {
 	'douban': ['friends_timeline', 'direct_messages']
 };
 T_LIST.t163 = T_LIST.tsina = T_LIST.tsohu = T_LIST.all;
-T_LIST.tqq = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.digu;
+T_LIST.tqq = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.identi_ca = T_LIST.digu;
 
 var T_NAMES = {
 	'tsina': '新浪微博',
@@ -96,7 +96,8 @@ var T_NAMES = {
 	'twitter': 'Twitter',
 //	'facebook': 'Facebook',
 	'plurk': 'Plurk',
-	'buzz': 'Google Buzz'
+	'buzz': 'Google Buzz',
+    'identi_ca': 'identi.ca'
 };
 
 var Languages = {
@@ -183,7 +184,7 @@ var refreshTimeLimit = {
         'direct_messages': 45
     }
 };
-refreshTimeLimit.digu = refreshTimeLimit.twitter = refreshTimeLimit.tsohu = refreshTimeLimit.t163 = refreshTimeLimit.fanfou = refreshTimeLimit.plurk = refreshTimeLimit.tsina;
+refreshTimeLimit.digu = refreshTimeLimit.twitter = refreshTimeLimit.identi_ca = refreshTimeLimit.tsohu = refreshTimeLimit.t163 = refreshTimeLimit.fanfou = refreshTimeLimit.plurk = refreshTimeLimit.tsina;
 refreshTimeLimit.renjian = refreshTimeLimit.zuosa = refreshTimeLimit.follow5 = refreshTimeLimit.leihou = refreshTimeLimit.douban = refreshTimeLimit.buzz = refreshTimeLimit.tqq;
 
 function showMsg(msg){

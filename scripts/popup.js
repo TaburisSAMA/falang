@@ -903,7 +903,7 @@ function _getFansList(to_t, read_more){
     		return;
     	}
         if(data){
-            var users = data.users || data.items;
+            var users = data.users || data.items || data;
             var next_cursor = data.next_cursor;
 //            log(c_user.uniqueKey + ': next_cursor ' + next_cursor);
             var $last_item = $("#followers_timeline ul.list .user_info:last");
