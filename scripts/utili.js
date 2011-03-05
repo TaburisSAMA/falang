@@ -94,7 +94,7 @@ var T_NAMES = {
 	'renjian': '人间网',
 //	'follow5': 'Follow5',
 	'twitter': 'Twitter',
-//	'facebook': 'Facebook',
+	'facebook': 'Facebook',
 	'plurk': 'Plurk',
 	'buzz': 'Google Buzz',
     'identi_ca': 'identi.ca'

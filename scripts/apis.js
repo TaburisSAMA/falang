@@ -3554,6 +3554,7 @@ var FacebookAPI = $.extend({}, sinaApi);
 $.extend(FacebookAPI, {
 	config: $.extend({}, sinaApi.config, {
 		host: 'https://graph.facebook.com',
+        user_home_url: 'http://www.facebook.com/',
 		source: '121425774590172', 
 		oauth_key: '121425774590172',
         oauth_secret: 'ab7ffce878acf3c7e870c0e7f0a1b29a',
@@ -3564,8 +3565,9 @@ $.extend(FacebookAPI, {
         support_friends_only: true, // 只支持friends
         support_repost: false,
         support_comment: false,
-        support_do_comment: false,
+        support_do_comment: true,
         support_mentions: false,
+        support_favorites: false,
         support_search: false,
         
         direct_messages: '/me/inbox',
@@ -3576,6 +3578,11 @@ $.extend(FacebookAPI, {
         update: '/me/feed_update',
         upload: '/me/photos',
         friends: '/{{user_id}}/friends',
+        followers: '/{{user_id}}/friends',
+        comment: '/{{id}}/comments',
+        favorites_create: '/{{id}}/likes',
+        favorites_destroy: '/{{id}}/likes',
+        new_message: '/{{id}}/notes',
         
         oauth_authorize: 	  '/oauth/authorize',
         oauth_request_token:  '/oauth/request_token',
@@ -3691,9 +3698,21 @@ $.extend(FacebookAPI, {
 			args.data.message = args.data.status;
 			delete args.data.status;
 		}
-		if(args.url == this.config.destroy) {
+        else if(args.url == this.config.comment) {
+			args.data.message = args.data.comment;
+			delete args.data.comment;
+		}
+		else if(args.url == this.config.destroy) {
 			args.url = args.url.replace('_delete', '');
 			args.type = 'DELETE';
+		}
+        else if(args.url == this.config.favorites_destroy) {
+			args.type = 'DELETE';
+		}
+        else if(args.url == this.config.new_message) {
+			args.data.message = args.data.text;
+            args.data.subject = args.data.text.slice(0, 80);
+			delete args.data.text;
 		}
 	},
 	
@@ -3723,7 +3742,7 @@ $.extend(FacebookAPI, {
 	
 	format_result_item: function(data, play_load, args) {
 		if(play_load == 'user' && data && data.id) {
-			data.t_url = data.link || 'http://www.facebook.com/' + data.id;
+			data.t_url = data.link || 'http://www.facebook.com/profile.php?id=' + data.id;
 			data.profile_image_url = this.config.host + '/' + data.id + '/picture';
 			data.screen_name = data.name;
 			data.description = data.about;
