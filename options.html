@@ -112,10 +112,12 @@
 	</div>
 	<!-- 用户设置END -->
 	<!-- 基本设置 -->
-	<ul id="common_set" class="set_wrap">
-		<li>
-			<p>
-				<label class="title"><script>_u.wi('sett_itemName_g_refresh_time')</script></label>
+	<table id="common_set" class="set_wrap">
+		<tr>
+			<th>
+				<script>_u.wi('sett_itemName_g_refresh_time')</script>
+			</th>
+			<td>
 				<span id="gRefreshTimeWrap">
 					<script>_u.wi('comm_TabName_friends_timeline')</script>:<input type="text" id="gRefreshTime_friends_timeline" class="inpRefTime" /><script>_u.wi('comm_second')</script>, 
 					<script>_u.wi('comm_TabName_mentions')</script>:<input type="text" id="gRefreshTime_mentions" class="inpRefTime" /><script>_u.wi('comm_second')</script>, 
@@ -125,10 +127,13 @@
 				<span class="jTip" jTitle="间隔越短越好吗？:　" jWidth="310">?<span class="c"><script>_u.wi('sett_jTip_g_refresh_time')</script></span></span>
 				&nbsp;<a href="api_rate_limit.html" target="_blank"><script>_u.wi('comm_show_rate_limit_stat')</script></a>
 				<br/><script>_u.wi('sett_des_g_refresh_time_hits')</script>
-			</p>
-		</li>
-		<li>
-			<p id="set_badge_wrap"><label class="title"><script>_u.wi('sett_itemName_set_badge')</script></label>
+			</td>
+		</tr>
+		<tr id="set_badge_wrap">
+			<th>
+				<script>_u.wi('sett_itemName_set_badge')</script>
+			</th>
+			<td>
 				<input type="checkbox" id="set_badge_friends_timeline" value="1" /><label for="set_badge_friends_timeline"><script>_u.wi('comm_TabName_friends_timeline')</script></label>
 				<input type="checkbox" id="set_badge_mentions" value="1" /><label for="set_badge_mentions"><script>_u.wi('comm_TabName_mentions')</script></label>
 				<input type="checkbox" id="set_badge_comments_timeline" value="1" /><label for="set_badge_comments_timeline"><script>_u.wi('comm_TabName_comments_timeline')</script></label>
@@ -136,10 +141,13 @@
 				<span class="jTip" jTitle="">?
 					<span class="c"><script>_u.wi('sett_jTip_set_badge')</script></span>
 				</span>
-			</p>
-		</li>
-		<li>
-			<p id="set_show_in_page_wrap"><label class="title"><script>_u.wi('sett_itemName_show_in_page')</script></label>
+			</td>
+		</tr>
+		<tr id="set_show_in_page_wrap">
+			<th>
+				<label class="title"><script>_u.wi('sett_itemName_show_in_page')</script>
+			</th>
+			<td>
 				<input type="checkbox" id="set_show_in_page_friends_timeline" /><label for="set_show_in_page_friends_timeline"><script>_u.wi('comm_TabName_friends_timeline')</script></label>
 				<input type="checkbox" id="set_show_in_page_mentions" /><label for="set_show_in_page_mentions"><script>_u.wi('comm_TabName_mentions')</script></label>
 				<input type="checkbox" id="set_show_in_page_comments_timeline" /><label for="set_show_in_page_comments_timeline"><script>_u.wi('comm_TabName_comments_timeline')</script></label>
@@ -147,20 +155,26 @@
 				<span class="jTip" jTitle="">?
 					<span class="c"><script>_u.wi('sett_jTip_show_in_page')</script></span>
 				</span>
-			</p>
-		</li>
-		<li>
-			<p id="set_sound_alert_wrap"><label class="title"><script>_u.wi('sett_itemName_sound_alert')</script></label>
+			</td>
+		</tr>
+		<tr id="set_sound_alert_wrap">
+			<th>
+				<label class="title"><script>_u.wi('sett_itemName_sound_alert')</script>
+			</th>
+			<td>
 				<input type="checkbox" id="sound_alert_friends_timeline" /><label for="sound_alert_friends_timeline"><script>_u.wi('comm_TabName_friends_timeline')</script></label>
 				<input type="checkbox" id="sound_alert_mentions" /><label for="sound_alert_mentions"><script>_u.wi('comm_TabName_mentions')</script></label>
 				<input type="checkbox" id="sound_alert_comments_timeline" /><label for="sound_alert_comments_timeline"><script>_u.wi('comm_TabName_comments_timeline')</script></label>
 				<input type="checkbox" id="sound_alert_direct_messages" /><label for="sound_alert_direct_messages"><script>_u.wi('comm_TabName_direct_messages')</script></label>
 				<span class="jTip" jTitle="" jWidth="300">?<span class="c"><script>_u.wi('sett_jTip_sound_alert')</script></span></span>
 				<label for="inpSoundFile"><script>_u.wi('sett_itemName_sound_file')</script></label><input type="text" id="inpSoundFile" />
-			</p>
-		</li>
-		<li>
-			<p id="set_destop_alert_wrap"><label class="title"><script>_u.wi('sett_itemName_destop_alert')</script></label>
+			</td>
+		</tr>
+		<tr id="set_destop_alert_wrap">
+			<th>
+				<label class="title"><script>_u.wi('sett_itemName_destop_alert')</script>
+			</th>
+			<td>
 				<input type="checkbox" id="destop_alert_friends_timeline" /><label for="destop_alert_friends_timeline"><script>_u.wi('comm_TabName_friends_timeline')</script></label>
 				<input type="checkbox" id="destop_alert_mentions" /><label for="destop_alert_mentions"><script>_u.wi('comm_TabName_mentions')</script></label>
 				<input type="checkbox" id="destop_alert_comments_timeline" /><label for="destop_alert_comments_timeline"><script>_u.wi('comm_TabName_comments_timeline')</script></label>
@@ -168,51 +182,61 @@
 				<span class="jTip" jTitle="">?<span class="c"><script>_u.wi('sett_jTip_destop_alert')</script></span></span>
 
 				<label for="inpDesktopNotificationsTimeout"><script>_u.wi('sett_itemName_destop_alert_timeout')</script></label><input type="text" id="inpDesktopNotificationsTimeout" class="inpRefTime" /><script>_u.wi('comm_second')</script>
-			</p>
-		</li>
-		<li>
-			<label class="title"><script>_u.wi('sett_itemName_sync_to_page')</script></label>
-			<span>
-				<input type="checkbox" id="unread_sync_to_page" value="1" /><label for="unread_sync_to_page"><script>_u.wi('sett_itemDes_sync_to_page')</script></label>
-			</span>
-			<span class="jTip" jTitle="">?
-				<span class="c"><script>_u.wi('sett_jTip_sync_to_page')</script></span>
-			</span>
-		</li>
-		<li>
-			<label class="title"><script>_u.wi('sett_itemName_send_select')</script></label>
-			<select id="send_accounts_default_select">
-				<option value="remember"><script>_u.wi('sett_send_select_remember')</script></option>
-				<option value="current"><script>_u.wi('sett_send_select_current')</script></option>
-				<option value="all"><script>_u.wi('sett_send_select_all')</script></option>
-			</select>
-			<span class="jTip" jTitle="" jWidth="330">?<span class="c"><script>_u.wi('sett_jTip_send_select')</script>
-			</span></span>
-		</li>
-		<li>
-			<label class="title" for="enable_contextmenu"><script>_u.wi('sett_itemName_context_menu')</script></label>
-			<input type="checkbox" id="enable_contextmenu" value="1" />
-			<span class="jTip" jTitle="" jWidth="330">?<span class="c"><script>_u.wi('sett_jTip_context_menu')</script>
-			</span></span>
-		</li>
-		<li>
-			<p>
-				<label class="title"><script>_u.wi('sett_itemName_quick_send_key')</script></label>
-				<input type="hidden" id="set_quick_send_key" value="" />
-				<input type="text" id="set_quick_send_key_inp" value="" />
-				<span class="jTip" jTitle="" jWidth="330">?<span class="c"><script>_u.wi('sett_jTip_quick_send_key')</script>
+			</td>
+		</tr>
+		<tr>
+			<th><script>_u.wi('sett_itemName_sync_to_page')</script></th>
+			<td>
+				<span>
+					<input type="checkbox" id="unread_sync_to_page" value="1" /><label for="unread_sync_to_page"><script>_u.wi('sett_itemDes_sync_to_page')</script></label>
+				</span>
+				<span class="jTip" jTitle="">?
+					<span class="c"><script>_u.wi('sett_jTip_sync_to_page')</script></span>
+				</span>
+			</td>
+		</tr>
+		<tr>
+			<th><script>_u.wi('sett_itemName_send_select')</script></th>
+			<td>
+				<select id="send_accounts_default_select">
+					<option value="remember"><script>_u.wi('sett_send_select_remember')</script></option>
+					<option value="current"><script>_u.wi('sett_send_select_current')</script></option>
+					<option value="all"><script>_u.wi('sett_send_select_all')</script></option>
+				</select>
+				<span class="jTip" jTitle="" jWidth="330">?<span class="c"><script>_u.wi('sett_jTip_send_select')</script>
 				</span></span>
-				<span id="set_quick_send_key_tip"><script>_u.wi('sett_des_quick_send_key')</script></span>
-			</p>
-		</li>
-		<li>
+			</td>
+		</tr>
+		<tr>
+			<th><label class="title" for="enable_contextmenu"><script>_u.wi('sett_itemName_context_menu')</script></label></th>
+			<td>
+				<input type="checkbox" id="enable_contextmenu" value="1" />
+				<span class="jTip" jTitle="" jWidth="330">?<span class="c"><script>_u.wi('sett_jTip_context_menu')</script>
+				</span></span>
+			</td>
+		</tr>
+		<tr>
 			<p>
-				<label class="title"><script>_u.wi('sett_itemName_translate_target')</script></label>
+				<th><script>_u.wi('sett_itemName_quick_send_key')</script></th>
+				<td>
+					<input type="hidden" id="set_quick_send_key" value="" />
+					<input type="text" id="set_quick_send_key_inp" value="" />
+					<span class="jTip" jTitle="" jWidth="330">?<span class="c"><script>_u.wi('sett_jTip_quick_send_key')</script>
+					</span></span>
+					<span id="set_quick_send_key_tip"><script>_u.wi('sett_des_quick_send_key')</script></span>
+				</td>
+			</p>
+		</tr>
+		<tr>
+			<th>
+				<script>_u.wi('sett_itemName_translate_target')</script>
+			</th>
+			<td>
 				<select id="translate_target"></select>
-			</p>
-		</li>
-		<li>
-			<p>
+			</td>
+		</tr>
+		<tr>
+			<th></th>
 				<!--<label>本地缓存信息数：</label>
 				<span>
 					<select id="selLocalStorageNum">
@@ -222,10 +246,11 @@
 						<option value="300">300</option>
 					</select>
 				</span>-->
+			<td>
 				<div><button id="cleanLocalStorage" ><script>_u.wi('sett_btn_clean_local_storage')</script></button></div>
-			</p>
-		</li>
-	</ul>
+			</td>
+		</tr>
+	</table>
 	<!-- 外观设置 -->
 	<ul id="appearance_set" class="set_wrap" style="display:none;">
 		<li>
@@ -279,20 +304,22 @@
 		</li>
 	</ul>
 	<!-- 高级设置 -->
-	<ul id="advanced_set" class="set_wrap" style="display:none;">
-		<li>
-			<label class="title" for="isGeoEnabled"><script>_u.wi('sett_itemName_geo')</script></label>
-			<span>
-				<input type="checkbox" id="isGeoEnabled"><label for="isGeoEnabled"><script>_u.wi('comm_enabled')</script></label>
-				<a id="btnShowMyGeo" style="display:none;" href="javascript:" onclick="showMyGeo()"><script>_u.wi('sett_show_my_geo')</script></a>
-			</span>
-			<span class="jTip" jTitle="" jWidth="320">?
-				<span class="c"><script>_u.wi('sett_jTip_geo')</script></span>
-			</span>
-		</li>
-		<li>
-			<label class="title"><script>_u.wi('sett_itemName_smooth_scroller')</script></label>
-			<span>
+	<table id="advanced_set" class="set_wrap" style="display:none;">
+		<tr>
+			<th><label class="title" for="isGeoEnabled"><script>_u.wi('sett_itemName_geo')</script></label></th>
+			<td>
+				<span>
+					<input type="checkbox" id="isGeoEnabled"><label for="isGeoEnabled"><script>_u.wi('comm_enabled')</script></label>
+					<a id="btnShowMyGeo" style="display:none;" href="javascript:" onclick="showMyGeo()"><script>_u.wi('sett_show_my_geo')</script></a>
+				</span>
+				<span class="jTip" jTitle="" jWidth="320">?
+					<span class="c"><script>_u.wi('sett_jTip_geo')</script></span>
+				</span>
+			</td>
+		</tr>
+		<tr>
+			<th><script>_u.wi('sett_itemName_smooth_scroller')</script></th>
+			<td>
 				<input type="checkbox" id="isSmoothScroller"><label for="isSmoothScroller"><script>_u.wi('comm_enabled')</script></label> &nbsp;
 				<label for="tween_type"><script>_u.wi('sett_smooth_scroller_tween')</script>:</label><select id="tween_type"></select> &nbsp;
 				<label for="ease_type"><script>_u.wi('sett_smooth_scroller_ease')</script>:</label><select id="ease_type">
@@ -300,33 +327,36 @@
 					<option value="easeOut">easeOut</option>
 				</select>
 				<span id="tween_demo"><span></span></span>
-			</span>
-		</li>
-		<li><label class="title"><script>_u.wi('sett_itemName_shared_template')</script></label>
-			<input type="text" id="tp_looking" value="我正在看: {{title}} {{url}} " style="width:200px;" />
-			<span class="jTip" jTitle="" jWidth="320">?
-				<span class="c"><script>_u.wi('sett_jTip_shared_template')</script></span>
-			</span>
-		</li>
-		<li>
-			<label class="title"><script>_u.wi('sett_itemName_auto_short_url')</script></label>
-			<span>
+			</td>
+		</tr>
+		<tr>
+			<th><script>_u.wi('sett_itemName_shared_template')</script></th>
+			<td>
+				<input type="text" id="tp_looking" value="我正在看: {{title}} {{url}} " style="width:200px;" />
+				<span class="jTip" jTitle="" jWidth="320">?
+					<span class="c"><script>_u.wi('sett_jTip_shared_template')</script></span>
+				</span>
+			</td>
+		</tr>
+		<tr>
+			<th><script>_u.wi('sett_itemName_auto_short_url')</script></th>
+			<td>
 				<input type="checkbox" name="autoShortUrl" value="1" checked="checked" id="autoShortUrl"><label for="autoShortUrl"><script>_u.wi('sett_des_auto_short_url')</script></label>, 
 				<label for="autoShortUrlCount"><script>_u.wi('sett_des_auto_short_url_words')</script>:</label><input type="text" id="autoShortUrlCount" value="15" />
 				<script>_u.wi('sett_des_shorten_url_service')</script>:
 				<select id="shorten_url_service"></select>
-			</span>
-		</li>
-		<li style="display:none;">
-			<label class="title">　　　 图片服务：</label>
-			<span>
+			</td>
+		</tr>
+		<tr style="display:none;">
+			<th>图片服务：</th>
+			<td>
 				<input type="checkbox" name="enableImageService"
 					value="1" checked="checked" id="enableImageService"><label for="enableImageService">开启图片服务，让twitter等不支持图片上传的微博也可以发图片</label>, 
 				图片服务:
 				<select id="image_service"></select>
-			</span>
-		</li>
-	</ul>
+			</td>
+		</tr>
+	</table>
 	<!-- 关于与感谢 -->
 	<div id="about_me" class="set_wrap" style="display:none;">
 		

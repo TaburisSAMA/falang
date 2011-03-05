@@ -11,7 +11,7 @@
 		"message": "FaWave(發微)，支持多微博的Chrome插件，各微博同時提示、無縫切換。有問題請找 @QLeelulu 反饋。",
 		"description": "该插件的简单描述"
 	},
-	
+
 	//通用的
 	"comm_add": {
 		"message": "添加",
@@ -20,6 +20,10 @@
 	"comm_blog": {
 		"message": "博客",
 		"description": "博客"
+	},
+    "comm_counts_info": {
+		"message": "粉{{friends_count}}, {{followers_count}}粉, {{statuses_count}}微博",
+		"description": "粉{{friends_count}}, {{followers_count}}粉, {{statuses_count}}微博"
 	},
 	"comm_mblog_type": {
 		"message": "微博類型",
@@ -305,7 +309,7 @@
 		"message": "寬度",
 		"description": "宽度"
 	},
-	
+
 	"comm_TabName_friends_timeline": {
 		"message": "首頁",
 		"description": "首页时间线（跟随的人）的tab标签上显示的名称"
@@ -362,7 +366,7 @@
 		"message": "FaWave(發微): 免打擾模式",
 		"description": "开启免打扰模式后显示的提示语"
 	},
-	
+
 	//abbreviation
 	"abb_all": {
 		"message": "全",
@@ -408,7 +412,7 @@
 		"message": "看",
 		"description": "查看评论或者其他的简称"
 	},
-	
+
 	//btn
 	"btn_alert_mode_title": {
 	    "message": "提示模式。點擊切換到免打擾模式",
@@ -544,7 +548,7 @@
 	    "message": "左鍵查看微博，右鍵打開主頁",
 		"description": "左键查看微薄，右键打开主页"
 	},
-	
+
 	//设置页面
 	//tab
 	"sett_TabName_common_set": {
@@ -567,7 +571,7 @@
 		"message": "關於",
 		"description": "设置页面关于tab的名称"
 	},
-	
+
 	//btn
 	"sett_btn_save_all": {
 		"message": "保存所有",
@@ -581,13 +585,13 @@
 		"message": "更新用戶信息",
 		"description": "更新用户信息"
 	},
-	
+
 	//基本设置
 	"sett_btn_clean_local_storage": {
 		"message": "清空本地緩存數據的按鈕",
 		"description": "清空本地缓存数据的按钮上的文字"
 	},
-	
+
 	"sett_itemName_g_refresh_time": {
 		"message": "獲取信息間隔時間：",
 		"description": "全局的获取信息间隔时间"
@@ -597,23 +601,23 @@
 		"description": "全局的获取信息间隔说明"
 	},
 	"sett_des_g_refresh_time_hits": {
-		"message": "　　　　　　　　　　(當前設置的刷新間隔每小時產生的請求次數為：<span id=\"gRefreshTimeHits\"></span>請求/每小時)",
+		"message": "(當前設置的刷新間隔每小時產生的請求次數為：<span id=\"gRefreshTimeHits\"></span>請求/每小時)",
 		"description": "全局设置的刷新间隔每小时产生的请求次数"
 	},
 	"sett_refresh_interval": {
 		"message": "刷新間隔",
 		"description": "刷新间隔"
 	},
-	
+
 	"sett_itemName_set_badge": {
-		"message": "　　　　未讀提示：",
+		"message": "未讀提示：",
 		"description": "未读微博是否提示选项"
 	},
 	"sett_jTip_set_badge": {
 		"message": "<b>FaWave(發微)的按鈕上未讀信息數的提示:　</b><br/><img src=\"/images/setting/unread.gif\" />",
 		"description": "未读微博是否提示选项的说明"
 	},
-	
+
 	"sett_itemName_show_in_page": {
 		"message": "在瀏覽的網頁提示：",
 		"description": "在浏览的网页提示"
@@ -622,9 +626,9 @@
 		"message": "<b>在你正在看的網頁上提示新信息，5秒鐘後自動隱藏:　</b><br/><img src=\"/images/setting/show_in_page.png\" />",
 		"description": "在浏览的网页提示的说明问题"
 	},
-	
+
 	"sett_itemName_sound_alert": {
-		"message": "　　　　聲音提示：",
+		"message": "聲音提示：",
 		"description": "未读微博是否播放声音提示的选项名称"
 	},
 	"sett_itemName_sound_file": {
@@ -635,9 +639,9 @@
 		"message": "有新微博的時候播放聲音提醒.<br/>聲音文件可以是網絡上的文件(http://***等等)，但是為了插件的穩定性，請選擇速度快速穩定的鏈接。默認值為：/sound/d.mp3",
 		"description": "未读微博是否播放声音提示的说明"
 	},
-	
+
 	"sett_itemName_destop_alert": {
-		"message": "　　　　桌面提示：",
+		"message": "桌面提示：",
 		"description": "未读微博是否桌面弹出窗提示的选项名"
 	},
 	"sett_itemName_destop_alert_timeout": {
@@ -648,9 +652,9 @@
 		"message": "有新微博的時候在桌面提示未讀信息數",
 		"description": "未读微博是否桌面弹出窗提示的说明"
 	},
-	
+
 	"sett_itemName_sync_to_page": {
-		"message": "　　　　同步設置：",
+		"message": "同步設置：",
 		"description": "已读数是否同步到相应的微博"
 	},
 	"sett_itemDes_sync_to_page": {
@@ -661,7 +665,7 @@
 		"message": "<span class=\"note\">暫時只支持新浪微博</span>。如果已經通過FaWave(發微)看過的信息，<br/>則同時將新浪微博的頁面提示數置零<br/><br/><img src=\"/images/setting/page_unread_tip. png\" />",
 		"description": "同时将新浪微博页面的未读提示置零的说明"
 	},
-	
+
 	"sett_itemName_send_select": {
 		"message": "多賬號發送默認選擇",
 		"description": "多账号发送试默认选择以何种方式选项帐号(全部、当前、记住上次)"
@@ -682,7 +686,7 @@
 		"message": "當你設置了多個賬號，在發送微博的時候可以根據需要選擇默認選中的發送賬號。",
 		"description": "多账号发送试默认选择以何种方式选项帐号(全部、当前、记住上次)的说明"
 	},
-	
+
 	"sett_itemName_context_menu": {
 		"message": "啟用右鍵菜單分享：",
 		"description": "启用右键菜单分享"
@@ -691,7 +695,7 @@
 		"message": "在你瀏覽的當前網頁的右鍵菜單中加入“通過FaWave分享”的選項。 ：",
 		"description": "启用右键菜单分享的说明"
 	},
-	
+
 	"sett_itemName_quick_send_key": {
 		"message": "快捷發微博快捷鍵：",
 		"description": "唤出快速发送微博界面的快捷键"
@@ -704,16 +708,16 @@
 		"message": "請直接按鍵",
 		"description": "唤出快速发送微博界面的快捷键的提示"
 	},
-	
+
 	"sett_itemName_translate_target": {
-		"message": "　　翻譯目標語言：",
+		"message": "翻譯目標語言：",
 		"description": "翻译目标语言"
 	},
 	"sett_btn_clean_cache": {
 		"message": "清空本地緩存數據",
 		"description": "清空本地缓存数据"
 	},
-	
+
 	//帐号设置
 	"sett_title_account_manage": {
 		"message": "用戶管理",
@@ -787,13 +791,13 @@
 		"message": "<span class=\"note\">帳號狀態：</span>“啟用”的帳號可以查看微博和發送微博。 “僅發送”的帳號不可以查看，僅在發送微博的時候可以選擇同步發送。 “停用”的帳號既不能查看也不可以同步發送，請僅在你暫時不想管理這個帳號的時候將它設為“停用”。 <br/><span class=\"note\">刷新間隔：</span>這裡的刷新頻率設置會覆蓋“<span class=\"note\">基本設置</span>”裡面的“獲取信息間隔時間”的設置，你可以在這里為特定的賬戶設置特定的刷新時間間隔，而不影響其他賬號使用全局設置。最低可以設置的值為<span class=\"note\">30秒</span>。括號內數字為當前全局設置值，填“0”表示使用全局設置。 <br/><span class=\"note\">帳號排序：</span>直接拖動帳號的頭像可以進行拖動排序。 <br/><span class=\"note\">保存：</span>所有操作會在你操作完成後自動保存。",
 		"description": "更新用户信息的说明"
 	},
-	
+
 	//外观设置
 	"sett_itemName_font": {
 		"message": "字體設置：",
 		"description": "字体设置"
 	},
-	
+
 	"sett_itemName_WH": {
 		"message": "高度設置：",
 		"description": "高宽设置"
@@ -806,7 +810,7 @@
 		"message": "<b>高度限制:</b>高度超過差不多570-580，會導致滾動條失效。",
 		"description": "高度设置"
 	},
-	
+
 	"sett_itemName_theme": {
 		"message": "主題選擇：",
 		"description": "主题选择"
@@ -819,7 +823,7 @@
 		"message": "簡潔",
 		"description": "简洁主题的名称"
 	},
-	
+
 	//高级设置
 	"sett_itemName_geo": {
 		"message": "上報我的地理位置：",
@@ -833,7 +837,7 @@
 		"message": "這裡獲取到的位置不一定準確，所以在啟用後最好看下自己的當前位置是否正確。",
 		"description": "上报地理位置的说明"
 	},
-	
+
 	"sett_itemName_smooth_scroller": {
 		"message": "是否啟用平滑滾動：",
 		"description": "是否启用平滑滚动"
@@ -846,7 +850,7 @@
 		"message": "緩動類型",
 		"description": "是否启用平滑滚动"
 	},
-	
+
 	"sett_itemName_shared_template": {
 		"message": "　分享網頁的模板：",
 		"description": "分享网页的模板"
@@ -867,7 +871,7 @@
 		"message": "<b>可用參數與說明:　</b><br/>當你使用“我正在看”的功能的時候，會根據該模板生成最終內容。 <br/>模板參數必須由\"{{}}\"包裹起來，可用的參數有：<br/><p><b>{{url}}</b>: 你當前正在瀏覽的網頁的url</p><p><b>{{title}}</b>: 你當前正在瀏覽的網頁的標題</p><img src=\"/images/setting/looking.png\" />",
 		"description": "分享网页的模板的设置说明"
 	},
-	
+
 	"sett_itemName_auto_short_url": {
 		"message": "是否自動縮短URL：",
 		"description": "是否自动缩短URL"
@@ -884,7 +888,7 @@
 		"message": "縮址服務",
 		"description": "缩址服务"
 	},
-	
+
 	//关于
 	"sett_title_author": {
 		"message": "作者",
@@ -894,7 +898,7 @@
 		"message": "官方微博",
 		"description": "官方微博"
 	},
-	
+
 	//message
 	"msg_interval_update_success": {
 		"message": "刷新間隔已更新",
@@ -1100,11 +1104,11 @@
 		"message": "你確定要刪除該賬號嗎？",
 		"description": "你确定要删除该账号吗？"
 	},
-	
+
 	"sett_itemName": {
 		"message": "",
 		"description": ""
 	}
-	
-	
+
+
 }

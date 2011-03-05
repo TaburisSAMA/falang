@@ -538,7 +538,7 @@ function showHeaderUserInfo(c_user){
     h_user.find('.info .name').html(c_user.screen_name);
     var nums = '';
     if(tapi.get_config(c_user).userinfo_has_counts){
-        nums = '粉{{friends_count}}, {{followers_count}}粉, {{statuses_count}}微博'.format(c_user);
+        nums = _u.i18n("comm_counts_info").format(c_user);
     }
     h_user.find('.info .nums').html(nums);
 };

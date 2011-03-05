@@ -1,4 +1,4 @@
-body{ font-family: arial, sans-serif; }
+body{ font: normal 12px arial, serif;}
 button{padding:3px;}
 button img{vertical-align: bottom; margin:0 2px;}
 ol, ul {
@@ -17,6 +17,23 @@ h3{
 	padding:2px;
 }
 p{margin: 0;}
+table {
+	margin: 10px 0;
+}
+td, th {
+	font-size:12px;
+	text-align: center;
+	padding: 5px 10px;
+	text-align: left;
+	vertical-align: top;
+}
+th {
+	text-align: right;
+	color:#AB5603;
+	white-space: nowrap;
+}
+td{  }
+
 .clearFix{ display:block;}
 .clearFix:after {content:"."; display:block;visibility:hidden;height:0;clear:both;}
 

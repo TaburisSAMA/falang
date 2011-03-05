@@ -54,8 +54,7 @@
 			<ul id="accountsForSend"></ul>
 			<textarea id="txtContent" ></textarea>
 			<div class="ctr">
-				<input id="btnSend" type="button" value="发微!" title="ctrl + enter 发送" class="btn send" disabled="disabled" />
-				<script>_u.wia('#btnSend','value','comm_send'); _u.wia('#btnSend','title','comm_send_tip');</script>
+				<span id="wordCount">140</span>
 				&nbsp;
 				<a id="btnAddEmotional" href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');" title="点击添加表情">
 					<img src="images/face.gif" />
@@ -70,7 +69,9 @@
 				<a id="urlShortenBtn" href="javascript:" title="缩短网址" onclick="addShortenUrl()"><img src="images/link_add.png" /></a>
 				<script>_u.wia('#urlShortenBtn','title','comm_url_shorten');</script>
 				<input type="text" id="urlShortenInp" onclick="showAddShortenUrl()" onkeyup="enterAddShortenUrl(event)" />
-				<span id="wordCount">140</span>
+				
+				<input id="btnSend" type="button" value="发微!" title="ctrl + enter 发送" class="btn send" disabled="disabled" />
+				<script>_u.wia('#btnSend','value','comm_send'); _u.wia('#btnSend','title','comm_send_tip');</script>
 			</div>
 		  </div>
 		</div><!-- submitWarp END -->

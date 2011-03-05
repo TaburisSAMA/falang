@@ -50,7 +50,7 @@ textarea:focus{outline: none;}
 	-webkit-transition: height .6s ease;
 }
 #submitWarp .ctr{margin-top:2px; position:relative;}
-#wordCount{font-size:13px;font-weight: bold; position:absolute; top:0; right:0;}
+#wordCount{font-size:13px;font-weight: bold; /*position:absolute; top:0; right:0;*/}
 #header{
 	font-size:12px;
 	position: relative;
@@ -158,6 +158,7 @@ textarea:focus{outline: none;}
 /* 头部 END */
 
 /* 头部编辑按钮 */
+#btnSend{ position:absolute; top:0; right:0; }
 #header:hover #tl_tabs .btns{ display:block; }
 #tl_tabs .btns{
 	display:none;

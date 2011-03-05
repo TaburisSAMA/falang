@@ -21,6 +21,10 @@
 		"message": "Blog",
 		"description": "博客"
 	},
+    "comm_counts_info": {
+		"message": "Fol {{friends_count}}, {{followers_count}} Fans, {{statuses_count}} Tweets",
+		"description": "粉{{friends_count}}, {{followers_count}}粉, {{statuses_count}}微博"
+	},
 	"comm_mblog_type": {
 		"message": "Type Of Blog",
 		"description": "微博类型"
@@ -50,7 +54,7 @@
 		"description": "停用"
 	},
 	"comm_emotional": {
-		"message": "Expression",
+		"message": "Emo",
 		"description": "表情"
 	},
 	"comm_enabled": {
@@ -552,7 +556,7 @@
 		"description": "设置页面基本设置tab的名称"
 	},
 	"sett_TabName_appearance_set": {
-		"message": "Skin settings",
+		"message": "Skin Settings",
 		"description": "设置页面外观设置tab的名称"
 	},
 	"sett_TabName_user_set": {
@@ -589,7 +593,7 @@
 	},
 
 	"sett_itemName_g_refresh_time": {
-		"message": "Interval to obtain information：",
+		"message": "Refresh Time: ",
 		"description": "全局的获取信息间隔时间"
 	},
 	"sett_jTip_g_refresh_time": {
@@ -597,7 +601,7 @@
 		"description": "全局的获取信息间隔说明"
 	},
 	"sett_des_g_refresh_time_hits": {
-		"message": "　　　　　　　　　　(The refresh interval is currently set number of requests generated per hour at：<span id=\"gRefreshTimeHits\"></span>request per hour)",
+		"message": "(The refresh interval is currently set number of requests generated per hour at：<span id=\"gRefreshTimeHits\"></span>request per hour)",
 		"description": "全局设置的刷新间隔每小时产生的请求次数"
 	},
 	"sett_refresh_interval": {
@@ -606,7 +610,7 @@
 	},
 
 	"sett_itemName_set_badge": {
-		"message": "　　　　Unread Tips：",
+		"message": "Unread Nums: ",
 		"description": "未读微博是否提示选项"
 	},
 	"sett_jTip_set_badge": {
@@ -615,7 +619,7 @@
 	},
 
 	"sett_itemName_show_in_page": {
-		"message": "Web browsing tips: ",
+		"message": "Web Browsing Tips: ",
 		"description": "在浏览的网页提示"
 	},
 	"sett_jTip_show_in_page": {
@@ -624,7 +628,7 @@
 	},
 
 	"sett_itemName_sound_alert": {
-		"message": "　　　　Voice prompts: ",
+		"message": "Alert Sound: ",
 		"description": "未读微博是否播放声音提示的选项名称"
 	},
 	"sett_itemName_sound_file": {
@@ -637,7 +641,7 @@
 	},
 
 	"sett_itemName_destop_alert": {
-		"message": "　　　　Desktop Tips: ",
+		"message": "Desktop Alert: ",
 		"description": "未读微博是否桌面弹出窗提示的选项名"
 	},
 	"sett_itemName_destop_alert_timeout": {
@@ -650,7 +654,7 @@
 	},
 
 	"sett_itemName_sync_to_page": {
-		"message": "　　　　Synchronization settings: ",
+		"message": "Synchronization To: ",
 		"description": "已读数是否同步到相应的微博"
 	},
 	"sett_itemDes_sync_to_page": {
@@ -663,7 +667,7 @@
 	},
 
 	"sett_itemName_send_select": {
-		"message": "The default choice of multiple accounts to send tweets",
+		"message": "Default Accounts Select:",
 		"description": "多账号发送试默认选择以何种方式选项帐号(全部、当前、记住上次)"
 	},
 	"sett_send_select_remember": {
@@ -684,16 +688,16 @@
 	},
 
 	"sett_itemName_context_menu": {
-		"message": "The sharing of functions into the right click menu: ",
+		"message": "Enable Right-click Menu: ",
 		"description": "启用右键菜单分享"
 	},
 	"sett_jTip_context_menu": {
-		"message": "The \"through FaWave sharing\"option added to your current web browser context menu。: ",
+		"message": "The \"Shared By FaWave\"option added to your current web browser context menu。: ",
 		"description": "启用右键菜单分享的说明"
 	},
 
 	"sett_itemName_quick_send_key": {
-		"message": "Rapid send tweets shortcut: ",
+		"message": "Quick Send Hot Key: ",
 		"description": "唤出快速发送微博界面的快捷键"
 	},
 	"sett_jTip_quick_send_key": {
@@ -706,7 +710,7 @@
 	},
 
 	"sett_itemName_translate_target": {
-		"message": "　　Target language translation: ",
+		"message": "Translation To Language: ",
 		"description": "翻译目标语言"
 	},
 	"sett_btn_clean_cache": {
@@ -740,7 +744,7 @@
 		"description": "添加用户的时候选择验证类型"
 	},
 	"sett_des_account_pin": {
-		"message": "　Authorization code: ",
+		"message": "Authorization code: ",
 		"description": "添加用户的时候填写授权码"
 	},
 	"sett_btn_get_account_pin": {
@@ -822,11 +826,11 @@
 
 	//高级设置
 	"sett_itemName_geo": {
-		"message": "Submit my location: ",
+		"message": "Submit My Geo: ",
 		"description": "上报我的地理位置"
 	},
 	"sett_show_my_geo": {
-		"message": "View my location",
+		"message": "View My Location",
 		"description": "查看我的位置"
 	},
 	"sett_jTip_geo": {
@@ -835,20 +839,20 @@
 	},
 
 	"sett_itemName_smooth_scroller": {
-		"message": "Whether to enable smooth scrolling: ",
+		"message": "Smooth Scrolling: ",
 		"description": "是否启用平滑滚动"
 	},
 	"sett_smooth_scroller_tween": {
-		"message": "Animation Type",
+		"message": "Animation",
 		"description": "动画类型"
 	},
 	"sett_smooth_scroller_ease": {
-		"message": "Ease type",
+		"message": "Ease",
 		"description": "是否启用平滑滚动"
 	},
 
 	"sett_itemName_shared_template": {
-		"message": "　Sharing web page templates: ",
+		"message": "　Sharing Template: ",
 		"description": "分享网页的模板"
 	},
 	"sett_shared_template": {
@@ -869,15 +873,15 @@
 	},
 
 	"sett_itemName_auto_short_url": {
-		"message": "Whether to automatically reduce the url: ",
+		"message": "Auto Shorten The Url: ",
 		"description": "是否自动缩短URL"
 	},
 	"sett_des_auto_short_url": {
-		"message": "Automatic shortening",
+		"message": "Auto Shorten",
 		"description": "自动缩短"
 	},
 	"sett_des_auto_short_url_words": {
-		"message": "When the maximum amount of characters, automatically reduce the text",
+		"message": "Over how many characters than auto shorten",
 		"description": "URL超过多少个字符自动缩短"
 	},
 	"sett_des_shorten_url_service": {
@@ -1037,15 +1041,15 @@
 		"description": "当前页面的URL不正确。"
 	},
 	"msg_repost_who": {
-		"message": "Forward information from @{{username}}",
+		"message": "Forward @{{username}}'s message",
 		"description": "转发@{{username}} 的信息"
 	},
 	"msg_direct_message_who": {
-		"message": "Send direct messages to @{{username}}",
+		"message": "Send direct message to @{{username}}",
 		"description": "给@{{username}} 发送私信"
 	},
 	"msg_comment_who": {
-		"message": "Comment message to @{{username}}",
+		"message": "Add comment to @{{username}}",
 		"description": "评论@{{username}} 的信息"
 	},
 	"msg_comment_reply_default": {
