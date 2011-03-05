@@ -1,4 +1,8 @@
 {
+    "language": {
+		"message": "en",
+		"description": "language"
+	},
 	"defaultTitle": {
 		"message": "FaWave, is a Chrome extension supporting multiple microblogging",
 		"description": "default title"

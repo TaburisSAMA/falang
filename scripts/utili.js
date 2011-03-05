@@ -847,6 +847,7 @@ function filterDatasByMaxId(datas, max_id, append) {
 
 //检查是否支持Twitter
 function checkTwitterEnabled(){
+    if(_u.i18n("language")!='zh_CN'){ return; }
     var _sets = localStorage.getObject(SETTINGS_KEY);
     _sets = _sets || {};
     if(!_sets.twitterEnabled){

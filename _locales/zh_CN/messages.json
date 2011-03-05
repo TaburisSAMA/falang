@@ -1,4 +1,8 @@
 {
+    "language": {
+		"message": "zh_CN",
+		"description": "language"
+	},
 	"defaultTitle": {
 		"message": "FaWave(发微) 多微博无缝切换插件",
 		"description": "default title"
