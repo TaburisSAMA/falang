@@ -45,6 +45,10 @@
 		"message": "关闭",
 		"description": "关闭"
 	},
+    "comm_de": {
+		"message": "'s ",
+		"description": "的"
+	},
 	"comm_del_user": {
 		"message": "删除用户",
 		"description": "删除用户"

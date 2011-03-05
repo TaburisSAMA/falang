@@ -34,13 +34,13 @@
 		<ul id="accountsForSend"></ul>
 		<textarea id="txtContent" ></textarea>
 		<div class="ctr">
-			<input id="btnSend" type="button" value="发微!" title="ctrl + enter 发送" class="btn send" disabled="disabled" />
-			<script>_u.wia('#btnSend','value','comm_send'); _u.wia('#btnSend','title','comm_send_tip');</script>&nbsp;
+			<span id="wordCount">140</span>&nbsp;
 			<a href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');" title="点击添加表情"><img src="images/face.gif" /><script>_u.wi('comm_emotional')</script></a>
 			<script>_u.wia('#btnAddEmotional','title','btn_emotional_title');</script>&nbsp;
 			<button onclick="cleanTxtContent();" class="btn"><script>_u.wi('comm_clear')</script></button>&nbsp;
 			<button onclick="window.close();" class="btn"><script>_u.wi('comm_close')</script></button>&nbsp;
-			<span id="wordCount">140</span>
+			<input id="btnSend" type="button" value="发微!" title="ctrl + enter 发送" class="btn send" disabled="disabled" />
+			<script>_u.wia('#btnSend','value','comm_send'); _u.wia('#btnSend','title','comm_send_tip');</script>
 		</div>
 	  </div>
 	</div><!-- submitWarp END -->

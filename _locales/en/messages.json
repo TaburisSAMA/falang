@@ -49,8 +49,12 @@
 		"message": "Delete user",
 		"description": "删除用户"
 	},
+    "comm_de": {
+		"message": "'s ",
+		"description": "的"
+	},
 	"comm_description": {
-		"message": "Des",
+		"message": "Intro",
 		"description": "简介"
 	},
 	"comm_disabled": {
@@ -286,7 +290,7 @@
 		"description": "总数"
 	},
 	"comm_tweet": {
-		"message": "Tweet",
+		"message": "Tweets",
 		"description": "微博"
 	},
 	"comm_url_shorten": {
@@ -491,7 +495,7 @@
 		"description": "翻译此微博"
 	},
 	"btn_emotional_title": {
-	    "message": "Add expression",
+	    "message": "Add emotion",
 		"description": "点击添加表情"
 	},
 	"btn_pic_title": {
