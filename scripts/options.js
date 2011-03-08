@@ -31,9 +31,9 @@ var TWEEN_TYPES = ['Quad', 'Cubic', 'Quart', 'Quint', 'Sine', 'Expo', 'Circ', 'E
 
 function donateRoll(){
     $.get('http://s8.hk/json/fawave_donaters.json', function(data){
-        if(data && data.length > 0){
+        if(data && data.users && data.users.length > 0){
             var _h = '';
-            $(data).each(function(){
+            $(data.users).each(function(){
                 _h += '<li><a target="_blank" href="{{homepage}}" title="{{username}}"><img src="{{face}}" /></a></li>'.format(this);
             });
             $("#donateUsers").html(_h);
