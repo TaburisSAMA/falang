@@ -49,6 +49,16 @@ label.title{color:#AB5603; font-weight:bold;}
 	border-top: 1px dashed #D5B163;
 }
 
+#header{ height:88px; }
+#header .logo{float:left; margin-right: 18px;}
+#header .thanks{float:left;}
+#header .thanks .t{font-weight:bold; font-size: 13px;}
+
+#donateUsersWrap{padding:0; margin:0; width:418px; height:60px; overflow:hidden;}
+#donateUsers{padding:0; margin:0; width:466px; height:60px; overflow:hidden;}
+#donateUsers li{float:left; margin:2px;}
+#donateUsers li img{ width:50px; height:50px; padding:2px; border:solid 1px #ccc;}
+
 .footer{margin-top:20px; border-top:solid 1px #ccc; padding-top:10px; text-align:center;}
 .footer img{vertical-align: middle;}
 

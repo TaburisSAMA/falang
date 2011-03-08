@@ -1733,7 +1733,7 @@ function sendComment(msg, commentTweetId, notSendMord){
     if(cid){ //如果是回复别人的微博
     	m = 'reply';
     	data.cid = cid;
-        data.comment = data.comment.replace(_u.i18n("comm_reply") + ' @'+ $('#replyUserName').val() +':', '');
+        data.comment = data.comment.replace(_u.i18n("msg_comment_reply_default").format({username:$('#replyUserName').val()}), '');
     	var reply_user_id = $('#replyUserId').val();
     	data.reply_user_id = reply_user_id;
     } 

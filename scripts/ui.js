@@ -11,7 +11,7 @@ function buildStatusHtml(statuses, t, c_user){
     var TEMPLATE_RT_RT = null;
     var theme = Settings.get().theme;
     var rt_replace_pre = null, rt_rt_replace_pre = null;
-    if(theme=='pip_io') {
+    if(theme=='pip_io' || theme=='work') {
     	rt_replace_pre = '<!-- {{retweeted_status_out}} -->';
     	rt_rt_replace_pre = '<!-- {{retweeted_retweeted_status_out}} -->';
     } else {

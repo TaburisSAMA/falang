@@ -20,12 +20,21 @@
 
 <body>
 <div>
-	<div class="logo">
-		<h1><script>_u.wi('extName')</script></h1>
-		
-		<span style="margin-right: 150px;color:green;font-size:18px; font-weight:bold;float:right;">
-			应用推荐： <a href="http://timgs.sinaapp.com/" target="_blank">微博图墙</a>
-		</span>
+	<div id="header">
+		<div class="logo">
+			<h1><script>_u.wi('extName')</script></h1>
+			<!--
+			<span style="margin-right: 150px;color:green;font-size:18px; font-weight:bold;float:right;">
+				应用推荐： <a href="http://timgs.sinaapp.com/" target="_blank">微博图墙</a>
+			</span> -->
+		</div>
+		<div class="thanks">
+			<div class="t">感谢以下朋友的捐助：<a href="http://item.taobao.com/item.htm?id=9279069357" target="_blank">(点此捐助FaWave)</a></div>
+			<div id="donateUsersWrap">
+				<ul id="donateUsers">
+				</ul>
+			</div>
+		</div>
 	</div>
 <div>
 <div class="other">
@@ -297,6 +306,7 @@
 						<option value="pip_io">Pip.io</option>
 						<option value="default"><script>_u.wi('sett_themeName_bubble')</script></option>
 						<option value="simple"><script>_u.wi('sett_themeName_simple')</script></option>
+						<option value="work">Work</option>
 					</select>
 				</span>
 				<div><img id="themePreview" src="/themes/default/theme.png" onclick="popupBox.showImg(this.src);return false;" /></div>

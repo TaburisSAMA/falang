@@ -29,7 +29,37 @@ var AUTH_TYPE_NAME = {
 
 var TWEEN_TYPES = ['Quad', 'Cubic', 'Quart', 'Quint', 'Sine', 'Expo', 'Circ', 'Elastic', 'Back', 'Bounce'];
 
+function donateRoll(){
+    $.get('http://s8.hk/json/fawave_donaters.json', function(data){
+        if(data && data.length > 0){
+            var _h = '';
+            $(data).each(function(){
+                _h += '<li><a target="_blank" href="{{homepage}}" title="{{username}}"><img src="{{face}}" /></a></li>'.format(this);
+            });
+            $("#donateUsers").html(_h);
+            
+            var _wrap=$('#donateUsers');//定义滚动区域
+        	var _interval=2000;//定义滚动间隙时间
+        	var _moving;//需要清除的动画
+        	_wrap.hover(function(){
+        		clearInterval(_moving);//当鼠标在滚动区域中时,停止滚动
+        	},function(){
+        		_moving=setInterval(function(){
+        			var _field=_wrap.find('li:first');//此变量不可放置于函数起始处,li:first取值是变化的
+        			var _h=_field.width();//取得每次滚动高度(多行滚动情况下,此变量不可置于开始处,否则会有间隔时长延时)
+        			_field.animate({marginLeft:-_h+'px'},600,function(){//通过取负margin值,隐藏第一行
+        				_field.css('marginLeft','').appendTo(_wrap);//隐藏后,将该行的margin值置零,并插入到最后,实现无缝滚动
+        			})
+        		},_interval)//滚动间隔时间取决于_interval
+        	}).trigger('mouseleave');//函数载入时,模拟执行mouseleave,即自动滚动
+        }
+    });
+	
+};
+
 $(function(){
+    donateRoll();
+    
     initTab();
 
     showDndAccountList(true);

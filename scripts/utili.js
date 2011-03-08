@@ -64,7 +64,7 @@ var UNREAD_TIMELINE_COUNT_KEY = 'idi_UNREAD_TIMELINE_COUNT_KEY';
 
 var IS_SYNC_TO_PAGE_KEY = 'idi_IS_SYNC_TO_PAGE_KEY'; //已读消息是否和新浪微博页面同步
 
-var THEME_LIST = {'default':'default', 'simple':'simple', 'pip_io':'pip_io'}; //主题列表
+var THEME_LIST = {'default':'default', 'simple':'simple', 'pip_io':'pip_io', 'work':'work'}; //主题列表
 
 var ALERT_MODE_KEY = 'idi_ALERT_MODE_KEY'; //信息提醒模式key
 
