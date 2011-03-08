@@ -595,6 +595,10 @@
 	},
 
 	//基本设置
+	"sett_msg_donate": {
+		"message": "感谢以下朋友的捐助：<a href=\"http://item.taobao.com/item.htm?id=9279069357\" target=\"_blank\">(点此捐助FaWave)</a>",
+		"description": "感谢以下朋友的捐助：<a href=\"http://item.taobao.com/item.htm?id=9279069357\" target=\"_blank\">(点此捐助FaWave)</a>"
+	},
 	"sett_btn_clean_local_storage": {
 		"message": "清空本地緩存數據的按鈕",
 		"description": "清空本地缓存数据的按钮上的文字"
