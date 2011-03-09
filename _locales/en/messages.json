@@ -549,7 +549,7 @@
 		"description": "右键点击打开原图"
 	},
 	"btn_select_pic_title": {
-	    "message": "Click here to select a file or drag and drop file to here",
+	    "message": "Click to select file or drag and drop file here",
 		"description": "点此选择文件或者将文件拖放至此"
 	},
 	"btn_show_user_title": {
