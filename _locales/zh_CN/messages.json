@@ -46,7 +46,7 @@
 		"description": "关闭"
 	},
     "comm_de": {
-		"message": "'s ",
+		"message": "的",
 		"description": "的"
 	},
 	"comm_del_user": {
