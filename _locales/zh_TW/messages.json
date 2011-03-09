@@ -735,6 +735,10 @@
 		"message": "用戶管理",
 		"description": "用户管理"
 	},
+	"sett_tip_add_account": {
+		"message": "<li>* 新浪微博的API，由于cookie信息会干扰认证，而我至今未找到解决办法，所以在添加或者编辑用户信息的时候，为了确保你可以正确设置你的账号信息，设置新浪微博的账号时，请你先<b><a href=\"http://t.sina.com.cn/logout.php?backurl=/\" target=\"_blank\">退出新浪微博</a></b></li><li>* 网易微博的API同样受到cookie信息干扰，设置网易微博的账号时，或者你已经在web版登录了，请你先<b><a href=\"http://reg.163.com/Logout.jsp?username=&url=http://t.163.com\" target=\"_blank\">退出网易微博</a></b></li>",
+		"description": "添加账号的时候提示用户的一些信息"
+	},
     "sett_jTip_update_accounts": {
 		"message": "為了快速啟動，用戶信息會緩存在本地，如果你修改了用戶頭像或者其他用戶信息，需要手動更新一下。",
 		"description": "更新用户信息的说明"

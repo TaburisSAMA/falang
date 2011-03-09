@@ -735,7 +735,11 @@
 		"message": "User Management",
 		"description": "用户管理"
 	},
-    "sett_jTip_update_accounts": {
+	"sett_tip_add_account": {
+		"message": "",
+		"description": "添加账号的时候提示用户的一些信息"
+	},
+	"sett_jTip_update_accounts": {
 		"message": "For quick start, user information will be cached on the local, if you modify the user picture, or other user information, update it manually。",
 		"description": "更新用户信息的说明"
 	},
