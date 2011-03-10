@@ -3,6 +3,7 @@
 */
 
 var OAUTH_CALLBACK_URL = chrome.extension.getURL('oauth_cb.html');
+var RE_JSON_BAD_WORD = /[\u000B\u000C]/ig; //具体见：http://www.cnblogs.com/rubylouvre/archive/2011/02/12/1951760.html
 
 var sinaApi = {
 	
@@ -1077,6 +1078,7 @@ var sinaApi = {
         	},
             success: function (data, textStatus, xhr) {
             	if(play_load != 'string') {
+                    data = data.replace(RE_JSON_BAD_WORD, '');
             		try{
                         data = JSON.parse(data);
                     }
@@ -1217,37 +1219,38 @@ $.extend(TQQAPI, {
         // 竟然是通过get传递
         oauth_params_by_get: true,
         support_comment: false,
-        support_do_comment: false,
+        support_do_comment: true,
         support_favorites_max_id: true,
         reply_dont_need_at_screen_name: true, // @回复无需填充@screen_name 
         rt_at_name: true, // RT的@name而不是@screen_name
         repost_delimiter: ' || ', //转发时的分隔符
-//        support_counts: false, // 只有rt_count这个，不过貌似有问题，总是404。暂时隐藏
+        support_counts: false, // 只有rt_count这个，不过貌似有问题，总是404。暂时隐藏
         friends_timeline: '/statuses/home_timeline',
 
-        mentions:             '/statuses/mentions_timeline', //
-        followers:            '/friends/user_fanslist', //
-        friends:              '/friends/user_idollist', //
-        favorites:            '/fav/list_t', //
-        favorites_create:     '/fav/addt', //
-        favorites_destroy:    '/fav/delt', //
+        mentions:             '/statuses/mentions_timeline',
+        followers:            '/friends/user_fanslist',
+        friends:              '/friends/user_idollist',
+        favorites:            '/fav/list_t',
+        favorites_create:     '/fav/addt',
+        favorites_destroy:    '/fav/delt',
         counts:               '/t/re_count', //仅仅是转播数
-        status_show:          '/t/show', //
-        update:               '/t/add', //
-        upload:               '/t/add_pic', //
-        repost:               '/t/re_add', //
-        comments:             '/t/re_list', //
-        destroy:              '/t/del', //
-        destroy_msg:          '/private/del', //
-        direct_messages:      '/private/recv',  //
-        sent_direct_messages: '/private/send',  //
-        new_message:          '/private/add', //
+        status_show:          '/t/show',
+        update:               '/t/add',
+        upload:               '/t/add_pic',
+        repost:               '/t/re_add',
+        comment:              '/t/comment',
+        comments:             '/t/re_list',
+        destroy:              '/t/del',
+        destroy_msg:          '/private/del',
+        direct_messages:      '/private/recv',
+        sent_direct_messages: '/private/send',
+        new_message:          '/private/add',
         rate_limit_status:    '/account/rate_limit_status',
-        friendships_create:   '/friends/add', //
-        friendships_destroy:  '/friends/del', //
-        friendships_show:     '/friends/check', //
+        friendships_create:   '/friends/add',
+        friendships_destroy:  '/friends/del',
+        friendships_show:     '/friends/check',
         reset_count:          '/statuses/reset_count',
-        user_show:            '/user/other_info', //
+        user_show:            '/user/other_info',
         
         // 用户标签
         tags: 				  '/tags',
@@ -1256,9 +1259,9 @@ $.extend(TQQAPI, {
         tags_suggestions:	  '/tags/suggestions',
         
         // 搜索
-        search:               '/search/t', //
+        search:               '/search/t',
 
-        verify_credentials: '/user/info', //
+        verify_credentials: '/user/info',
         
         gender_map: {0:'n', 1:'m', 2:'f'},
 
@@ -1363,6 +1366,13 @@ $.extend(TQQAPI, {
             case this.config.comments:
                 args.data.rootid = args.data.id;
 			    delete args.data.id;
+                break;
+            case this.config.comment:
+                args.data.reid = args.data.id;
+			    delete args.data.id;
+                break;
+            case this.config.counts:
+                args.data.flag = 2;
                 break;
             case this.config.repost:
                 args.data.reid = args.data.id;
