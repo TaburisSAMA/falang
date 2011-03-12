@@ -596,7 +596,7 @@
 
 	//基本设置
 	"sett_msg_donate": {
-		"message": "Thanks for their donate：<a href=\"http://item.taobao.com/item.htm?id=9279069357\" target=\"_blank\">(Cliak To Donate FaWave)</a>",
+		"message": "Thanks for their donation：<a href=\"http://item.taobao.com/item.htm?id=9279069357\" target=\"_blank\">(Cliak To Donate FaWave)</a>",
 		"description": "感谢以下朋友的捐助：<a href=\"http://item.taobao.com/item.htm?id=9279069357\" target=\"_blank\">(点此捐助FaWave)</a>"
 	},
 	"sett_btn_clean_local_storage": {
