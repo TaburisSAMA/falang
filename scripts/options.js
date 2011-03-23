@@ -324,6 +324,12 @@ function showDndAccountList(bindDnd){
     $('#account-blogType').html(blogtype_options);
     showSupportAuthTypes($('#account-blogType').val());
     
+    // 显示新浪微博appkey 选项
+    var appkey_options = '';
+    for(var k in TSINA_APPKEYS) {
+    	appkey_options += '<option value="{{value}}">{{name}}</option>'.format({name: TSINA_APPKEYS[k][0], value: k});
+    }
+    $('#account-appkey').html(appkey_options);
 };
 
 //保存拖放排序后的用户列表顺序
@@ -682,6 +688,7 @@ function saveAccount(){
     var pwd = $.trim($("#account-pwd").val());
     var blogType = $.trim($("#account-blogType").val()) || 'tsina'; //微博类型，兼容，默认tsina
     var authType = $.trim($("#account-authType").val()); //登录验证类型
+    var appkey = $.trim($('#account-appkey').val()) || 'fawave';
     var pin = $.trim($('#account-pin').val()); // oauth pin码
     var apiProxy = $.trim($('#account-proxy-api').val());
     var user = {
@@ -690,6 +697,10 @@ function saveAccount(){
     // 目前只允许twitter设置代理
     if(blogType == 'twitter' && apiProxy) {
     	user.apiProxy = apiProxy;
+    }
+    // 目前只是新浪需要设在key
+    if(blogType == 'tsina' && appkey) {
+    	user.appkey = appkey;
     }
     if((authType == 'baseauth' || authType == 'xauth') && userName && pwd){ // TODO: xauth还未支持
         //userName = userName.toLowerCase(); //小写
@@ -763,6 +774,11 @@ function showSupportAuthTypes(blogType, authType){
     	$('.account-proxy').show();
     } else {
     	$('.account-proxy').hide();
+    }
+    if(blogType == 'tsina') {
+    	$('.account-appkey').show();
+    } else {
+    	$('.account-appkey').hide();
     }
 };
 

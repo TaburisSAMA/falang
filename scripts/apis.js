@@ -5,6 +5,12 @@
 var OAUTH_CALLBACK_URL = chrome.extension.getURL('oauth_cb.html');
 var RE_JSON_BAD_WORD = /[\u000B\u000C]/ig; //具体见：http://www.cnblogs.com/rubylouvre/archive/2011/02/12/1951760.html
 
+// 伪装成微博AIR
+var TSINA_APPKEYS = {
+    'weibo_air': ['伪装成微博AIR', '3434422667', '523f2d0d134bfd5aa138f9e5af828bf9'],
+    'fawave': ['FaWave', '3538199806', '18cf587d60e11e3c160114fd92dd1f2b']
+};
+
 var sinaApi = {
 	
 	config: {
@@ -232,16 +238,29 @@ var sinaApi = {
         }
         return m;
     },
-    
 
 	// 设置认证头
 	apply_auth: function(url, args, user) {
+    	var appkey = null;
+    	if(user.blogType == 'tsina' && user.appkey) {
+			// 设在其他key
+			appkey = TSINA_APPKEYS[user.appkey];
+			if(appkey && args.data.source) {
+				args.data.source = appkey[1];
+			}
+		}
         user.authType = user.authType || 'baseauth'; //兼容旧版本
 		if(user.authType == 'baseauth') {
 			args.headers['Authorization'] = make_base_auth_header(user.userName, user.password);
 		} else if(user.authType == 'oauth' || user.authType == 'xauth') {
+			var oauth_secret = this.config.oauth_secret;
+			var oauth_key = this.config.oauth_key;
+			if(appkey) {
+				oauth_key = appkey[1];
+				oauth_secret = appkey[2];
+			}
 			var accessor = {
-				consumerSecret: this.config.oauth_secret
+				consumerSecret: oauth_secret
 			};
 			// 已通过oauth认证
 			if(user.oauth_token_secret) {
@@ -259,7 +278,7 @@ var sinaApi = {
 				method: args.type, 
 				parameters: parameters
 	        };
-			message.parameters.oauth_consumer_key = this.config.oauth_key;
+			message.parameters.oauth_consumer_key = oauth_key;
 			message.parameters.oauth_version = '1.0';
 			// 已通过oauth认证
 			if(user.oauth_token_key) {
@@ -4261,4 +4280,48 @@ var tapi = {
     status_show: function(data, callback) {
     	return this.api_dispatch(data).status_show(data, callback);
     }
+};
+
+// 微盘api, http://vdisk.me/api/doc
+var VDiskAPI = {
+	appkey: '306790',
+	app_secret: 'c26f2cc9138bb726bfcac1311cbd39bb',
+	
+	_sha256: function(basestring) {
+		b64pad = '=';
+		HMAC_SHA256_init(this.app_secret);
+	 	HMAC_SHA256_write(basestring);
+	 	mac = HMAC_SHA256_finalize();
+	 	return binb2b64(mac);
+	},
+	
+	/* http://openapi.vdisk.me/?m=auth&a=get_token
+	 * POST
+	 * 
+	 * account: 帐号
+	 * password: 密码
+	 * appkey: 您的appkey
+	 * time: 当前的时间戳, time((time_t*)NULL) 
+	 * signature: 动态签名, hmac_sha256("account=相应的值&appkey=相应的值&password=相应的值&time=相应的值", app_secret)
+	 * 		PHP实例: $signature = hash_hmac('sha256', "account={$account}&appkey={$appkey}&password={$password}&time={$time}", $app_secret, false);
+	 * 可选:
+	 * app_type: 登录类型, 如: app_type=sinat (注意: 目前支持微博帐号)
+	 */
+	
+	get_token: function(user, callback) {
+		var params = {
+			account: user.username,
+			password: user.password,
+			appkey: this.appkey,
+			time: new Date().getTime()
+		};
+		var basestring = 'account={{account}}&appkey={{appkey}}&password={{password}}&time={{time}}'.format(params);
+		console.log(basestring)
+//		params.signature = this._sha256('scramble=1122&account=example@gmail.com&password=123456&appkey=12345678');
+		params.signature = this._sha256(basestring);
+		console.log(params);
+		$.post('http://openapi.vdisk.me/?m=auth&a=get_token', params, function(data){
+			console.log(data);
+		});
+	}
 };

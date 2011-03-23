@@ -846,15 +846,15 @@ function filterDatasByMaxId(datas, max_id, append) {
 };
 
 //检查是否支持Twitter
-function checkTwitterEnabled(){
-    if(_u.i18n("language")!='zh_CN'){ return; }
-    var _sets = localStorage.getObject(SETTINGS_KEY);
-    _sets = _sets || {};
-    if(!_sets.twitterEnabled){
-        delete T_NAMES.twitter;
-    }
-};
-checkTwitterEnabled();
+//function checkTwitterEnabled(){
+//    if(_u.i18n("language")!='zh_CN'){ return; }
+//    var _sets = localStorage.getObject(SETTINGS_KEY);
+//    _sets = _sets || {};
+//    if(!_sets.twitterEnabled){
+//        delete T_NAMES.twitter;
+//    }
+//};
+//checkTwitterEnabled();
 
 /*
 * 缓动函数
@@ -1689,6 +1689,7 @@ var VideoService = {
 		},
 		// http://video.sina.com.cn/playlist/4576702-1405053100-1.html#44164340 => 
 		// http://you.video.sina.com.cn/api/sinawebApi/outplayrefer.php/vid=44164340_1405053100_1/s.swf
+		// http://you.video.sina.com.cn/api/sinawebApi/outplayrefer.php/vid=44164340_1405053100_Z0LhTSVpCzbK+l1lHz2stqkP7KQNt6nkjWqxu1enJA5ZQ0/XM5GdZtwB5CrSANkEqDhAQJw+c/ol0x0/s.swf
 		// http://you.video.sina.com.cn/b/32394075-1575345837.html =>
 		// http://you.video.sina.com.cn/api/sinawebApi/outplayrefer.php/vid=32394075_1575345837/s.swf
 		sina: {
