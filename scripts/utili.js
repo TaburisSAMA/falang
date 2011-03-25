@@ -1196,22 +1196,48 @@ var ShortenUrl = {
 	// MAX_INDEX => http://yongwo.de:1235/api?u=http://is.gd/imWyT&cb=foo
 	MAX_INDEX: 46,
 	expand: function(shorturl, callback, context) {
-//		var index = Math.floor(Math.random() * (this.MAX_INDEX + 1));
-		var url = 'http://s8.hk/api/e?u=' + shorturl;
-//		if(index == this.MAX_INDEX) {
-//			var url = 'http://s8.hk/api/e?u=' + shorturl;
-//		} else {
-//			var url = 'http://urlexpand' + index + '.appspot.com/api?u=' + shorturl;
-//		}
-		$.ajax({
-			url: url,
-			success: function(data, status, xhr) {
+		this.expand_sinaurl(shorturl, function(data){
+			if(!data) {
+				var url = 'http://s8.hk/api/e?u=' + shorturl;
+				$.ajax({
+					url: url,
+					success: function(data, status, xhr) {
+						callback.call(context, data);
+					}, 
+					error: function(xhr, status) {
+						callback.call(context, null);
+					}
+				});
+			} else {
 				callback.call(context, data);
-			}, 
-			error: function(xhr, status) {
-				callback.call(context, null);
 			}
-		});
+		}, context);
+	},
+	
+	SINAURL_RE: /http:\/\/(t|sinaurl)\.cn\/(\w+)/i,
+	// 新浪短址特殊处理
+	// http://t.sina.com.cn/mblog/sinaurl_info.php?url=h6yl4g
+	expand_sinaurl: function(shorturl, callback, context) {
+		var m = this.SINAURL_RE.exec(shorturl);
+		if(m) {
+			var id = m[2];
+			$.ajax({
+				url: 'http://t.sina.com.cn/mblog/sinaurl_info.php?url=' + id,
+				success: function(data, status, xhr) {
+					try {
+						data = JSON.parse(data).data[id];
+					}catch(e) {
+//						console.log(e);
+					}
+					callback.call(context, data);
+				}, 
+				error: function(xhr, status) {
+					callback.call(context, null);
+				}
+			});
+		} else {
+			callback.call(context, null);
+		}
 	},
 	
 	expandAll: function() {
@@ -1229,19 +1255,24 @@ var ShortenUrl = {
                 }
 				return;
 			}
-			if(cache[url]) {
-				$(this).attr('title', _u.i18n("comm_mbright_to_open") + ' ' + cache[url]).attr('rhref', cache[url]);
-                UrlUtil.showFaviconBefore(this, cache[url]);
-				if(!VideoService.attempt(cache[url], this)) {
-                	ImageService.attempt(cache[url], this);
+			var cache_data = cache[url];
+			if(cache_data) {
+				var longurl = cache_data.url || cache_data;
+				$(this).attr('title', _u.i18n("comm_mbright_to_open") 
+					+ ' ' + longurl).attr('rhref', longurl);
+                UrlUtil.showFaviconBefore(this, longurl);
+				if(!VideoService.attempt(cache_data, this)) {
+                	ImageService.attempt(longurl, this);
                 }
 			} else {
-				ShortenUrl.expand(url, function(longurl) {
+				ShortenUrl.expand(url, function(data) {
+					var longurl = data ? (data.url || data) : data;
 					if(longurl) {
-						$(this).attr('title', _u.i18n("comm_mbright_to_open") + ' ' + longurl).attr('rhref', longurl).addClass('longurl');
-						cache[$(this).attr('href')] = longurl;
+						$(this).attr('title', _u.i18n("comm_mbright_to_open") 
+							+ ' ' + longurl).attr('rhref', longurl).addClass('longurl');
+						cache[$(this).attr('href')] = data;
                         UrlUtil.showFaviconBefore(this, longurl);
-						if(!VideoService.attempt(longurl, this)) {
+						if(!VideoService.attempt(data, this)) {
 		                	ImageService.attempt(longurl, this);
 		                }
 					}
@@ -1752,26 +1783,56 @@ var VideoService = {
 			tpl: '<embed src="http://v.ifeng.com/include/exterior.swf?guid={{id}}&pageurl=http://www.ifeng.com&fromweb=other&AutoPlay=true" quality="high"  allowScriptAccess="always" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" width="460" height="400"></embed>'
 		}
 	},
-	attempt: function(url, ele) {
+	
+	format_flash: function(flash_url) {
+		return '<embed src="' + flash_url + 
+			'" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="460" height="400"></embed>';
+	},
+	
+	attempt: function(urldata, ele) {
+		var url = urldata.url || urldata;
+		var flash = urldata.flash;
+		var flash_title = urldata.title || '';
+		var screen_pic = urldata.screen;
 		for(var name in this.services) {
 			var service = this.services[name];
 			if(service.url_re.test(url)) {
 				if(service.append) {
 					// 直接添加到后面
+					var flash_code = flash ? this.format_flash(flash) : this.format_tpl(service, url, ele);
 					if($(ele).parent().find('.embed_insert').length == 0) {
-						$(ele).parent().append('<div class="embed_insert">' + this.format_tpl(service, url, ele) + '</div>');
+						$(ele).parent().append('<div class="embed_insert">' + flash_code + '</div>');
 					}
 				} else {
 					var old_title = $(ele).attr('title');
 					var title = _u.i18n("comm_mbleft_to_preview");
+					if(flash_title) {
+						title += '[' + flash_title + ']';
+					}
 					if(old_title) {
 						title += ', ' + old_title;
 					}
-					$(ele).attr('rhref', url).attr('title', title).attr('href', 'javascript:void(0);').click(function() {
-						VideoService.show($(this).attr('videoType'), $(this).attr('rhref'), this);
+					$(ele).attr('rhref', url).attr('title', title)
+							.attr('href', 'javascript:void(0);')
+							.attr('flash', flash || '')
+							.attr('flash_title', flash_title)
+							.click(function() {
+						VideoService.show($(this).attr('videoType'), 
+							$(this).attr('rhref'), 
+							$(this).attr('flash'), 
+							$(this).attr('flash_title'),
+							this);
 					});
+					if(screen_pic) {
+						var img_html = '<br/><img src="' + screen_pic + '" />';
+//						if(flash_title) {
+//							img_html = '<br/>' + flash_title + img_html;
+//						}
+						$(ele).parent().append(img_html);
+					}
 				}
-				$(ele).attr('videoType', name).after(' [<a onclick="VideoService.popshow(this);" href="javascript:void(0);" title="'+ _u.i18n("comm_popup_play") +'" class="external_link">'+ _u.i18n("abb_play") +'</a>]');
+				$(ele).attr('videoType', name).after(' [<a onclick="VideoService.popshow(this);" href="javascript:void(0);" title="' 
+						+ _u.i18n("comm_popup_play") +'" class="external_link">'+ _u.i18n("abb_play") +'</a>]');
 				return true;
 			}
 		}
@@ -1787,16 +1848,28 @@ var VideoService = {
 		}
 		return service.tpl.format({id: id});
 	},
-	show: function(name, url, ele) {
+	show: function(name, url, flash, ele) {
 		var service = this.services[name];
-		popupBox.showVideo(url, this.format_tpl(service, url, ele));
+		var flash_code = flash ? this.format_flash(flash) : this.format_tpl(service, url, ele);
+		popupBox.showVideo(url, flash_code);
 	},
 	popshow: function(ele) {
-		var l = (window.screen.availWidth-510)/2;
 		var $this = $(ele).prev('a');
 		var vtype = $this.attr('videoType');
-		var url = 'popshow.html?vtype=' + vtype + '&url=' + ($this.attr('rhref') || $this.attr('href'));
-		var width_height = vtype == 'xiami' ? 'width=300,height=50': 'width=460,height=420';
-    	window.open(url, '_blank', 'left=' + l + ',top=30,' + width_height + ',menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
+		var flash = $this.attr('flash');
+		var title = $this.attr('flash_title') || '';
+		var shorturl = $this.html();
+		var url = 'popshow.html?vtype=' + vtype 
+			+ '&s=' + shorturl + '&title=' + title;
+		if(flash) {
+			url += '&flash=' + flash;
+		} else {
+			url += '&url=' + ($this.attr('rhref') || $this.attr('href'));
+		}
+		var l = (window.screen.availWidth-510)/2;
+		var width_height = vtype == 'xiami' 
+			? 'width=300,height=50': 'width=460,height=420';
+    	window.open(url, '_blank', 'left=' + l + ',top=30,' 
+    		+ width_height + ',menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
 	}
 };
