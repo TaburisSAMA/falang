@@ -269,7 +269,7 @@ var Settings = {
         popupHeight: 520, 
         theme: 'pip_io', //主题样式
         translate_target: 'zh', // 默认翻译语言
-        shorten_url_service: 'is.gd', // 默认缩址服务
+        shorten_url_service: 'goo.gl', // 默认缩址服务
         image_service: 'Imgur', // 默认的图片服务
         enable_image_service: true, // 默认开启图片服务
         isGeoEnabled: false, //默认不开启上报地理位置信息
