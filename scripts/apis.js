@@ -7,7 +7,7 @@ var RE_JSON_BAD_WORD = /[\u000B\u000C]/ig; //具体见：http://www.cnblogs.com/
 
 // 伪装成微博AIR
 var TSINA_APPKEYS = {
-    'weibo_air': ['伪装成微博AIR', '3434422667', '523f2d0d134bfd5aa138f9e5af828bf9'],
+    'weibo_air': ['微博AIR', '3434422667', '523f2d0d134bfd5aa138f9e5af828bf9'],
     'fawave': ['FaWave', '3538199806', '18cf587d60e11e3c160114fd92dd1f2b']
 };
 
