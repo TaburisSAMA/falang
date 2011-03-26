@@ -1267,8 +1267,8 @@ var ShortenUrl = {
 				return;
 			}
 			var cache_data = cache[url];
-			if(cache_data) {
-				var longurl = cache_data.url || cache_data;
+			if(cache_data && cache_data.url) {
+				var longurl = cache_data.url;
 				$(this).attr('title', _u.i18n("comm_mbright_to_open") 
 					+ ' ' + longurl).attr('rhref', longurl);
                 UrlUtil.showFaviconBefore(this, longurl);
@@ -1277,7 +1277,7 @@ var ShortenUrl = {
                 }
 			} else {
 				ShortenUrl.expand(url, function(data) {
-					var longurl = data ? (data.url || data) : data;
+					var longurl = data ? data.url: data;
 					if(longurl) {
 						$(this).attr('title', _u.i18n("comm_mbright_to_open") 
 							+ ' ' + longurl).attr('rhref', longurl).addClass('longurl');
