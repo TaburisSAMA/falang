@@ -269,7 +269,7 @@ var Settings = {
         popupHeight: 520, 
         theme: 'pip_io', //主题样式
         translate_target: 'zh', // 默认翻译语言
-        shorten_url_service: 'goo.gl', // 默认缩址服务
+        shorten_url_service: 't.cn', // 默认缩址服务
         image_service: 'Imgur', // 默认的图片服务
         enable_image_service: true, // 默认开启图片服务
         isGeoEnabled: false, //默认不开启上报地理位置信息
@@ -1038,11 +1038,11 @@ function getPageHeight() {
 
 //浮动层
 var popupBox = {
-    tp: '<div id="popup_box">\
-            <div class="pb_title clearFix"><span class="t"></span><a href="javascript:" onclick="popupBox.close()" class="pb_close">'+ _u.i18n("comm_close") +'</a></div>\
-            <div class="pb_content"></div>\
-        </div>\
-        <div id="popup_box_overlay"></di>',
+    tp: '<div id="popup_box">' +
+            '<div class="pb_title clearFix"><span class="t"></span><a href="javascript:" onclick="popupBox.close()" class="pb_close">'+ _u.i18n("comm_close") +'</a></div>' +
+            '<div class="pb_content"></div>' +
+        '</div>' +
+        '<div id="popup_box_overlay"></di>',
     box: null,
     checkBox: function(){
         if(!this.box){
@@ -1149,7 +1149,7 @@ var popupBox = {
 };
 
 var UrlUtil = {
-    domainRe: /^https?:\/\/([^/]+)/i,
+    domainRe: /^https?:\/\/([^\/]+)/i,
     getDomain: function(url){
         if(url){
             var m = url.match(UrlUtil.domainRe);
@@ -1170,6 +1170,17 @@ var UrlUtil = {
 // shorturl
 var ShortenUrl = {
 	services: {
+		// http://api.t.sina.com.cn/short_url/shorten.json?source=3538199806&url_long=http://www.tudou.com/programs/view/cl_8vhHMCfs/
+		't.cn': {api: 'http://api.t.sina.com.cn/short_url/shorten.json?source=3434422667',
+			format: 'json', method: 'get',
+			param_name: 'url_long',
+			result_callback: function(data) {
+				if(data && data.length == 1) {
+					data = data[0];
+				}
+				return data ? data.url_short : null;
+			}
+		},
 		'goo.gl': {api: 'http://goo.gl/api/url', format: 'json', method: 'post', param_name: 'url', result_name: 'short_url'},
 //		'v.gd':  'http://v.gd/create.php?format=simple&url={{url}}',
 		'is.gd': 'http://is.gd/api.php?longurl={{url}}',
@@ -1300,7 +1311,7 @@ var ShortenUrl = {
 		var format_name = null;
 		var method = 'get';
 		var data = {};
-		var result_name = null;
+		var result_name = null, result_callback = null;
 		if(typeof(service) !== 'string') {
 			format_name = service.format_name || format_name;
 			format = service.format || format;
@@ -1310,6 +1321,7 @@ var ShortenUrl = {
 				data[format_name] = format;
 			}
 			result_name = service.result_name;
+			result_callback = service.result_callback;
 			if(name == 'goo.gl') {
 				data.user = 'toolbar@google.com';
 				data.auth_token = this._create_googl_auth_token(longurl);
@@ -1324,7 +1336,9 @@ var ShortenUrl = {
 			data: data,
 			dataType: format,
 			success: function(data, status, xhr) {
-				if(result_name) {
+				if(result_callback) {
+					data = result_callback(data);
+				} else if(result_name) {
 					data = data[result_name];
 				}
 				callback.call(context, data);
@@ -1336,7 +1350,7 @@ var ShortenUrl = {
 	},
 	
 	// goo.gl的认证token计算函数
-	_create_googl_auth_token: function(f){function k(){for(var c=0,b=0;b<arguments.length;b++)c=c+arguments[b]&4294967295;return c}function m(c){c=c=String(c>0?c:c+4294967296);var b;b=c;for(var d=0,i=false,j=b.length-1;j>=0;--j){var g=Number(b.charAt(j));if(i){g*=2;d+=Math.floor(g/10)+g%10}else d+=g;i=!i}b=b=d%10;d=0;if(b!=0){d=10-b;if(c.length%2==1){if(d%2==1)d+=9;d/=2}}b=String(d);b+=c;return b}function n(c){for(var b=5381,d=0;d<c.length;d++)b=k(b<<5,b,c.charCodeAt(d));return b}function o(c){for(var b=0,d=0;d<c.length;d++)b=k(c.charCodeAt(d),b<<6,b<<16,-b);return b}f={byteArray_:f,charCodeAt:function(c){return this.byteArray_[c]}};f.length=f.byteArray_.length;var e=n(f.byteArray_);e=e>>2&1073741823;e=e>>4&67108800|e&63;e=e>>4&4193280|e&1023;e=e>>4&245760|e&16383;var l="7";f=o(f.byteArray_);var h=(e>>2&15)<<4|f&15;h|=(e>>6&15)<<12|(f>>8&15)<<8;h|=(e>>10&15)<<20|(f>>16&15)<<16;h|=(e>>14&15)<<28|(f>>24&15)<<24;l+=m(h);return l}
+	_create_googl_auth_token: function(f){function k(){for(var c=0,b=0;b<arguments.length;b++)c=c+arguments[b]&4294967295;return c}function m(c){c=c=String(c>0?c:c+4294967296);var b;b=c;for(var d=0,i=false,j=b.length-1;j>=0;--j){var g=Number(b.charAt(j));if(i){g*=2;d+=Math.floor(g/10)+g%10}else d+=g;i=!i}b=b=d%10;d=0;if(b!=0){d=10-b;if(c.length%2==1){if(d%2==1)d+=9;d/=2;}}b=String(d);b+=c;return b;}function n(c){for(var b=5381,d=0;d<c.length;d++)b=k(b<<5,b,c.charCodeAt(d));return b;}function o(c){for(var b=0,d=0;d<c.length;d++)b=k(c.charCodeAt(d),b<<6,b<<16,-b);return b;}f={byteArray_:f,charCodeAt:function(c){return this.byteArray_[c];}};f.length=f.byteArray_.length;var e=n(f.byteArray_);e=e>>2&1073741823;e=e>>4&67108800|e&63;e=e>>4&4193280|e&1023;e=e>>4&245760|e&16383;var l="7";f=o(f.byteArray_);var h=(e>>2&15)<<4|f&15;h|=(e>>6&15)<<12|(f>>8&15)<<8;h|=(e>>10&15)<<20|(f>>16&15)<<16;h|=(e>>14&15)<<28|(f>>24&15)<<24;l+=m(h);return l;}
 };
 
 // 图片服务
@@ -1796,8 +1810,8 @@ var VideoService = {
 	},
 	
 	format_flash: function(flash_url) {
-		return '<embed src="' + flash_url + 
-			'" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="460" height="400"></embed>';
+		return '<div><embed src="' + flash_url + 
+			'" type="application/x-shockwave-flash" quality="high" width="460" height="400" align="middle" allowScriptAccess="sameDomain"></embed></div>';
 	},
 	
 	attempt: function(urldata, ele) {
