@@ -9,12 +9,20 @@
 	<script type="text/javascript" src="scripts/lib/jquery-1.4.js" ></script>
 	<script type="text/javascript" src="scripts/utili.js" ></script>
 	<script type="text/javascript">
-		this.document.title = _u.i18n('comm_player') + ' -- ' + _u.i18n('defaultTitle');
-
+		document.title = _u.i18n('comm_player') 
+		    + ' - ' + _u.i18n('defaultTitle');
 		$(document).ready(function() {
 			var params = decodeForm(window.location.search);
-			$('#url').attr('href', params.url).html('[' + params.vtype + '] ' + params.url);
-			$('#content').html(VideoService.format_tpl(VideoService.services[params.vtype], params.url, '#content'));
+			var flash = params.flash;
+			var title = params.title || '';
+			var vtype = params.vtype;
+			$('#url').before(' [' + vtype + '] ')
+			    .attr('href', params.s).html(title + ' ' + params.s);
+			var flash_code = flash ? 
+			    VideoService.format_flash(flash) 
+			    : 
+			    VideoService.format_tpl(VideoService.services[vtype], params.url, '#content');
+			$('#content').html(flash_code);
 		});
 	</script>
  </head>

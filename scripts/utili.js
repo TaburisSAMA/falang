@@ -1196,22 +1196,33 @@ var ShortenUrl = {
 	// MAX_INDEX => http://yongwo.de:1235/api?u=http://is.gd/imWyT&cb=foo
 	MAX_INDEX: 46,
 	expand: function(shorturl, callback, context) {
-		this.expand_sinaurl(shorturl, function(data){
-			if(!data) {
-				var url = 'http://s8.hk/api/e?u=' + shorturl;
-				$.ajax({
-					url: url,
-					success: function(data, status, xhr) {
-						callback.call(context, data);
-					}, 
-					error: function(xhr, status) {
-						callback.call(context, null);
-					}
-				});
-			} else {
+		var url = 'http://s8.hk/api/e?f=json&u=' + shorturl;
+		$.ajax({
+			url: url,
+			success: function(data, status, xhr) {
+				data = JSON.parse(data);
 				callback.call(context, data);
+			}, 
+			error: function(xhr, status) {
+				callback.call(context, null);
 			}
-		}, context);
+		});
+//		this.expand_sinaurl(shorturl, function(data){
+//			if(!data) {
+//				var url = 'http://s8.hk/api/e?u=' + shorturl;
+//				$.ajax({
+//					url: url,
+//					success: function(data, status, xhr) {
+//						callback.call(context, data);
+//					}, 
+//					error: function(xhr, status) {
+//						callback.call(context, null);
+//					}
+//				});
+//			} else {
+//				callback.call(context, data);
+//			}
+//		}, context);
 	},
 	
 	SINAURL_RE: /http:\/\/(t|sinaurl)\.cn\/(\w+)/i,

@@ -2492,7 +2492,7 @@ $.extend(StatusNetAPI, {
 		}
 
 		return TwitterAPI.format_result_item.apply(this, [data, play_load, args]);
-	},
+	}
 });
 
 
