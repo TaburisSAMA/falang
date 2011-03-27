@@ -364,7 +364,11 @@
 					</div>
 					<?js if(tweet.retweeted_status.thumbnail_pic){ ?>
 					<div>
-						<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.retweeted_status.bmiddle_pic}" title="#{_u.i18n("btn_show_original_pic_title")}" original="#{tweet.retweeted_status.original_pic}" onmousedown="rOpenPic(event, this)" class="thumbnail_pic" >
+						<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" 
+						    bmiddle="#{tweet.retweeted_status.bmiddle_pic}" 
+						    title="#{_u.i18n("btn_show_original_pic_title")}" 
+						    original="#{tweet.retweeted_status.original_pic}" 
+						    onmousedown="rOpenPic(event, this)" class="thumbnail_pic" >
 						<img class="imgicon pic" src="#{tweet.retweeted_status.thumbnail_pic}" /></a>
 					</div>
 					<?js } ?>

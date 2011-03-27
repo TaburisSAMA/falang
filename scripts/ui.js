@@ -54,7 +54,7 @@ function buildStatusHtml(statuses, t, c_user){
         rtrtOretweetBtn: '',
         rtrtRetweetBtn: '<a class="rtweet" href="javascript:void(0);" onclick="doRT(this, false, true);" title="'+ _u.i18n("btn_old_rt_title") +'">RT</a>',
         rtrtRepostBtn: '<a class="reposttweet" href="javascript:void(0);" onclick="javascript:doRepost(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\',\'{{retweeted_status.retweeted_status.id}}\');" title="'+ _u.i18n("btn_repost_title") +'">'+ _u.i18n("abb_repost") +'</a>',
-        rtrtCommentBtn: '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\', \'{{retweeted_status.retweeted_status.user.id}}\', ,\'{{retweeted_status.retweeted_status.id}}\');" title="'+ _u.i18n("btn_comment_title") +'">'+ _u.i18n("abb_comment") +'</a>',
+        rtrtCommentBtn: '<a class="commenttweet" href="javascript:void(0);" onclick="javascript:doComment(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\', \'{{retweeted_status.retweeted_status.user.id}}\', \'{{retweeted_status.retweeted_status.id}}\');" title="'+ _u.i18n("btn_comment_title") +'">'+ _u.i18n("abb_comment") +'</a>',
         rtrtCommentCounts: '<span class="commentCounts">({{rtrt_comments_count}})</span>',
         rtrtReplyBtn: '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\',\'{{retweeted_status.retweeted_status.id}}\');" title="'+ _u.i18n("btn_mention_title") +'">@</a>',
         rtrtAddFavoritesMsgBtn: '<a class="newMessage" href="javascript:void(0);" onclick="addFavorites(this,\'{{retweeted_status.retweeted_status.user.screen_name}}\',\'{{retweeted_status.retweeted_status.id}}\');" title="'+ _u.i18n("btn_add_favorites_title") +'"><img width="11px" src="/images/favorites_2.gif"/></a>',
@@ -127,11 +127,7 @@ function buildStatusHtml(statuses, t, c_user){
 	}
     if(c_user.blogType != 'twitter' && c_user.blogType != 'identi_ca') {
     	BUTTON_TPLS.rtOretweetBtn = BUTTON_TPLS.oretweetBtn = '';
-    } 
-//    else if(c_user.blogType == 't163') {
-//    	BUTTON_TPLS.rtOretweetBtn = '<a href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'{{retweeted_status.user.screen_name}}\',\'{{retweeted_status.id}}\');" title="163转发">转发</a>';
-//    	BUTTON_TPLS.oretweetBtn = '<a href="javascript:void(0);" onclick="javascript:sendOretweet(this,\'{{user.screen_name}}\',\'{{id}}\');" title="163转发">转发({{retweet_count}})</a>';
-//    }
+    }
 	
 	switch(c_user.blogType){
 	    case 'digu':
@@ -144,7 +140,6 @@ function buildStatusHtml(statuses, t, c_user){
 	        break;
 	    case 'douban':
 	    	BUTTON_TPLS.replyBtn = BUTTON_TPLS.rtReplyBtn = BUTTON_TPLS.rtrtReplyBtn = '';
-            //BUTTON_TPLS.new_msgBtn = BUTTON_TPLS.new_msgBtn.replace('>私<', '>豆邮<');
 	        break;
         case 'facebook':
 	    	BUTTON_TPLS.replyBtn = BUTTON_TPLS.rtReplyBtn = BUTTON_TPLS.rtrtReplyBtn = BUTTON_TPLS.new_msgBtn = BUTTON_TPLS.commentCounts = '';
@@ -223,22 +218,11 @@ function buildStatusHtml(statuses, t, c_user){
         	buttons.commentBtn = buttons.commentCounts = buttons.rtCommentCounts = buttons.rtCommentBtn = '';
         }
         if(status.retweeted_status && status.retweeted_status.retweeted) {
-//        	if(c_user.blogType == 't163') {
-//		    	buttons.rtOretweetBtn = '<a href="javascript:void(0);" title="已成功转发">已转发</a>';
-//		    } else {
-//		    	buttons.rtOretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="已成功锐推"></a>';
-//		    }
         	buttons.rtOretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="'+ _u.i18n("btn_rted_title") +'"></a>';
         }
         if(status.retweeted) {
-//        	if(c_user.blogType == 't163') {
-//		    	buttons.oretweetBtn = '<a href="javascript:void(0);" title="已成功转发">已转发(' + status.retweet_count + ')</a>';
-//		    } else {
-//        		buttons.oretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="已成功锐推"></a>';
-//		    }
         	buttons.oretweetBtn = '<a class="oretweet ort orted" href="javascript:void(0);" title="'+ _u.i18n("btn_rted_title") +'"></a>';
         }
-//        console.log(status)
         var status_type = status.status_type || t;
         var context = {
             provinces: provinces,
@@ -261,7 +245,7 @@ function buildStatusHtml(statuses, t, c_user){
             	html = html.replace(rt_replace_pre, Shotenjin.render(TEMPLATE_RT, context));
             	if(need_rt_rt) {
             		if(!TEMPLATE_RT_RT) {
-            			TEMPLATE_RT_RT = TEMPLATE_RT.replace(/tweet\.retweeted_status\./g, 'tweet.retweeted_status.retweeted_status.').replace(/btn\.rt/g, 'btn.rtrt');
+            			TEMPLATE_RT_RT = TEMPLATE_RT.replace(/tweet\.retweeted_status/g, 'tweet.retweeted_status.retweeted_status').replace(/btn\.rt/g, 'btn.rtrt');
             		}
             		context.is_rt_rt = true;
             		context.retweeted_status_user = status.retweeted_status.user;
