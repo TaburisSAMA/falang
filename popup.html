@@ -432,7 +432,7 @@
 				<div class="user_info">
 					<div class="userName"><a href="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?></a>
 					<?js if(!user.is_me){ ?>
-					<a class="follow" href="javascript:" onclick="doReply(this, '#{user.screen_name}','#{user.id}')">@</a>
+					<a class="follow" href="javascript:" onclick="doReply(this, '#{user.screen_name}', '', '#{user.id}')">@</a>
 					<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">#{_u.i18n("abb_direct_message")}</a>
 						<?js if(support_follow){ ?>
 						<a class="follow" href="javascript:" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">#{_u.i18n("comm_f_destroy")}</a>

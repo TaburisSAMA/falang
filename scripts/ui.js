@@ -88,7 +88,7 @@ function buildStatusHtml(statuses, t, c_user){
     }
     
     // 支持转发列表
-    if(config.support_repost_timeline) {
+    if(config.support_repost && config.support_repost_timeline) {
     	var tpl = '<span class="repostCounts">(<a href="javascript:void(0);" title="'
     		+ _u.i18n("comm_show_repost_timeline") 
     		+ '" timeline_type="repost" onclick="showRepostTimeline(this, {{id}});">{{repost_count}}</a>)</span>';
@@ -159,20 +159,31 @@ function buildStatusHtml(statuses, t, c_user){
     	status.retweeted_status = status.retweeted_status || status.status;
     	
     	var comments_count_tpl = '<a href="javascript:void(0);" timeline_type="comment" title="'+ _u.i18n("btn_show_comments_title") +'" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>';
-    	status.comments_count = status.comments_count || 0;
+    	if(status.comments_count === undefined) {
+    		status.comments_count = '看';
+    	}
     	var comments_btn = comments_count_tpl.format(status);
      	status.comments_btn = comments_btn;
      	status.rt_comments_count = status.rtrt_comments_count = '-';
      	var rt_status = status.retweeted_status;
      	if(rt_status && rt_status.user) {
-     		rt_status.repost_count = rt_status.repost_count || 0;
+     		if(rt_status.repost_count === undefined) {
+     			rt_status.repost_count = '看';
+     		}
+     		if(rt_status.comments_count === undefined) {
+     			rt_status.comments_count = '看';
+     		}
      		status.retweeted_status_screen_name = rt_status.user.screen_name;
      		status.retweeted_status_id = rt_status.id;
-     		rt_status.comments_count = rt_status.comments_count || 0;
      		status.rt_comments_count = comments_count_tpl.format(rt_status);
      		var rtrt_status = rt_status.retweeted_status;
      		if(rtrt_status && rtrt_status.user) {
-     			rtrt_status.comments_count = rtrt_status.comments_count || 0;
+     			if(rtrt_status.repost_count === undefined) {
+     				rtrt_status.repost_count = '看';
+         		}
+     			if(rtrt_status.comments_count === undefined) {
+     				rtrt_status.comments_count = '看';
+         		}
      			status.rtrt_comments_count = comments_count_tpl.format(rtrt_status);
      		}
      	} else {

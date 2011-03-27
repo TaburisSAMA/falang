@@ -1563,13 +1563,18 @@ function addPageMsgs(msgs, t, append){
 function sendReplyMsg(msg){
     var btn = $("#replySubmit"),
         txt = $("#replyTextarea"),
-        userName = $("#ye_dialog_title").text();
+        screen_name = $("#ye_dialog_title").text();
     var user = getUser();
     var config = tapi.get_config(user);
     var tweetId = $("#replyTweetId").val();
     // 判断是否需要填充 @screen_name
     if(config.reply_dont_need_at_screen_name !== true || !tweetId) {
-    	msg = userName + ' ' + msg;
+    	if(config.rt_at_name) {
+    		// 需要使用name替代screen_name
+    		msg = '@' + $('#replyUserName').val() + ' ' + msg;
+    	} else {
+    		msg = screen_name + ' ' + msg;
+    	}
     }
     if(tweetId) {
     	data = {sina_id: tweetId}; // @回复
@@ -1586,7 +1591,7 @@ function sendReplyMsg(msg){
             hideReplyInput();
             txt.val('');
             setTimeout(callCheckNewMsg, 1000, 'friends_timeline');
-            showMsg(userName + ' ' + _u.i18n("comm_success"));
+            showMsg(screen_name + ' ' + _u.i18n("comm_success"));
         }else if(sinaMsg.error){
 //            showMsg('error: ' + sinaMsg.error);
         }
@@ -1844,11 +1849,11 @@ function resizeFawave(w, h){
 };
 
 //====>>>>>>>>>>>>>>>
-function doReply(ele, userName, tweetId){//@回复
+function doReply(ele, screen_name, tweetId, name){//@回复
     $('#actionType').val('reply');
-    $('#replyTweetId').val(tweetId);
-    $('#replyUserName').val(userName);
-    $('#ye_dialog_title').html('@' + userName);
+    $('#replyTweetId').val(tweetId || '');
+    $('#replyUserName').val(name);
+    $('#ye_dialog_title').html('@' + screen_name);
 
     $('#chk_sendOneMore').attr("checked", false).val('').hide();
     $('#txt_sendOneMore').text('').hide();
@@ -1982,14 +1987,37 @@ function doRT(ele, is_rt, is_rt_rt){//RT
     }
     var _msg_user = data.user;
     var config = tapi.get_config(getUser());
-    var rt_name = config.rt_at_name ? (_msg_user.name || _msg_user.id) : _msg_user.screen_name;
     var repost_pre = config.repost_pre;
-    var val = tapi.get_config(getUser()).need_processMsg ? data.text : htmlToText(data.text);
-    val = repost_pre + ' ' + '@' + rt_name + ' ' + val;
-    if(data.original_pic) {
+    var need_processMsg = config.need_processMsg;
+    var val = need_processMsg ? data.text : htmlToText(data.text);
+    var original_pic = data.original_pic;
+    if(data.retweeted_status) {
+    	if(data.retweeted_status.original_pic) {
+    		original_pic = data.retweeted_status.original_pic;
+    	}
+    	var rt_name = config.rt_at_name ? 
+    		(data.retweeted_status.user.name || data.retweeted_status.user.id) 
+    		: data.retweeted_status.user.screen_name;
+    	val += '//@' + rt_name + ':' + (need_processMsg ? data.retweeted_status.text 
+    			: htmlToText(data.retweeted_status.text));
+    	if(data.retweeted_status.retweeted_status) {
+    		if(data.retweeted_status.retweeted_status.original_pic) {
+        		original_pic = data.retweeted_status.retweeted_status.original_pic;
+        	}
+    		var rtrt_name = config.rt_at_name ? 
+    	    		(data.retweeted_status.retweeted_status.user.name || data.retweeted_status.retweeted_status.user.id) 
+    	    		: data.retweeted_status.retweeted_status.user.screen_name;
+        	val += '//@' + rtrt_name + ':' + (need_processMsg ? 
+        		data.retweeted_status.retweeted_status.text 
+        		: htmlToText(data.retweeted_status.retweeted_status.text));
+        }
+    }
+    var name = config.rt_at_name ? (_msg_user.name || _msg_user.id) : _msg_user.screen_name;
+    val = repost_pre + ' ' + '@' + name + ' ' + val;
+    if(original_pic) {
     	// 有图片，自动带上图片地址，并尝试缩短
     	var settings = Settings.get();
-    	var longurl = data.original_pic;
+    	var longurl = original_pic;
     	val += config.image_shorturl_pre + longurl;
         _shortenUrl(longurl, settings, function(shorturl) {
         	if(shorturl){

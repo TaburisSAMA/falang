@@ -30,9 +30,9 @@ var sinaApi = {
         support_do_comment: true, // 判断是否支持发送评论
         support_repost_comment: true, // 判断是否支持转发同时发评论
         support_repost_comment_to_root: false, // 判断是否支持转发同时给原文作者发评论
+        support_repost: true, // 是否支持新浪形式转载
         support_repost_timeline: true, // 支持查看转发列表
 		support_upload: true, // 是否支持上传图片
-		support_repost: true, // 是否支持新浪形式转载
 		repost_pre: '转:', // 转发前缀
         repost_delimiter: '//', //转发的分隔符
 		image_shorturl_pre: ' [图] ', // RT图片缩址前缀
@@ -1255,7 +1255,7 @@ $.extend(TQQAPI, {
         support_do_comment: true,
         support_repost_timeline: true, // 支持查看转发列表
         support_favorites_max_id: true,
-        reply_dont_need_at_screen_name: true, // @回复无需填充@screen_name 
+        reply_dont_need_at_screen_name: true, // @回复某条微博 无需填充@screen_name 
         rt_at_name: true, // RT的@name而不是@screen_name
         repost_delimiter: ' || ', //转发时的分隔符
         support_counts: false, // 只有rt_count这个，不过貌似有问题，总是404。暂时隐藏
@@ -1628,6 +1628,7 @@ $.extend(TSohuAPI, {
         support_comment: true,
         support_repost_comment: false,
         support_repost_comment_to_root: false,
+        support_repost_timeline: false,
 //        support_cursor_only: true,
         
         favorites: '/favourites',
@@ -1758,6 +1759,7 @@ $.extend(DiguAPI, {
 	    support_comment: false,
 	    support_do_comment: false,
 	    support_repost: false,
+	    support_repost_timeline: false,
 	    support_max_id: false,
 	    support_sent_direct_messages: false,
 	    repost_pre: '转载:',
@@ -2014,6 +2016,7 @@ $.extend(ZuosaAPI, {
 	    support_comment: false,
 	    support_do_comment: false,
 	    support_repost: false,
+	    support_repost_timeline: false,
 	    support_max_id: false,
 	    support_search_max_id: false,
 	    
@@ -2173,7 +2176,7 @@ $.extend(LeiHouAPI, {
 	    support_comment: false,
 	    support_do_comment: false,
 	    support_repost: false,
-	    
+	    support_repost_timeline: false,
 		support_favorites: false,
 		support_do_favorite: false,
 		support_destroy_msg: false,
@@ -2312,6 +2315,7 @@ $.extend(Follow5API, {
 	    support_comment: false,
 	    support_do_comment: false,
 	    support_repost: false,
+	    support_repost_timeline: false,
 	    support_upload: false,
 
 	    verify_credentials: '/users/verify_credentials',
@@ -2456,6 +2460,7 @@ $.extend(TwitterAPI, {
 	    support_comment: false,
 	    support_do_comment: false,
 	    support_repost: false,
+	    support_repost_timeline: false,
 	    support_upload: false,
 	    oauth_callback: 'oob',
 	    search: '/search_statuses',
@@ -2559,6 +2564,7 @@ $.extend(StatusNetAPI, {
 	    support_do_comment: false,
 	    support_repost: false,
 	    support_upload: false,
+	    support_repost_timeline: false,
 	    oauth_callback: 'oob',
 	    search: '/search_statuses',
 	    repost: '/statuses/update',
@@ -2603,6 +2609,7 @@ $.extend(FanfouAPI, {
 	    support_comment: false,
 	    support_do_comment: false,
 	    support_repost: false,
+	    support_repost_timeline: false,
 	    upload: '/photos/upload',
 	    search: '/search/public_timeline',
 	    favorites_create: '/favorites/create/{{id}}',
@@ -2729,12 +2736,13 @@ $.extend(T163API, {
         oauth_authorize: '/oauth/authenticate',
         support_counts: false,
         support_comment: true,
+        support_repost_timeline: false,
         support_repost_comment: true,
         support_repost_comment_to_root: true,
         support_search_max_id: false,
         support_favorites_max_id: true,
         repost_pre: 'RT', // 转发前缀
-        repost_delimiter: ' ||',
+        repost_delimiter: '||',
         favorites: '/favorites/{{id}}',
         favorites_create: '/favorites/create/{{id}}',
         search: '/search',
@@ -2743,6 +2751,7 @@ $.extend(T163API, {
         comments: '/statuses/comments/{{id}}',
         friends_timeline: '/statuses/home_timeline',
         comments_timeline: '/statuses/comments_to_me',
+        repost_timeline: '/statuses/{{id}}/retweeted_by',
         
         gender_map: {0:'n', 1:'m', 2:'f'}
 	}),
@@ -2754,6 +2763,10 @@ $.extend(T163API, {
 	},
     
     reset_count: function(data, callback) {
+		callback();
+	},
+	
+	counts: function(data, callback) {
 		callback();
 	},
 
@@ -2902,17 +2915,25 @@ $.extend(T163API, {
 			var results = url_re.exec(data.text);
 			if(results) {
 				data.original_pic = results[1];
-				data.thumbnail_pic = 'http://oimagec6.ydstatic.com/image?w=120&h=120&url=' + data.original_pic;
-				data.bmiddle_pic = 'http://oimagec6.ydstatic.com/image?w=460&url=' + data.original_pic;
+				data.thumbnail_pic = 
+					'http://oimagec6.ydstatic.com/image?w=120&h=120&url=' 
+					+ data.original_pic;
+				data.bmiddle_pic = 
+					'http://oimagec6.ydstatic.com/image?w=460&url=' 
+					+ data.original_pic;
 				data.text = data.text.replace(results[0], '');
 			}
 			data.user = this.format_result_item(data.user, 'user', args);
 			var tpl = '{{user.t_url}}/status/{{id}}';
 			if(data.retweeted_status) {
-				data.retweeted_status = this.format_result_item(data.retweeted_status, 'status', args);
+				data.retweeted_status = 
+					this.format_result_item(data.retweeted_status, 'status', args);
 			}
-			if(data.is_retweet_by_user && (args.data.user_id === undefined || args.user.id == args.data.user_id)) { // 只有是当前登录用户，才显示已转发
-				data.retweeted = true;
+			data.repost_count = data.retweet_count;
+			if(data.is_retweet_by_user 
+					&& (args.data.user_id === undefined 
+						|| args.user.id == args.data.user_id)) { 
+				// 只有是当前登录用户，才显示已转发
 				data.retweet_me = args.user; // 当前用户转发
 				if(String(data.retweet_user_id) == String(args.user.id)) {
 					data.retweet_user_id = null;
@@ -2925,7 +2946,8 @@ $.extend(T163API, {
 					screen_name: data.retweet_user_screen_name,
 					name: data.retweet_user_name
 				};
-				data.retweet_user = this.format_result_item(data.retweet_user, 'user', args);
+				data.retweet_user = 
+					this.format_result_item(data.retweet_user, 'user', args);
 			}
 //			// 设置status的t_url
 			data.t_url = tpl.format(data);
@@ -2934,7 +2956,7 @@ $.extend(T163API, {
 				data.retweeted_status = {
 					id: data.in_reply_to_status_id,
 					text: data.in_reply_to_status_text,
-					comments_count: data.comments_count,
+//					comments_count: data.comments_count,
 					user: {
 						id: data.in_reply_to_user_id,
 						screen_name: data.in_reply_to_user_name,
@@ -2945,12 +2967,13 @@ $.extend(T163API, {
 				data.retweeted_status.user = this.format_result_item(data.retweeted_status.user, 'user', args);
 				data.retweeted_status = this.format_result_item(data.retweeted_status, 'status', args);
 				
-				if(data.root_in_reply_to_status_id && data.root_in_reply_to_status_id != data.in_reply_to_status_id 
+				if(data.root_in_reply_to_status_id 
+						&& data.root_in_reply_to_status_id != data.in_reply_to_status_id 
 						&& data.root_in_reply_to_status_text) {
 					data.retweeted_status.retweeted_status = {
 						id: data.root_in_reply_to_status_id,
 						text: data.root_in_reply_to_status_text,
-						comments_count: data.retweeted_status.comments_count,
+//						comments_count: data.retweeted_status.comments_count,
 						user: {
 							id: data.root_in_reply_to_user_id,
 							screen_name: data.root_in_reply_to_user_name,
@@ -2963,8 +2986,10 @@ $.extend(T163API, {
 					delete data.root_in_reply_to_user_id;
 					delete data.root_in_reply_to_screen_name;
 					delete data.root_in_reply_to_user_name;
-					data.retweeted_status.retweeted_status.user = this.format_result_item(data.retweeted_status.retweeted_status.user, 'user', args);
-					data.retweeted_status.retweeted_status = this.format_result_item(data.retweeted_status.retweeted_status, 'status', args);
+					data.retweeted_status.retweeted_status.user = 
+						this.format_result_item(data.retweeted_status.retweeted_status.user, 'user', args);
+					data.retweeted_status.retweeted_status = 
+						this.format_result_item(data.retweeted_status.retweeted_status, 'status', args);
 				}
 				delete data.in_reply_to_status_id;
 				delete data.in_reply_to_status_text;
@@ -2991,7 +3016,8 @@ $.extend(T163API, {
 			data.status.user = this.format_result_item(data.status.user, 'user', args);
 			data.status = this.format_result_item(data.status, 'status', args);
 			
-			if(data.root_in_reply_to_status_id && data.root_in_reply_to_status_id != data.in_reply_to_status_id 
+			if(data.root_in_reply_to_status_id 
+					&& data.root_in_reply_to_status_id != data.in_reply_to_status_id 
 					&& data.root_in_reply_to_status_text) {
 				data.status.retweeted_status = {
 					id: data.root_in_reply_to_status_id,
@@ -3035,6 +3061,7 @@ $.extend(RenjianAPI, {
 		support_comment: false,
 		support_do_comment: false,
 		support_repost: true,
+		support_repost_timeline: false,
 	    support_search: false,
 		favorites: '/statuses/likes',
         favorites_create: '/statuses/like/{{id}}',
@@ -3210,6 +3237,8 @@ $.extend(BuzzAPI, {
         result_format: '', // 由alt参数确定返回值格式
         userinfo_has_counts: false, //用户信息中是否包含粉丝数、微博数等信息
         support_counts: false,
+        support_repost: true,
+        support_repost_timeline: false, // 支持查看转发列表
 		support_upload: false, // 是否支持上传图片
 		support_cursor_only: true,  // 只支持游标方式翻页
 		support_mentions: false,
@@ -3456,6 +3485,7 @@ $.extend(DoubanAPI, {
 		userinfo_has_counts: false, // 用户信息中是否包含粉丝数、微博数等信息
         support_comment: false,
 		support_repost: false,
+		support_repost_timeline: false,
 		support_max_id: false,
 		support_favorites: false,
 		support_do_favorite: false,
@@ -3686,6 +3716,7 @@ $.extend(FacebookAPI, {
         support_cursor_only: true,  // 只支持游标方式翻页
         support_friends_only: true, // 只支持friends
         support_repost: false,
+        support_repost_timeline: false,
         support_comment: false,
         support_do_comment: true,
         support_mentions: false,
@@ -3935,6 +3966,7 @@ $.extend(PlurkAPI, {
         support_comment: false,
         support_direct_messages: false,
         support_repost: false,
+        support_repost_timeline: false,
         support_mentions: false,
         support_cursor_only: true,  // 只支持游标方式翻页
         repost_pre: 'RT', // 转发前缀
