@@ -59,7 +59,7 @@ div.msgInfo {padding-top:3px;}
 }
 .list li div.retweeted .userName{color:green;font-weight:normal;}
 .list li div.retweeted .edit a{color:green;font-weight:bold;}
-.list li div.retweeted .commentCounts a{color:green;font-weight:normal;}
+.list li div.retweeted .commentCounts a, .list li div.retweeted .repostCounts a{color:green;font-weight:normal;}
 .list li div.retweeted.rt_retweeted{margin-left: 35px;}
 .list_p{ margin:0;padding:0; background: -webkit-gradient(linear,left bottom,left top,from(#CDD2E0),to(#fff), color-stop(02,#fff));}
 .list li .msg a, .comments a{color:#F77004;}
@@ -68,7 +68,7 @@ div.msgInfo {padding-top:3px;}
 .list li .edit a{margin:0 0 0 5px;}
 .list li .edit a:hover{background:none;text-decoration:underline;}
 .list li .commentCounts, .list li .repostCounts{color:#888;font-weight:normal;}
-.list li .commentCounts a{padding:0;margin:0;font-weight:normal;}
+.list li .commentCounts a, .list li .repostCounts a{padding:0;margin:0;font-weight:normal;}
 .readMore{display:none;text-align:center;background: #ccc; color:green; margin: 2px 0; padding:3px; border:solid 1px #ccc; font-size:14px;font-weight:bold;}
 .readMore:hover{text-decoration: none;}
 .list .comments{display:none;margin-top:3px;border-top:5px solid gainsboro;border-bottom:5px solid gainsboro;background: #F7FEFF;}

@@ -21,6 +21,10 @@
 		"message": "添加",
 		"description": "添加"
 	},
+	"comm_repost": {
+        "message": "轉發",
+        "description": "转发"
+    },
 	"comm_blog": {
 		"message": "博客",
 		"description": "博客"
@@ -57,6 +61,10 @@
 		"message": "簡介",
 		"description": "简介"
 	},
+	"comm_tags": {
+        "message": "标签",
+        "description": "标签"
+    },
 	"comm_disabled": {
 		"message": "停用",
 		"description": "停用"
@@ -269,6 +277,10 @@
 		"message": "查看評論",
 		"description": "查看评论"
 	},
+	"comm_show_repost_timeline": {
+        "message": "查看轉發",
+        "description": "查看转发"
+    },
 	"comm_show_original_status": {
 		"message": "查看原信息",
 		"description": "查看原信息"
@@ -470,6 +482,10 @@
 	    "message": "隱藏評論",
 		"description": "隐藏评论"
 	},
+	"btn_hide_repost_timeline": {
+        "message": "隱藏轉發列表",
+        "description": "隐藏转发列表"
+    },
 	"btn_show_comments_title": {
 	    "message": "點擊查看評論",
 		"description": "点击查看评论"

@@ -259,7 +259,7 @@
 					</div>
 					<div class="msg">
 						<div class="tweet">
-							<div class="tweet_text">#{processMsg(account, tweet.text)} #{btn.showMapBtn}
+							<div class="tweet_text">#{processMsg(account, tweet)} #{btn.showMapBtn}
 								<?js if(tweet.crosspostSource) { ?>
 								<a target="_blank" href="#{tweet.crosspostSource}" title="#{_u.i18n('comm_show_original')}">#{_u.i18n('comm_show_original')}</a>
 								<?js } ?>
@@ -296,7 +296,7 @@
 						<?js } ?>
 					</div>
 					<div class="comments">
-						<p style="text-align:right;"><a href="javascript:void(0);" onclick="showComments(this, '#{tweet.id}');">#{_u.i18n("btn_hide_comments")}</a></p>
+						<p style="text-align:right;"><a href="javascript:void(0);" class="comment_hide_list_btn" onclick="showComments(this, '#{tweet.id}');">#{_u.i18n("btn_hide_comments")}</a></p>
 						<ul class="comment_list"></ul>
 						<div class="comment_paging" page="1">
 							<a class="pre_page" href="javascript:void(0);" onclick="commentPage(this, '#{tweet.id}', true);" style="display:none;">#{_u.i18n("btn_prev_page")}</a>
@@ -334,7 +334,15 @@
 			<!-- 转发 -->
 			<div class="msg">
 				<div class="tweetItem retweeted commentWrap showCounts_#{tweet.retweeted_status.id} <?js if(is_rt_rt){ ?>rt_retweeted<?js } ?>" id="tweet#{tweet.retweeted_status.id}">
-					<div class="userName"><?js if(is_rt_rt){ ?><a user_id='#{retweeted_status_user.id}' user_screen_name="#{retweeted_status_user.screen_name}" href="javascript:getUserTimeline('#{retweeted_status_user.screen_name}', '#{retweeted_status_user.id}');">@#{retweeted_status_user.screen_name}</a> <?js } ?><?js if(tType=='comments_timeline' && !is_rt_rt){ ?> #{_u.i18n('comm_comment_to_before')} <?js }else{ ?> #{_u.i18n('comm_repost_to_before')} <?js } ?>
+					<div class="userName">
+					    <?js if(is_rt_rt){ ?>
+					    <a user_id='#{retweeted_status_user.id}' user_screen_name="#{retweeted_status_user.screen_name}" 
+					        href="javascript:getUserTimeline('#{retweeted_status_user.screen_name}', '#{retweeted_status_user.id}');">@#{retweeted_status_user.screen_name}</a> 
+					    <?js } ?><?js if(tType=='comments_timeline' && !is_rt_rt){ ?> 
+					        #{_u.i18n('comm_comment_to_before')} 
+					    <?js }else{ ?> 
+					        #{_u.i18n('comm_repost_to_before')}
+					    <?js } ?>
 						<span class="showtip">
 							<a target="_blank" 
 								href="javascript:getUserTimeline('#{tweet.retweeted_status.user.screen_name}', '#{tweet.retweeted_status.user.id}');" 
@@ -349,7 +357,7 @@
 							<a href="javascript:void(0);" onclick="javascript:translate(this);" title="#{_u.i18n('btn_translate_title')}">#{_u.i18n("btn_translate")}</a>
 						</span>
 					</div>
-					<div class="tweet_text">#{processMsg(account, tweet.retweeted_status.text)} #{btn.rtShowMapBtn}
+					<div class="tweet_text">#{processMsg(account, tweet.retweeted_status)} #{btn.rtShowMapBtn}
 						<?js if(tweet.crosspostSource) { ?>
 						<a target="_blank" href="#{tweet.crosspostSource}" title="#{_u.i18n('comm_show_original')}">#{_u.i18n('comm_show_original')}</a>
 						<?js } ?>
@@ -372,7 +380,7 @@
 					</div>
 					<?js } ?>
 					<div class="comments">
-						<p style="text-align:right;"><a href="javascript:void(0);" onclick="showComments(this, '#{tweet.retweeted_status.id}');">#{_u.i18n("btn_hide_comments")}</a></p>
+						<p style="text-align:right;"><a href="javascript:void(0);" class="comment_hide_list_btn" onclick="showComments(this, '#{tweet.retweeted_status.id}');">#{_u.i18n("btn_hide_comments")}</a></p>
 						<ul class="comment_list"></ul>
 						<div class="comment_paging" page="1">
 							<a class="pre_page" href="javascript:void(0);" onclick="commentPage(this, '#{tweet.retweeted_status.id}', true);" style="display:none;">#{_u.i18n("btn_prev_page")}</a>
@@ -446,6 +454,13 @@
 				<?js if(user.description){ ?>
 				<div class="des">#{_u.i18n("comm_description")}：#{user.description}</div>
 				<?js } ?>
+				<?js if(user.tags){ ?>
+                <div class="tags">#{_u.i18n("comm_tags")}：
+	                <?js for(var i=0;i<user.tags.length;i++){ var tag = user.tags[i]; ?>
+	                <a target="_blank" href="http://t.qq.com/search/tag.php?k=#{tag.name}">#{tag.name}</a>
+	                <?js } ?>
+                </div>
+                <?js } ?>
 			</div>
 		</textarea>
 		<!-- 粉丝模板 -->

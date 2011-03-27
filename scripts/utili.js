@@ -1210,8 +1210,8 @@ var ShortenUrl = {
 		var url = 'http://s8.hk/api/e?f=json&u=' + shorturl;
 		$.ajax({
 			url: url,
+			dataType: 'json',
 			success: function(data, status, xhr) {
-				data = JSON.parse(data);
 				callback.call(context, data);
 			}, 
 			error: function(xhr, status) {
@@ -1245,12 +1245,9 @@ var ShortenUrl = {
 			var id = m[2];
 			$.ajax({
 				url: 'http://t.sina.com.cn/mblog/sinaurl_info.php?url=' + id,
+				dataType: 'json',
 				success: function(data, status, xhr) {
-					try {
-						data = JSON.parse(data).data[id];
-					}catch(e) {
-//						console.log(e);
-					}
+					data = data.data[id];
 					callback.call(context, data);
 				}, 
 				error: function(xhr, status) {

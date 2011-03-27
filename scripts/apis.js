@@ -30,6 +30,7 @@ var sinaApi = {
         support_do_comment: true, // 判断是否支持发送评论
         support_repost_comment: true, // 判断是否支持转发同时发评论
         support_repost_comment_to_root: false, // 判断是否支持转发同时给原文作者发评论
+        support_repost_timeline: true, // 支持查看转发列表
 		support_upload: true, // 是否支持上传图片
 		support_repost: true, // 是否支持新浪形式转载
 		repost_pre: '转:', // 转发前缀
@@ -156,28 +157,26 @@ var sinaApi = {
     /**
      * 处理内容
      */
-    processMsg: function (str, notEncode) {
-        if(!str){ return ''; }
-        if(!this.config.need_processMsg) { // 无需处理
-        	return str;
+    processMsg: function (str_or_status, notEncode) {
+    	var str = str_or_status && str_or_status.text || str_or_status;
+        if(str && this.config.need_processMsg){
+	        if(!notEncode){
+	            str = HTMLEnCode(str);
+	        }
+	        var re = new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&\\-/#=;:!\\+~]+)(?:\\](.+)\\[/url\\]|)', 'ig');
+	        str = str.replace(re, this._replaceUrl);
+	        
+	        str = this.processAt(str, str_or_status); //@***
+	
+	        str = this.processEmotional(str);
+	
+	        str = this.processSearch(str);
+	
+	        str = str.replace( /([\uE001-\uE537])/gi, this.getIphoneEmoji);
         }
-        if(!notEncode){
-            str = HTMLEnCode(str);
-        }
-
-        var re = new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&\\-/#=;:!\\+~]+)(?:\\](.+)\\[/url\\]|)', 'ig');
-        str = str.replace(re, this._replaceUrl);
-        
-        str = this.processAt(str); //@***
-
-        str = this.processEmotional(str);
-
-        str = this.processSearch(str);
-
-        str = str.replace( /([\uE001-\uE537])/gi, this.getIphoneEmoji );
-        
-        return str;
+        return str || '';
     },
+    
     getIphoneEmoji: function(str){
         return "<span class=\"iphoneEmoji "+ str.charCodeAt(0).toString(16).toUpperCase()+"\"></span>";
     },
@@ -462,6 +461,17 @@ var sinaApi = {
             data: data
         };
         this._sendRequest(params, callbackFn);
+	},
+	
+	// id, count, page
+    repost_timeline: function(data, callback, context){
+        var params = {
+            url: this.config.repost_timeline,
+            type: 'get',
+            play_load: 'status',
+            data: data
+        };
+        this._sendRequest(params, callback, context);
 	},
 
 	// since_id, max_id, count, page 
@@ -1221,6 +1231,7 @@ function make_base_auth_url(domain, user, password) {
 
 // 腾讯微博api
 var TQQAPI = $.extend({}, sinaApi);
+TQQAPI._user_timeline = TQQAPI.user_timeline;
 
 $.extend(TQQAPI, {
 	config: $.extend({}, sinaApi.config, {
@@ -1237,15 +1248,17 @@ $.extend(TQQAPI, {
         oauth_access_token:   '/cgi-bin/access_token',
         // 竟然是通过get传递
         oauth_params_by_get: true,
-        support_comment: false,
+        support_comment: false, // 不支持comment_timeline
         support_do_comment: true,
+        support_repost_timeline: true, // 支持查看转发列表
         support_favorites_max_id: true,
         reply_dont_need_at_screen_name: true, // @回复无需填充@screen_name 
         rt_at_name: true, // RT的@name而不是@screen_name
         repost_delimiter: ' || ', //转发时的分隔符
         support_counts: false, // 只有rt_count这个，不过貌似有问题，总是404。暂时隐藏
         friends_timeline: '/statuses/home_timeline',
-
+        repost_timeline: 	  '/t/re_list_repost',
+        
         mentions:             '/statuses/mentions_timeline',
         followers:            '/friends/user_fanslist',
         friends:              '/friends/user_idollist',
@@ -1307,9 +1320,28 @@ $.extend(TQQAPI, {
 	    });
     },
     
-    processAt: function (str) { //@***
-        str = str.replace(/([^#])?@([\w\-\_]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ this.config.user_home_url +'$2" title="左键查看微薄，右键打开主页">@$2</a>');
-//        str = str.replace(/([^#])@([\w\-\_]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ this.config.user_home_url +'$2" title="左键查看微薄，右键打开主页">@$2</a>');
+    AT_USER_RE: /([^#])?@([\w\-\_]+)/g,
+    ONLY_AT_USER_RE: /@([\w\-\_]+)/g,
+    
+    processAt: function (str, status) { //@***
+    	var tpl = '{{m1}}<a target="_blank" href="javascript:getUserTimeline(\'{{m2}}\');" rhref="'
+    		+ this.config.user_home_url +'{{m2}}" title="' 
+    		+ _u.i18n("btn_show_user_title") + '">{{username}}</a>';
+    	str = str.replace(this.AT_USER_RE, function(match, $1, $2) {
+        	var users = status.users || {};
+        	var username = users[$2];
+        	if(username) {
+        		username += '(@' + $2 + ')';
+        	} else {
+        		username = '@' + $2;
+        	}
+        	var data = {
+        		m1: $1 || '',
+        		m2: $2,
+        		username: username
+        	};
+        	return tpl.format(data);
+        });
         return str;
     },
 
@@ -1327,15 +1359,27 @@ $.extend(TQQAPI, {
 		callback();
 	},
 	
-	counts: function(data, callback) {
-		callback();
-	},
+//	counts: function(data, callback) {
+//		callback();
+//	},
 	
 	format_upload_params: function(user, data, pic) {
     	if(data.status){
             data.content = data.status;
             delete data.status;
         }
+    },
+    
+    // 先获取用户信息 user_show
+    user_timeline: function(data, callback) {
+    	var $this = this;
+    	var params = {name: data.id || data.screen_name};
+    	this.user_show(params, function(user_info) {
+    		$this._user_timeline(data, function(results, error) {
+    			results.user = user_info;
+    			callback(results, error);
+    		});
+    	});
     },
 	
 	before_sendRequest: function(args, user) {
@@ -1383,15 +1427,33 @@ $.extend(TQQAPI, {
             	}
                 break;
             case this.config.comments:
+            	// flag:标识0 转播列表，1点评列表 2 点评与转播列表
+            	args.data.flag = 1;
                 args.data.rootid = args.data.id;
 			    delete args.data.id;
+                break;
+            case this.config.repost_timeline:
+            	args.url = args.url.replace('_repost', '');
+            	args.data.flag = 0;
+                args.data.rootid = args.data.id;
+			    delete args.data.id;
+                break;
+            case this.config.reply:
+            	// 使用 回复@xxx:abc 点评实现 reply
+            	args.url = this.config.comment;
+            	args.data.content = '回复@' + args.data.reply_user_id + ':' + args.data.content;
+                args.data.reid = args.data.id;
+			    delete args.data.id;
+			    delete args.data.reply_user_id;
+			    delete args.data.cid;
                 break;
             case this.config.comment:
                 args.data.reid = args.data.id;
 			    delete args.data.id;
                 break;
             case this.config.counts:
-                args.data.flag = 2;
+//            	console.log(args.data);
+//                args.data.flag = 2;
                 break;
             case this.config.repost:
                 args.data.reid = args.data.id;
@@ -1439,12 +1501,14 @@ $.extend(TQQAPI, {
 		data = data.data;
         if(!data){ return data; }
 		var items = data.info || data;
+		delete data.info;
+		var users = data.user || {};
 		if(!$.isArray(items)) {
 			items = data.results || data.users;
 		}
 		if($.isArray(items)) {
-	    	for(var i in items) {
-	    		items[i] = this.format_result_item(items[i], play_load, args);
+	    	for(var i=0; i<items.length; i++) {
+	    		items[i] = this.format_result_item(items[i], play_load, args, users);
 	    	}
 	    	data.items = items;
             if(data.user && !data.user.id){
@@ -1462,12 +1526,12 @@ $.extend(TQQAPI, {
 	    		}
 	    	}
 	    } else {
-	    	data = this.format_result_item(data, play_load, args);
+	    	data = this.format_result_item(data, play_load, args, users);
 	    }
 		return data;
 	},
 
-	format_result_item: function(data, play_load, args) {
+	format_result_item: function(data, play_load, args, users) {
 		if(play_load == 'user' && data && data.name) {
 			var user = {};
 			user.t_url = 'http://t.qq.com/' + data.name;
@@ -1483,9 +1547,18 @@ $.extend(TQQAPI, {
 			user.friends_count = data.idolnum;
 			user.statuses_count = data.tweetnum;
 			user.description = data.introduction;
+			if(data.tag) {
+				user.tags = data.tag;
+			}
 			data = user;
 		} else if(play_load == 'status' || play_load == 'comment' || play_load == 'message') {
+			// type:微博类型 1-原创发表、2-转载、3-私信 4-回复 5-空回 6-提及 7: 点评
 			var status = {};
+//			status.status_type = data.type;
+			if(data.type == 7) {
+				// 腾讯的点评会今日hometimeline，很不给力
+				status.status_type = 'comments_timeline';
+			}
 			status.t_url = 'http://t.qq.com/p/t/' + data.id;
 			status.id = data.id;
 			status.text = data.origtext; //data.text;
@@ -1504,14 +1577,31 @@ $.extend(TQQAPI, {
 					status.in_reply_to_status_id = data.source.id;
 					status.in_reply_to_screen_name = data.source.nick;
 				} else {
-					// 转发
-					status.retweeted_status = this.format_result_item(data.source, 'status', args);
+					status.retweeted_status = 
+						this.format_result_item(data.source, 'status', args, users);
+					// 评论
+					if(play_load == 'comment') {
+						status.status = status.retweeted_status;
+						delete status.retweeted_status;
+					}
 				}
 			}
-			status.repost_count = data.count;
+			status.repost_count = data.count || 0;
+			status.comments_count = data.mcount || 0; // 评论数
 			status.source = data.from;
-			status.user = this.format_result_item(data, 'user', args);
-			data = status;
+			status.user = this.format_result_item(data, 'user', args, users);
+			// 如果有text属性，则替换其中的@xxx 为 中文名(@xxx)
+    		if(status && status.text) {
+    			var matchs = status.text.match(this.ONLY_AT_USER_RE);
+    			if(matchs) {
+    				status.users = {};
+    				for(var j=0; j<matchs.length; j++) {
+    					var name = $.trim(matchs[j]).substring(1);
+    					status.users[name] = users[name];
+    				}
+    			}
+    		}
+    		data = status;
 		} 
 		return data;
 	}
@@ -4106,8 +4196,8 @@ var tapi = {
 		return tapi.api_dispatch(user).translate(text, target, callback);
 	},
 	
-	processMsg: function(user, str, notEncode) {
-		return tapi.api_dispatch(user).processMsg(str, notEncode);
+	processMsg: function(user, str_or_status, not_encode) {
+		return tapi.api_dispatch(user).processMsg(str_or_status, not_encode);
 	},
 
     get_config: function(user) {
@@ -4143,6 +4233,11 @@ var tapi = {
 	// id, count, page
 	comments_timeline: function(data, callbackFn){
 		return this.api_dispatch(data).comments_timeline(data, callbackFn);
+	},
+	
+	// id, count, page, since_id, max_id
+    repost_timeline: function(data, callback, context){
+		return this.api_dispatch(data).repost_timeline(data, callback, context);
 	},
 	
 	// since_id, max_id, count, page 
@@ -4316,10 +4411,8 @@ var VDiskAPI = {
 			time: new Date().getTime()
 		};
 		var basestring = 'account={{account}}&appkey={{appkey}}&password={{password}}&time={{time}}'.format(params);
-		console.log(basestring)
 //		params.signature = this._sha256('scramble=1122&account=example@gmail.com&password=123456&appkey=12345678');
 		params.signature = this._sha256(basestring);
-		console.log(params);
 		$.post('http://openapi.vdisk.me/?m=auth&a=get_token', params, function(data){
 			console.log(data);
 		});
