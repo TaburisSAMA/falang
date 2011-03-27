@@ -158,7 +158,10 @@ var sinaApi = {
      * 处理内容
      */
     processMsg: function (str_or_status, notEncode) {
-    	var str = str_or_status && str_or_status.text || str_or_status;
+    	var str = str_or_status;
+    	if(str_or_status.text !== undefined) {
+    		str = str_or_status.text;
+    	}
         if(str && this.config.need_processMsg){
 	        if(!notEncode){
 	            str = HTMLEnCode(str);

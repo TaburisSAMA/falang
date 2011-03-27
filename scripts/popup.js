@@ -1918,7 +1918,7 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
     }
 	// 光标在前
 	$t.val(v).focus();
-    if(v== _u.i18n("comm_repost_default")){t.select();}
+    if(v== _u.i18n("comm_repost_default")){$t.select();}
     countReplyText();
 };
 
