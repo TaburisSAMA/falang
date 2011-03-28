@@ -1295,7 +1295,7 @@ $.extend(TQQAPI, {
         
         // 搜索
         search:               '/search/t',
-
+        user_search:	      '/search/user',
         verify_credentials: '/user/info',
         
         gender_map: {0:'n', 1:'m', 2:'f'},
@@ -1478,6 +1478,7 @@ $.extend(TQQAPI, {
            		delete args.data.user_id;
            		break;
            	case this.config.search:
+           	case this.config.user_search:
 	            args.data.keyword = args.data.q;
 	            args.data.pagesize = args.data.reqnum;
 	            delete args.data.reqnum;
@@ -1777,6 +1778,7 @@ $.extend(DiguAPI, {
         comment:              '/statuses/update',
         reply:                '/statuses/update',
         search: '/search_statuses',
+        user_search: '/search_user',
         
         gender_map: {0:'n', 1:'m', 2:'f'},
 
@@ -4223,12 +4225,16 @@ var tapi = {
 		return T_APIS[(data.user ? data.user.blogType : data.blogType) || 'tsina'];
 	},
 	
-	search: function(data, callback) {
-		return tapi.api_dispatch(data).search(data, callback);
+	search: function(data, callback, context) {
+		return tapi.api_dispatch(data).search(data, callback, context);
 	},
 	
-	translate: function(user, text, target, callback) {
-		return tapi.api_dispatch(user).translate(text, target, callback);
+	user_search: function(data, callback, context) {
+		return tapi.api_dispatch(data).user_search(data, callback, context);
+	},
+	
+	translate: function(user, text, target, callback, context) {
+		return tapi.api_dispatch(user).translate(text, target, callback, context);
 	},
 	
 	processMsg: function(user, str_or_status, not_encode) {
@@ -4239,12 +4245,12 @@ var tapi = {
 		return this.api_dispatch(user).config;
 	},
 	
-	get_authorization_url: function(user, callbackFn) {
-		return this.api_dispatch(user).get_authorization_url(user, callbackFn);
+	get_authorization_url: function(user, callback, context) {
+		return this.api_dispatch(user).get_authorization_url(user, callback, context);
 	},
 	
-	get_access_token: function(user, callbackFn) {
-		return this.api_dispatch(user).get_access_token(user, callbackFn);
+	get_access_token: function(user, callback, context) {
+		return this.api_dispatch(user).get_access_token(user, callback, context);
 	},
 	
 	verify_credentials: function(user, callbackFn, data){

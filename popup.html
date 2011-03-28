@@ -85,15 +85,25 @@
 				</span>
 				<span class="top_btns">
 					<span>
-						<a id="btnShowSearch" href="javascript:" class="search" onclick="Search.toggleInput();" title="点击开始搜索"><img src="images/search.png" /><script>_u.wi('comm_search')</script></a>
+						<a id="btnShowSearch" href="javascript:" class="search" onclick="Search.toggleInput(this);" title="_u.wi('btn_search_title')"><img src="images/search.png" /><script>_u.wi('comm_search')</script></a>
 						<script>_u.wia('#btnShowSearch','title','btn_search_title');</script>
-						<span id="searchWrap">
-							<input type="text" id="txtSearch" />
-							<a id="btnSearch" href="javascript:" class="btnSearch" onclick="Search.search();" title="点击搜索"><img src="images/search.png" /></a>
+						<span class="searchWrap">
+							<input type="text" class="txtSearch" />
+							<a id="btnSearch" href="javascript:" class="btnSearch" onclick="Search.search();"><img src="images/search.png" /></a>
 							<img class="arrow" src="images/layerArrow.gif"/>
 							<script>_u.wia('#btnSearch','title','btn_search_title');</script>
 						</span>
 					</span>
+					<span>
+                        <a id="btnShowSearchUser" href="javascript:" class="search search_user" onclick="Search.toggleInput(this);" title="_u.wi('btn_search_title')"><img src="images/face.gif" /><script>_u.wi('comm_search_user')</script></a>
+                        <script>_u.wia('#btnShowSearchUser','title','btn_search_user_title');</script>
+                        <span class="searchWrap searchUserWrap">
+                            <input type="text" class="txtSearch" />
+                            <a id="btnSearchUser" href="javascript:" class="btnSearch" onclick="Search.search();"><img src="images/search.png" /></a>
+                            <img class="arrow" src="images/layerArrow.gif"/>
+                            <script>_u.wia('#btnSearchUser','title','btn_search_user_title');</script>
+                        </span>
+                    </span>
 					<a id="btnQuickUpImg" href="javascript:" class="quickUpImg" onclick="openUploadImage();" title="点击上传图片"><img src="images/image.gif" /><script>_u.wi('comm_pic')</script></a>
 					<script>_u.wia('#btnQuickUpImg','title','btn_pic_title');</script>
 				</span>

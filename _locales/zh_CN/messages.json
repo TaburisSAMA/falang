@@ -237,6 +237,10 @@
 		"message": "搜索",
 		"description": "搜索"
 	},
+	"comm_search_user": {
+        "message": "搜人",
+        "description": "搜人"
+    },
 	"comm_setting": {
 		"message": "设置",
 		"description": "设置"
@@ -546,6 +550,10 @@
 	    "message": "点击开始搜索",
 		"description": "点击开始搜索"
 	},
+	"btn_search_user_title": {
+        "message": "点击开始搜人",
+        "description": "点击开始搜人"
+    },
 	"btn_share_title": {
 	    "message": "分享你正在看的网页",
 		"description": "分享你正在看的网页"

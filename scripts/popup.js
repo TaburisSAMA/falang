@@ -369,17 +369,27 @@ function initIamDoing(){
 
 //搜索
 var Search = {
-    toggleInput: function(){
-        $("#searchWrap").toggle();
-        $("#txtSearch").focus().keypress(function(event) {
+	current_search: 'search', // 默认当前搜索类型 search, search_user
+	current_keyword: '',
+    toggleInput: function(ele){
+		$('.searchWrap').hide();
+		var $search_wrap = $(ele).nextAll('.searchWrap');
+		Search.current_search = $search_wrap.hasClass('searchUserWrap') ? 'search_user' : 'search';
+		$search_wrap.toggle();
+		var $text = $search_wrap.find(".txtSearch").focus().keypress(function(event) {
+			Search.current_keyword = $(this).val();
         	if(event.keyCode == '13') {
         		Search.search();
         	}
         });
+		Search.current_keyword = $text.val();
     },
     search: function(read_more) {
     	var c_user = getUser();
-    	var q = $("#txtSearch").val();
+    	var q = $.trim(Search.current_keyword);
+    	if(!q) {
+    		return;
+    	}
     	// http://www.google.com/search?q=twitter&source=fawave&tbs=mbl:1
     	if(c_user.blogType == 'twitter') {
     		chrome.tabs.create({url: 'http://www.google.com/search?q=' + q + '&source=fawave&tbs=mbl:1', selected: false});
@@ -397,7 +407,6 @@ var Search = {
 	    if(read_more) {
 	    	// 滚动的话，获取上次的参数
 	        max_id = $tab.attr('max_id');
-	        q = $tab.attr('q');
 	        cursor = $tab.attr('cursor');
 	        page = Number($tab.attr('page') || 1);
 	    }  else {
@@ -419,11 +428,17 @@ var Search = {
 		    }
 	    }
 	    showLoading();
-	    var m = 'user_timeline';
-	    hideReadMore(m);
-	    tapi.search(params, function(data, textStatus) {
+	    var timeline_type = 'user_timeline';
+	    var method = 'search';
+	    var data_type = 'status';
+	    if(Search.current_search == 'search_user') {
+	    	method = 'user_search';
+	    	data_type = 'user';
+	    }
+	    hideReadMore(timeline_type);
+	    tapi[method](params, function(data, textStatus) {
 	    	hideLoading();
-            hideReadMoreLoading(m);
+            hideReadMoreLoading(timeline_type);
 	    	// 如果用户已经切换，则不处理
 	    	var now_user = getUser();
 	    	if(now_user.uniqueKey != c_user.uniqueKey) {
@@ -438,7 +453,8 @@ var Search = {
 	    	}
 	        if(statuses.length > 0){
 	        	var c_tb = getCurrentTab();
-	        	if(c_tb != "#user_timeline_timeline") {
+	        	var want_tab = "#" + timeline_type + "_timeline";
+	        	if(c_tb != want_tab) {
 	        		//添加当前激活的状态
 	                $tab.siblings().removeClass('active').end().addClass('active');
 	                //切换tab前先保护滚动条位置
@@ -447,22 +463,22 @@ var Search = {
 	                //切换tab
 	                $('.list_p').hide();
 	                
-	                $("#user_timeline_timeline").show();
+	                $(want_tab).show();
 	                $ul.html('');
 	
-	                window.currentTab = "#user_timeline_timeline";
+	                window.currentTab = want_tab;
 	        	}
-	            statuses = addPageMsgs(statuses, m, true);
+	            statuses = addPageMsgs(statuses, timeline_type, true, data_type);
 	            // 保存数据，用于翻页
-	            $tab.attr('q', q);
+//	            $tab.attr('q', q);
 	            $tab.attr('page', page + 1);
 	        }
-	        if(statuses.length > 0) {
+	        if(statuses.length >= PAGE_SIZE) {
             	max_id = data.max_id || String(statuses[statuses.length - 1].id);
             	$tab.attr('max_id', max_id);
-            	showReadMore(m);
+            	showReadMore(timeline_type);
             } else {
-            	hideReadMore(m, true); //没有分页了
+            	hideReadMore(timeline_type, true); //没有分页了
             }
 	        checkShowGototop();
 	    });
@@ -1506,10 +1522,11 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
 };
 
 // 添加分页数据，并且自动删除重复的数据，返回删除重复的数据集
-function addPageMsgs(msgs, t, append){
+function addPageMsgs(msgs, t, append, data_type){
 	if(!msgs || msgs.length == 0){
 		return [];
 	}
+	data_type = data_type || 'status';
     var ids = [];
     var _ul = $("#" + t + "_timeline ul.list"), htmls = [];
     var method = append ? 'append' : 'prepend';
@@ -1519,7 +1536,7 @@ function addPageMsgs(msgs, t, append){
     var result = filterDatasByMaxId(msgs, max_id, append);
     msgs = result.news;
 
-    htmls = buildStatusHtml(msgs, t);
+    htmls = data_type == 'status' ? buildStatusHtml(msgs, t) : buildUsersHtml(msgs, t);
     _ul[method](htmls.join(''));
     // 处理缩址
     ShortenUrl.expandAll();
