@@ -376,7 +376,7 @@ var Search = {
 		var $search_wrap = $(ele).nextAll('.searchWrap');
 		Search.current_search = $search_wrap.hasClass('searchUserWrap') ? 'search_user' : 'search';
 		$search_wrap.toggle();
-		var $text = $search_wrap.find(".txtSearch").focus().keypress(function(event) {
+		var $text = $search_wrap.find(".txtSearch").focus().keyup(function(event) {
 			Search.current_keyword = $(this).val();
         	if(event.keyCode == '13') {
         		Search.search();
@@ -500,7 +500,8 @@ function checkSupportedTabs(user){
     	                    '#tl_tabs .tab-direct_messages'],
     	support_mentions: ['#tl_tabs .tab-mentions, #mentions_timeline',
     	                    '#tl_tabs .tab-mentions'],
-    	support_search: ['a.search, #searchWrap', 'a.search']
+    	support_search: ['.search_span', '.search_span'],
+    	support_user_search: ['.user_search_span', '.user_search_span']
     };
     for(var key in checks) {
     	if(!config[key]){

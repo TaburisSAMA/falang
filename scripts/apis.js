@@ -47,6 +47,7 @@ var sinaApi = {
 		support_mentions: true, 
 		support_friendships_create: true,
 		support_search: true,
+		support_user_search: true, // 支持搜人
 		support_search_max_id: true,
 		support_favorites_max_id: false, // 收藏分页使用max_id
 		
@@ -2024,7 +2025,7 @@ $.extend(ZuosaAPI, {
 	    
 	    upload: '/statuses/update',
 	    repost: '/statuses/update',
-	    search: '/search'
+	    search: '/search' // 为何搜人的结果和搜索的一样？！
 	}),
 	
 	// 无需urlencode
@@ -2089,6 +2090,8 @@ $.extend(ZuosaAPI, {
 			// id => user
 			args.data.user = args.data.id;
 			delete args.data.id;
+		} else if(args.url == this.config.search || args.url == this.config.user_search) {
+			args.data.ec = 'utf-8';
 		}
     },
 	
@@ -2139,6 +2142,11 @@ $.extend(ZuosaAPI, {
 			data.t_url = tpl + data.id;
 			this.format_result_item(data.user, 'user', args);
 		} else if(play_load == 'user' && data && data.id) {
+			if(data.user && data.user.id) {
+//				var status = data;
+//				delete status.user;
+				data = data.user;
+			}
 			data.t_url = 'http://zuosa.com/' + (data.screen_name || data.name);
 			if(data.profile_image_url) {
 				data.profile_image_url = data.profile_image_url.replace('/normal/', '/middle/');
@@ -2182,6 +2190,7 @@ $.extend(LeiHouAPI, {
 		support_favorites: false,
 		support_do_favorite: false,
 		support_destroy_msg: false,
+		support_user_search: false,
 	
 	    upload: '/statuses/update',
 	    repost: '/statuses/update',
@@ -2235,10 +2244,10 @@ $.extend(LeiHouAPI, {
 	format_result: function(data, play_load, args) {
 		if($.isArray(data)) {
 	    	for(var i in data) {
-	    		data[i] = this.format_result_item(data[i], play_load);
+	    		data[i] = this.format_result_item(data[i], play_load, args);
 	    	}
 	    } else {
-	    	data = this.format_result_item(data, play_load);
+	    	data = this.format_result_item(data, play_load, args);
 	    }
 		// 若是follwers api，则需要封装成cursor接口
 		// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
@@ -2279,6 +2288,9 @@ $.extend(LeiHouAPI, {
 			this.format_result_item(data.user, 'user', args);
 			data.t_url = tpl.format(data);
 		} else if(play_load == 'user' && data && data.id) {
+			if(data.user) {
+				data = data.user;
+			}
 			data.t_url = 'http://leihou.com/' + (data.screen_name || data.id);
 			if(data.profile_image_url) {
 				// 'profile_image_url': u'http://a1.leihou.com/avatar/5c/0c/13879_0_m.png'
@@ -2567,6 +2579,7 @@ $.extend(StatusNetAPI, {
 	    support_repost: false,
 	    support_upload: false,
 	    support_repost_timeline: false,
+	    support_user_search: false, //暂时屏蔽
 	    oauth_callback: 'oob',
 	    search: '/search_statuses',
 	    repost: '/statuses/update',
@@ -2615,6 +2628,7 @@ $.extend(FanfouAPI, {
 	    upload: '/photos/upload',
 	    search: '/search/public_timeline',
 	    favorites_create: '/favorites/create/{{id}}',
+	    support_user_search: false,
 
         gender_map:{"男":'m', '女':'f'}
 	}),
@@ -3065,6 +3079,7 @@ $.extend(RenjianAPI, {
 		support_repost: true,
 		support_repost_timeline: false,
 	    support_search: false,
+	    support_user_search: false,
 		favorites: '/statuses/likes',
         favorites_create: '/statuses/like/{{id}}',
         favorites_destroy: '/statuses/unlike/{{id}}',
@@ -3276,6 +3291,7 @@ $.extend(BuzzAPI, {
         comment: '/activities/{{user_id}}/@self/{{id}}/@comments?key={{key}}&alt={{alt}}',
         reply: '/activities/{{user_id}}/@self/{{id}}/@comments?key={{key}}&alt={{alt}}',
         search: '/activities/search',
+        user_search: '/activities/search/@people',
 		verify_credentials: '/people/@me/@self'
 	}),
 	
@@ -3515,6 +3531,7 @@ $.extend(DoubanAPI, {
         comment: '/miniblog/{{id}}/comments_post',
         reply: '/miniblog/{{id}}/comments_post',
         comments: '/miniblog/{{id}}/comments',
+        user_search: '/people',
 		verify_credentials: '/people/%40me'
 	}),
 	
@@ -3723,7 +3740,7 @@ $.extend(FacebookAPI, {
         support_do_comment: true,
         support_mentions: false,
         support_favorites: false,
-        support_search: false,
+        
         
         direct_messages: '/me/inbox',
         verify_credentials: '/me',
@@ -3868,6 +3885,13 @@ $.extend(FacebookAPI, {
 			args.data.message = args.data.text;
             args.data.subject = args.data.text.slice(0, 80);
 			delete args.data.text;
+		} else if(args.url == this.config.user_search) {
+			// https://graph.facebook.com/search?q=mark&type=user
+			args.url = '/search';
+			args.data.type = 'user';
+		} else if(args.url == this.config.search) {
+			args.url = '/search';
+			args.data.type = 'post';
 		}
 	},
 	
@@ -3970,6 +3994,7 @@ $.extend(PlurkAPI, {
         support_repost: false,
         support_repost_timeline: false,
         support_mentions: false,
+        support_user_search: false, // 暂时屏蔽
         support_cursor_only: true,  // 只支持游标方式翻页
         repost_pre: 'RT', // 转发前缀
         verify_credentials: '/Users/login',
