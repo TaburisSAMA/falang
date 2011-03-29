@@ -447,7 +447,7 @@ function _sendFawaveMsgWrap(msg, user, stat, selLi){
     chrome.extension.sendRequest({method:'publicQuickSendMsg', user:user, sendMsg:msg}, function(response){
         stat.sendedCount++;
         var msg = response.msg;
-        if(msg && msg.id){
+        if( msg === true || (msg && msg.id) ){
             stat.successCount++;
             $("#fawave_accountsForSend li[uniquekey=" + user.uniqueKey +"]").removeClass('sel');
         }else if(msg && msg.error){
@@ -467,7 +467,7 @@ function _sendFawaveMsgWrap(msg, user, stat, selLi){
                 chrome.extension.sendRequest({method:'notifyCheckNewMsg'}, function(response){});
                 
                 if(stat.userCount > 1){ //多个用户的
-                    showFawaveSendMsg(_u.i18n("msg_send_complete").format({successCount:successCount, errorCount:(stat.userCount - stat.successCount)}));
+                    showFawaveSendMsg(_u.i18n("msg_send_complete").format({successCount:stat.successCount, errorCount:(stat.userCount - stat.successCount)}));
                 }
             }
         }
