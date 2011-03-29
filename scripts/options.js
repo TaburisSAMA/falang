@@ -65,6 +65,8 @@ $(function(){
     showDndAccountList(true);
 
     init();
+    
+    initExportImport();
 
     $("#refresh-account").click(function(){
         refreshAccountInfo();
@@ -556,8 +558,45 @@ function initJtip(){
     });
 };
 
+//导出、导入设置
+function initExportImport(){
+    //popupBox.showHtmlBox
+    $("#showExportSettings").click(function(){
+        var out = {UserList:getUserList('all'), Settings:Settings.get()};
+        popupBox.showHtmlBox(_u.i18n('sett_export'), '<textarea style="width:350px;height:350px;" onmouseover="this.select()" readonly>' + JSON.stringify(out) + '</textarea>');
+    });
+    
+    $("#showImportSettings").click(function(){
+        popupBox.showHtmlBox(_u.i18n('sett_import'), 
+            '<textarea id="txtImportSettings" style="width:350px;height:350px;"></textarea>'
+           +'<br/><button onclick="importSettings();">' + _u.i18n('sett_import') + '</button>' );
+    });
+};
+function importSettings(){
+    var s = $("#txtImportSettings").val();
+    try{
+        s = JSON.parse(s);
+    }catch(err){
+        _showMsg('Import Error: ' + err);
+        s = null;
+    }
+    if(s){
+        if(s.UserList){
+            var ulOld = getUserList('all');
+            var ulNew = $.extend(ulOld, s.UserList);
+            saveUserList(ulNew);
+        }
+        if(s.Settings){
+            var oldSet = Settings.get();
+            oldSet = $.extend(oldSet, s.Settings);
+            Settings.save();
+        }
+        document.location.reload();
+    }
+}
+
 //初始化快速发送热键
-var TEMP_SET_KEYS = [];
+var TEMPSET_KEYS = [];
 function initQuickSendHotKey(){
     var keys = Settings.get().quickSendHotKey;
     keys = keys.split(',');

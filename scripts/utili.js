@@ -1145,6 +1145,12 @@ var popupBox = {
         popupBox.box.find('.pb_title .t, .pb_footer .t').html('<a target="_blank" href="' + url +'">'+ _u.i18n("comm_show_original_vedio") +'</a>');
         popupBox.box.find('.pb_content').html(playcode);
         popupBox.show();
+    },
+    showHtmlBox: function(title, content){
+        this.checkBox();
+        popupBox.box.find('.pb_title .t, .pb_footer .t').html(title);
+        popupBox.box.find('.pb_content').html(content);
+        popupBox.show();
     }
 };
 

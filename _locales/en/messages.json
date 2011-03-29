@@ -911,7 +911,7 @@
 		"message": "<b>Available parameters and description: </b><br/>When you use the \"I'm watching\" feature, will generate the final content based on this template. <br/>template parameter must be wrapped up by \"{{}}\", the available parameters are: <br/><p><b>{{url}}</b>: You are currently browsing the Web url</p><p><b>{{title}}</b>: You are currently browsing the page title</p><img src = \"/images/setting/looking.png\" />",
 		"description": "分享网页的模板的设置说明"
 	},
-
+	
 	"sett_itemName_auto_short_url": {
 		"message": "Auto Shorten The Url: ",
 		"description": "是否自动缩短URL"
@@ -927,6 +927,15 @@
 	"sett_des_shorten_url_service": {
 		"message": "URL shortening service",
 		"description": "缩址服务"
+	},
+	
+	"sett_export": {
+		"message": "Export Settings",
+		"description": "导出设置"
+	},
+	"sett_import": {
+		"message": "Import Settings",
+		"description": "导入设置"
 	},
 
 	//关于

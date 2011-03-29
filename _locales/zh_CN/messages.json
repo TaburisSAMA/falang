@@ -944,6 +944,15 @@
 		"message": "缩址服务",
 		"description": "缩址服务"
 	},
+	
+	"sett_export": {
+		"message": "导出设置",
+		"description": "导出设置"
+	},
+	"sett_import": {
+		"message": "导入设置",
+		"description": "导入设置"
+	},
 
 	//关于
 	"sett_title_author": {
