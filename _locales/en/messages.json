@@ -514,6 +514,10 @@
 	    "message": "Translate this tweet",
 		"description": "翻译此微博"
 	},
+	"btn_read_later_title": {
+        "message": "Read Later",
+        "description": "稍后再读 Read Later"
+    },
 	"btn_emotional_title": {
 	    "message": "Add emotion",
 		"description": "点击添加表情"
@@ -928,6 +932,12 @@
 		"message": "URL shortening service",
 		"description": "缩址服务"
 	},
+	
+	// instapaper
+    "sett_itemName_instapaper": {
+        "message": "Instapaper Account：",
+        "description": "Instapaper 帐号"
+    },
 	
 	"sett_export": {
 		"message": "Export Settings",

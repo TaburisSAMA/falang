@@ -4459,3 +4459,42 @@ var VDiskAPI = {
 		});
 	}
 };
+
+/**
+ * http://www.instapaper.com/api/simple
+ * 
+ * @type Object
+ */
+var Instapaper = {
+	
+	request: function(user, url, data, callback, context){
+		var headers = {Authorization: make_base_auth_header(user.username, user.password)};
+		$.ajax({
+			url: url,
+			data: data,
+			timeout: 60000,
+			type: 'post',
+			beforeSend: function(req) {
+		    	for(var k in headers) {
+		    		req.setRequestHeader(k, headers[k]);
+	    		}
+	        },
+			success: function(data, text_status, xhr){
+	        	callback.call(context, text_status == 'success', text_status, xhr);
+			},
+			error: function(xhr, text_status, err){
+				callback.call(context, false, text_status, xhr);
+			}
+		});
+	},
+	
+	authenticate: function(user, callback, context) {
+		var api = 'https://www.instapaper.com/api/authenticate';
+		this.request(user, api, {}, callback, context);
+	},
+	
+	add: function(user, data, callback, context){
+		var api = 'https://www.instapaper.com/api/add';
+		this.request(user, api, data, callback, context);
+	}
+};

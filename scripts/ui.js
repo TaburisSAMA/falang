@@ -147,7 +147,7 @@ function buildStatusHtml(statuses, t, c_user){
         default:
             break;
 	}
- 	
+	var support_instapaper = Settings.get().instapaper_user != null;
     for(var i in statuses) {
     	var status = statuses[i];
     	status.repost_count = status.repost_count === undefined ? '-' : status.repost_count;
@@ -246,6 +246,7 @@ function buildStatusHtml(statuses, t, c_user){
             tweet: status,
             is_rt_rt: false,
             support_follow: c_user.blogType != 'douban',
+            support_instapaper: support_instapaper,
             btn: buttons
         };
         try {

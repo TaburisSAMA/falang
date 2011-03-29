@@ -49,8 +49,9 @@ function donateRoll(){
         			var _h=_field.width();//取得每次滚动高度(多行滚动情况下,此变量不可置于开始处,否则会有间隔时长延时)
         			_field.animate({marginLeft:-_h+'px'},600,function(){//通过取负margin值,隐藏第一行
         				_field.css('marginLeft','').appendTo(_wrap);//隐藏后,将该行的margin值置零,并插入到最后,实现无缝滚动
-        			})
-        		},_interval)//滚动间隔时间取决于_interval
+        			});
+        		},_interval);
+        		//滚动间隔时间取决于_interval
         	}).trigger('mouseleave');//函数载入时,模拟执行mouseleave,即自动滚动
         }
     });
@@ -171,6 +172,47 @@ $(function(){
     } else {
     	$('#enableImageService').removeAttr('checked');
     }
+    
+    // 设在instapaper 帐号
+    var settings = Settings.get();
+    if(settings.instapaper_user) {
+    	var instapaper_user = settings.instapaper_user;
+    	$('#instapaper_username').val(instapaper_user.username);
+    	$('#instapaper_password').val(instapaper_user.password);
+    	$('#delete_instapaper_account_btn').show();
+    }
+    $('#set_instapaper_account_btn').click(function(){
+    	var username = $.trim($('#instapaper_username').val());
+    	if(!username) {
+    		$('#instapaper_username').focus().select();
+    		return;
+    	}
+    	var password = $('#instapaper_password').val();
+    	if(!password) {
+    		$('#instapaper_password').focus();
+    		return;
+    	}
+    	var user = {username: username, password: password};
+    	Instapaper.authenticate(user, function(success){
+    		if(success) {
+    			var settings = Settings.get();
+    			settings.instapaper_user = user;
+    			Settings.save();
+    			_showMsg(_u.i18n("msg_save_success"));
+    			$('#delete_instapaper_account_btn').show();
+    		} else {
+    			_showMsg(_u.i18n("msg_wrong_name_or_pwd"));
+    		}
+    	});
+    });
+    $('#delete_instapaper_account_btn').click(function(){
+    	var settings = Settings.get();
+    	settings.instapaper_user = null;
+		Settings.save();
+		$('#instapaper_username').val('');
+    	$('#instapaper_password').val('');
+		$(this).hide();
+    });
 });
 
 //统计全局的刷新间隔设置产生的请求次数

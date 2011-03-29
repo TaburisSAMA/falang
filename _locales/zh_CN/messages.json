@@ -522,6 +522,10 @@
 	    "message": "翻译此微博",
 		"description": "翻译此微博"
 	},
+	"btn_read_later_title": {
+        "message": "稍后再读 Read Later",
+        "description": "稍后再读 Read Later"
+    },
 	"btn_emotional_title": {
 	    "message": "点击添加表情",
 		"description": "点击添加表情"
@@ -944,6 +948,12 @@
 		"message": "缩址服务",
 		"description": "缩址服务"
 	},
+	
+	// instapaper
+	"sett_itemName_instapaper": {
+        "message": "Instapaper 帐号：",
+        "description": "Instapaper 帐号"
+    },
 	
 	"sett_export": {
 		"message": "导出设置",

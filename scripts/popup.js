@@ -1763,14 +1763,14 @@ function sendRepost(msg, repostTweetId, notSendMord){
 //    }
 };
 
-function sendComment(msg, commentTweetId, notSendMord){
+function sendComment(msg, comment_id, notSendMord){
     var btn, txt, cid, data, user_id;
     btn = $("#replySubmit");
     txt = $("#replyTextarea");
     cid = $('#commentCommentId').val();
     user_id = $('#commentUserId').val();
-    commentTweetId = commentTweetId || $('#commentTweetId').val();
-    data = {comment: msg, id: commentTweetId};
+    comment_id = comment_id || $('#commentTweetId').val();
+    data = {comment: msg, id: comment_id};
     var user = getUser();
     // 判断评论是否需要用到原微博的id
     if(tapi.get_config(user).comment_need_user_id) {
@@ -2463,4 +2463,39 @@ function translate(ele) {
 			$ele.after('<hr /><div class="tweet_text_old">' + translatedText + '</div>');
 		}
 	});
+};
+
+// read later
+function read_later(ele) {
+	var $button = $(ele);
+	$button.hide();
+	var $ele = $(ele).parents('.userName').next();
+	var $datelink = $ele.nextAll('.msgInfo:first').find('a:first');
+	if(!$ele.hasClass('tweet_text')) {
+		$ele = $ele.find('.tweet_text');
+	}
+	var $link = $ele.find('a:first');
+	if($link.length == 0) {
+		_showMsg("No URL");
+	} else {
+		var url = $link.attr('rhref') || $link.attr('href');
+		var title = $link.attr('flash_title');
+		var selection = $ele.text() + ' ' + $datelink.attr('href');
+		var data = {
+			url: url,
+			selection: selection
+		};
+		if(title) {
+			data.title = title;
+		}
+		var user = Settings.get().instapaper_user;
+		Instapaper.add(user, data, function(success, error, xhr){
+			if(success) {
+				_showMsg(_u.i18n("msg_save_success"));
+			} else {
+				_showMsg('Read later fail.');
+				$button.show();
+			}
+		});
+	}
 };
