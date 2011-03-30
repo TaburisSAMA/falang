@@ -72,11 +72,11 @@ var methodManager = {
         if(request.msgs && request.msgs.length>0){
             var msg_wrap = $("#fa_wave_msg_wrap");
             if(msg_wrap.length < 1){
-                msg_wrap = $('<div id="fa_wave_msg_wrap">\
-                                <div class="fawave_btns fawave_clearFix">\
-	                                <a href="javascript:void(0)" class="fawave_but fawave_logo fawave_not_alert"><img src="' + chrome.extension.getURL("icons/icon48.png") + '" />'+ _u.i18n("comm_not_alert_this_page") +'</a>\
-                                    <a href="javascript:void(0)" class="close_fawave_remind fawave_but fawave_fr">'+ _u.i18n("comm_close") +'</a>\
-                                </div><div class="fa_wave_list"></div></div>').appendTo('body');
+                msg_wrap = $('<div id="fa_wave_msg_wrap">' +
+                                '<div class="fawave_btns fawave_clearFix">' +
+	                                '<a href="javascript:void(0)" class="fawave_but fawave_logo fawave_not_alert"><img src="' + chrome.extension.getURL("icons/icon48.png") + '" />'+ _u.i18n("comm_not_alert_this_page") +'</a>' +
+                                    '<a href="javascript:void(0)" class="close_fawave_remind fawave_but fawave_fr">'+ _u.i18n("comm_close") +'</a>' +
+                                '</div><div class="fa_wave_list"></div></div>').appendTo('body');
                 msg_wrap.find('.close_fawave_remind').click(function(){ close_fawave_remind(); });
                 msg_wrap.find('.fawave_not_alert').click(function(){ window.fawave_not_alert = true; close_fawave_remind(); });
                 msg_wrap.hover(function(){

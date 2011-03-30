@@ -1914,3 +1914,193 @@ var VideoService = {
     		+ width_height + ',menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
 	}
 };
+
+function _bind_tip_items($tip_div) {
+	$tip_div.find('li').mouseover(function(){
+		$tip_div.find('li').removeClass('cur');
+    	$(this).addClass('cur');
+    }).click(function(){
+    	var $text = $($tip_div.attr('ele_id'));
+    	var value = $text.val();
+    	var ele = $text.get(0);
+    	var new_value = value.substring(0, ele._at_key_index + 1);
+    	new_value += $(this).attr('name') + ' ' + value.substring(ele.selectionStart);
+    	$text.focus().val(new_value);
+    	// 设置光标位置
+    	ele.selectionStart = ele.selectionEnd = ele._at_key_index + $(this).attr('name').length + 2;
+    	$tip_div.hide();
+    });
+}
+
+function at_user_autocomplete(ele_id) {
+	// support @ autocomplete
+	var $tip_div = $('<div ele_id="' + ele_id + '" style="z-index: 2000; position: absolute;display:none; " class="at_user"><ul></ul></div>');
+	$(document.body).append($tip_div);
+	$(ele_id).keyup(function(event){
+    	if(!this._at_key_loading && // 不是正在加载
+    			event.keyCode != '13' && event.keyCode != '38' && event.keyCode != '40') {
+    		var value = $(this).val().substring(0, this.selectionStart);
+        	var key_index = value.search(/@[^@\s]{1,20}$/g), key = null;
+        	if(key_index >= 0) {
+        		key = value.substring(key_index + 1);
+        		if(!/^[a-zA-Z0-9\u4e00-\u9fa5_]+$/.test(key)){
+        			key = null;
+        		}
+        	}
+        	var $text_tip = $('#text_tip');
+        	if(key) {
+        		// http://xiaocai.info/2011/03/js-textarea-body-offset/
+        		this._at_key = key;
+        		this._at_key_index = key_index;
+        		this._at_key_loading = true;
+        		at_user_search(key, function(names){
+        			this._at_key_loading = false;
+        			var html = '';
+            		for(var i in names) {
+            			var item = names[i];
+            			html += '<li name="' + item[0] + '">' + item[1] + '</li>';
+            		}
+            		if(!html) {
+            			$tip_div.hide();
+            			return;
+            		}
+            		$tip_div.find('ul').html(html).find('li:first').addClass('cur');
+            		_bind_tip_items($tip_div);
+            		
+            		var $this = $(this);
+            		var ele_offset = $this.offset();
+            		if($text_tip.length == 0) {
+            			$text_tip = $('<div id="text_tip" style="z-index:-1000;position:absolute;opacity:0;overflow:auto;display:inline;word-wrap:break-word;"></div>');
+            			$(document.body).append($text_tip);
+            		}
+            		$text_tip.css({
+        				left: ele_offset.left, 
+        				top: ele_offset.top, 
+        				height: $this.height,
+        				width: $this.width(),
+        				'font-family': $this.css('font-family'),
+        				'font-size': $this.css('font-size')
+        			});
+            		var text = $this.val().substring(0, this.selectionStart);
+            		function _format(s) {
+            			return s.replace(/</ig, '&lt;').replace(/>/ig, '&gt;')
+            				.replace(/\r/g, '').replace(/ /g, '&nbsp;').replace(/\n/g, '<br/>');
+            		}
+            		$text_tip.html(_format(text) + '<span>&nbsp;</span>');
+            		var $span = $text_tip.find('span');
+            		var offset = $span.offset();
+            		var left = offset.left - $span.width();
+            		if((left + $tip_div.width()) > (ele_offset.left + $this.width())) {
+            			left -= $tip_div.width();
+            		}
+            		var top = Math.min(offset.top + $span.height(), ele_offset.top + $this.height());
+            		$tip_div.css({left: left, top: top}).show();
+        		}, this);
+        	} else {
+        		$tip_div.hide();
+        	}
+    	}
+    }).keydown(function(){
+    	if($tip_div.css('display') != 'none') {
+//    		keycode 38 = Up 
+//    		keycode 40 = Down
+    		if(event.keyCode == '13') {
+    			$tip_div.find('li.cur').click();
+        		return false;
+        	} else if(event.keyCode == '38'){
+        		var $prev = $tip_div.find('li.cur').prev();
+        		if($prev.length == 1) {
+        			$tip_div.find('li.cur').removeClass('cur');
+        			$prev.addClass('cur');
+        		}
+        		return false;
+        	} else if(event.keyCode == '40'){
+        		var $next = $tip_div.find('li.cur').next();
+        		if($next.length == 1) {
+        			$tip_div.find('li.cur').removeClass('cur');
+        			$next.addClass('cur');
+        		}
+        		return false;
+        	}
+    	}
+    });
+	
+};
+
+
+//@user search
+function at_user_search(query, callback, context) {
+	var query_regex = new RegExp(query, 'i');
+	var current_user = getUser();
+	var b_view = getBackgroundView();
+	var hits = {}, hit_count = 0;
+	var config = tapi.get_config(current_user);
+	var data_types = [b_view.friendships.friend_data_type].concat(T_LIST.all);
+	for(var index=0; index < data_types.length; index++) {
+		var tweets = b_view.get_data_cache(data_types[index], current_user.uniqueKey) || [];
+		var len = tweets.length;
+	// console.log(data_types[index], len);
+	    for(var i=0; i<len; i++){
+	    	var tweet = tweets[i];
+	    	var items = [tweet.user || tweet];
+	    	var retweeted_status = tweet.retweeted_status || tweet.status;
+	    	if(retweeted_status) {
+	    		items.push(retweeted_status.user);
+	    		if(retweeted_status.retweeted_status) {
+	    			items.push(retweeted_status.retweeted_status.user);
+	    		}
+	    	}
+	    	for(var j=0; j<items.length; j++) {
+	    		var user = items[j];
+	    		if(_check_name(user, query_regex)){
+	            	if(!hits[user.id]) {
+	            		if(config.rt_at_name) {
+	            			hits[user.id] = [user.name, user.screen_name];
+	            		} else {
+	            			hits[user.id] = [user.screen_name, user.screen_name];
+	            		}
+	            		hit_count++;
+	            	}
+	            }
+	    	}
+	        if(hit_count >= 10) {
+	        	callback.call(context, hits);
+	        	return;
+	    	}
+	    }
+	}
+	if(hit_count < 2) {
+		// 命中太少，则尝试获取最新的
+		b_view.friendships.fetch_friends(current_user.uniqueKey, function(friends){
+			for(var i=0; i<friends.length; i++){
+				user = friends[i];
+				if(_check_name(user, query_regex)){
+	            	if(!hits[user.id]) {
+	            		if(config.rt_at_name) {
+	            			hits[user.id] = [user.name, user.screen_name];
+	            		} else {
+	            			hits[user.id] = [user.screen_name, user.screen_name];
+	            		}
+	            		hit_count++;
+	            		if(hit_count >= 10) {
+	                    	break;
+	                	}
+	            	}
+	            }
+			}
+			callback.call(context, hits);
+	    	return;
+		});
+	} else {
+		callback.call(context, hits);
+		return;
+	}
+};
+
+function _check_name(user, query_regex) {
+	if(!user) {
+		return false;
+	}
+	return user.screen_name && user.screen_name.search(query_regex) >= 0
+		|| user.name && user.name.search(query_regex) >= 0;
+};

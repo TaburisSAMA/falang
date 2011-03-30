@@ -20,7 +20,7 @@ function init(){
 	initTxtContentEven();
 
     $("#txtContent").focus();
-
+    at_user_autocomplete('#txtContent');
     $(window).unload(function(){ initOnUnload(); }); 
 };
 
