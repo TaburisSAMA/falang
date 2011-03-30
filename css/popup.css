@@ -699,3 +699,21 @@ div.mainContent{word-wrap: break-word; line-height:1.5em;}
 .external_link{padding-left:10px;background-repeat:no-repeat;background-position-y: 50%;
   background-image: url(../images/external_link.png);
 }
+
+.at_user{
+	border:1px solid #ccc;
+	background:#fff;
+	padding:2px 2px;
+	position:absolute;
+}
+.at_user li{
+	color:#666;
+	height:21px;
+	line-height:21px;
+	overflow:hidden;
+	padding:0 5px 0 5px;
+	cursor:pointer;
+}
+.at_user li.cur{
+	background:#eeeff6;
+}

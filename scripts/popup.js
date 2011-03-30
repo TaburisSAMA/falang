@@ -108,6 +108,106 @@ function init(){
     		}
     	});
     });
+    
+    // support @ autocomplete
+    $("#txtContent").keyup(function(event){
+    	if(event.keyCode != '13' && event.keyCode != '38' && event.keyCode != '40') {
+    		var value = $(this).val().substring(0, this.selectionStart);
+        	var key_index = value.search(/@[^@\s]{1,20}$/g), key = null;
+        	if(key_index >= 0) {
+        		key = value.substring(key_index + 1);
+        		if(!/^[a-zA-Z0-9\u4e00-\u9fa5_]+$/.test(key)){
+        			key = null;
+        		}
+        	}
+        	var $text_tip = $('#text_tip');
+        	if(key) {
+        		// http://xiaocai.info/2011/03/js-textarea-body-offset/
+        		this._at_key = key;
+        		this._at_key_index = key_index;
+        		var names = at_user_search(key);
+        		var html = '';
+        		for(var i in names) {
+        			var item = names[i];
+        			html += '<li name="' + item[0] + '">' + item[1] + '</li>';
+        		}
+        		if(!html) {
+        			$('.at_user').hide();
+        			return;
+        		}
+        		$('.at_user ul').html(html).find('li:first').addClass('cur');
+        		
+        		var $this = $(this);
+        		var ele_offset = $this.offset();
+        		if($text_tip.length == 0) {
+        			$text_tip = $('<div id="text_tip" style="z-index:-1000;position:absolute;opacity:0.5;overflow:auto;display:inline;word-wrap:break-word;"></div>');
+        			$text_tip.css({
+        				left: ele_offset.left, 
+        				top: ele_offset.top, 
+        				height: $this.height,
+        				width: $this.width(),
+        				'font-family': $this.css('font-family'),
+        				'font-size': $this.css('font-size')
+        			});
+        			$this.parent().append($text_tip);
+        		}
+        		var text = $this.val().substring(0, this.selectionStart);
+        		function _format(s) {
+        			return s.replace(/</ig, '&lt;').replace(/>/ig, '&gt;')
+        				.replace(/\r/g, '').replace(/ /g, '&nbsp;').replace(/\n/g, '<br/>');
+        		}
+        		$text_tip.html(_format(text) + '<span>&nbsp;</span>');
+        		var $span = $text_tip.find('span');
+        		var offset = $span.offset();
+        		var left = offset.left - $span.width();
+        		if((left + $('.at_user').width()) > (ele_offset.left + $this.width())) {
+        			left -= $('.at_user').width();
+        		}
+        		var top = Math.min(offset.top + $span.height(), ele_offset.top + $this.height());
+        		$('.at_user').css({left: left, 
+        			top: top}).show();
+        	} else {
+        		$('.at_user').hide();
+        	}
+    	}
+    }).keydown(function(){
+    	if($('.at_user').css('display') != 'none') {
+//    		keycode 38 = Up 
+//    		keycode 40 = Down
+    		if(event.keyCode == '13') {
+        		$('.at_user li.cur').click();
+        		return false;
+        	} else if(event.keyCode == '38'){
+        		var $prev = $('.at_user li.cur').prev();
+        		if($prev.length == 1) {
+        			$('.at_user li.cur').removeClass('cur');
+        			$prev.addClass('cur');
+        		}
+        		return false;
+        	} else if(event.keyCode == '40'){
+        		var $next = $('.at_user li.cur').next();
+        		if($next.length == 1) {
+        			$('.at_user li.cur').removeClass('cur');
+        			$next.addClass('cur');
+        		}
+        		return false;
+        	}
+    	}
+    });
+    $('.at_user li').live('mouseover', function(){
+    	$('.at_user li').removeClass('cur');
+    	$(this).addClass('cur');
+    }).live('click', function(){
+    	var $text = $('#txtContent');
+    	var value = $text.val();
+    	var ele = $text.get(0);
+    	var new_value = value.substring(0, ele._at_key_index + 1);
+    	new_value += $(this).attr('name') + ' ' + value.substring(ele.selectionStart);
+    	$text.focus().val(new_value);
+    	// 设置光标位置
+    	ele.selectionStart = ele.selectionEnd = ele._at_key_index + $(this).attr('name').length + 2;
+    	$('.at_user').hide();
+    });
 };
 
 function initializeMap(){};//给载入地图api调用
@@ -2482,10 +2582,7 @@ function read_later(ele) {
 		var url = $link.attr('rhref') || $link.attr('href');
 		var title = $link.attr('flash_title');
 		var selection = $ele.text() + ' ' + $datelink.attr('href');
-		var data = {
-			url: url,
-			selection: selection
-		};
+		var data = {url: url, selection: selection};
 		if(title) {
 			data.title = title;
 		}
@@ -2499,4 +2596,56 @@ function read_later(ele) {
 			}
 		});
 	}
+};
+
+//  @user search
+function at_user_search(query) {
+	var query_regex = new RegExp(query, 'i');
+	var user = getUser();
+    var b_view = getBackgroundView();
+    var hits = {}, hit_count = 0;
+    var config = tapi.get_config(user);
+    for(var index=0; index<T_LIST.all.length; index++) {
+    	var cache_key = user.uniqueKey + T_LIST.all[index] + '_tweets';
+    	if(b_view && b_view.tweets[cache_key]){
+            var tweets = b_view.tweets[cache_key];
+            var len = tweets.length;
+            for(var i=0; i<len; i++){
+            	var tweet = tweets[i];
+            	var items = [tweet];
+            	var retweeted_status = tweet.retweeted_status || tweet.status;
+            	if(retweeted_status) {
+            		items.push(retweeted_status);
+            		if(retweeted_status.retweeted_status) {
+            			items.push(retweeted_status.retweeted_status);
+            		}
+            	}
+            	for(var j=0; j<items.length; j++) {
+            		var t = items[j];
+            		if(_check_name(t, query_regex)){
+                    	if(!hits[t.user.id]) {
+                    		if(config.rt_at_name) {
+                    			hits[t.user.id] = [t.user.name, t.user.screen_name];
+                    		} else {
+                    			hits[t.user.id] = [t.user.screen_name, t.user.name];
+                    		}
+                    		hit_count++;
+                    	}
+                    }
+            	}
+                if(hit_count >= 10) {
+                	return hits;
+            	}
+            }
+        }
+    }
+    return hits;
+};
+
+function _check_name(tweet, query_regex) {
+	if(!tweet.user) {
+		return false;
+	}
+	return tweet.user.screen_name.search(query_regex) >= 0
+		|| tweet.user.name.search(query_regex) >= 0;
 };
