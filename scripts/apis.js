@@ -4317,8 +4317,16 @@ var tapi = {
 	},
 	
 	// id, user_id, screen_name, cursor, count
-	friends: function(data, callbackFn){
-		return this.api_dispatch(data).friends(data, callbackFn);
+	/**
+	 * 获取关注人列表
+	 * 
+	 * cursor: 用于分页请求，请求第1页cursor传-1，
+	 *  在返回的结果中会得到next_cursor字段，
+	 *  表示下一页的cursor。next_cursor为0表示已经到记录末尾。
+	 * 返回值格式 data = {users: [], next_cursor: xx}
+	 */
+	friends: function(data, callback, context){
+		return this.api_dispatch(data).friends(data, callback, context);
 	},
 	
 	// page

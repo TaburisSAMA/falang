@@ -111,7 +111,8 @@ function init(){
     
     // support @ autocomplete
     $("#txtContent").keyup(function(event){
-    	if(event.keyCode != '13' && event.keyCode != '38' && event.keyCode != '40') {
+    	if(!this._at_key_loading && // 不是正在加载
+    			event.keyCode != '13' && event.keyCode != '38' && event.keyCode != '40') {
     		var value = $(this).val().substring(0, this.selectionStart);
         	var key_index = value.search(/@[^@\s]{1,20}$/g), key = null;
         	if(key_index >= 0) {
@@ -125,47 +126,50 @@ function init(){
         		// http://xiaocai.info/2011/03/js-textarea-body-offset/
         		this._at_key = key;
         		this._at_key_index = key_index;
-        		var names = at_user_search(key);
-        		var html = '';
-        		for(var i in names) {
-        			var item = names[i];
-        			html += '<li name="' + item[0] + '">' + item[1] + '</li>';
-        		}
-        		if(!html) {
-        			$('.at_user').hide();
-        			return;
-        		}
-        		$('.at_user ul').html(html).find('li:first').addClass('cur');
-        		
-        		var $this = $(this);
-        		var ele_offset = $this.offset();
-        		if($text_tip.length == 0) {
-        			$text_tip = $('<div id="text_tip" style="z-index:-1000;position:absolute;opacity:0.5;overflow:auto;display:inline;word-wrap:break-word;"></div>');
-        			$text_tip.css({
-        				left: ele_offset.left, 
-        				top: ele_offset.top, 
-        				height: $this.height,
-        				width: $this.width(),
-        				'font-family': $this.css('font-family'),
-        				'font-size': $this.css('font-size')
-        			});
-        			$this.parent().append($text_tip);
-        		}
-        		var text = $this.val().substring(0, this.selectionStart);
-        		function _format(s) {
-        			return s.replace(/</ig, '&lt;').replace(/>/ig, '&gt;')
-        				.replace(/\r/g, '').replace(/ /g, '&nbsp;').replace(/\n/g, '<br/>');
-        		}
-        		$text_tip.html(_format(text) + '<span>&nbsp;</span>');
-        		var $span = $text_tip.find('span');
-        		var offset = $span.offset();
-        		var left = offset.left - $span.width();
-        		if((left + $('.at_user').width()) > (ele_offset.left + $this.width())) {
-        			left -= $('.at_user').width();
-        		}
-        		var top = Math.min(offset.top + $span.height(), ele_offset.top + $this.height());
-        		$('.at_user').css({left: left, 
-        			top: top}).show();
+        		this._at_key_loading = true;
+        		at_user_search(key, function(names){
+        			this._at_key_loading = false;
+        			var html = '';
+            		for(var i in names) {
+            			var item = names[i];
+            			html += '<li name="' + item[0] + '">' + item[1] + '</li>';
+            		}
+            		if(!html) {
+            			$('.at_user').hide();
+            			return;
+            		}
+            		$('.at_user ul').html(html).find('li:first').addClass('cur');
+            		
+            		var $this = $(this);
+            		var ele_offset = $this.offset();
+            		if($text_tip.length == 0) {
+            			$text_tip = $('<div id="text_tip" style="z-index:-1000;position:absolute;opacity:0.5;overflow:auto;display:inline;word-wrap:break-word;"></div>');
+            			$text_tip.css({
+            				left: ele_offset.left, 
+            				top: ele_offset.top, 
+            				height: $this.height,
+            				width: $this.width(),
+            				'font-family': $this.css('font-family'),
+            				'font-size': $this.css('font-size')
+            			});
+            			$this.parent().append($text_tip);
+            		}
+            		var text = $this.val().substring(0, this.selectionStart);
+            		function _format(s) {
+            			return s.replace(/</ig, '&lt;').replace(/>/ig, '&gt;')
+            				.replace(/\r/g, '').replace(/ /g, '&nbsp;').replace(/\n/g, '<br/>');
+            		}
+            		$text_tip.html(_format(text) + '<span>&nbsp;</span>');
+            		var $span = $text_tip.find('span');
+            		var offset = $span.offset();
+            		var left = offset.left - $span.width();
+            		if((left + $('.at_user').width()) > (ele_offset.left + $this.width())) {
+            			left -= $('.at_user').width();
+            		}
+            		var top = Math.min(offset.top + $span.height(), ele_offset.top + $this.height());
+            		$('.at_user').css({left: left, 
+            			top: top}).show();
+        		}, this);
         	} else {
         		$('.at_user').hide();
         	}
@@ -2599,53 +2603,78 @@ function read_later(ele) {
 };
 
 //  @user search
-function at_user_search(query) {
+function at_user_search(query, callback, context) {
 	var query_regex = new RegExp(query, 'i');
-	var user = getUser();
+	var current_user = getUser();
     var b_view = getBackgroundView();
     var hits = {}, hit_count = 0;
-    var config = tapi.get_config(user);
-    for(var index=0; index<T_LIST.all.length; index++) {
-    	var cache_key = user.uniqueKey + T_LIST.all[index] + '_tweets';
-    	if(b_view && b_view.tweets[cache_key]){
-            var tweets = b_view.tweets[cache_key];
-            var len = tweets.length;
-            for(var i=0; i<len; i++){
-            	var tweet = tweets[i];
-            	var items = [tweet];
-            	var retweeted_status = tweet.retweeted_status || tweet.status;
-            	if(retweeted_status) {
-            		items.push(retweeted_status);
-            		if(retweeted_status.retweeted_status) {
-            			items.push(retweeted_status.retweeted_status);
-            		}
-            	}
-            	for(var j=0; j<items.length; j++) {
-            		var t = items[j];
-            		if(_check_name(t, query_regex)){
-                    	if(!hits[t.user.id]) {
-                    		if(config.rt_at_name) {
-                    			hits[t.user.id] = [t.user.name, t.user.screen_name];
-                    		} else {
-                    			hits[t.user.id] = [t.user.screen_name, t.user.name];
-                    		}
-                    		hit_count++;
-                    	}
-                    }
-            	}
-                if(hit_count >= 10) {
-                	return hits;
-            	}
-            }
+    var config = tapi.get_config(current_user);
+    var data_types = [b_view.friendships.friend_data_type].concat(T_LIST.all);
+    for(var index=0; index < data_types.length; index++) {
+    	var tweets = b_view.get_data_cache(data_types[index], current_user.uniqueKey) || [];
+    	var len = tweets.length;
+//    	console.log(data_types[index], len);
+        for(var i=0; i<len; i++){
+        	var tweet = tweets[i];
+        	var items = [tweet.user || tweet];
+        	var retweeted_status = tweet.retweeted_status || tweet.status;
+        	if(retweeted_status) {
+        		items.push(retweeted_status.user);
+        		if(retweeted_status.retweeted_status) {
+        			items.push(retweeted_status.retweeted_status.user);
+        		}
+        	}
+        	for(var j=0; j<items.length; j++) {
+        		var user = items[j];
+        		if(_check_name(user, query_regex)){
+                	if(!hits[user.id]) {
+                		if(config.rt_at_name) {
+                			hits[user.id] = [user.name, user.screen_name];
+                		} else {
+                			hits[user.id] = [user.screen_name, user.screen_name];
+                		}
+                		hit_count++;
+                	}
+                }
+        	}
+            if(hit_count >= 10) {
+            	callback.call(context, hits);
+            	return;
+        	}
         }
     }
-    return hits;
+    if(hit_count < 2) {
+    	// 命中太少，则尝试获取最新的
+    	b_view.friendships.fetch_friends(current_user.uniqueKey, function(friends){
+    		for(var i=0; i<friends.length; i++){
+    			user = friends[i];
+    			if(_check_name(user, query_regex)){
+                	if(!hits[user.id]) {
+                		if(config.rt_at_name) {
+                			hits[user.id] = [user.name, user.screen_name];
+                		} else {
+                			hits[user.id] = [user.screen_name, user.screen_name];
+                		}
+                		hit_count++;
+                		if(hit_count >= 10) {
+                        	break;
+                    	}
+                	}
+                }
+    		}
+    		callback.call(context, hits);
+        	return;
+    	});
+    } else {
+    	callback.call(context, hits);
+    	return;
+    }
 };
 
-function _check_name(tweet, query_regex) {
-	if(!tweet.user) {
+function _check_name(user, query_regex) {
+	if(!user) {
 		return false;
 	}
-	return tweet.user.screen_name.search(query_regex) >= 0
-		|| tweet.user.name.search(query_regex) >= 0;
+	return user.screen_name && user.screen_name.search(query_regex) >= 0
+		|| user.name && user.name.search(query_regex) >= 0;
 };

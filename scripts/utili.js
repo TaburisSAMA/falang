@@ -64,7 +64,12 @@ var UNREAD_TIMELINE_COUNT_KEY = 'idi_UNREAD_TIMELINE_COUNT_KEY';
 
 var IS_SYNC_TO_PAGE_KEY = 'idi_IS_SYNC_TO_PAGE_KEY'; //已读消息是否和新浪微博页面同步
 
-var THEME_LIST = {'default':'default', 'simple':'simple', 'pip_io':'pip_io', 'work':'work'}; //主题列表
+var THEME_LIST = {
+	'default':'default', 
+	'simple':'simple', 
+	'pip_io':'pip_io', 
+	'work':'work'
+}; //主题列表
 
 var ALERT_MODE_KEY = 'idi_ALERT_MODE_KEY'; //信息提醒模式key
 
@@ -79,7 +84,9 @@ var T_LIST = {
 	'douban': ['friends_timeline', 'direct_messages']
 };
 T_LIST.t163 = T_LIST.tsina = T_LIST.tsohu = T_LIST.all;
-T_LIST.tqq = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa = T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter = T_LIST.identi_ca = T_LIST.digu;
+T_LIST.tqq = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa 
+	= T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter 
+	= T_LIST.identi_ca = T_LIST.digu;
 
 var T_NAMES = {
 	'tsina': '新浪微博',
@@ -813,11 +820,17 @@ function getDictLength(d) {
 	return length;
 };
 
-// 根据maxid删除重复的数据
-// 如果是prepend
-// 判断最后一个等于最大id的，将它和它后面的删除
-// 如果是append
-// 判断最后一个等于最大id的，将它和它前面的删除，twitter很强大，id大到js无法计算
+/**
+ * 根据maxid删除重复的数据
+ *
+ * @param {Array}datas
+ * @param {String}max_id
+ * @param {Boolean}append
+ * 	如果append == true, 判断最后一个等于最大id的，将它和它前面的删除，twitter很强大，id大到js无法计算
+ *  否则为prepend，判断最后一个等于最大id的，将它和它后面的删除
+ * @return {Object}
+ * @api public
+ */
 function filterDatasByMaxId(datas, max_id, append) {
 	var news = datas, olds = [];
     if(max_id && datas && datas.length > 0){

@@ -13,45 +13,73 @@ var SHORT_URLS = {};
 window.checking={}; //正在检查是否有最新微博
 window.paging={}; //正在获取分页微博
 
-function getMaxMsgId(t, user_uniqueKey){
-    if(!user_uniqueKey){
-        user_uniqueKey = getUser().uniqueKey;
+
+function _format_data_key(data_type, end_str, user_uniquekey) {
+	if(!user_uniquekey){
+		user_uniquekey = getUser().uniqueKey;
     }
-    var _key = user_uniqueKey + t + '_tweets';
-    var _t_tweets = tweets[_key];
-    var _last_id = null;
-    if(_t_tweets && _t_tweets.length){
+	return user_uniquekey + data_type + end_str;
+};
+
+/**
+ * 获取指定数据类型的本地缓存
+ *
+ * @param {String}user_uniqueKey
+ * @param {String}data_type, like friends_timeline, mentions and os on.
+ *  See utili.js / T_LIST.all define.
+ * @return {Array}
+ * @api public
+ */
+function get_data_cache(data_type, user_uniquekey) {
+	var key = _format_data_key(data_type, '_tweets', user_uniquekey);
+	return tweets[key];
+};
+
+function set_data_cache(cache, data_type, user_uniquekey) {
+	var key = _format_data_key(data_type, '_tweets', user_uniquekey);
+	tweets[key] = cache;
+};
+
+/**
+ * 获取本地数据中最后一条记录的id标识值，用于分页和过滤数据
+ *
+ * @param String}data_type
+ * @param {String}user_uniqueKey
+ * @return last_id when cache is not empty, otherwise null.
+ * @api public|private
+ */
+function getMaxMsgId(data_type, user_uniquekey){
+    var cache = get_data_cache(data_type, user_uniquekey);
+    var last_id = null;
+    if(cache && cache.length > 0){
     	// 兼容网易的cursor_id
         // 兼容腾讯的PageTime
-        var _last_id = _t_tweets[_t_tweets.length-1].timestamp || _t_tweets[_t_tweets.length-1].cursor_id || _t_tweets[_t_tweets.length-1].id;
-//    	var _last_id = _t_tweets[_t_tweets.length-1].cursor_id || _t_tweets[_t_tweets.length-1].id;
-//    	var _last_id = _t_tweets[_t_tweets.length-1];
-    	if(typeof(_last_id) === 'number'){
-    		_last_id--;
+    	var last_index = cache.length - 1;
+        var last_id = cache[last_index].timestamp 
+        	|| cache[last_index].cursor_id 
+        	|| cache[last_index].id;
+    	if(typeof(last_id) === 'number'){
+    		last_id--;
     	}
     }
-    return _last_id;
+    return last_id;
 };
 
 
-function getLastPage(t, user_uniqueKey){
-    if(!user_uniqueKey){
-        user_uniqueKey = getUser().uniqueKey;
-    }
-    var _key = user_uniqueKey + t + '_last_page';
-    return LAST_PAGES[_key];
+function getLastPage(data_type, user_uniquekey){
+    return LAST_PAGES[_format_data_key(data_type, '_last_page', user_uniquekey)];
 };
 
-function setLastPage(t, page, user_uniqueKey){
-    if(!user_uniqueKey){
-        user_uniqueKey = getUser().uniqueKey;
-    }
-    var _key = user_uniqueKey + t + '_last_page';
-    LAST_PAGES[_key] = page;
+function setLastPage(data_type, page, user_uniquekey){
+    var key = _format_data_key(data_type, '_last_page', user_uniquekey);
+    LAST_PAGES[key] = page;
 };
 
 //用户跟随放到background view这里处理
 var friendships = {
+	fetch_cursors: {},
+	fetch_times: {}, // 上次爬取时间
+	friend_data_type: 'user_friends',
     create: function(user_id, screen_name, callback){ //更随某人
     	var user = getUser();
         var params = {id:user_id, user:user};
@@ -84,10 +112,80 @@ var friendships = {
             hideLoading();
         });
     },
-    show: function(user_id){ //查看与某人的更随关系
+    show: function(user_id){ //查看与某人的跟随关系
     	var user = getUser();
         var params = {id:user_id, user:user};
         tapi.friendships_show(params, function(sinaMsgs, textStatus){});
+    },
+    fetch_friends: function(user_uniquekey, callback, context) {
+    	var user;
+    	if(user_uniquekey) {
+    		user = getUserByUniqueKey(user_uniquekey);
+    	} else {
+    		user = getUser();
+    	}
+    	var friend_data_type = this.friend_data_type;
+    	var count = 200;
+    	// 上次爬取的结果
+    	var fetch_cursor = friendships.fetch_cursors[user_uniquekey];
+    	var append = true;
+    	if(fetch_cursor == null) {
+    		// 第一次获取
+    		fetch_cursor = '-1';
+//    		console.log('first fetch friends');
+    	} else if(fetch_cursor == '0') {
+    		if(new Date().getTime() - friendships.fetch_times[user_uniquekey] < 60000) {
+    			// 上次爬取时间和这次间隔在60秒以内的，直接返回空，不爬取
+    			callback.call(context, []);
+    			return;
+    		}
+    		// 已经全部爬取，现在只获取最近的即可
+    		// 为了省流量，只获取最近50
+    		count = 50;
+    		fetch_cursor = '-1';
+    		append = false;
+    	}
+    	tapi.friends({user: user, cursor: fetch_cursor, count: count}, function(data){
+    		var friends = data.users || data.items || data;
+    		// 重新获取一次cache，防止期间cache被更新了，之前的引用就失效了
+    		var cache = get_data_cache(friend_data_type, user.uniqueKey) || [];
+    		if(friends && friends.length > 0) {
+    			var max_id = null;
+    			if(cache.length > 0) {
+    				if(append) {
+        				max_id = cache[cache.length - 1].id;
+        			} else {
+        				max_id = cache[0].id;
+        			}
+    			}
+                var result = filterDatasByMaxId(friends, max_id, append);
+                friends = result.news;
+                if(friends.length > 0) {
+                	var rt_at_name = tapi.get_config(user).rt_at_name;
+                    for(var i=0; i<friends.length; i++) {
+        				var friend = friends[i];
+        				// 只保存最简单的数据，减少内存占用
+        				friends[i] = {id: friend.id, screen_name: friend.screen_name};
+        				if(rt_at_name) {
+        					friends[i].name = friend.name;
+        				}
+        			}
+                    if(append) {
+                    	cache = cache.concat(friends);
+                    } else {
+                    	cache = friends.concat(cache);
+                    }
+                    set_data_cache(cache, friend_data_type, user.uniqueKey);
+                }
+    		}
+    		if(friendships.fetch_cursors[user_uniquekey] != '0') {
+    			friendships.fetch_cursors[user_uniquekey] = String(data.next_cursor);
+//    			console.log('fetch_done_once');
+    		}
+    		friendships.fetch_times[user_uniquekey] = new Date().getTime();
+//    		console.log('fetch new', friends.length, 'cursor', data.next_cursor, cache.length);
+    		callback.call(context, friends || []);
+    	});
     }
 }; 
 
@@ -105,7 +203,6 @@ function checkTimeline(t, p, user_uniqueKey){
     if(!c_user){
         return;
     }
-    //var t = 'friends_timeline';
     if(isDoChecking(user_uniqueKey, t, 'checking')){ return; }
     
     setDoChecking(user_uniqueKey, t, 'checking', true);
@@ -131,14 +228,10 @@ function checkTimeline(t, p, user_uniqueKey){
     	}
     	if(!$.isArray(sinaMsgs)) {
     		sinaMsgs = [];
-//    		setDoChecking(user_uniqueKey, t, 'checking', false);
-//    		hideLoading();
-//    		return;
     	}
     	var popupView = getPopupView();
         var isFirstTime = false;
         var _key = user_uniqueKey + t + '_tweets';
-//        if(!tweets[_key] || tweets[_key].length == 0){
         if(!tweets[_key]){
             tweets[_key] = [];
             isFirstTime = true;//如果不存在，则为第一次获取微博
@@ -170,7 +263,8 @@ function checkTimeline(t, p, user_uniqueKey){
         	// 保存最新的id，用于过滤数据和判断
         	// 兼容网易的cursor_id
             // 兼容腾讯的pagetime
-            setLastMsgId(sinaMsgs[0].timestamp || sinaMsgs[0].cursor_id || sinaMsgs[0].id, t, user_uniqueKey);
+            setLastMsgId(sinaMsgs[0].timestamp || sinaMsgs[0].cursor_id 
+            	|| sinaMsgs[0].id, t, user_uniqueKey);
             if(c_user.blogType == 'tqq'){
                 //qq的last_id保存的是timestamp，但是在过滤重复信息的时候需要用到id，所以再保存一个ID
                 setLastMsgId(sinaMsgs[0].id, t+'_real_id', user_uniqueKey);
@@ -208,7 +302,8 @@ function checkTimeline(t, p, user_uniqueKey){
     	}
     	setDoChecking(user_uniqueKey, t, 'checking', false);
         if(isFirstTime){//如果是第一次(启动插件时),则获取以前的微薄
-            if(tweets[_key].length < PAGE_SIZE) { //如果第一次(启动插件时)获取的新信息少于分页大小，则加载一页以前的微薄，做缓冲
+            if(tweets[_key].length < PAGE_SIZE) { 
+            	//如果第一次(启动插件时)获取的新信息少于分页大小，则加载一页以前的微薄，做缓冲
                 getTimelinePage(user_uniqueKey, t);
             } else if (popupView) {
                 popupView.showReadMore(t);
@@ -403,17 +498,17 @@ function playSound(t){
 
 //桌面信息提醒
 var NotificationsManager = {
-    tp: '<script> uniqueKey = "{{user.uniqueKey}}"; Timeout = {{timeout}};</script>\
-        <div class="item">\
-            <div class="usericon"><img src="{{user.profile_image_url}}" class="face"/><img src="images/blogs/{{user.blogType}}_16.png" class="blogType"/></div>\
-            <div class="info"><span class="username">{{user.screen_name}}</span><br/>\
-                <span class="unreads">\
-                    <span id="unr_friends_timeline"><span>{{unreads.friends_timeline}}</span>'+ _u.i18n("abb_friends_timeline") +'</span> &nbsp;&nbsp; <span id="unr_mentions"><span>{{unreads.mentions}}</span>@</span> <br/>\
-                    <span id="unr_comments_timeline"><span>{{unreads.comments_timeline}}</span>'+ _u.i18n("abb_comment") +'</span> &nbsp;&nbsp; <span id="unr_direct_messages"><span>{{unreads.direct_messages}}</span>'+ _u.i18n("abb_direct_message") +'</span> \
-                </span>\
-            </div>\
-        </div>\
-        <script> removeHighlight(); TIME_LINE = "{{t}}"; highlightTimeline();</script>',
+    tp: '<script> uniqueKey = "{{user.uniqueKey}}"; Timeout = {{timeout}};</script>' + 
+        '<div class="item">' +
+            '<div class="usericon"><img src="{{user.profile_image_url}}" class="face"/><img src="images/blogs/{{user.blogType}}_16.png" class="blogType"/></div>' + 
+            '<div class="info"><span class="username">{{user.screen_name}}</span><br/>' + 
+                '<span class="unreads">' + 
+                    '<span id="unr_friends_timeline"><span>{{unreads.friends_timeline}}</span>'+ _u.i18n("abb_friends_timeline") +'</span> &nbsp;&nbsp; <span id="unr_mentions"><span>{{unreads.mentions}}</span>@</span> <br/>' + 
+                    '<span id="unr_comments_timeline"><span>{{unreads.comments_timeline}}</span>'+ _u.i18n("abb_comment") +'</span> &nbsp;&nbsp; <span id="unr_direct_messages"><span>{{unreads.direct_messages}}</span>'+ _u.i18n("abb_direct_message") + '</span> ' + 
+                '</span>' + 
+            '</div>' + 
+        '</div>' + 
+        '<script> removeHighlight(); TIME_LINE = "{{t}}"; highlightTimeline();</script>',
     
     cache: {}, //存放要显示的账号
     isEnabled: function(t){
@@ -480,20 +575,16 @@ var RefreshManager = {
     * @getFirst: 如果为true， 则先发送一次请求，再启动定时器.
     */
     start: function(getFirst){
-        //try{
-            var userList = getUserList(), refTime = 90;
-            for(var j in userList){
-                var user = userList[j];
-                for(var i in T_LIST[user.blogType]){
-                    var uniqueKey = user.uniqueKey, t = T_LIST[user.blogType][i];
-                    refTime = Settings.getRefreshTime(user, t);
-                    if(getFirst){ checkTimeline(t, null, uniqueKey); }
-                    this.itv[uniqueKey+t] = setInterval(checkTimeline, 1000*refTime, t, null, uniqueKey);
-                }
+        var userList = getUserList(), refTime = 90;
+        for(var j in userList){
+            var user = userList[j];
+            for(var i in T_LIST[user.blogType]){
+                var uniqueKey = user.uniqueKey, t = T_LIST[user.blogType][i];
+                refTime = Settings.getRefreshTime(user, t);
+                if(getFirst){ checkTimeline(t, null, uniqueKey); }
+                this.itv[uniqueKey+t] = setInterval(checkTimeline, 1000*refTime, t, null, uniqueKey);
             }
-        //}catch(err){
-
-        //}
+        }
     },
     stop: function(){
         for(var i in this.itv){
