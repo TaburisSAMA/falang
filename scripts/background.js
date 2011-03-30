@@ -145,7 +145,13 @@ var friendships = {
     		fetch_cursor = '-1';
     		append = false;
     	}
-    	tapi.friends({user: user, cursor: fetch_cursor, count: count}, function(data){
+    	var params = {
+    		user: user,
+    		user_id: user.id,
+    		cursor: fetch_cursor, 
+    		count: count
+    	};
+    	tapi.friends(params, function(data){
     		var friends = data.users || data.items || data;
     		// 重新获取一次cache，防止期间cache被更新了，之前的引用就失效了
     		var cache = get_data_cache(friend_data_type, user.uniqueKey) || [];
@@ -183,7 +189,7 @@ var friendships = {
 //    			console.log('fetch_done_once');
     		}
     		friendships.fetch_times[user_uniquekey] = new Date().getTime();
-//    		console.log('fetch new', friends.length, 'cursor', data.next_cursor, cache.length);
+    		console.log('fetch new', friends.length, 'cursor', data.next_cursor, cache.length);
     		callback.call(context, friends || []);
     	});
     }

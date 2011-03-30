@@ -1475,6 +1475,10 @@ $.extend(TQQAPI, {
            		if(String(args.data.startindex) == '-1') {
            			args.data.startindex = '0';
            		}
+           		if(args.data.reqnum > 30) {
+           			// 最大只能获取30，否则就会抛错 {"data":null,"msg":"server error","ret":4}
+           			args.data.reqnum = 30;
+           		}
            		delete args.data.cursor;
            		delete args.data.user_id;
            		break;
@@ -1680,11 +1684,17 @@ $.extend(TSohuAPI, {
     		data.items = items;
     		delete data.statuses;
     		delete data.comments;
+    	} else if(data.users) {
+    		items = data.users;
     	}
 		if($.isArray(items)) {
 	    	for(var i in items) {
 	    		items[i] = this.format_result_item(items[i], play_load, args);
 	    	}
+	    	if(items.length == 0) {
+		    	// 没数据，需要填充next_cursor = '0';
+	    		data.next_cursor = '0';
+		    }
 	    } else {
 	    	data = this.format_result_item(data, play_load, args);
 	    }
@@ -3374,7 +3384,15 @@ $.extend(BuzzAPI, {
 			delete args.data.comment;
 			delete args.data.reply_user_id;
 			delete args.data.cid;
-		}
+		} 
+//		else if(args.url == this.config.friends) {
+//			// itemsPerPage: 5 kind: "buzz#peopleFeed" startIndex: 0 totalResults: 28
+//			args.data.startIndex = args.data.c;
+//			if(String(args.data.startIndex) == '-1') {
+//				args.data.startIndex = '0';
+//			}
+//			delete args.data.c;
+//		}
 	},
 	
 	format_result: function(data, play_load, args) {
@@ -3397,6 +3415,17 @@ $.extend(BuzzAPI, {
 	    		}
 	    	}
 	    	data.items = items;
+	    	if(args.url == this.config.friends){
+	    		var cursor = parseInt(args.data.c);
+	    		if(cursor == -1){
+	    			cursor = 0;
+	    		}
+				var next_cursor = cursor + items.length;
+				if(next_cursor >= data.totalResults) {
+					next_cursor = '0'; 
+				}
+				data.next_cursor = next_cursor;
+			}
 	    } else {
 	    	data = this.format_result_item(data, play_load, args);
 	    }
@@ -3861,7 +3890,11 @@ $.extend(FacebookAPI, {
 		}
 		if(args.data.cursor) {
 			if(String(args.data.cursor) != '-1') {
-				args.data.until = args.data.cursor;
+				if(args.url == this.config.friends) {
+					args.data.offset = args.data.cursor;
+				} else {
+					args.data.until = args.data.cursor;
+				}
 			}
 			delete args.data.cursor;
 		}
@@ -3911,7 +3944,7 @@ $.extend(FacebookAPI, {
 	    if(data.paging) { // cursor 分页
 	    	if(data.paging.next) {
 	    		var params = decodeForm(data.paging.next);
-	    		data.next_cursor = params.until;
+	    		data.next_cursor = String(params.until || params.offset);
 	    	} else {
 	    		data.next_cursor = '0'; // 到底了
 	    	}
@@ -3994,7 +4027,7 @@ $.extend(PlurkAPI, {
         support_repost: false,
         support_repost_timeline: false,
         support_mentions: false,
-        support_user_search: false, // 暂时屏蔽
+//        support_user_search: false, // 暂时屏蔽
         support_cursor_only: true,  // 只支持游标方式翻页
         repost_pre: 'RT', // 转发前缀
         verify_credentials: '/Users/login',
@@ -4013,6 +4046,7 @@ $.extend(PlurkAPI, {
         comment_destroy: '/Responses/responseDelete',
         comments: '/Responses/get',
         search: '/PlurkSearch/search',
+        user_search: '/UserSearch/search',
         user_timeline: '/Timeline/getPlurks' // filter: Can be only_user
 	}),
 	
@@ -4101,7 +4135,7 @@ $.extend(PlurkAPI, {
 			delete args.data.comment;
 			delete args.data.id;
 		}
-		if(args.url == this.config.search) {
+		if(args.url == this.config.search || args.url == this.config.user_search) {
 			args.data.query = args.data.q;
 			delete args.data.q;
 		}
@@ -4120,6 +4154,9 @@ $.extend(PlurkAPI, {
 			return true;
 		}
     	var items = data;
+    	if(args.url == this.config.user_search) {
+    		items = data.users;
+    	}
     	var status_users = data.plurk_users || data.plurks_users || data.friends || data.users;
     	delete data.plurk_users;
     	delete data.plurks_users;
@@ -4140,7 +4177,9 @@ $.extend(PlurkAPI, {
 	    	}
 	    	// 设置cursor
     		if(items.length > 0) {
-    			if(args.url == this.config.followers || args.url == this.config.friends) {
+    			if(args.url == this.config.followers 
+    					|| args.url == this.config.friends
+    					|| args.url == this.config.user_search) {
     				data = {items: items};
     				var last_offset = Number(args.data.offset || 0);
     				data.next_cursor = last_offset + items.length;
@@ -4157,6 +4196,13 @@ $.extend(PlurkAPI, {
 	    				data.has_next = false;
 	    				data.comment_count = data.response_count;
 	    			}
+    			}
+    		} else {
+    			if(args.url == this.config.followers 
+    					|| args.url == this.config.friends
+    					|| args.url == this.config.user_search) {
+    				// 没有数据了
+    				data = {items: [], next_cursor: '0'};
     			}
     		}
 	    } else {
