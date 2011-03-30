@@ -2023,6 +2023,13 @@ function at_user_autocomplete(ele_id) {
         		return false;
         	}
     	}
+    }).focusout(function(){
+    	// 延时隐藏，要不然点击选择的时候，已经被隐藏了，无法选择
+    	setTimeout(function(){
+    		$tip_div.hide();
+    	}, 100);
+    }).click(function(){
+    	$(this).keyup();
     });
 	
 };
