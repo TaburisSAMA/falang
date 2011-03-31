@@ -135,8 +135,9 @@ textarea:focus{outline: none;}
 #header .user .info{ display:inline-block; margin-left:8px; }
 #header .user .info .name{color:green;font-weight:bold;}
 #header .user .info .nums{line-height: 22px; color:#888;}
-.tabs { overflow:hidden; position:absolute; bottom:-1px; right:3px;}
+.tabs { /*overflow:hidden;*/ position:absolute; bottom:-1px; right:3px;}
 .tabs li{
+	position:relative;
 	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#DDD));
 	border: solid 1px #BBB;
 	border-top-left-radius: 3px 3px;
@@ -387,7 +388,17 @@ div.mainContent{word-wrap: break-word; line-height:1.5em;}
 	-webkit-border-radius:3px;
 }
 
-.unreadCount{color:red;}
+.unreadCount{
+	background: #AA1317;
+	border-radius: 2px;
+	font-size: 11px;
+	line-height: 12px;
+	padding: 0 1px;
+	position: absolute;
+	top: -6px;
+	right: -1px;
+	color: white;
+}
 .imgicon{cursor: url(../images/big.cur), auto;}
 
 .list li .edit a.ort{

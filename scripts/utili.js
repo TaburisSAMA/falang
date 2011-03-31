@@ -72,6 +72,7 @@ var THEME_LIST = {
 }; //主题列表
 
 var ALERT_MODE_KEY = 'idi_ALERT_MODE_KEY'; //信息提醒模式key
+var AUTO_INSERT_MODE_KEY = 'idi_AUTO_INSERT_MODE_KEY'; //新信息是否自动插入
 
 //['friends_timeline','mentions','comments_timeline','comments_by_me','direct_messages','favorites']
 //需要不停检查更新的timeline的分类列表
@@ -613,6 +614,17 @@ function getAlertMode(){
 
 function setAlertMode(mode){
     localStorage.setObject(ALERT_MODE_KEY, mode);
+};
+//<<--
+
+//-- 新信息是否自动插入 --
+function getAutoInsertMode(){
+    var mode = localStorage.getObject(AUTO_INSERT_MODE_KEY);
+    return mode || 'notautoinsert';
+};
+
+function setAutoInsertMode(mode){
+    localStorage.setObject(AUTO_INSERT_MODE_KEY, mode);
 };
 //<<--
 

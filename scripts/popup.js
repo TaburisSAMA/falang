@@ -64,6 +64,7 @@ function init(){
     }
 
     changeAlertMode(getAlertMode());
+    changeAutoInsertMode(getAutoInsertMode());
 
     $('#ye_dialog_close').click(function(){ hideReplyInput(); });
 
@@ -119,7 +120,7 @@ function initializeMap(){};//给载入地图api调用
 function initTabs(){
     window.currentTab = '#friends_timeline_timeline';
     $('#tl_tabs li').click(function() {
-        var t = $(this);
+        var t = $(this), currentIsActive = t.hasClass('active');
         //不进行任何操作							 
         if(t.hasClass('tab-none')) {
             return;
@@ -128,7 +129,9 @@ function initTabs(){
         t.siblings().removeClass('active').end().addClass('active');
         //切换tab前先保护滚动条位置
         var old_t = getCurrentTab().replace('#','').replace(/_timeline$/i,'');
-        saveScrollTop(old_t);
+        if(!currentIsActive){
+            saveScrollTop(old_t);
+        }
         //切换tab
         $('.list_p').hide();
         var c_t = t.attr('href').replace('#','').replace(/_timeline$/i,'');
@@ -149,6 +152,10 @@ function initTabs(){
             checkShowGototop();
             return;
         }
+        //如果点击的当前tab是激活的，并且有未读信息，则清空列表，重新获取
+        if(currentIsActive && t.find(".unreadCount").html()) {
+            c_ul.find('ul.list').html('');
+        };
         if(!c_ul.find('ul.list').html()){
             getSinaTimeline(c_t);
         }
@@ -701,7 +708,8 @@ function addUnreadCountToTabs(){
             if(ur>0 && c_user.uniqueKey == user.uniqueKey){ //当前用户，则设置timeline tab上的提示
                 tab = $("#tl_tabs .tab-" + T_LIST[user.blogType][i]);
                 if(tab.length == 1 && !tab.hasClass('active')){
-                    tab.find('.unreadCount').html('(' + ur + ')');
+                    //tab.find('.unreadCount').html('(' + ur + ')');
+                    tab.find('.unreadCount').html(ur);
                     user_unread += ur;
                 }else{
                     removeUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
@@ -1490,40 +1498,70 @@ function readMore(t){
     }
 };
 
-/*如果当前tab是激活的，就返回true，否则返回false(即为未读)*/
+/************
+ * 给BG调用的。
+ * 如果当前tab是激活的，就返回true，否则返回false(即为未读). 
+ * 修改：根据用户设置是否自动提示新消息来返回true or false
+ * */
 function addTimelineMsgs(msgs, t, user_uniqueKey){
     var c_user = getUser();
     if(!user_uniqueKey){
         user_uniqueKey = c_user.uniqueKey;
     }
+    //不是当前用户
     if(c_user.uniqueKey != user_uniqueKey){
         return false;
     }
 
     var li = $('.tab-' + t);
     var _ul = $("#" + t + "_timeline ul.list");
+    
+    var _msg_user = null, _unreadCount = 0;
+    for(var i in msgs){
+        _msg_user = msgs[i].user || msgs[i].sender;
+        if(_msg_user && c_user && _msg_user.id != c_user.id){
+            _unreadCount += 1;
+        }
+    }
+    var ur = getUnreadTimelineCount(t);
+    ur += _unreadCount;
+    
     if(!li.hasClass('active')){
         //清空，让下次点tab的时候重新取
     	_ul.html('');
-        var _msg_user = null, _unreadCount = 0;
-        for(var i in msgs){
-            _msg_user = msgs[i].user || msgs[i].sender;
-            if(_msg_user && c_user && _msg_user.id != c_user.id){
-                _unreadCount += 1;
-            }
-        }
-        var ur = getUnreadTimelineCount(t);
-        ur += _unreadCount;
-        if(ur>0){
-            li.find('.unreadCount').html('(' + ur + ')');
-            //$("#accountListDock ." + user_uniqueKey + " .unr").html(_unreadCount + getUserUnreadTimelineCount(user_uniqueKey)).show();
+    	if(ur>0){
+            li.find('.unreadCount').html(ur);
+            //li.find('.unreadCount').html('(' + ur + ')');
             updateDockUserUnreadCount(user_uniqueKey);
         }
+//        var _msg_user = null, _unreadCount = 0;
+//        for(var i in msgs){
+//            _msg_user = msgs[i].user || msgs[i].sender;
+//            if(_msg_user && c_user && _msg_user.id != c_user.id){
+//                _unreadCount += 1;
+//            }
+//        }
+//        var ur = getUnreadTimelineCount(t);
+//        ur += _unreadCount;
+//        if(ur>0){
+//            li.find('.unreadCount').html(ur);
+//            //li.find('.unreadCount').html('(' + ur + ')');
+//            //$("#accountListDock ." + user_uniqueKey + " .unr").html(_unreadCount + getUserUnreadTimelineCount(user_uniqueKey)).show();
+//            updateDockUserUnreadCount(user_uniqueKey);
+//        }
         return false;
     }else{
-    	addPageMsgs(msgs, t, false);
+    	if(getAutoInsertMode() === 'notautoinsert'){
+    	    if(ur>0){
+                li.find('.unreadCount').html(ur);
+    	    }
+    	    return false;
+    	}else{
+    	    addPageMsgs(msgs, t, false);
+    	    return true;
+    	}
     }
-    return true;
+    return false;
 };
 
 // 添加分页数据，并且自动删除重复的数据，返回删除重复的数据集
@@ -2301,6 +2339,19 @@ function changeAlertMode(to_mode){
     var tip = (to_mode=='alert') ? _u.i18n("btn_alert_mode_title") : _u.i18n("btn_dnd_mode_title");
     btn.attr('mode', to_mode).attr('title', tip).find('img').attr('src', 'images/' + to_mode + '_mode.png');
     setUnreadTimelineCount(0, 'friends_timeline');
+};
+
+//====>>>>
+//新消息是否自动插入：自动插入、仅提示新消息数
+function changeAutoInsertMode(to_mode){
+    var btn = $("#btnAutoInsert");
+    if(!to_mode){
+        var mode = btn.attr('mode');
+        to_mode = (mode == 'notautoinsert') ? 'autoinsert' : 'notautoinsert';
+    }
+    setAutoInsertMode(to_mode);
+    var tip = (to_mode=='notautoinsert') ? _u.i18n("btn_not_auto_insert_title") : _u.i18n("btn_auto_insert_title");
+    btn.attr('mode', to_mode).attr('title', tip).find('img').attr('src', 'images/' + to_mode + '.png');
 };
 
 //====>>>>
