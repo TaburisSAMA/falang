@@ -129,7 +129,7 @@ function initTabs(){
         t.siblings().removeClass('active').end().addClass('active');
         //切换tab前先保护滚动条位置
         var old_t = getCurrentTab().replace('#','').replace(/_timeline$/i,'');
-        if(!currentIsActive){
+        if(!currentIsActive){ //如果当前不是激活的（点击的不是当前tab）
             saveScrollTop(old_t);
         }
         //切换tab
@@ -152,8 +152,8 @@ function initTabs(){
             checkShowGototop();
             return;
         }
-        //如果点击的当前tab是激活的，并且有未读信息，则清空列表，重新获取
-        if(currentIsActive && t.find(".unreadCount").html()) {
+        //如果有未读信息，则清空列表，重新获取
+        if(t.find(".unreadCount").html()) {
             c_ul.find('ul.list').html('');
         };
         if(!c_ul.find('ul.list').html()){
