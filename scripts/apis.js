@@ -574,16 +574,26 @@ var sinaApi = {
         this._sendRequest(params, callbackFn);
     },
 
-    // since_id, max_id, count, page 
-    direct_messages: function(data, callbackFn){
-		if(!callbackFn) return;
+    // since_id, max_id, count
+    direct_messages: function(data, callback, context){
         var params = {
             url: this.config.direct_messages,
             type: 'get',
             play_load: 'message',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callback, context);
+	},
+	
+	// since_id, max_id, count
+	sent_direct_messages: function(data, callback, context) {
+		var params = {
+            url: this.config.sent_direct_messages,
+            type: 'get',
+            play_load: 'message',
+            data: data
+        };
+        this._sendRequest(params, callback, context);
 	},
 
 	// id
@@ -4324,27 +4334,27 @@ var tapi = {
 		return this.api_dispatch(user).get_access_token(user, callback, context);
 	},
 	
-	verify_credentials: function(user, callbackFn, data){
-	    return this.api_dispatch(user).verify_credentials(user, callbackFn, data);
+	verify_credentials: function(user, callback, data, context){
+	    return this.api_dispatch(user).verify_credentials(user, callback, data, context);
 	},
         
-    rate_limit_status: function(data, callbackFn){
-	    return this.api_dispatch(data).rate_limit_status(data, callbackFn);
+    rate_limit_status: function(data, callback, context){
+	    return this.api_dispatch(data).rate_limit_status(data, callback, context);
 	},
 
 	// since_id, max_id, count, page 
-	friends_timeline: function(data, callbackFn){
-		return this.api_dispatch(data).friends_timeline(data, callbackFn);
+	friends_timeline: function(data, callback, context){
+		return this.api_dispatch(data).friends_timeline(data, callback, context);
 	},
 	
 	// id, user_id, screen_name, since_id, max_id, count, page 
-	user_timeline: function(data, callbackFn){
-		return this.api_dispatch(data).user_timeline(data, callbackFn);
+	user_timeline: function(data, callback, context){
+		return this.api_dispatch(data).user_timeline(data, callback, context);
 	},
 	
 	// id, count, page
-	comments_timeline: function(data, callbackFn){
-		return this.api_dispatch(data).comments_timeline(data, callbackFn);
+	comments_timeline: function(data, callback, context){
+		return this.api_dispatch(data).comments_timeline(data, callback, context);
 	},
 	
 	// id, count, page, since_id, max_id
@@ -4353,13 +4363,13 @@ var tapi = {
 	},
 	
 	// since_id, max_id, count, page 
-	mentions: function(data, callbackFn){
-		return this.api_dispatch(data).mentions(data, callbackFn);
+	mentions: function(data, callback, context){
+		return this.api_dispatch(data).mentions(data, callback, context);
 	},
 	
 	// id, user_id, screen_name, cursor, count
-	followers: function(data, callbackFn){
-		return this.api_dispatch(data).followers(data, callbackFn);
+	followers: function(data, callback, context){
+		return this.api_dispatch(data).followers(data, callback, context);
 	},
 	
 	// id, user_id, screen_name, cursor, count
@@ -4376,124 +4386,131 @@ var tapi = {
 	},
 	
 	// page
-	favorites: function(data, callbackFn){
-		return this.api_dispatch(data).favorites(data, callbackFn);
+	favorites: function(data, callback, context){
+		return this.api_dispatch(data).favorites(data, callback, context);
 	},
 	
 	// id
-	favorites_create: function(data, callbackFn){
-		return this.api_dispatch(data).favorites_create(data, callbackFn);
+	favorites_create: function(data, callback, context){
+		return this.api_dispatch(data).favorites_create(data, callback, context);
 	},
 	
 	// id
-	favorites_destroy: function(data, callbackFn){
-		return this.api_dispatch(data).favorites_destroy(data, callbackFn);
+	favorites_destroy: function(data, callback, context){
+		return this.api_dispatch(data).favorites_destroy(data, callback, context);
 	},
 	
 	// ids
-	counts: function(data, callbackFn){
-		return this.api_dispatch(data).counts(data, callbackFn);
+	counts: function(data, callback, context){
+		return this.api_dispatch(data).counts(data, callback, context);
 	},
 	
 	// id
-	user_show: function(data, callbackFn){
-		return this.api_dispatch(data).user_show(data, callbackFn);
+	user_show: function(data, callback, context){
+		return this.api_dispatch(data).user_show(data, callback, context);
 	},
 	
-	// since_id, max_id, count, page 
-	direct_messages: function(data, callbackFn){
-		return this.api_dispatch(data).direct_messages(data, callbackFn);
+	// since_id, max_id, count
+	direct_messages: function(data, callback, context){
+		return this.api_dispatch(data).direct_messages(data, callback, context);
 	},
 	
-	// id
-	destroy_msg: function(data, callbackFn){
-		return this.api_dispatch(data).destroy_msg(data, callbackFn);
-	},
-	
-	new_message: function(data, callbackFn){
-		return this.api_dispatch(data).new_message(data, callbackFn);
-	},
-	
-	update: function(data, callbackFn){
-		return this.api_dispatch(data).update(data, callbackFn);
-	},
-	
-	upload: function(user, data, pic, before_request, onprogress, callback){
-		return this.api_dispatch(user).upload(user, data, pic, before_request, onprogress, callback);
-	},
-	
-	repost: function(data, callbackFn){
-		return this.api_dispatch(data).repost(data, callbackFn);
-	},
-	
-	comment: function(data, callbackFn){
-		return this.api_dispatch(data).comment(data, callbackFn);
-	},
-	
-	reply: function(data, callbackFn){
-		return this.api_dispatch(data).reply(data, callbackFn);
-	},
-	
-	comments: function(data, callbackFn){
-		return this.api_dispatch(data).comments(data, callbackFn);
+	// since_id, max_id, count
+	sent_direct_messages: function(data, callback, context){
+		return this.api_dispatch(data).sent_direct_messages(data, callback, context);
 	},
 	
 	// id
-	comment_destroy: function(data, callbackFn){
-		return this.api_dispatch(data).comment_destroy(data, callbackFn);
+	destroy_msg: function(data, callback, context){
+		return this.api_dispatch(data).destroy_msg(data, callback, context);
 	},
 	
-	friendships_create: function(data, callbackFn){
-		return this.api_dispatch(data).friendships_create(data, callbackFn);
+	new_message: function(data, callback, context){
+		return this.api_dispatch(data).new_message(data, callback, context);
+	},
+	
+	update: function(data, callback, context){
+		return this.api_dispatch(data).update(data, callback, context);
+	},
+	
+	upload: function(user, data, pic, before_request, 
+			onprogress, callback, context){
+		return this.api_dispatch(user).upload(user, data, pic, 
+				before_request, onprogress, callback, context);
+	},
+	
+	repost: function(data, callback, context){
+		return this.api_dispatch(data).repost(data, callback, context);
+	},
+	
+	comment: function(data, callback, context){
+		return this.api_dispatch(data).comment(data, callback, context);
+	},
+	
+	reply: function(data, callback, context){
+		return this.api_dispatch(data).reply(data, callback, context);
+	},
+	
+	comments: function(data, callback, context){
+		return this.api_dispatch(data).comments(data, callback, context);
 	},
 	
 	// id
-	friendships_destroy: function(data, callbackFn){
-		return this.api_dispatch(data).friendships_destroy(data, callbackFn);
+	comment_destroy: function(data, callback, context){
+		return this.api_dispatch(data).comment_destroy(data, callback, context);
 	},
 	
-	friendships_show: function(data, callbackFn){
-		return this.api_dispatch(data).friendships_show(data, callbackFn);
+	friendships_create: function(data, callback, context){
+		return this.api_dispatch(data).friendships_create(data, callback, context);
+	},
+	
+	// id
+	friendships_destroy: function(data, callback, context){
+		return this.api_dispatch(data).friendships_destroy(data, callback, context);
+	},
+	
+	friendships_show: function(data, callback, context){
+		return this.api_dispatch(data).friendships_show(data, callback, context);
 	},
 	
 	// type
-	reset_count: function(data, callbackFn){
-		return this.api_dispatch(data).reset_count(data, callbackFn);
+	reset_count: function(data, callback, context){
+		return this.api_dispatch(data).reset_count(data, callback, context);
 	},
     
     // id
-	retweet: function(data, callbackFn){
-		return this.api_dispatch(data).retweet(data, callbackFn);
+	retweet: function(data, callback, context){
+		return this.api_dispatch(data).retweet(data, callback, context);
 	},
 	
 	// id
-	destroy: function(data, callbackFn){
-		return this.api_dispatch(data).destroy(data, callbackFn);
+	destroy: function(data, callback, context){
+		return this.api_dispatch(data).destroy(data, callback, context);
 	},
 	
 	// user_id, count, page
-    tags: function(data, callback) {
-    	return this.api_dispatch(data).tags(data, callback);
+    tags: function(data, callback, context) {
+    	return this.api_dispatch(data).tags(data, callback, context);
     },
     
     // count, page
-    tags_suggestions: function(data, callback) {
-    	return this.api_dispatch(data).tags_suggestions(data, callback);
+    tags_suggestions: function(data, callback, context) {
+    	return this.api_dispatch(data).tags_suggestions(data, callback, context);
     },
     
     // tags
-    create_tag: function(data, callback) {
-    	return this.api_dispatch(data).create_tag(data, callback);
+    create_tag: function(data, callback, context) {
+    	return this.api_dispatch(data).create_tag(data, callback, context);
     },
     
     // tag_id
-    destroy_tag: function(data, callback) {
-    	return this.api_dispatch(data).destroy_tag(data, callback);
+    destroy_tag: function(data, callback, context) {
+    	return this.api_dispatch(data).destroy_tag(data, callback, context);
     },
     
     // id
-    status_show: function(data, callback) {
-    	return this.api_dispatch(data).status_show(data, callback);
+    status_show: function(data, callback, context) {
+    	return this.api_dispatch(data).status_show(data, callback, context);
     }
 };
 

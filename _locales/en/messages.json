@@ -924,6 +924,11 @@
 		"description": "分享网页的模板的设置说明"
 	},
 	
+	"sett_jTip_instapaper": {
+        "message": "Enable Instapaper，RL(Read Later) button will show in toolbar<br /><img src=\"/images/setting/rl.jpg\" />",
+        "description": "启动Instapaper设置说明"
+    },
+	
 	"sett_itemName_auto_short_url": {
 		"message": "Auto Shorten The Url: ",
 		"description": "是否自动缩短URL"

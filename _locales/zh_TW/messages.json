@@ -923,6 +923,11 @@
 		"message": "<b>可用參數與說明:　</b><br/>當你使用“我正在看”的功能的時候，會根據該模板生成最終內容。 <br/>模板參數必須由\"{{}}\"包裹起來，可用的參數有：<br/><p><b>{{url}}</b>: 你當前正在瀏覽的網頁的url</p><p><b>{{title}}</b>: 你當前正在瀏覽的網頁的標題</p><img src=\"/images/setting/looking.png\" />",
 		"description": "分享网页的模板的设置说明"
 	},
+	
+	"sett_jTip_instapaper": {
+        "message": "启动Instapaper，将会在功能按键栏中出现 RL(Read Later) 按钮<br /><img src=\"/images/setting/rl.jpg\" />",
+        "description": "启动Instapaper设置说明"
+    },
 
 	"sett_itemName_auto_short_url": {
 		"message": "是否自動縮短URL：",

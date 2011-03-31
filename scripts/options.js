@@ -770,6 +770,7 @@ function saveAccount(){
     var blogType = $.trim($("#account-blogType").val()) || 'tsina'; //微博类型，兼容，默认tsina
     var authType = $.trim($("#account-authType").val()); //登录验证类型
     var appkey = $.trim($('#account-appkey').val()) || 'fawave';
+    appkey = 'fawave';
     var pin = $.trim($('#account-pin').val()); // oauth pin码
     var apiProxy = $.trim($('#account-proxy-api').val());
     var user = {
@@ -856,11 +857,12 @@ function showSupportAuthTypes(blogType, authType){
     } else {
     	$('.account-proxy').hide();
     }
-    if(blogType == 'tsina') {
-    	$('.account-appkey').show();
-    } else {
-    	$('.account-appkey').hide();
-    }
+//    if(blogType == 'tsina') {
+//    	$('.account-appkey').show();
+//    } else {
+//    	$('.account-appkey').hide();
+//    }
+    $('.account-appkey').hide();
 };
 
 function showEditAccount(uniqueKey){

@@ -74,7 +74,6 @@ var THEME_LIST = {
 var ALERT_MODE_KEY = 'idi_ALERT_MODE_KEY'; //信息提醒模式key
 var AUTO_INSERT_MODE_KEY = 'idi_AUTO_INSERT_MODE_KEY'; //新信息是否自动插入
 
-//['friends_timeline','mentions','comments_timeline','comments_by_me','direct_messages','favorites']
 //需要不停检查更新的timeline的分类列表
 var T_LIST = {
 	'all': ['friends_timeline','mentions','comments_timeline','direct_messages'],
@@ -183,13 +182,15 @@ var refreshTimeLimit = {
         'friends_timeline': 30, 
         'mentions': 30, 
         'comments_timeline': 30, 
-        'direct_messages': 30
+        'direct_messages': 30,
+        'sent_direct_messages': 60
     },
     'tqq':{
         'friends_timeline': 45, 
         'mentions': 45, 
         'comments_timeline': 45, 
-        'direct_messages': 45
+        'direct_messages': 45,
+        'sent_direct_messages': 60
     }
 };
 refreshTimeLimit.digu = refreshTimeLimit.twitter = refreshTimeLimit.identi_ca = refreshTimeLimit.tsohu = refreshTimeLimit.t163 = refreshTimeLimit.fanfou = refreshTimeLimit.plurk = refreshTimeLimit.tsina;
@@ -1921,7 +1922,7 @@ var VideoService = {
 		}
 		var l = (window.screen.availWidth-510)/2;
 		var width_height = vtype == 'xiami' 
-			? 'width=300,height=50': 'width=460,height=420';
+			? 'width=300,height=50': 'width=460,height=430';
     	window.open(url, '_blank', 'left=' + l + ',top=30,' 
     		+ width_height + ',menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
 	}

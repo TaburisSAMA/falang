@@ -380,12 +380,17 @@ function initIamDoing(){
 
 //搜索
 var Search = {
-	current_search: 'search', // 默认当前搜索类型 search, search_user
+	current_search: '', // 默认当前搜索类型 search, search_user
 	current_keyword: '',
     toggleInput: function(ele){
 		$('.searchWrap').hide();
 		var $search_wrap = $(ele).nextAll('.searchWrap');
-		Search.current_search = $search_wrap.hasClass('searchUserWrap') ? 'search_user' : 'search';
+		var search_type = $search_wrap.hasClass('searchUserWrap') ? 'search_user' : 'search';
+		if(search_type == Search.current_search) {
+			Search.current_search = '';
+			return;
+		}
+		Search.current_search = search_type;
 		$search_wrap.toggle();
 		var $text = $search_wrap.find(".txtSearch").focus().keyup(function(event) {
 			Search.current_keyword = $(this).val();

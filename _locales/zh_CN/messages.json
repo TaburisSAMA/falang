@@ -939,6 +939,11 @@
 		"message": "<b>可用参数与说明:　</b><br/>当你使用“我正在看”的功能的时候，会根据该模板生成最终内容。<br/>模板参数必须由\"{{}}\"包裹起来，可用的参数有：<br/><p><b>{{url}}</b>: 你当前正在浏览的网页的url</p><p><b>{{title}}</b>: 你当前正在浏览的网页的标题</p><img src=\"/images/setting/looking.png\" />",
 		"description": "分享网页的模板的设置说明"
 	},
+	
+	"sett_jTip_instapaper": {
+        "message": "启动Instapaper，将会在功能按键栏中出现 RL(Read Later) 按钮<br /><img src=\"/images/setting/rl.jpg\" />",
+        "description": "启动Instapaper设置说明"
+    },
 
 	"sett_itemName_auto_short_url": {
 		"message": "是否自动缩短URL：",

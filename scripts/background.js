@@ -189,11 +189,35 @@ var friendships = {
 //    			console.log('fetch_done_once');
     		}
     		friendships.fetch_times[user_uniquekey] = new Date().getTime();
-    		console.log('fetch new', friends.length, 'cursor', data.next_cursor, cache.length);
+//    		console.log('fetch new', friends.length, 'cursor', data.next_cursor, cache.length);
     		callback.call(context, friends || []);
     	});
     }
-}; 
+};
+
+//function merge_direct_messages(user_uniquekey, direct_messages, sent_messages){
+//	// 对私信进行合并排序
+//	var messages = get_data_cache('messages', user_uniquekey);
+//	if(!messages) {
+//		messages = [];
+//	}
+//	var need_sort = false;
+//	[direct_messages, sent_messages].forEach(function(items){
+//		if(items && items.length > 0){
+//			need_sort = true;
+//			messages = messages.concat(items);
+//		}
+//	});
+//	if(need_sort) {
+//		messages.sort(function(a, b){
+//			if(a.created_at < b.created_at) {
+//				return -1;
+//			}
+//			return 1;
+//		});
+//	}
+//	set_data_cache(messages, 'messages', user_uniquekey);
+//};
 
 //获取最新的(未看的)微博
 // @t : 获取timeline的类型
