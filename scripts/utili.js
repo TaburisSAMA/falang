@@ -229,7 +229,7 @@ function hideLoading(){
 //设置选项
 var Settings = {
     defaults: {
-        twitterEnabled: false,
+        twitterEnabled: true,
         globalRefreshTime:{ //全局的刷新间隔时间
             friends_timeline: 90,
             mentions: 120,
