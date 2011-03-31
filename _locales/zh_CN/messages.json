@@ -454,6 +454,14 @@
 	    "message": "已开启免打扰模式。点击切换到提示模式",
 		"description": "已开启免打扰模式。点击切换到提示模式"
 	},
+	"btn_not_auto_insert_title": {
+	    "message": "当前为仅提示新微博数模式。点击切换到自动插入新微博模式。",
+		"description": "当前为仅提示新微博数模式。点击切换到自动插入新微博模式。"
+	},
+	"btn_auto_insert_title": {
+	    "message": "当前为自动插入新微博模式，点击切换到仅提示新微博数模式。",
+		"description": "当前为自动插入新微博模式。点击切换到仅提示新微博数模式。"
+	},
 	"btn_add_favorites_title": {
 	    "message": "点击收藏",
 		"description": "点击收藏"
