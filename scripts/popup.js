@@ -1726,7 +1726,7 @@ function _sendMsgWraper(msg, user, stat, selLi){
                 setTimeout(callCheckNewMsg, 1000, 'friends_timeline');
                 var failCount = stat.userCount - stat.successCount;
                 if(stat.userCount > 1 && failCount > 0){ //多个用户，并且有发送失败才显示
-                    showMsg(_u.i18n("msg_send_complete").format({successCount:successCount, errorCount:failCount}));
+                    showMsg(_u.i18n("msg_send_complete").format({successCount:stat.successCount, errorCount:failCount}));
                 }
             }
         }
