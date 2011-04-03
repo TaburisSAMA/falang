@@ -2372,10 +2372,10 @@ fawave.face = {
         				}
         			});
         			var $face_icons = $('<div style="display:none;" class="face_icons ' + face_type[0] + '_faces"></div>');
-        			if(i == 0) {
-        				$face_tab.addClass('active');
-        				$face_icons.show();
-        			}
+//        			if(current_blogtype == face_type[0]) {
+//        				$face_tab.addClass('active');
+//        				$face_icons.show();
+//        			}
         			$('#face_box .face_tab p').append($face_tab);
             		$('#face_box .faceItemPicbg').append($face_icons);
             		var exists = {};
@@ -2392,8 +2392,9 @@ fawave.face = {
             			exists[name] = true;
             		}
         		}
-        		
         	}
+        	var current_blogtype = getUser().blogType;
+        	$('#face_box .face_tab span[face_type="' + current_blogtype + '"]').click();
             $("#face_box_target_id").val(target_id);
             var offset = $(ele).offset();
             f.css({top: offset.top+20, left: offset.left}).show();

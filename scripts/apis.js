@@ -1687,6 +1687,21 @@ $.extend(TSohuAPI, {
         }
 	}),
 	
+	processEmotional: function(str){
+	    str = str.replace(/\[([\u4e00-\u9fff,\uff1f,\w]{1,10})\]/g, this._replaceEmotional);
+	    return str;
+	},
+	_replaceEmotional: function(m, g1){
+	    var tpl = '<img title="{{title}}" src="{{src}}" />';
+	    if(g1) {
+	        var face = TSOHU_EMOTIONS[g1];
+	        if(face) {
+	            return tpl.format({title: m, src: TSOHU_EMOTIONS_URL_PRE + face});
+	        }
+	    }
+	    return m;
+	},
+	
 	reset_count: function(data, callback) {
 		callback();
 	},

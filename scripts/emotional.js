@@ -255,6 +255,61 @@ var RENJIAN_EMOTIONS = {
    ]
 };
 
+// TSOHU 表情
+// .find('i').each(function(){console.log('"' + $(this).attr('title') + '": "' + $(this).attr('class') + '",')});
+var TSOHU_EMOTIONS_URL_PRE = 'http://s3.cr.itc.cn/img/';
+var TSOHU_FACE_TPL = '[{{name}}]';
+var TSOHU_EMOTIONS = {
+"地球一小时": "i2/t/178.gif",
+"盐": "t/536.gif",
+"心相映": "t/532.gif",
+"急救箱": "t/531.gif",
+"地震": "t/530.gif",
+"蜡烛": "t/425.gif",
+//"握手": "x x53",
+"蛋糕": "t/527.gif",
+"内裤": "t/528.gif",
+"内衣": "t/529.gif",
+"雪": "t/526.gif",
+"福": "t/519.gif",
+"微笑": "i3/t/2026.gif",
+"色": "i3/t/2027.gif",
+"呲牙": "i3/t/2028.gif",
+"偷笑": "i3/t/2029.gif",
+"害羞": "i3/t/2030.gif",
+"大哭": "i3/t/2031.gif",
+"哭": "i3/t/061.gif",
+"酷": "i3/t/2033.gif",
+"发火": "i3/t/2034.gif",
+"怒": "i3/t/2035.gif",
+"疑问": "i3/t/2036.gif",
+"感叹": "i3/t/2037.gif",
+"调皮": "i3/t/2038.gif",
+"眨眼": "i3/t/2039.gif",
+"寒": "i3/t/2040.gif",
+"睡觉": "i3/t/2041.gif",
+"困": "i3/t/2042.gif",
+"不满": "i3/t/2043.gif",
+"噘嘴": "i3/t/2044.gif",
+"听歌": "i3/t/2045.gif",
+"汗": "i3/t/2046.gif",
+"脸红": "i3/t/2047.gif",
+"耳语": "i3/t/2048.gif",
+"嘘": "i3/t/2049.gif",
+"吐": "i3/t/2050.gif",
+"馋": "i3/t/2051.gif",
+"鄙视": "i3/t/2052.gif",
+"讽刺": "i3/t/2053.gif",
+"发呆": "i3/t/2054.gif",
+"晕": "i3/t/2055.gif",
+"被踹": "i3/t/2056.gif",
+"衰": "i3/t/2057.gif",
+"受伤": "i3/t/2058.gif",
+"海盗": "i3/t/2059.gif",
+"闭嘴": "i3/t/2060.gif",
+"佐罗": "i3/t/2061.gif"
+};
+
 // TQQ表情
 // http://mat1.gtimg.com/www/mb/images/face/14.gif
 // .find('a').each(function(i, item){console.log('"' + $(this).attr('title') + '"' + ': ' + '"' + $(this).attr('class').substring(1) + '.gif",');});
@@ -370,5 +425,6 @@ var TQQ_EMOTIONS = {
 
 var FACE_TYPES = [
     ['tsina', TSINA_FACES, TSINA_FACE_URL_PRE, TSINA_FACE_TPL, '新浪'],      
-    ['tqq', TQQ_EMOTIONS, TQQ_EMOTIONS_URL_PRE, TQQ_FACE_TPL, '腾讯']
+    ['tqq', TQQ_EMOTIONS, TQQ_EMOTIONS_URL_PRE, TQQ_FACE_TPL, '腾讯'],
+    ['tsohu', TSOHU_EMOTIONS, TSOHU_EMOTIONS_URL_PRE, TSOHU_FACE_TPL, '搜狐']
 ];
