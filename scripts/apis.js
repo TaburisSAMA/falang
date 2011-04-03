@@ -228,17 +228,10 @@ var sinaApi = {
     },
     _replaceEmotional: function(m, g1){
         var tpl = '<img title="{{title}}" src="{{src}}" />';
-        if(window.emotionalDict && g1) {
-            if(emotionalDict[g1]){
-                var src = emotionalDict[g1];
-                if(src.indexOf('http') != 0){
-                    src = '/images/faces/' + src + '.gif';
-                }
-                return tpl.format({title: m, src: src});
-            }
-            var other = TSINA_API_EMOTIONS[g1] || TSINA_FACES[g1];
-            if(other) {
-                return tpl.format({title: m, src: TSINA_FACE_URL_PRE + other});
+        if(g1) {
+            var face = TSINA_API_EMOTIONS[g1];
+            if(face) {
+                return tpl.format({title: m, src: TSINA_FACE_URL_PRE + face});
             }
         }
         return m;
@@ -1342,7 +1335,7 @@ $.extend(TQQAPI, {
 	        if(window.TQQ_EMOTIONS && g1) {
 	        	var emotion = window.TQQ_EMOTIONS[g1];
 	            if(emotion) {
-	                var tpl = '<img title="{{title}}" src="http://mat1.gtimg.com/www/mb/images/face/{{emotion}}.gif" />';
+	                var tpl = '<img title="{{title}}" src="' + TQQ_EMOTIONS_URL_PRE + '{{emotion}}" />';
 	                return tpl.format({title: g1, emotion: emotion});
 	            }
 	        }
@@ -1709,6 +1702,10 @@ $.extend(TSohuAPI, {
 		} else if(args.url == this.config.search) {
 			args.data.rpp = args.data.count;
 			delete args.data.count;
+		} else if(args.url == this.config.user_timeline) {
+			if(!args.data.id) {
+				args.data.id = args.data.screen_name;
+			}
 		}
 	},
 	

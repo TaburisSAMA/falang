@@ -35,7 +35,7 @@
 		<textarea id="txtContent" ></textarea>
 		<div class="ctr">
 			<span id="wordCount">140</span>&nbsp;
-			<a href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');" title="点击添加表情"><img src="images/face.gif" /><script>_u.wi('comm_emotional')</script></a>
+			<a id="btnAddEmotional" href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');"><img src="images/face.gif" /><script>_u.wi('comm_emotional')</script></a>
 			<script>_u.wia('#btnAddEmotional','title','btn_emotional_title');</script>&nbsp;
 			<button onclick="cleanTxtContent();" class="btn"><script>_u.wi('comm_clear')</script></button>&nbsp;
 			<button onclick="window.close();" class="btn"><script>_u.wi('comm_close')</script></button>&nbsp;
@@ -62,16 +62,21 @@
 	<div id="msgInfoWarp" style=""></div>
 	
 	<!-- 表情选择 -->
-	<div id="face_box" class="layerBox" style="width:360px;display:none;">
-	<div class="layerBoxCon1" style="width:360px">
-	<div class="faceItem clearFix">
-	<div class="layerArrow"></div>
-	<div class="layerMedia_close">
-	<a class="close" href="javascript:void(fawave.face.hide())" title="Close"></a>
+	<div id="face_box" class="layerBox" style="display:none;">
+		<div class="layerBoxCon1">
+			<div class="faceItem clearFix">
+				<div class="layerArrow"></div>
+				<div class="face_tab tab2">
+                    <p>
+                        <a id="btnFaceBoxClose" class="close" href="javascript:void(fawave.face.hide())"></a>
+                        <script>_u.wia('#btnFaceBoxClose','title','comm_close');</script>
+                    </p>
+                </div>
+				<div class="faceItemPicbg">
+				</div>
+			</div>
+		</div>
 	</div>
-	<div class="faceItemPicbg">
-	<ul id="face_icons"></ul>
-	</div></div></div></div>
 	<input id="face_box_target_id" type="hidden" value="" />
 	<!-- 表情选择 End -->
 

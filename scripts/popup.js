@@ -2358,30 +2358,41 @@ fawave.face = {
         var f = $("#face_box");
         if(f.css('display') == 'none' || $("#face_box_target_id").val() != target_id) {
         	// 初始化表情
-        	var $face_icons = $('#face_icons');
-        	if(!$face_icons.attr('init_icons')) {
-        		var exists = {};
-        		$('#face_icons li a').each(function() {
-        			exists[$(this).attr('title')] = true;
-        		});
-        		var tpl = '<li><a href="javascript:void(0)" onclick="fawave.face.insert(this)" value="[{{name}}]" title="{{name}}"><img src="{{url}}" alt="{{name}}"></a></li>';
-    			for(var name in TSINA_FACES) {
-        			if(exists[name]) continue;
-        			$face_icons.append(tpl.format({'name': name, 'url': TSINA_FACE_URL_PRE + TSINA_FACES[name]}));
-        			exists[name] = true;
+        	if($('#face_box .faceItemPicbg .face_icons').length == 0) {
+        		// FACE_TYPES   [typename, faces, url_pre, tpl, type_title]
+        		for(var i=0; i<FACE_TYPES.length; i++) {
+        			var face_type = FACE_TYPES[i];
+        			var $face_tab = $('<span face_type="' + face_type[0] + '">' + face_type[4] + '</span>');
+        			$face_tab.click(function(){
+        				if(!$(this).hasClass('active')) {
+        					$('.face_tab span').removeClass('active');
+            				$('#face_box .faceItemPicbg .face_icons').hide();
+            				$('#face_box .faceItemPicbg .' + $(this).attr('face_type') + '_faces').show();
+            				$(this).addClass('active');
+        				}
+        			});
+        			var $face_icons = $('<div style="display:none;" class="face_icons ' + face_type[0] + '_faces"></div>');
+        			if(i == 0) {
+        				$face_tab.addClass('active');
+        				$face_icons.show();
+        			}
+        			$('#face_box .face_tab p').append($face_tab);
+            		$('#face_box .faceItemPicbg').append($face_icons);
+            		var exists = {};
+            		$('#face_icons li a').each(function() {
+            			exists[$(this).attr('title')] = true;
+            		});
+            		var face_tpl = face_type[3];
+            		var tpl = '<li><a href="javascript:void(0)" onclick="fawave.face.insert(this)"' 
+            			+ ' value="' + face_tpl + '" title="{{name}}"><img src="{{url}}" alt="{{name}}"></a></li>';
+            		var faces = face_type[1], url_pre = face_type[2];
+            		for(var name in faces) {
+            			if(exists[name]) continue;
+            			$face_icons.append(tpl.format({'name': name, 'url': url_pre + faces[name]}));
+            			exists[name] = true;
+            		}
         		}
-        		for(var name in emotionalDict) {
-        			if(exists[name]) continue;
-        			var src = emotionalDict[name];
-			        if(src.indexOf('http') != 0){
-			            src = '/images/faces/' + src + '.gif';
-			        } else {
-			        	continue;
-			        }
-        			$face_icons.append(tpl.format({'name': name, 'url': src}));
-        			exists[name] = true;
-        		}
-        		$face_icons.attr('init_icons', true);
+        		
         	}
             $("#face_box_target_id").val(target_id);
             var offset = $(ele).offset();
