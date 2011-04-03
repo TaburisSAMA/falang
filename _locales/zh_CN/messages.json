@@ -412,6 +412,10 @@
 		"message": "私",
 		"description": "私信的简称"
 	},
+	"abb_send_direct_message_to_user": {
+        "message": "发私信给",
+        "description": "发私信给"
+    },
 	"abb_send_direct_message": {
 		"message": "私",
 		"description": "发送私信的简称"

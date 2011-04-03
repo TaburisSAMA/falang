@@ -404,6 +404,10 @@
 		"message": "Dm",
 		"description": "私信的简称"
 	},
+	"abb_send_direct_message_to_user": {
+        "message": "Send message to",
+        "description": "发私信给"
+    },
 	"abb_send_direct_message": {
 		"message": "Dm",
 		"description": "发送私信的简称"
