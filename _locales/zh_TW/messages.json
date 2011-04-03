@@ -878,9 +878,17 @@
 
 	//高级设置
 	"sett_itemName_geo": {
-		"message": "上報我的地理位置：",
-		"description": "上报我的地理位置"
-	},
+        "message": "开启我的地理位置：",
+        "description": "开启我的地理位置"
+    },
+    "sett_itemName_use_browser_geo": {
+        "message": "使用浏览器判断地理位置",
+        "description": "使用浏览器判断地理位置"
+    },
+    "sett_itemName_use_ip_geo": {
+        "message": "使用IP判断地理位置",
+        "description": "使用IP判断地理位置"
+    },
 	"sett_show_my_geo": {
 		"message": "查看我的位置",
 		"description": "查看我的位置"

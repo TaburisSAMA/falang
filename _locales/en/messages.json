@@ -878,9 +878,17 @@
 
 	//高级设置
 	"sett_itemName_geo": {
-		"message": "Submit My Geo: ",
-		"description": "上报我的地理位置"
+		"message": "Enable My Geo: ",
+		"description": "开启我的地理位置"
 	},
+	"sett_itemName_use_browser_geo": {
+        "message": "Use browser location API",
+        "description": "使用浏览器判断地理位置"
+    },
+    "sett_itemName_use_ip_geo": {
+        "message": "Use IP determine location",
+        "description": "使用IP判断地理位置"
+    },
 	"sett_show_my_geo": {
 		"message": "View My Location",
 		"description": "查看我的位置"

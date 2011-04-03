@@ -27,7 +27,7 @@
 	</script>
 	<script type="text/javascript" src="scripts/lib/sha1.js" ></script>
 	<script type="text/javascript" src="scripts/lib/oauth.js" ></script>
-	<script type="text/javascript" src="scripts/s8api.js" ></script>
+	<script type="text/javascript" src="scripts/lib/jssha256.js" ></script>
 	<script type="text/javascript" src="scripts/apis.js" ></script>
 	<script type="text/javascript" src="scripts/ui.js" ></script>
 	<script type="text/javascript" src="scripts/popup.js" ></script>
@@ -327,9 +327,11 @@
 					   <?js } ?>
 					   #{_u.i18n('comm_post_by')} #{tweet.source|| _u.i18n("comm_web_site")}
 					   <?js if(!tweet.retweeted_status && tweet.in_reply_to_status_id && tweet.in_reply_to_screen_name){ ?>
-					   <a href="javascript:void(0);" class="show_source_status_btn" status_id="#{tweet.in_reply_to_status_id}" title="#{_u.i18n('comm_show_original_status')}">#{_u.i18n("btn_show_source_status", [tweet.in_reply_to_screen_name])}</a>
+					   <a href="javascript:void(0);" class="show_source_status_btn" status_id="#{tweet.in_reply_to_status_id}" 
+					       title="#{_u.i18n('comm_show_original_status')}">#{_u.i18n("btn_show_source_status", [tweet.in_reply_to_screen_name])}</a>
 					   <?js } ?>
-					   
+					   <!-- 提示私信是回复给谁的 -->
+					   #{btn.messageReplyToBtn}
 					</div>
 					<?js } ?>
 				</div>

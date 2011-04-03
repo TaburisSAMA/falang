@@ -1172,11 +1172,14 @@ function getSinaTimeline(t, notCheckNew){
     var _ul = $("#" + t + "_timeline ul.list");
     var c_user = getUser();
     var b_view = getBackgroundView();
-    var _key = c_user.uniqueKey + t + '_tweets';
+    var data_type = t;
+    if('direct_messages' == data_type) {
+    	data_type = 'messages';
+    }
+    var cache = b_view.get_data_cache(data_type, c_user.uniqueKey);
     hideReadMoreLoading(t);
-    if(b_view.tweets[_key] && b_view.tweets[_key].length > 0){
-        var tweetsAll = b_view.tweets[_key];
-        var msgs = tweetsAll.slice(0, PAGE_SIZE);
+    if(cache && cache.length > 0){
+        var msgs = cache.slice(0, PAGE_SIZE);
         var htmls = [];
         var ids = [];
         htmls = buildStatusHtml(msgs, t);
@@ -1208,7 +1211,7 @@ function getSinaTimeline(t, notCheckNew){
             	showCounts(t, ids);
             }
         }
-        if(tweetsAll.length >= (PAGE_SIZE/2)) {
+        if(cache.length >= (PAGE_SIZE/2)) {
             showReadMore(t);
         }
     } else if(!notCheckNew){
@@ -1216,7 +1219,6 @@ function getSinaTimeline(t, notCheckNew){
         b_view.checkTimeline(t);
     }
 };
-//<<<<<<<<<<<<<<<<<<<<<<<========
 
 //显示评论数和回复数
 function showCounts(t, ids){
@@ -1492,12 +1494,16 @@ function readMore(t){
     showLoading();
     var _b_view = getBackgroundView();
     var c_user = getUser();
-    var _key = c_user.uniqueKey + t + '_tweets';
-    var cache = _b_view.tweets[_key];
-    if(!cache || getTimelineOffset(t) >= cache.length){
+    var data_type = t;
+    if(data_type == 'direct_messages') {
+    	data_type = 'messages';
+    }
+    var cache = _b_view.get_data_cache(data_type, c_user.uniqueKey);
+    var timeline_offset = getTimelineOffset(t);
+    if(!cache || timeline_offset >= cache.length) {
         _b_view.getTimelinePage(c_user.uniqueKey, t);
-    }else{
-        var msgs = cache.slice(getTimelineOffset(t), getTimelineOffset(t) + PAGE_SIZE);
+    } else {
+        var msgs = cache.slice(timeline_offset, timeline_offset + PAGE_SIZE);
         addPageMsgs(msgs, t, true);
         showReadMore(t);
     }
@@ -1521,47 +1527,29 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
     var li = $('.tab-' + t);
     var _ul = $("#" + t + "_timeline ul.list");
     
-    var _msg_user = null, _unreadCount = 0;
-    for(var i in msgs){
-        _msg_user = msgs[i].user || msgs[i].sender;
-        if(_msg_user && c_user && _msg_user.id != c_user.id){
-            _unreadCount += 1;
+    var unread = getUnreadTimelineCount(t);
+    for(var i=0; i<msgs.length; i++){
+        var _msg_user = msgs[i].user || msgs[i].sender;
+        if(_msg_user && _msg_user.id != c_user.id){
+        	unread += 1;
         }
     }
-    var ur = getUnreadTimelineCount(t);
-    ur += _unreadCount;
-    
-    if(!li.hasClass('active')){
+    if(!li.hasClass('active')) {
         //清空，让下次点tab的时候重新取
     	_ul.html('');
-    	if(ur>0){
-            li.find('.unreadCount').html(ur);
-            //li.find('.unreadCount').html('(' + ur + ')');
+    	if(unread > 0){
+            li.find('.unreadCount').html(unread);
+            //li.find('.unreadCount').html('(' + unread + ')');
             updateDockUserUnreadCount(user_uniqueKey);
         }
-//        var _msg_user = null, _unreadCount = 0;
-//        for(var i in msgs){
-//            _msg_user = msgs[i].user || msgs[i].sender;
-//            if(_msg_user && c_user && _msg_user.id != c_user.id){
-//                _unreadCount += 1;
-//            }
-//        }
-//        var ur = getUnreadTimelineCount(t);
-//        ur += _unreadCount;
-//        if(ur>0){
-//            li.find('.unreadCount').html(ur);
-//            //li.find('.unreadCount').html('(' + ur + ')');
-//            //$("#accountListDock ." + user_uniqueKey + " .unr").html(_unreadCount + getUserUnreadTimelineCount(user_uniqueKey)).show();
-//            updateDockUserUnreadCount(user_uniqueKey);
-//        }
         return false;
-    }else{
-    	if(getAutoInsertMode() === 'notautoinsert'){
-    	    if(ur>0){
-                li.find('.unreadCount').html(ur);
+    } else {
+    	if(getAutoInsertMode() === 'notautoinsert') {
+    	    if(unread > 0){
+                li.find('.unreadCount').html(unread);
     	    }
     	    return false;
-    	}else{
+    	} else {
     	    addPageMsgs(msgs, t, false);
     	    return true;
     	}
@@ -1571,11 +1559,14 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
 
 // 添加分页数据，并且自动删除重复的数据，返回删除重复的数据集
 function addPageMsgs(msgs, t, append, data_type){
-	if(!msgs || msgs.length == 0){
-		return [];
+	msgs = msgs || [];
+	if(msgs.length == 0){
+		return msgs;
+	}
+	if(t == 'sent_direct_messages') {
+		t = 'direct_messages';
 	}
 	data_type = data_type || 'status';
-    var ids = [];
     var _ul = $("#" + t + "_timeline ul.list"), htmls = [];
     var method = append ? 'append' : 'prepend';
     var direct = append ? 'last' : 'first';
@@ -1588,21 +1579,27 @@ function addPageMsgs(msgs, t, append, data_type){
     _ul[method](htmls.join(''));
     // 处理缩址
     ShortenUrl.expandAll();
-    for(var i in msgs){
-        if(t != 'direct_messages'){
-        	ids.push(msgs[i].id);
-            if(msgs[i].retweeted_status){
-                ids.push(msgs[i].retweeted_status.id);
-                if(msgs[i].retweeted_status.retweeted_status) {
-                	ids.push(msgs[i].retweeted_status.retweeted_status.id);
-                }
-            } else if (msgs[i].status){ // 评论
-                ids.push(msgs[i].status.id);
-                if(msgs[i].status.retweeted_status) {
-                	ids.push(msgs[i].status.retweeted_status.id);
+    var ids = [];
+    if(t != 'direct_messages') {
+	    for(var i=0; i<msgs.length; i++){
+	    	var status = msgs[i];
+	    	var retweeted_status = status.retweeted_status || status.status;
+        	ids.push(status.id);
+            if(retweeted_status){
+                ids.push(retweeted_status.id);
+                if(retweeted_status.retweeted_status) {
+                	ids.push(retweeted_status.retweeted_status.id);
                 }
             }
+	    }
+    }
+    if(ids.length > 0) {
+        if(ids.length > 100) {
+            var ids2 = ids.slice(0, 99);
+            ids = ids.slice(99, ids.length);
+            showCounts(t, ids2);
         }
+        showCounts(t, ids);
     }
     var h_old = _ul.height();
     //hold住当前阅读位置
@@ -1611,15 +1608,6 @@ function addPageMsgs(msgs, t, append, data_type){
     if(!append && st_old > 50){ //大于50才做处理，否则不重新定位(顶部用户可能想直接看到最新的微博)
         var h_new = _ul.height();
         list_warp.scrollTop(h_new - h_old + st_old);
-    }
-
-    if(ids.length > 0){
-        if(ids.length > 100){
-            var ids2 = ids.slice(0, 99);
-            ids = ids.slice(99, ids.length);
-            showCounts(t, ids2);
-        }
-        showCounts(t, ids);
     }
     return msgs;
 };
@@ -2364,7 +2352,7 @@ function changeAutoInsertMode(to_mode){
 fawave.face = {
     show: function(ele, target_id){
         var f = $("#face_box");
-        if(f.css('display')=='none' || $("#face_box_target_id").val()!=target_id){
+        if(f.css('display') == 'none' || $("#face_box_target_id").val() != target_id) {
         	// 初始化表情
         	var $face_icons = $('#face_icons');
         	if(!$face_icons.attr('init_icons')) {

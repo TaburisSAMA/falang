@@ -39,6 +39,8 @@ var sinaApi = {
 		support_favorites: true, // 判断是否支持收藏列表
 		support_do_favorite: true, // 判断是否支持收藏功能
         support_geo: true, //是否支持地理位置信息上传
+        latitude_field: 'lat', // 纬度参数名
+        longitude_field: 'long', // 经度参数名
 		// 是否支持max_id 分页
 		support_max_id: true,
 		support_destroy_msg: true, //是否支持删除私信
@@ -634,22 +636,35 @@ var sinaApi = {
 		};
 		this._sendRequest(params, callback);
 	},
-    
-    update: function(data, callbackFn){
-        if(!callbackFn) return;
-        if(this.config.support_geo && Settings.get().isGeoEnabled && Settings.get().geoPosition){
-        	if(Settings.get().geoPosition.latitude) {
-    			data.lat = Settings.get().geoPosition.latitude;
-                data.long = Settings.get().geoPosition.longitude;
+	
+	get_geo: function() {
+		var settings = Settings.get();
+        if(this.config.support_geo && settings.isGeoEnabled && settings.geoPosition){
+        	if(settings.geoPosition.latitude) {
+    			return settings.geoPosition;
     		}
         }
+        return null;
+	},
+	
+	// 格式化经纬度参数
+	format_geo_arguments: function(data, geo){
+		data[this.config.latitude_field] = geo.latitude;
+        data[this.config.longitude_field] = geo.longitude;
+	},
+    
+    update: function(data, callback){
+		var geo = this.get_geo();
+		if(geo) {
+			this.format_geo_arguments(data, geo);
+		}
         var params = {
             url: this.config.update,
             type: 'post',
             play_load: 'status',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callback);
     },
     
     // 格式上传参数，方便子类覆盖做特殊处理
@@ -670,12 +685,10 @@ var sinaApi = {
     	var auth_args = {type: 'post', data: {}, headers: {}};
     	pic.keyname = pic.keyname || 'pic';
     	data.source = data.source || this.config.source;
-    	if(this.config.support_geo && Settings.get().isGeoEnabled && Settings.get().geoPosition){
-    		if(Settings.get().geoPosition.latitude) {
-    			data.lat = Settings.get().geoPosition.latitude;
-                data.long = Settings.get().geoPosition.longitude;
-    		}
-        }
+    	var geo = this.get_geo();
+    	if(geo) {
+			this.format_geo_arguments(data, geo);
+		}
     	this.format_upload_params(user, data, pic);
 	    var boundary = '----multipartformboundary' + (new Date).getTime();
 	    var dashdash = '--';
@@ -1270,6 +1283,9 @@ $.extend(TQQAPI, {
         rt_at_name: true, // RT的@name而不是@screen_name
         repost_delimiter: ' || ', //转发时的分隔符
         support_counts: false, // 只有rt_count这个，不过貌似有问题，总是404。暂时隐藏
+        
+        latitude_field: 'wei', // 纬度参数名
+        longitude_field: 'jing', // 经度参数名
         friends_timeline: '/statuses/home_timeline',
         repost_timeline: 	  '/t/re_list_repost',
         
@@ -1423,12 +1439,6 @@ $.extend(TQQAPI, {
             delete args.data.comment;
         }
         
-        if(args.data.lat && args.data.long){
-            args.data.wei = args.data.lat;
-            args.data.jing = args.data.long;
-            delete args.data.lat;
-            delete args.data.long;
-        }
         switch(args.url){
             case this.config.new_message:
             case this.config.user_timeline:
@@ -1609,6 +1619,21 @@ $.extend(TQQAPI, {
 			status.comments_count = data.mcount || 0; // 评论数
 			status.source = data.from;
 			status.user = this.format_result_item(data, 'user', args, users);
+			// 收件人
+//			tohead: ""
+//			toisvip: 0
+//			toname: "macgirl"
+//			tonick: "美仪"
+			if(data.toname) {
+				status.recipient = {
+					name: data.toname,
+					nick: data.tonick,
+					isvip: data.toisvip,
+					head: data.tohead
+				};
+				status.recipient = this.format_result_item(status.recipient, 'user', args, users);
+			}
+			
 			// 如果有text属性，则替换其中的@xxx 为 中文名(@xxx)
     		if(status && status.text) {
     			var matchs = status.text.match(this.ONLY_AT_USER_RE);
@@ -2673,6 +2698,10 @@ $.extend(FanfouAPI, {
 		callback();
 	},
 	
+	format_geo_arguments: function(data, geo) {
+		data.location = geo.latitude + ',' + geo.longitude;
+	},
+	
 	before_sendRequest: function(args, user) {
 		if(args.url == this.config.new_message) {
 			// id => user
@@ -2682,11 +2711,6 @@ $.extend(FanfouAPI, {
 			if(args.data.sina_id){
 				args.data.in_reply_to_status_id = args.data.sina_id;
 				delete args.data.sina_id;
-			}
-			if(args.data.lat) {
-				args.data.location = args.data.lat + ',' + args.data.long;
-				delete args.data.lat;
-				delete args.data.long;
 			}
 		} else if(args.url == this.config.friends || args.url == this.config.followers) {
 			// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
@@ -2701,7 +2725,13 @@ $.extend(FanfouAPI, {
 			delete args.data.cursor;
 			delete args.data.user_id;
 			delete args.data.screen_name;
-		}
+		} 
+//		else if(args.url == this.config.user_timeline) {
+//			if(args.data.screen_name) {
+//				args.data.id = args.data.screen_name;
+//				delete args.data.screen_name;
+//			}
+//		}
     },
 	
 	/* photo（必须）- 照片文件。和<input type="file" name="photo" />效果一样
@@ -2837,8 +2867,6 @@ $.extend(T163API, {
 	
 	format_upload_params: function(user, data, pic) {
     	delete data.source;
-    	delete data.lat;
-    	delete data.long;
     },
 	
 	upload: function(user, params, pic, before_request, onprogress, callback) {
@@ -4278,6 +4306,31 @@ $.extend(PlurkAPI, {
 	}
 });
 
+var TumblrAPI = $.extend({}, sinaApi);
+$.extend(TumblrAPI, {
+	config: $.extend({}, sinaApi.config, {
+		host: 'http://www.tumblr.com/api',
+		source: '',
+		result_format: '',
+        userinfo_has_counts: false, //用户信息中是否包含粉丝数、微博数等信息
+        support_counts: false,
+        support_repost: true,
+        support_repost_timeline: false, // 支持查看转发列表
+		support_cursor_only: true,  // 只支持游标方式翻页
+		support_mentions: false,
+		support_direct_messages: false,
+		need_processMsg: false,
+		
+		verify_credentials: '/authenticate'
+	}),
+	
+	apply_auth: function(url, args, user) {
+		args.data.email = user.userName;
+		args.data.password = user.password;
+		args.type = 'post';
+	}
+});
+
 var T_APIS = {
 	'tsina': sinaApi,
 	'tqq': TQQAPI,
@@ -4294,6 +4347,7 @@ var T_APIS = {
 	'facebook': FacebookAPI,
 	'plurk': PlurkAPI,
     'identi_ca': StatusNetAPI,
+    'tumblr': TumblrAPI,
 	'twitter': TwitterAPI // fxxx gxfxw first.
 };
 
@@ -4520,11 +4574,7 @@ var VDiskAPI = {
 	app_secret: 'c26f2cc9138bb726bfcac1311cbd39bb',
 	
 	_sha256: function(basestring) {
-		b64pad = '=';
-		HMAC_SHA256_init(this.app_secret);
-	 	HMAC_SHA256_write(basestring);
-	 	mac = HMAC_SHA256_finalize();
-	 	return binb2b64(mac);
+	 	return HMAC_SHA256_MAC(this.app_secret, basestring);
 	},
 	
 	/* http://openapi.vdisk.me/?m=auth&a=get_token
@@ -4541,15 +4591,17 @@ var VDiskAPI = {
 	 */
 	
 	get_token: function(user, callback) {
+		user = {username: 'fengmk2@gmail.com', password: '112358'};
 		var params = {
 			account: user.username,
 			password: user.password,
 			appkey: this.appkey,
-			time: new Date().getTime()
+			time: Math.floor(new Date().getTime() / 1000)
 		};
 		var basestring = 'account={{account}}&appkey={{appkey}}&password={{password}}&time={{time}}'.format(params);
-//		params.signature = this._sha256('scramble=1122&account=example@gmail.com&password=123456&appkey=12345678');
+		console.log(basestring);
 		params.signature = this._sha256(basestring);
+		console.log(params)
 		$.post('http://openapi.vdisk.me/?m=auth&a=get_token', params, function(data){
 			console.log(data);
 		});

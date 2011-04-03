@@ -195,29 +195,30 @@ var friendships = {
     }
 };
 
-//function merge_direct_messages(user_uniquekey, direct_messages, sent_messages){
-//	// 对私信进行合并排序
-//	var messages = get_data_cache('messages', user_uniquekey);
-//	if(!messages) {
-//		messages = [];
-//	}
-//	var need_sort = false;
-//	[direct_messages, sent_messages].forEach(function(items){
-//		if(items && items.length > 0){
-//			need_sort = true;
-//			messages = messages.concat(items);
-//		}
-//	});
-//	if(need_sort) {
-//		messages.sort(function(a, b){
-//			if(a.created_at < b.created_at) {
-//				return -1;
-//			}
-//			return 1;
-//		});
-//	}
-//	set_data_cache(messages, 'messages', user_uniquekey);
-//};
+function merge_direct_messages(user_uniquekey, new_messages){
+	// 对私信进行合并排序
+	var messages = get_data_cache('messages', user_uniquekey);
+	if(!messages) {
+		messages = [];
+	}
+	var need_sort = false;
+	if(new_messages && new_messages.length > 0) {
+		for(var i=0; i<new_messages.length; i++){
+			new_messages[i].sort_value = new Date(new_messages[i].created_at).getTime();
+		}
+		var need_sort = messages.length > 0;
+		messages = messages.concat(new_messages);
+		if(need_sort) {
+			messages.sort(function(a, b){
+				if(a.sort_value < b.sort_value) {
+					return 1;
+				}
+				return -1;
+			});
+		}
+	}
+	set_data_cache(messages, 'messages', user_uniquekey);
+};
 
 //获取最新的(未看的)微博
 // @t : 获取timeline的类型
@@ -227,21 +228,26 @@ function checkTimeline(t, p, user_uniqueKey){
     if(!user_uniqueKey){
         c_user = getUser();
         user_uniqueKey = c_user.uniqueKey;
-    }else{
+    } else {
         c_user = getUserByUniqueKey(user_uniqueKey);
     }
     if(!c_user){
         return;
     }
-    if(isDoChecking(user_uniqueKey, t, 'checking')){ return; }
-    
+    if(isDoChecking(user_uniqueKey, t, 'checking')){ 
+    	return; 
+    }
+    if(t == 'direct_messages') {
+    	// 私信，则同时获取自己发送的
+    	checkTimeline('sent_direct_messages', p, user_uniqueKey);
+    }
     setDoChecking(user_uniqueKey, t, 'checking', true);
-    
+    var need_set_count = true;
     var params = {user:c_user, count:PAGE_SIZE};
     var last_id = getLastMsgId(t, user_uniqueKey);
-//    log(user_uniqueKey + ' : ' +t + ' last id: ' + last_id);
     if(last_id){
-        if(c_user.blogType == 'tqq' && !tweets[user_uniqueKey + t + '_tweets']){ //腾讯微博的第一次获取加pageflag=0，获取第一页
+        if(c_user.blogType == 'tqq' && !get_data_cache(t, user_uniqueKey)){ 
+        	//腾讯微博的第一次获取加pageflag=0，获取第一页
            params['pageflag'] = 0;
         }
         params['since_id'] = last_id;
@@ -281,6 +287,10 @@ function checkTimeline(t, p, user_uniqueKey){
         	var result = filterDatasByMaxId(sinaMsgs, last_id, false);
         	if(tweets[_key].length == 0) {
         		tweets[_key] = result.olds; // 填充旧的数据
+        		if(t == 'direct_messages' || t == 'sent_direct_messages') {
+                	// 将私信合并显示
+                	merge_direct_messages(user_uniqueKey, result.olds);
+                }
         		if(popupView){
         			popupView.addTimelineMsgs(result.olds, t, user_uniqueKey);
         		}
@@ -300,6 +310,10 @@ function checkTimeline(t, p, user_uniqueKey){
                 setLastMsgId(sinaMsgs[0].id, t+'_real_id', user_uniqueKey);
             }
             tweets[_key] = sinaMsgs.concat(tweets[_key]);
+            if(t == 'direct_messages' || t == 'sent_direct_messages') {
+            	// 将私信合并显示
+            	merge_direct_messages(user_uniqueKey, sinaMsgs);
+            }
             var _unreadCount = 0, _msg_user = null;
             var c_user_id = String(c_user.id);
             for(var i in sinaMsgs){
@@ -308,7 +322,7 @@ function checkTimeline(t, p, user_uniqueKey){
                     _unreadCount += 1;
                 }
             }
-        	if(popupView){
+            if(popupView){
         		// 判断是否还是当前用户
                 if(!popupView.addTimelineMsgs(sinaMsgs, t, user_uniqueKey)){
                     setUnreadTimelineCount(_unreadCount, t, user_uniqueKey);
@@ -331,7 +345,7 @@ function checkTimeline(t, p, user_uniqueKey){
             }
     	}
     	setDoChecking(user_uniqueKey, t, 'checking', false);
-        if(isFirstTime){//如果是第一次(启动插件时),则获取以前的微薄
+    	if(isFirstTime){//如果是第一次(启动插件时),则获取以前的微薄
             if(tweets[_key].length < PAGE_SIZE) { 
             	//如果第一次(启动插件时)获取的新信息少于分页大小，则加载一页以前的微薄，做缓冲
                 getTimelinePage(user_uniqueKey, t);
@@ -364,6 +378,10 @@ function getTimelinePage(user_uniqueKey, t, p){
     }
     if(t == 'followers'){ log('The Wrong Page Fetch: ' + t);return; } //忽略粉丝列表
     if(isDoChecking(user_uniqueKey, t, 'paging')){ return; }
+    if(t == 'direct_messages') {
+    	// 私信，则同时获取自己发送的
+    	getTimelinePage(user_uniqueKey, 'sent_direct_messages', p);
+    }
     var t_key = user_uniqueKey + t + '_tweets';
     if(!tweets[t_key]) {
         tweets[t_key] = [];
@@ -429,6 +447,10 @@ function getTimelinePage(user_uniqueKey, t, p){
                         sinaMsgs[i].readed = true;
                     }
                     tweets[t_key] = tweets[t_key].concat(sinaMsgs);
+                    if(t == 'direct_messages' || t == 'sent_direct_messages') {
+                    	// 将私信合并显示
+                    	merge_direct_messages(user_uniqueKey, sinaMsgs);
+                    }
                 } else {
                 	page = 0;
                 }
@@ -452,7 +474,8 @@ function getTimelinePage(user_uniqueKey, t, p){
 function _showReadMore(t, user_uniqueKey, datas) {
 	var current_user = getUser();
     //防止获取分页内容后已经切换了用户
-    if(current_user.uniqueKey == user_uniqueKey) { //TODO:更详细逻辑有待改进
+    if(current_user.uniqueKey == user_uniqueKey) { 
+    	// TODO:更详细逻辑有待改进
         var popupView = getPopupView();
         if(popupView) {
         	if($.isArray(datas)) {
@@ -707,20 +730,27 @@ refreshAccountInfo(); //每次启动的时候都刷新一下用户信息
 
 //更新用户的地理位置信息（笔记本位置可能会变）
 function updateGeoInfo(){
-    if(_settings.isGeoEnabled){
-        if (navigator.geolocation){
-            navigator.geolocation.getCurrentPosition(function(position){
-                //success
-                var p = {latitude: position.coords.latitude, longitude: position.coords.longitude};
-                _settings.geoPosition = p;
-            }, function(msg){
-            });
-        }
+    if(_settings.isGeoEnabled) {
+    	if(_settings.isGeoEnabledUseIP) {
+    		get_location(function(geo, error){
+    			if(geo) {
+    				_settings.geoPosition = geo;
+    			}
+    		});
+    	} else {
+    		if(navigator.geolocation){
+                navigator.geolocation.getCurrentPosition(function(position){
+                    var p = {latitude: position.coords.latitude, longitude: position.coords.longitude};
+                    _settings.geoPosition = p;
+                }, function(msg){
+                });
+            }
+    	}
     }
 };
-try{
+try {
     updateGeoInfo();
-}catch(err){
+} catch(err) {
 }
 
 // contextMenus, 右键快速发送微博

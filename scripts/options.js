@@ -18,7 +18,8 @@ var SUPPORT_AUTH_TYPES = {
 	'buzz': ['oauth'],
 	'facebook': ['oauth'],
 	'plurk': ['baseauth'],
-    'identi_ca': ['oauth', 'baseauth']
+    'identi_ca': ['oauth', 'baseauth'],
+    'tumblr': ['baseauth']
 };
 
 var AUTH_TYPE_NAME = {
@@ -444,12 +445,10 @@ function changeAccountStatus(uniqueKey, stat){
     _li.find('.detail .stat .statName').html(statName);
 };
 
-
-
 function showMyGeo(){
     var geoPosition = $("#isGeoEnabled").data('position');
     if(geoPosition){
-        popupBox.showMap('icons/icon48.png', geoPosition.latitude, geoPosition.longitude);
+        popupBox.showMap('icons/icon48.png', geoPosition.latitude, geoPosition.longitude, geoPosition);
     }else{
         _showMsg(_u.i18n("msg_no_geo_info"));
     }
@@ -481,16 +480,22 @@ function init(){
     });
 
     //地理位置
-    $("#isGeoEnabled").attr("checked", settings.isGeoEnabled ? true : false).data('position', settings.geoPosition);
-    if($("#isGeoEnabled").attr('checked')){
-        $("#btnShowMyGeo").show();
+    if(settings.isGeoEnabled) {
+    	if(settings.isGeoEnabledUseIP) {
+    		$("#isGeoEnabledUseIP").attr("checked", true);
+    	} else {
+    		$('#isGeoEnabled').attr("checked", true);
+    	}
+    	$("#isGeoEnabled").data('position', settings.geoPosition);
+    	$("#btnShowMyGeo").show();
     }
     $("#isGeoEnabled").click(function(){
         if(!$(this).attr('checked')){ //未选中，不用检测
             $("#btnShowMyGeo").hide();
             return;
         }
-        if (navigator.geolocation) {
+        $("#isGeoEnabledUseIP").attr('checked', false);
+        if(navigator.geolocation) {
             $("#save-all").attr('disabled',true);
             navigator.geolocation.getCurrentPosition(function(position){
                 //success
@@ -508,7 +513,27 @@ function init(){
             _showMsg(_u.i18n("msg_not_support_geo"));
         }
     });
-
+    
+    // 使用ip判断是否开启
+    $('#isGeoEnabledUseIP').click(function(){
+    	if(!$(this).attr('checked')){ //未选中，不用检测
+            $("#btnShowMyGeo").hide();
+            return;
+        }
+    	$("#isGeoEnabled").attr('checked', false);
+    	// 获取当前ip
+    	$("#save-all").attr('disabled',true);
+    	get_location(function(geo, error){
+    		if(geo) {
+				$('#isGeoEnabled').data('position', geo);
+                $("#btnShowMyGeo").show();
+			} else {
+				_showMsg(_u.i18n("msg_enabled_geo_false") + ' ' + error);
+                $("#isGeoEnabledUseIP").attr('checked', false);
+			}
+			$("#save-all").removeAttr('disabled');
+    	});
+    });
 
     $("#autoShortUrlCount").val(settings.sharedUrlAutoShortWordCount);
 
@@ -969,8 +994,18 @@ function saveAll(){
     settings.smoothSeaeType = $("#ease_type").val();
 
     //地理位置
-    settings.isGeoEnabled = $("#isGeoEnabled").attr("checked") ? true : false;
-    settings.geoPosition = $("#isGeoEnabled").data('position');
+    if($("#isGeoEnabled").attr("checked") || $("#isGeoEnabledUseIP").attr("checked")) {
+    	settings.isGeoEnabled = true;
+    	settings.geoPosition = $("#isGeoEnabled").data('position');
+    	if($("#isGeoEnabledUseIP").attr("checked")) {
+    		settings.isGeoEnabledUseIP = true;
+    	} else {
+    		settings.isGeoEnabledUseIP = false;
+    	}
+    } else {
+    	settings.isGeoEnabled = false;
+    	settings.geoPosition = null;
+    }
 
     settings.isSyncReadedToSina = $("#unread_sync_to_page").attr("checked") ? true : false;
     

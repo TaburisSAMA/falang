@@ -86,7 +86,7 @@ var T_LIST = {
 T_LIST.t163 = T_LIST.tsina = T_LIST.tsohu = T_LIST.all;
 T_LIST.tqq = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa 
 	= T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter 
-	= T_LIST.identi_ca = T_LIST.digu;
+	= T_LIST.identi_ca = T_LIST.tumblr = T_LIST.digu;
 
 var T_NAMES = {
 	'tsina': '新浪微博',
@@ -104,7 +104,8 @@ var T_NAMES = {
 	'facebook': 'Facebook',
 	'plurk': 'Plurk',
 	'buzz': 'Google Buzz',
-    'identi_ca': 'identi.ca'
+    'identi_ca': 'identi.ca',
+    'tumblr': 'Tumblr'
 };
 
 var Languages = {
@@ -282,6 +283,7 @@ var Settings = {
         image_service: 'Imgur', // 默认的图片服务
         enable_image_service: true, // 默认开启图片服务
         isGeoEnabled: false, //默认不开启上报地理位置信息
+        isGeoEnabledUseIP: false, //true 使用ip判断， false 使用浏览器来判断
         geoPosition: null, //获取到的地理位置信息，默认为空
 
         lookingTemplate: _u.i18n('sett_shared_template')
@@ -1127,7 +1129,7 @@ var popupBox = {
         };
         image.src = imgSrc;
     },
-    showMap: function(user_img, myLatitude, myLongitude){
+    showMap: function(user_img, myLatitude, myLongitude, geo_info){
         this.checkBox();
         var latlng = new google.maps.LatLng(myLatitude, myLongitude);
         var myOptions = {
@@ -1152,8 +1154,17 @@ var popupBox = {
                     /*
                         InfoWindow 信息窗口类。显示标记位置的信息
                     */
+                	var address = results[0].formatted_address;
+                	if(geo_info) {
+                		if(geo_info.ip) {
+                			address += '<br/>IP: ' + geo_info.ip;
+                		}
+                		if(geo_info.more) {
+                			address += '<br/>ISP: ' + geo_info.more;
+                		}
+                	}
                     var infowindow = new google.maps.InfoWindow({
-                        content: '<img class="map_user_icon" src="'+user_img+'" />' + results[0].formatted_address,
+                        content: '<img class="map_user_icon" src="'+user_img+'" />' + address,
                         maxWidth: 60
                     });
                     infowindow.open(map, marker);//打开信息窗口。一般与map和标记关联
@@ -2123,4 +2134,38 @@ function _check_name(user, query_regex) {
 	}
 	return user.screen_name && user.screen_name.search(query_regex) >= 0
 		|| user.name && user.name.search(query_regex) >= 0;
+};
+
+
+// 根据当前ip获取地理坐标信息
+// callback(geo, error_message)
+var get_location = function(callback) {
+	$.ajax({
+		url:'http://s8.hk/api/ip', 
+		success: function(ip) {
+			var url = 'http://api.map.sina.com.cn/geocode/ip_to_geo.php?format=json&source=3434422667&ip=' + ip;
+			$.ajax({
+				url: url, 
+				dataType: 'json',
+				success: function(data){
+					var geo = data.geos && data.geos[0];
+					var error = null;
+					if(geo && geo.latitude) {
+						geo.latitude = parseFloat(geo.latitude);
+						geo.longitude = parseFloat(geo.longitude);
+					} else {
+						error = String(geo && geo.error || geo);
+						geo = null;
+					}
+					callback(geo, error);
+				},
+				error: function(jqXHR, textStatus, errorThrown){
+					callback(null, String(errorThrown));
+				}
+			});
+		},
+		error: function(jqXHR, textStatus, errorThrown){
+			callback(null, String(errorThrown));
+		}
+	});
 };

@@ -1,5 +1,6 @@
 // @author qleelulu@gmail.com
 
+// 检测是否支持文件上传
 function checkChrome(){
     if(!window.BlobBuilder){
         $("body").html($("#needUpdateChrome")[0].outerHTML);
@@ -18,20 +19,19 @@ function initOnLoad(){
 function init(){
 	initSelectSendAccounts(true);
 	initTxtContentEven();
-
     $("#txtContent").focus();
     at_user_autocomplete('#txtContent');
     $(window).unload(function(){ initOnUnload(); }); 
 };
 
 
-var TP_USER_UPLOAD_INFO =  '<li id="u_uploadinfo_{{uniqueKey}}">\
-                                <img src="{{profile_image_url}}">{{screen_name}}<img src="/images/blogs/{{blogType}}_16.png" class="blogType">: \
-                                <span class="barWrap"><strong class="bar" style="width: 10%;"><span></span></strong></span>\
-                                <span class="progressInfo"></span>\
-                            </li>';
-function sendMsg(){ //覆盖popup.js的同名方法
+var TP_USER_UPLOAD_INFO = '<li id="u_uploadinfo_{{uniqueKey}}">'
+    + '<img src="{{profile_image_url}}">{{screen_name}}<img src="/images/blogs/{{blogType}}_16.png" class="blogType">: '
+    + '<span class="barWrap"><strong class="bar" style="width: 10%;"><span></span></strong></span>'
+    + '<span class="progressInfo"></span>'
+    + '</li>';
 
+function sendMsg(){ //覆盖popup.js的同名方法
     var check = true;
     var c_user = getUser();
     if(!c_user){
@@ -127,9 +127,11 @@ function _uploadWrap(user, data, pic, stat, selLi){
     );
 };
 
-var FILECHECK = {maxFileSize: 2*1024000,
-                 fileTypes: '__image/gif__image/jpeg__image/jpg__image/png__'
-                };
+var FILECHECK = {
+	maxFileSize: 2*1024000,
+    fileTypes: '__image/gif__image/jpeg__image/jpg__image/png__'
+};
+
 function checkFile(file){
     var check = true;
     if(file){

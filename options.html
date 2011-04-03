@@ -325,8 +325,15 @@
 			<th><label class="title" for="isGeoEnabled"><script>_u.wi('sett_itemName_geo')</script></label></th>
 			<td>
 				<span>
-					<input type="checkbox" id="isGeoEnabled"><label for="isGeoEnabled"><script>_u.wi('comm_enabled')</script></label>
-					<a id="btnShowMyGeo" style="display:none;" href="javascript:" onclick="showMyGeo()"><script>_u.wi('sett_show_my_geo')</script></a>
+				    <input type="checkbox" id="isGeoEnabledUseIP" />
+                    <label for="isGeoEnabledUseIP"><script>_u.wi('sett_itemName_use_ip_geo')</script></label>
+                    
+					<input type="checkbox" id="isGeoEnabled" />
+					<label for="isGeoEnabled"><script>_u.wi('sett_itemName_use_browser_geo')</script></label>
+					
+					<a id="btnShowMyGeo" style="display:none;" href="javascript:" onclick="showMyGeo()">
+					   <script>_u.wi('sett_show_my_geo')</script>
+					</a>
 				</span>
 				<span class="jTip" jTitle="" jWidth="320">?
 					<span class="c"><script>_u.wi('sett_jTip_geo')</script></span>
