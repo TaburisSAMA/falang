@@ -1943,34 +1943,33 @@ function _bind_tip_items($tip_div) {
 	$tip_div.find('li').mouseover(function(){
 		$tip_div.find('li').removeClass('cur');
     	$(this).addClass('cur');
-    }).click(function(){
-    	var $text = $($tip_div.attr('ele_id'));
-    	var value = $text.val();
-    	var ele = $text.get(0);
-    	var new_value = value.substring(0, ele._at_key_index + 1);
-    	new_value += $(this).attr('name') + ' ' + value.substring(ele.selectionStart);
-    	$text.focus().val(new_value);
-    	// 设置光标位置
-    	ele.selectionStart = ele.selectionEnd = ele._at_key_index + $(this).attr('name').length + 2;
-    	$tip_div.hide();
     });
 }
 
-function at_user_autocomplete(ele_id) {
+// match_all_text 是否匹配全部内容
+function at_user_autocomplete(ele_id, match_all_text, select_callback) {
 	// support @ autocomplete
 	var $tip_div = $('<div ele_id="' + ele_id + '" style="z-index: 2000; position: absolute;display:none; " class="at_user"><ul></ul></div>');
 	$(document.body).append($tip_div);
+	var ele = $(ele_id).get(0);
+	ele.select_callback = select_callback;
+	ele.match_all_text = match_all_text;
 	$(ele_id).keyup(function(event){
     	if(!this._at_key_loading && // 不是正在加载
     			event.keyCode != '13' && event.keyCode != '38' && event.keyCode != '40') {
-    		var value = $(this).val().substring(0, this.selectionStart);
-        	var key_index = value.search(/@[^@\s]{1,20}$/g), key = null;
-        	if(key_index >= 0) {
-        		key = value.substring(key_index + 1);
-        		if(!/^[a-zA-Z0-9\u4e00-\u9fa5_]+$/.test(key)){
-        			key = null;
-        		}
-        	}
+    		var key_index = 0, key = null;
+    		if(!match_all_text) {
+    			var value = $(this).val().substring(0, this.selectionStart);
+    			key_index = value.search(/@[^@\s]{1,20}$/g);
+    			if(key_index >= 0) {
+            		key = value.substring(key_index + 1);
+            		if(!/^[a-zA-Z0-9\u4e00-\u9fa5_]+$/.test(key)){
+            			key = null;
+            		}
+            	}
+    		} else {
+    			key = $(this).val();
+    		}
         	var $text_tip = $('#text_tip');
         	if(key) {
         		// http://xiaocai.info/2011/03/js-textarea-body-offset/
@@ -1980,9 +1979,9 @@ function at_user_autocomplete(ele_id) {
         		at_user_search(key, function(names){
         			this._at_key_loading = false;
         			var html = '';
-            		for(var i in names) {
-            			var item = names[i];
-            			html += '<li name="' + item[0] + '">' + item[1] + '</li>';
+            		for(var user_id in names) {
+            			var item = names[user_id];
+            			html += '<li name="' + item[0] + '" user_id="' + user_id + '">' + item[1] + '</li>';
             		}
             		if(!html) {
             			$tip_div.hide();
@@ -2055,7 +2054,33 @@ function at_user_autocomplete(ele_id) {
     }).click(function(){
     	$(this).keyup();
     });
-	
+	$tip_div.click(function(){
+    	var $select_li = $(this).find('li.cur:first');
+    	var $text = $($tip_div.attr('ele_id'));
+    	var value = $text.val();
+    	var ele = $text.get(0);
+    	var user_name = $select_li.attr('name');
+    	if(ele.match_all_text) {
+    		$text.val(user_name);
+    		$text.focus();
+    	} else {
+    		var new_value = value.substring(0, ele._at_key_index + 1);
+        	new_value += user_name + ' ' + value.substring(ele.selectionStart);
+        	$text.focus().val(new_value);
+        	// 设置光标位置
+        	ele.selectionStart = ele.selectionEnd = ele._at_key_index + user_name.length + 2;
+    	}
+    	if(ele.select_callback) {
+    		ele.select_callback({
+    			id: $select_li.attr('user_id'),
+    			name: user_name,
+    			screen_name: $select_li.html()
+    		});
+    	}
+    	setTimeout(function(){
+    		$tip_div.hide();
+    	}, 100);
+    });
 };
 
 
@@ -2070,7 +2095,6 @@ function at_user_search(query, callback, context) {
 	for(var index=0; index < data_types.length; index++) {
 		var tweets = b_view.get_data_cache(data_types[index], current_user.uniqueKey) || [];
 		var len = tweets.length;
-	// console.log(data_types[index], len);
 	    for(var i=0; i<len; i++){
 	    	var tweet = tweets[i];
 	    	var items = [tweet.user || tweet];

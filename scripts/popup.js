@@ -113,6 +113,10 @@ function init(){
     // support @ autocomplete
     at_user_autocomplete("#txtContent");
     at_user_autocomplete("#replyTextarea");
+    at_user_autocomplete("#direct_message_user", true, function(user){
+    	// 选中则发私信
+    	doNewMessage($("#direct_message_user").get(0), user.screen_name, user.id);
+    });
 };
 
 function initializeMap(){};//给载入地图api调用
