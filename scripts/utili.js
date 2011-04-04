@@ -99,13 +99,13 @@ var T_NAMES = {
 	'zuosa': '做啥',
 	'leihou': '雷猴',
 	'renjian': '人间网',
-//	'follow5': 'Follow5',
+//	'follow5': 'Follow5', // f5的api实在太弱了，无法做完美
 	'twitter': 'Twitter',
 	'facebook': 'Facebook',
 	'plurk': 'Plurk',
 	'buzz': 'Google Buzz',
-    'identi_ca': 'identi.ca',
-    'tumblr': 'Tumblr'
+    'identi_ca': 'identi.ca'
+//    'tumblr': 'Tumblr'
 };
 
 var Languages = {
@@ -191,6 +191,13 @@ var refreshTimeLimit = {
         'mentions': 45, 
         'comments_timeline': 45, 
         'direct_messages': 45,
+        'sent_direct_messages': 60
+    },
+    'follow5':{
+        'friends_timeline': 45, 
+        'mentions': 60, 
+        'comments_timeline': 60, 
+        'direct_messages': 60,
         'sent_direct_messages': 60
     }
 };

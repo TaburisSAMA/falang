@@ -237,7 +237,7 @@ function checkTimeline(t, p, user_uniqueKey){
     if(isDoChecking(user_uniqueKey, t, 'checking')){ 
     	return; 
     }
-    if(t == 'direct_messages') {
+    if(t == 'direct_messages' && tapi.get_config(c_user).support_sent_direct_messages) {
     	// 私信，则同时获取自己发送的
     	checkTimeline('sent_direct_messages', p, user_uniqueKey);
     }
@@ -378,7 +378,7 @@ function getTimelinePage(user_uniqueKey, t, p){
     }
     if(t == 'followers'){ log('The Wrong Page Fetch: ' + t);return; } //忽略粉丝列表
     if(isDoChecking(user_uniqueKey, t, 'paging')){ return; }
-    if(t == 'direct_messages') {
+    if(t == 'direct_messages' && tapi.get_config(c_user).support_sent_direct_messages) {
     	// 私信，则同时获取自己发送的
     	getTimelinePage(user_uniqueKey, 'sent_direct_messages', p);
     }

@@ -2388,6 +2388,9 @@ $.extend(Follow5API, {
 	    support_repost: false,
 	    support_repost_timeline: false,
 	    support_upload: false,
+	    support_sent_direct_messages: false,
+	    support_favorites: false, // 判断是否支持收藏列表
+		support_do_favorite: false, // 判断是否支持收藏功能
 
 	    verify_credentials: '/users/verify_credentials',
 	    direct_messages: '/destroy_messages', 
@@ -2435,8 +2438,7 @@ $.extend(Follow5API, {
 			if(!args.data.page) {
 				args.data.page = 1;
 			}
-		} 
-		else if(args.url == this.config.new_message) {
+		} else if(args.url == this.config.new_message) {
 			// id => fid
 			// text => status
 			if(args.data.id) {
@@ -2447,7 +2449,11 @@ $.extend(Follow5API, {
 				args.data.status = args.data.text;
 				delete args.data.text;
 			}
-		} 
+		} else if(args.url == this.config.direct_messages || args.url == this.config.mentions) {
+			if(args.data.since_id) {
+				delete args.data.since_id;
+			}
+		}
     },
 	
 	format_result: function(data, play_load, args) {
@@ -2457,10 +2463,10 @@ $.extend(Follow5API, {
 				data = [];
 			}
 	    	for(var i in data) {
-	    		data[i] = this.format_result_item(data[i], play_load);
+	    		data[i] = this.format_result_item(data[i], play_load, args);
 	    	}
 	    } else {
-	    	data = this.format_result_item(data, play_load);
+	    	data = this.format_result_item(data, play_load, args);
 	    }
 		// 若是follwers api，则需要封装成cursor接口
 		// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
@@ -2486,6 +2492,7 @@ $.extend(Follow5API, {
 			this.format_result_item(data.user, 'user', args);
 			data.t_url = 'http://www.follow5.com/f5/mwfm/home?c=note&nid=' + data.id;
 		} else if(play_load == 'user' && data && data.id) {
+			delete data.password;
 			data.t_url = data.url;
 			if(!data.screen_name) {
 				data.screen_name = data.name;
@@ -2507,7 +2514,6 @@ $.extend(Follow5API, {
 			this.format_result_item(data.user, 'user', args);
 		} else if(play_load == 'message') {
 			this.format_result_item(data.sender, 'user', args);
-			data.sender.id = data.sender.screen_name;
 			this.format_result_item(data.recipient, 'user', args);
 		}
 		return data;
@@ -2836,6 +2842,21 @@ $.extend(T163API, {
 	
 	processSearch: DiguAPI.processSearch,
 	
+//	processEmotional: function(str){
+//	    str = str.replace(/\[([\u4e00-\u9fff,\uff1f,\w]{1,10})\]/g, this._replaceEmotional);
+//	    return str;
+//	},
+	_replaceEmotional: function(m, g1){
+	    var tpl = '<img title="{{title}}" src="{{src}}" />';
+	    if(g1) {
+	        var face = T163_EMOTIONS[g1];
+	        if(face) {
+	            return tpl.format({title: m, src: T163_EMOTIONS_URL_PRE + face});
+	        }
+	    }
+	    return m;
+	},
+	
 	url_encode: function(text) {
 		return text;
 	},
@@ -2879,6 +2900,9 @@ $.extend(T163API, {
 	
 	format_upload_params: function(user, data, pic) {
     	delete data.source;
+    	// 不支持地理坐标
+    	delete data.lat;
+    	delete data.long;
     },
 	
 	upload: function(user, params, pic, before_request, onprogress, callback) {
