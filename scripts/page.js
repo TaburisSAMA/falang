@@ -1,5 +1,7 @@
 // @author qleelulu@gmail.com
 
+var TSINA_API_EMOTIONS = window.TSINA_API_EMOTIONS || {};
+
 var FAWAVE_BASE_URL = chrome.extension.getURL("");
 
 var _u = {

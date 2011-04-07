@@ -1504,7 +1504,11 @@ function readMore(t){
     }
     var cache = _b_view.get_data_cache(data_type, c_user.uniqueKey);
     var timeline_offset = getTimelineOffset(t);
-    if(!cache || timeline_offset >= cache.length) {
+    //tab上如果有未读数，则需要加上
+    var unread_count = $("#tl_tabs li.tab-" + t + " .unreadCount").html();
+    unread_count = Number(unread_count);
+    unread_count = isNaN(unread_count) ? 0 : unread_count;
+    if(!cache || (timeline_offset + unread_count) >= cache.length) {
         _b_view.getTimelinePage(c_user.uniqueKey, t);
     } else {
         var msgs = cache.slice(timeline_offset, timeline_offset + PAGE_SIZE);
@@ -1783,7 +1787,7 @@ function sendRepost(msg, repostTweetId, notSendMord){
         }
     }
     tapi.repost(data, function(status, textStatus){
-        if(status.id || status.retweeted_status.id){
+        if(status && (status.id || status.retweeted_status.id) ){
             hideReplyInput();
             txt.val('');
             setTimeout(callCheckNewMsg, 1000, 'friends_timeline');
