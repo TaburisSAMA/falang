@@ -298,8 +298,12 @@ var Settings = {
     init: function(){ //只在background载入的时候调用一次并给 _settings 赋值就可以
         var _sets = localStorage.getObject(SETTINGS_KEY);
         _sets = _sets || {};
+        // 兼容不支持的缩址
+        if(_sets.shorten_url_service && !ShortenUrl.services[_sets.shorten_url_service]) {
+        	delete _sets.shorten_url_service;
+        }
         _sets = $.extend({}, this.defaults, _sets);
-
+        
         if(!THEME_LIST[_sets.theme]){
             _sets.theme = this.defaults.theme;
         }
@@ -1233,19 +1237,19 @@ var ShortenUrl = {
 		},
 		'goo.gl': {api: 'http://goo.gl/api/url', format: 'json', method: 'post', param_name: 'url', result_name: 'short_url'},
 //		'v.gd':  'http://v.gd/create.php?format=simple&url={{url}}',
-		'is.gd': 'http://is.gd/api.php?longurl={{url}}',
-		's8.hk': 'http://s8.hk/api/s?u={{url}}',
+//		'is.gd': 'http://is.gd/api.php?longurl={{url}}',
+//		's8.hk': 'http://api.yongwo.de/api/s?u={{url}}',
 		'seso.me': 'http://seso.me/api/?longurl={{url}}',
 		'tinyurl.com': 'http://tinyurl.com/api-create.php?url={{url}}',
 		'to.ly': 'http://to.ly/api.php?longurl={{url}}',
 		'zi.mu': 'http://zi.mu/api.php?format=simple&action=shorturl&url={{url}}',
 		'fa.by': 'http://fa.by/?module=ShortURL&file=Add&mode=API&url={{url}}',
-		'sqze.it': {api: 'http://long-shore.com/api/squeeze/', format: 'json', method: 'post', param_name: 'long_url', result_name: 'url'},
-		'2.ly': {api: 'http://2.ly/api/short', format: 'json', method: 'get', param_name: 'longurl', result_name: 'url'},
-		'2.gp': {api: 'http://2.gp/api/short', format: 'json', method: 'get', param_name: 'longurl', result_name: 'url'},
-		'7.ly': {api: 'http://7.ly/api/short', format: 'json', method: 'get', param_name: 'longurl', result_name: 'url'},
-		'aa.cx': 'http://aa.cx/api.php?url={{url}}',
-		'2br.in': {api: 'http://api.2br.in/shorten.json', format: 'json', method: 'get', param_name: 'url', result_name: 'shorten_url'},
+//		'sqze.it': {api: 'http://long-shore.com/api/squeeze/', format: 'json', method: 'post', param_name: 'long_url', result_name: 'url'},
+//		'2.ly': {api: 'http://2.ly/api/short', format: 'json', method: 'get', param_name: 'longurl', result_name: 'url'},
+//		'2.gp': {api: 'http://2.gp/api/short', format: 'json', method: 'get', param_name: 'longurl', result_name: 'url'},
+//		'7.ly': {api: 'http://7.ly/api/short', format: 'json', method: 'get', param_name: 'longurl', result_name: 'url'},
+//		'aa.cx': 'http://aa.cx/api.php?url={{url}}',
+//		'2br.in': {api: 'http://api.2br.in/shorten.json', format: 'json', method: 'get', param_name: 'url', result_name: 'shorten_url'},
 		'lnk.by': {api: 'http://lnk.by/Shorten', 
 			format_name: 'format', 
 			format: 'json', 
@@ -1257,7 +1261,7 @@ var ShortenUrl = {
 	// MAX_INDEX => http://yongwo.de:1235/api?u=http://is.gd/imWyT&cb=foo
 	MAX_INDEX: 46,
 	expand: function(shorturl, callback, context) {
-		var url = 'http://s8.hk/api/e?f=json&u=' + shorturl;
+		var url = 'http://api.yongwo.de/api/e?f=json&u=' + shorturl;
 		$.ajax({
 			url: url,
 			dataType: 'json',
@@ -1270,7 +1274,7 @@ var ShortenUrl = {
 		});
 //		this.expand_sinaurl(shorturl, function(data){
 //			if(!data) {
-//				var url = 'http://s8.hk/api/e?u=' + shorturl;
+//				var url = 'http://api.yongwo.de/api/e?u=' + shorturl;
 //				$.ajax({
 //					url: url,
 //					success: function(data, status, xhr) {
@@ -2172,7 +2176,7 @@ function _check_name(user, query_regex) {
 // callback(geo, error_message)
 var get_location = function(callback) {
 	$.ajax({
-		url:'http://s8.hk/api/ip', 
+		url:'http://api.yongwo.de/api/ip', 
 		success: function(ip) {
 			var url = 'http://api.map.sina.com.cn/geocode/ip_to_geo.php?format=json&source=3434422667&ip=' + ip;
 			$.ajax({
