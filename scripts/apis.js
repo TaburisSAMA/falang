@@ -15,8 +15,8 @@ var sinaApi = {
 	
 	config: {
 		host: 'http://api.weibo.com',
-        user_home_url: 'http://t.weibo.com/n/',
-        search_url: 'http://t.weibo.com/k/',
+        user_home_url: 'http://weibo.com/n/',
+        search_url: 'http://weibo.com/k/',
 		result_format: '.json',
 		source: '3538199806',
         oauth_key: '3538199806',
