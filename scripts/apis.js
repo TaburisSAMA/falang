@@ -3623,7 +3623,7 @@ $.extend(DoubanAPI, {
 		need_processMsg: false,
 		support_cursor_only: true,
 		support_search: false,
-		support_sent_direct_messages: false,
+		// support_sent_direct_messages: false,
 //		oauth_callback: null,
 		oauth_host: 'http://www.douban.com',
 		oauth_authorize: 	  '/service/auth/authorize',
@@ -3636,6 +3636,7 @@ $.extend(DoubanAPI, {
         update: '/miniblog/saying',
         destroy: '/miniblog/{{id}}',
         direct_messages: '/doumail/inbox',
+        sent_direct_messages: '/doumail/outbox',
         friends: '/people/{{user_id}}/contacts',
         followers: '/people/{{user_id}}/friends',
         new_message: '/doumails',
@@ -3808,6 +3809,10 @@ $.extend(DoubanAPI, {
 			delete data.content;
 		} else if(play_load == 'message') {
 			data.sender = data.user = this.format_result_item(data.author, 'user', args);
+			if(data['db:entity'] && data['db:entity']['@name'] == "receiver") {
+			    data.recipient = this.format_result_item(data['db:entity'], 'user', args);
+			    delete data['db:entity'];
+			}
 			data.text = data.title['$t'];
 			data.id = data.id['$t'];
 			data.id = data.id.substring(data.id.lastIndexOf('/doumail/') + 9, data.id.length);
