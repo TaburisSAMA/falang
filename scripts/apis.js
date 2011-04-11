@@ -1631,6 +1631,7 @@ $.extend(TQQAPI, {
     		if(status && status.text) {
     			var matchs = status.text.match(this.ONLY_AT_USER_RE);
     			if(matchs) {
+
     				status.users = {};
     				for(var j=0; j<matchs.length; j++) {
     					var name = $.trim(matchs[j]).substring(1);
@@ -3654,8 +3655,6 @@ $.extend(DoubanAPI, {
         callback({error: _u.i18n("comm_no_api")});
     },
 	
-	MSG_TPL: '<?xml version="1.0" encoding="UTF-8"?><entry xmlns="http://www.w3.org/2005/Atom" xmlns:db="http://www.douban.com/xmlns/" xmlns:gd="http://schemas.google.com/g/2005" xmlns:opensearch="http://a9.com/-/spec/opensearchrss/1.0/"><db:entity name="receiver"><uri>http://api.douban.com/people/{{id}}</uri></db:entity><content>{{text}}</content><title>{{text}}</title></entry>',
-	
 	/*
 	 * start-index	 返回多个元素时，起始元素的下标	 下标从1开始
 	 * max-results	 返回多个entry时，每页最多的结果数	 除非特别说明，
@@ -3686,8 +3685,7 @@ $.extend(DoubanAPI, {
 			args.data.apikey = args.data.source;
 			delete args.data.source;
 			if(args.url == this.config.update) {
-				var tpl = '<?xml version="1.0" encoding="UTF-8"?><entry xmlns:ns0="http://www.w3.org/2005/Atom" xmlns:db="http://www.douban.com/xmlns/"><content>{{status}}</content></entry>';
-				args.content = tpl.format(args.data);
+				args.content = '<?xml version="1.0" encoding="UTF-8"?><entry xmlns:ns0="http://www.w3.org/2005/Atom" xmlns:db="http://www.douban.com/xmlns/"><content>{{status}}</content></entry>'.format(args.data);
 				args.contentType = 'application/atom+xml; charset=utf-8';
 				args.data = {};
 			} else if(args.url == this.config.destroy || args.url == this.config.destroy_msg) {
@@ -3697,12 +3695,11 @@ $.extend(DoubanAPI, {
 			} else if(args.url == this.config.friends_timeline || args.url == this.config.user_timeline) {
 				args.data.type = 'all';
 			} else if(args.url == this.config.new_message) {
-				args.content = this.MSG_TPL.format(args.data);
+			    args.content = '<?xml version="1.0" encoding="UTF-8"?><entry xmlns="http://www.w3.org/2005/Atom" xmlns:db="http://www.douban.com/xmlns/" xmlns:gd="http://schemas.google.com/g/2005" xmlns:opensearch="http://a9.com/-/spec/opensearchrss/1.0/"><db:entity name="receiver"><uri>http://api.douban.com/people/{{id}}</uri></db:entity><content>{{text}}</content><title>{{text}}</title></entry>'.format(args.data);
 				args.contentType = 'application/atom+xml; charset=utf-8';
 				args.data = {};
 			} else if(args.url == this.config.comment) {
-				var tpl = '<?xml version="1.0" encoding="UTF-8"?><entry><content>{{comment}}</content></entry>';
-				args.content = tpl.format(args.data);
+				args.content = '<?xml version="1.0" encoding="UTF-8"?><entry><content>{{comment}}</content></entry>'.format(args.data);
 				args.contentType = 'application/atom+xml; charset=utf-8';
 				args.data = {id: args.data.id};
 				args.url = args.url.replace('_post', '');
@@ -3815,7 +3812,7 @@ $.extend(DoubanAPI, {
 			data.id = data.id['$t'];
 			data.id = data.id.substring(data.id.lastIndexOf('/doumail/') + 9, data.id.length);
 			data.t_url = data.link[1]['@href'];
-			data.text += ' <a href="{{t_url}}">'+ _u.i18n("comm_view") +'</a>'.format(data);
+			data.text += (' <a href="{{t_url}}">'+ _u.i18n("comm_view") +'</a>').format(data);
 			delete data.title;
 		}
 		if(data.published) {
