@@ -663,7 +663,7 @@ function importSettings(){
 }
 
 //初始化快速发送热键
-var TEMPSET_KEYS = [];
+var TEMP_SET_KEYS = [];
 function initQuickSendHotKey(){
     var keys = Settings.get().quickSendHotKey;
     keys = keys.split(',');
