@@ -14,7 +14,7 @@ var TSINA_APPKEYS = {
 var sinaApi = {
 	
 	config: {
-		host: 'http://api.weibo.com',
+		host: 'http://api.t.sina.com.cn',
         user_home_url: 'http://weibo.com/n/',
         search_url: 'http://weibo.com/k/',
 		result_format: '.json',
