@@ -117,6 +117,8 @@ function init(){
     	// 选中则发私信
     	doNewMessage($("#direct_message_user").get(0), user.screen_name, user.id);
     });
+    
+    adShow();
 };
 
 function initializeMap(){};//给载入地图api调用
@@ -2564,4 +2566,12 @@ function read_later(ele) {
 			}
 		});
 	}
+};
+
+// AD
+function adShow(){
+    var ad = getBackgroundView().ADs.getNext();
+    if(ad){
+        $("#topAd").html('<a href="{{url}}" target="_blank" title="{{title}}">{{title}}</a>'.format(ad));
+    }
 };

@@ -213,6 +213,12 @@ textarea:focus{outline: none;}
 }
 /* 用户发送列表选择 END */
 
+/* AD */
+#topAd{position: absolute; right: 4px; top: 23px;max-width:238px;
+		overflow:hidden; white-space:nowrap; text-overflow: ellipsis;
+}
+#topAd a{color:#AA814D;}
+
 #doingWarp{
 	display:inline-block;
 	vertical-align: top;

@@ -681,6 +681,33 @@ function onChangeUser(){
     }
 };
 
+// AD
+var ADs = {
+    adlist: null,
+    currentIndex: -1,
+    fetchAds:function(){
+        $.getJSON("http://api.yongwo.de/fawave/adlist/", function(ads){
+            if(ads){
+                ADs.adlist = ads;
+                ADs.currentIndex = -1;
+            }
+        });
+    },
+    getNext: function(){
+        if(!ADs.adlist || ADs.currentIndex >= ADs.adlist.length){
+            ADs.fetchAds();
+        }else{
+            var ran = Math.round(Math.random()*8)%4;s
+            if(ran===1){
+                ADs.currentIndex++;
+                return ADs.adlist[ ADs.currentIndex ];
+            }
+        }
+        return null;
+    }
+};
+ADs.fetchAds();
+
 //刷新账号信息
 function refreshAccountInfo(){
     var stat = {errorCount: 0, successCount: 0};
