@@ -2,7 +2,7 @@
 
 // 检测是否支持文件上传
 function checkChrome(){
-    if(!window.BlobBuilder && !window.WebKitBlogBuilder){
+    if(!window.BlobBuilder && !window.WebKitBlobBuilder){
         $("body").html($("#needUpdateChrome")[0].outerHTML);
         $("#needUpdateChrome").show();
         return false;

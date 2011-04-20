@@ -2,8 +2,8 @@
 * @author qleelulu@gmail.com
 */
 
-if(typeof BlobBuilder === 'undefined' && typeof WebKitBlogBuilder !== 'undefined') {
-	var BlobBuilder = WebKitBlogBuilder;
+if(typeof BlobBuilder === 'undefined' && typeof WebKitBlobBuilder !== 'undefined') {
+	var BlobBuilder = WebKitBlobBuilder;
 }
 
 var OAUTH_CALLBACK_URL = chrome.extension.getURL('oauth_cb.html');
