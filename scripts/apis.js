@@ -2,6 +2,10 @@
 * @author qleelulu@gmail.com
 */
 
+if(typeof BlobBuilder === 'undefined' && typeof WebKitBlogBuilder !== 'undefined') {
+	var BlobBuilder = WebKitBlogBuilder;
+}
+
 var OAUTH_CALLBACK_URL = chrome.extension.getURL('oauth_cb.html');
 var RE_JSON_BAD_WORD = /[\u000B\u000C]/ig; //具体见：http://www.cnblogs.com/rubylouvre/archive/2011/02/12/1951760.html
 
@@ -728,8 +732,8 @@ var sinaApi = {
 	    builder += 'Content-Type: '+ pic.file.type;
 	    builder += crlf;
 	    builder += crlf; 
-
-	    var bb = new BlobBuilder(); //NOTE
+	    
+	    var bb = new BlobBuilder(); //NOTE change to WebKitBlogBuilder
 	    bb.append(builder);
 	    bb.append(pic.file);
 	    builder = crlf;
