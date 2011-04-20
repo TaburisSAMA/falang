@@ -697,7 +697,7 @@ var ADs = {
         if(!ADs.adlist || ADs.currentIndex >= ADs.adlist.length){
             ADs.fetchAds();
         }else{
-            var ran = Math.round(Math.random()*8)%4;s
+            var ran = Math.round(Math.random()*8)%4;
             if(ran===1){
                 ADs.currentIndex++;
                 return ADs.adlist[ ADs.currentIndex ];
