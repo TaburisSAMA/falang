@@ -47,6 +47,11 @@ function sendMsg(){ //覆盖popup.js的同名方法
     	var image_url = $('#imageUrl').val();
     	if(image_url) {
     		file = getImageBlob(image_url);
+    	} else {
+    		var dataUrl = $('#imgPreview img').attr('src');
+    		if(dataUrl) {
+    			file = dataUrlToBlob(dataUrl);
+    		}
     	}
     }
     if(!checkFile(file)){
@@ -190,7 +195,7 @@ function selectFile(fileEle){
     $("#progressBar span").html("");
     if(file){
         var check = checkFile(file);
-        console.dir(file);
+//        console.dir(file);
         if(check){
             var reader = new FileReader();
             reader.onload = function(e){
@@ -222,3 +227,10 @@ function enabledUpload(){
     $("#btnSend").removeAttr('disabled');
     $("#imageFile").removeAttr('disabled');
 }
+
+//function capture(ele) {
+//	chrome.tabs.captureVisibleTab(null, null, function(dataUrl) {
+//		var blob = dataUrlToBlob(dataUrl);
+//		$("#imgPreview").html('<img class="pic" src="' + dataUrl + '" />');
+//	});
+//}
