@@ -22,6 +22,29 @@ function init(){
     $("#txtContent").focus();
     at_user_autocomplete('#txtContent');
     $(window).unload(function(){ initOnUnload(); }); 
+    
+    // 判断是否截图
+    var params = decodeForm(window.location.search);
+    if(params.tabId) {
+    	chrome.tabs.get(parseInt(params.tabId), function(tab) {
+    		// 设置标题和缩短网址
+    		var title = tab.title || '';
+    		var loc_url = tab.url;
+            var $txt = $("#txtContent");
+            var settings = Settings.get();
+            $txt.val(formatText(settings.lookingTemplate, {title: title, url: loc_url})).focus();
+            countInputText();
+            _shortenUrl(loc_url, settings, function(shorturl){
+	            if(shorturl) {
+	                $txt.val($txt.val().replace(loc_url, shorturl)).focus();
+	            }
+	        });
+            // 截图
+    		chrome.tabs.captureVisibleTab(tab.windowId, null, function(dataurl) {
+        		$("#imgPreview").html('<img class="pic" src="' + dataurl + '" />');
+        	});
+    	});
+    }
 };
 
 var TP_USER_UPLOAD_INFO = '<li id="u_uploadinfo_{{uniqueKey}}">'
@@ -195,7 +218,6 @@ function selectFile(fileEle){
     $("#progressBar span").html("");
     if(file){
         var check = checkFile(file);
-//        console.dir(file);
         if(check){
             var reader = new FileReader();
             reader.onload = function(e){
@@ -226,11 +248,4 @@ function disabledUpload(){
 function enabledUpload(){
     $("#btnSend").removeAttr('disabled');
     $("#imageFile").removeAttr('disabled');
-}
-
-//function capture(ele) {
-//	chrome.tabs.captureVisibleTab(null, null, function(dataUrl) {
-//		var blob = dataUrlToBlob(dataUrl);
-//		$("#imgPreview").html('<img class="pic" src="' + dataUrl + '" />');
-//	});
-//}
+};
