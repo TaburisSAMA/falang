@@ -790,7 +790,8 @@ function createSharedContextmenu(){
                 var text = info.selectionText;
                 text = text || tab.title;
                 var link = info.linkUrl || info.frameUrl || info.pageUrl;
-                if(link == info.srcUrl) { // 如果等于图片本身，则使用当前页面url
+                var image_rex = /\.(jpg|png|gif|bmp)$/ig;
+                if(link == info.srcUrl || image_rex.test(link)) { // 如果等于图片本身，则使用当前页面url
                 	link = info.frameUrl || info.pageUrl;
                 }
                 chrome.tabs.sendRequest(tab.id, {method:'showSendQuickMessage', text: text, link: link, info: info});
