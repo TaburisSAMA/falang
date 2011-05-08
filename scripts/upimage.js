@@ -24,7 +24,6 @@ function init(){
     $(window).unload(function(){ initOnUnload(); }); 
 };
 
-
 var TP_USER_UPLOAD_INFO = '<li id="u_uploadinfo_{{uniqueKey}}">'
     + '<img src="{{profile_image_url}}">{{screen_name}}<img src="/images/blogs/{{blogType}}_16.png" class="blogType">: '
     + '<span class="barWrap"><strong class="bar" style="width: 10%;"><span></span></strong></span>'
@@ -44,6 +43,12 @@ function sendMsg(){ //覆盖popup.js的同名方法
         check = false;
     }
     var file = $("#imageFile")[0].files[0];
+    if(!file) {
+    	var image_url = $('#imageUrl').val();
+    	if(image_url) {
+    		file = getImageBlob(image_url);
+    	}
+    }
     if(!checkFile(file)){
         check = false;
     }
@@ -139,7 +144,7 @@ function checkFile(file){
             _showMsg(_u.i18n("msg_file_too_large"));
             check = false;
         }
-        if(FILECHECK.fileTypes.indexOf('__'+file.type+'__') < 0){
+        if(file.type && FILECHECK.fileTypes.indexOf('__' + file.type + '__') < 0){
             _showMsg(_u.i18n("msg_pic_type_error"));
             check = false;
         }
@@ -180,10 +185,12 @@ function size(bytes){   // simple function to show a friendly size
 function selectFile(fileEle){
     var file = fileEle.files[0];
     $("#imgPreview").html('');
+    $('#imageUrl').val('');
     $("#progressBar")[0].style.width = "0%";
     $("#progressBar span").html("");
     if(file){
         var check = checkFile(file);
+        console.dir(file);
         if(check){
             var reader = new FileReader();
             reader.onload = function(e){
@@ -191,6 +198,18 @@ function selectFile(fileEle){
             };
             reader.readAsDataURL(file);
         }
+    }
+};
+
+function selectUrl(ele){
+    var url = $(ele).val();
+    $("#imgPreview").html('');
+    $('#uploadForm').get(0).reset();
+    $('#imageUrl').val(url);
+    $("#progressBar")[0].style.width = "0%";
+    $("#progressBar span").html("");
+    if(url){
+    	$("#imgPreview").html('<img class="pic" src="' + url + '" />');
     }
 };
 

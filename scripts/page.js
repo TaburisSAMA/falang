@@ -50,6 +50,7 @@ var methodManager = {
         //注意下面三句的顺序，不能乱
         var text = request.text;
         var link = request.link;
+        var info = request.info; // mediaType: "image"
         if(!text) {
         	text = link;
         } else if(link) {
@@ -58,6 +59,9 @@ var methodManager = {
         $("#fawaveTxtContentInp").focus();
         if(text){ 
         	$("#fawaveTxtContentInp").val(text); 
+        }
+        if(info.mediaType == 'image') {
+        	$('#imgPreview').html('<img style="max-width: 400px; max-height: 150px;" src="' + info.srcUrl + '" />');
         }
         fawaveCountInputText();
         if(link) {
@@ -238,6 +242,7 @@ var QUICK_SEND_TEMPLATE = ' \
                     <span class="fawave-wordCount">140</span>\
                     <textarea id="fawaveTxtContentInp" style="width:100%;" rows="5" ></textarea>\
                 </div>\
+                <div id="imgPreview" style="margin: 5px;"></div> \
                 <ul id="fawave_accountsForSend"></ul>\
                 <div class="fawaveSubmitWarp">\
                     <button id="btnFawaveQuickSend" class="btn-positive" title="'+ _u.i18n("comm_send_tip") +'">\
@@ -414,6 +419,7 @@ function fawaveToggleLooking(ele){
 
 function sendFawaveMsg(){
     var msg = $.trim($("#fawaveTxtContentInp").val());
+    var image_url = $('#imgPreview img').attr('src');
     if(!msg){
         showFawaveSendMsg(_u.i18n("msg_need_content"));
         return;
@@ -441,15 +447,15 @@ function sendFawaveMsg(){
     stat.successCount = 0;
     $("#fawaveSendMsgWrap input, #fawaveSendMsgWrap button, #fawaveSendMsgWrap textarea").attr('disabled', true);
     for(var i in users){
-        _sendFawaveMsgWrap(msg, users[i], stat, selLi);
+        _sendFawaveMsgWrap(msg, image_url, users[i], stat, selLi);
     }
 };
 
-function _sendFawaveMsgWrap(msg, user, stat, selLi){
-    chrome.extension.sendRequest({method:'publicQuickSendMsg', user:user, sendMsg:msg}, function(response){
+function _sendFawaveMsgWrap(msg, imageUrl, user, stat, selLi){
+    chrome.extension.sendRequest({method:'publicQuickSendMsg', user:user, sendMsg:msg, imageUrl: imageUrl}, function(response){
         stat.sendedCount++;
         var msg = response.msg;
-        if( msg === true || (msg && msg.id) ){
+        if( msg === true || (msg && msg.id) || (msg && msg.data && msg.data.id) || response.textStatus == 'success'){
             stat.successCount++;
             $("#fawave_accountsForSend li[uniquekey=" + user.uniqueKey +"]").removeClass('sel');
         }else if(msg && msg.error){
@@ -460,6 +466,8 @@ function _sendFawaveMsgWrap(msg, user, stat, selLi){
         }
         if(stat.successCount >= stat.userCount){//全部发送成功
             selLi.addClass('sel');
+            // 清空图片
+            $('#imgPreview').html('');
             $("#fawaveSendMsgWrap .btn-negative").click();
         }
         if(stat.sendedCount >= stat.userCount){//全部发送完成
@@ -472,6 +480,7 @@ function _sendFawaveMsgWrap(msg, user, stat, selLi){
                     showFawaveSendMsg(_u.i18n("msg_send_complete").format({successCount:stat.successCount, errorCount:(stat.userCount - stat.successCount)}));
                 }
             }
+            
         }
         user = null;
         stat = null;

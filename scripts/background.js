@@ -789,8 +789,8 @@ function createSharedContextmenu(){
             "onclick": function(info, tab) {
                 var text = info.selectionText;
                 text = text || tab.title;
-                var link = info.linkUrl || info.srcUrl || info.frameUrl || info.pageUrl;
-                chrome.tabs.sendRequest(tab.id, {method:'showSendQuickMessage', text: text, link: link});
+                var link = info.linkUrl || info.frameUrl || info.pageUrl;
+                chrome.tabs.sendRequest(tab.id, {method:'showSendQuickMessage', text: text, link: link, info: info});
             }
         });
     }
@@ -841,13 +841,26 @@ r_method_manager = {
     publicQuickSendMsg: function(request, sender, sendResponse){
         var msg = request.sendMsg;
         var user = request.user;
-        var data = {status: msg, user:user};
-        tapi.update(data, function(sinaMsg, textStatus){
+        var imageUrl = request.imageUrl;
+        var pic = imageUrl ? getImageBlob(imageUrl) : null;
+        var config = tapi.get_config(user);
+        if(!config.support_upload) {
+        	pic = null;
+        }
+        var callback = function(sinaMsg, textStatus){
             if(sinaMsg.id){
                 setTimeout(checkNewMsg, 1000, 'friends_timeline');
             }
             sendResponse({msg:sinaMsg, textStatus:textStatus});
-        });
+        };
+        if(pic) {
+        	var data = {status: msg};
+        	pic = {file: pic};
+        	tapi.upload(user, data, pic, function(){}, function(){}, callback);
+        } else {
+        	var data = {status: msg, user:user};
+        	tapi.update(data, callback);
+        }
     },
     notifyCheckNewMsg: function(request, sender, sendResponse){
         setTimeout(checkNewMsg, 1000, 'friends_timeline');

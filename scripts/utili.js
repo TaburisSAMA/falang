@@ -2204,3 +2204,23 @@ var get_location = function(callback) {
 		}
 	});
 };
+
+function getImageBlob(url) {
+	var r = new XMLHttpRequest();
+	r.open("GET", url, false);
+	// 详细请查看: https://developer.mozilla.org/En/XMLHttpRequest/Using_XMLHttpRequest#Receiving_binary_data
+	// XHR binary charset opt by Marcus Granado 2006 [http://mgran.blogspot.com]
+	r.overrideMimeType('text/plain; charset=x-user-defined');
+	r.send(null);
+	var bb = new BlobBuilder();
+	var data = r.responseText;
+	var arr = new Uint8Array(data.length);
+	for(var i = 0, l = data.length; i < l; i++) {
+		arr[i] = data.charCodeAt(i);
+	}
+	bb.append(arr.buffer);
+	var blob = bb.getBlob();
+	blob.name = blob.fileName = url.substring(url.lastIndexOf('/') + 1);
+	blob.fileType = "image/jpeg";
+	return blob;
+}
