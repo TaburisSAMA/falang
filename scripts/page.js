@@ -238,7 +238,9 @@ var QUICK_SEND_TEMPLATE = ' \
             <div class="close"><a href="javascript:" class="fawavemodal-close">x</a></div> \
             <div class="modal-data"> \
                 <div>\
-                    <input type="checkbox" id="fawave-share-page-chk" /><label for="fawave-share-page-chk">'+ _u.i18n("comm_share_this_page") +'</label>\
+                	<input type="checkbox" id="fawave-share-page-chk-and-capture" /><label for="fawave-share-page-chk-and-capture">'+ _u.i18n("comm_share_this_page_and_capture") +'</label>\
+                    &nbsp;&nbsp;\
+                	<input type="checkbox" id="fawave-share-page-chk" /><label for="fawave-share-page-chk">'+ _u.i18n("comm_share_this_page") +'</label>\
                     <span class="fawave-wordCount">140</span>\
                     <textarea id="fawaveTxtContentInp" style="width:100%;" rows="5" ></textarea>\
                 </div>\
@@ -300,6 +302,7 @@ function fawaveInitTemplate(){
     $("#fawaveSendMsgWrap .btn-negative").click(function(){
         $("#fawaveTxtContentInp").val('');
         $("#fawave-share-page-chk").attr("checked", false);
+        $("#fawave-share-page-chk-and-capture").attr("checked", false);
         //showFawaveAlertMsg('');
         $("#fawaveSendMsgWrap").hide();
     });
@@ -319,6 +322,13 @@ function fawaveInitTemplate(){
     if(chkLooking){
         chkLooking.addEventListener("click", function() {
             fawaveToggleLooking(this);
+        }, false);
+    }
+    
+    var chkLooking_and_capture = document.getElementById("fawave-share-page-chk-and-capture");
+    if(chkLooking_and_capture){
+    	chkLooking_and_capture.addEventListener("click", function() {
+            fawaveToggleLooking(this, true);
         }, false);
     }
 
@@ -391,14 +401,13 @@ function toggleSelectAllSendAccount(){
     }
 };
 
-function fawaveToggleLooking(ele){
+function fawaveToggleLooking(ele, capture){
     chrome.extension.sendRequest({method:'getLookingTemplate'}, function(response){
         var fawaveLookingTemplate = response.lookingTemplate;
         var loc_url = window.location.href, s_url = $(ele).data('short_url');
         loc_url = s_url || loc_url;
         var title = document.title;
         var result = fawaveFormatText(fawaveLookingTemplate, {title:(title||''), url:loc_url});
-        //countInputText();
         if($(ele).attr('checked')){
             $("#fawaveTxtContentInp").val(result);
             if(!s_url){
@@ -409,9 +418,22 @@ function fawaveToggleLooking(ele){
                         fawaveCountInputText();
                     }
                 });
+                // 截图
+                if(capture) {
+                	$("#fawaveSendMsgWrap").hide();
+                	setTimeout(function() {
+                		chrome.extension.sendRequest({method:'captureVisibleTab'}, function(response){
+                    		$("#imgPreview").html('<img style="max-width: 400px; max-height: 150px;" src="' + response.dataUrl + '" />');
+                    		$("#fawaveSendMsgWrap").show();
+                        });
+                	}, 500);
+                }
             }
         }else{
             $("#fawaveTxtContentInp").val($("#fawaveTxtContentInp").val().replace(result, ''));
+            if(capture) {
+            	$("#imgPreview").html('');
+            }
         }
         fawaveCountInputText();
     });

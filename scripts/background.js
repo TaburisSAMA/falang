@@ -868,5 +868,10 @@ r_method_manager = {
     },
     notifyCheckNewMsg: function(request, sender, sendResponse){
         setTimeout(checkNewMsg, 1000, 'friends_timeline');
+    },
+    captureVisibleTab: function(request, sender, sendReponse) {
+    	chrome.tabs.captureVisibleTab(null, null, function(dataUrl) {
+    		sendReponse({dataUrl: dataUrl});
+    	});
     }
 };

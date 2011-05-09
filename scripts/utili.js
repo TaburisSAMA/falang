@@ -2230,6 +2230,10 @@ function binaryToBlob(data) {
  * @api public
  */
 function getImageBlob(url) {
+	if(url.indexOf('data:') == 0) {
+		// is dataUrl
+		return dataUrlToBlob(url);
+	}
 	var r = new XMLHttpRequest();
 	r.open("GET", url, false);
 	// 详细请查看: https://developer.mozilla.org/En/XMLHttpRequest/Using_XMLHttpRequest#Receiving_binary_data

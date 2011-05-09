@@ -813,7 +813,7 @@ var sinaApi = {
 	                errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
 	                _showMsg('error: ' + textStatus + errorThrown + 'statuCode: ' + status);
 	            }
-	            callback.call(context, {}, 'error', status); //不管什么状态，都返回 error
+	            callback.call(context, r || {}, 'error', status); //不管什么状态，都返回 error
 	        }
 	    });
     },
