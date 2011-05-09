@@ -418,16 +418,16 @@ function fawaveToggleLooking(ele, capture){
                         fawaveCountInputText();
                     }
                 });
-                // 截图
-                if(capture) {
-                	$("#fawaveSendMsgWrap").hide();
-                	setTimeout(function() {
-                		chrome.extension.sendRequest({method:'captureVisibleTab'}, function(response){
-                    		$("#imgPreview").html('<img style="max-width: 400px; max-height: 150px;" src="' + response.dataUrl + '" />');
-                    		$("#fawaveSendMsgWrap").show();
-                        });
-                	}, 500);
-                }
+            }
+            // 截图
+            if(capture) {
+            	$("#fawaveSendMsgWrap").hide();
+            	setTimeout(function() {
+            		chrome.extension.sendRequest({method:'captureVisibleTab'}, function(response){
+                		$("#imgPreview").html('<img style="max-width: 400px; max-height: 150px;" src="' + response.dataUrl + '" />');
+                		$("#fawaveSendMsgWrap").show();
+                    });
+            	}, 500);
             }
         }else{
             $("#fawaveTxtContentInp").val($("#fawaveTxtContentInp").val().replace(result, ''));
