@@ -870,7 +870,7 @@ r_method_manager = {
         setTimeout(checkNewMsg, 1000, 'friends_timeline');
     },
     captureVisibleTab: function(request, sender, sendReponse) {
-    	chrome.tabs.captureVisibleTab(null, null, function(dataUrl) {
+    	chrome.tabs.captureVisibleTab(null, {format: 'png'}, function(dataUrl) {
     		sendReponse({dataUrl: dataUrl});
     	});
     }

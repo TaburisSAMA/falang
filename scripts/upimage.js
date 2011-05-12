@@ -40,7 +40,7 @@ function init(){
 	            }
 	        });
             // 截图
-    		chrome.tabs.captureVisibleTab(tab.windowId, null, function(dataurl) {
+    		chrome.tabs.captureVisibleTab(tab.windowId, {format: 'png'}, function(dataurl) {
         		$("#imgPreview").html('<img class="pic" src="' + dataurl + '" />');
         	});
     	});
