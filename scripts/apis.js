@@ -2533,9 +2533,9 @@ $.extend(TwitterAPI, {
 	
 	// 覆盖不同的参数
 	config: $.extend({}, sinaApi.config, {
-		host: 'http://api.twitter.com',
-        user_home_url: 'http://twitter.com/',
-        search_url: 'http://twitter.com/search?q=',
+		host: 'https://api.twitter.com',
+        user_home_url: 'https://twitter.com/',
+        search_url: 'https://twitter.com/search?q=',
 		source: 'fawave', 
         oauth_key: 'i1aAkHo2GkZRWbUOQe8zA',
         oauth_secret: 'MCskw4dW5dhWAYKGl3laRVTLzT8jTonOIOpmzEY',
@@ -2556,7 +2556,7 @@ $.extend(TwitterAPI, {
 	}),
        
     processSearch: function (str) {
-        str = str.replace(/(^|&lt;|a-zA-Z_0-9|\s)(#|$)([\w\u4e00-\u9fa5|\_]*|$)/g,'$1<a class="tag" title="$3" href="http://twitter.com/search?q=%23$3" target="_blank">$2$3</a>');
+        str = str.replace(/(^|&lt;|a-zA-Z_0-9|\s)(#|$)([\w\u4e00-\u9fa5|\_]*|$)/g,'$1<a class="tag" title="$3" href="https://twitter.com/search?q=%23$3" target="_blank">$2$3</a>');
         //str = str.replace(/[^\w]#([\w\u4e00-\u9fa5|\_]+)/g, ' <a target="_blank" href="'+ this.config.search_url +'%23$1" title="Search #$1">#$1</a>');
         return str;
     },
@@ -3875,7 +3875,7 @@ $.extend(FacebookAPI, {
         
         oauth_authorize: 	  '/oauth/authorize',
         oauth_request_token:  '/oauth/request_token',
-        oauth_callback: 'https://chrome.google.com/extensions/detail/aicelmgbddfgmpieedjiggifabdpcnln/',
+        oauth_callback: 'http://fawave.net4team.net/',
         oauth_access_token:   '/oauth/access_token',
         oauth_scope: [
         	'offline_access', 
