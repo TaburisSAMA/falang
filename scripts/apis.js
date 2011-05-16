@@ -1947,11 +1947,13 @@ $.extend(DiguAPI, {
 				args.data.page = 1;
 			}
 			if(args.data.user_id){
-				args.data.friendUserId = args.data.user_id;
+				//args.data.friendUserId = args.data.user_id;
+				args.data.friendUserIdOrName = args.data.user_id;
 			}
-			if(args.data.screen_name){
-				args.data.friendUsername = args.data.screen_name;
-			}
+//			if(args.data.screen_name){
+//				//args.data.friendUsername = args.data.screen_name;
+//				args.data.friendUserIdOrName = args.data.screen_name;
+//			}
 			delete args.data.user_id;
 			delete args.data.screen_name;
 		} else if(args.url == this.config.new_message) {
@@ -1964,15 +1966,21 @@ $.extend(DiguAPI, {
 		} else if(args.url == this.config.friendships_create || args.url == this.config.friendships_destroy) {
 			// id => userIdOrName
 			args.data.userIdOrName = args.data.id;
+			// method change to get
+			args.type = 'get';
+			delete args.data.source;
 			delete args.data.id;
 		} else if(args.url == this.config.user_timeline) {
 			if(args.data.id) {
-				args.data.userIdOrName = args.data.id;
+				// args.data.userIdOrName = args.data.id;
+				// id is name
+				args.data.name = args.data.id;
 				delete args.data.id;
-			} else if(args.data.screen_name){
-				args.data.userIdOrName = args.data.screen_name;
-				delete args.data.screen_name;
-			}
+			} 
+//			else if(args.data.screen_name){
+//				args.data.userIdOrName = args.data.screen_name;
+//				delete args.data.screen_name;
+//			}
 		} else if(args.url == this.config.verify_credentials) {
 			args.data.isAllInfo = true;
 			delete args.data.source;
@@ -1997,6 +2005,40 @@ $.extend(DiguAPI, {
 		// digu {"wrong":"no data"}
 		if(data.wrong == 'no data') {
 			data = [];
+		}
+		if(args.url == this.config.friendships_create) {
+			// new api: http://code.google.com/p/digu-api/wiki/User
+			// result : 操作结果 返回结果为11时表示用户不存存 
+			// 当type=1时，返回结果为：
+			//	0表示你申请者被该用户屏蔽，不能与他成为好友关系；
+			//  -1表示 跟随失败；-2表示跟随的人数超过了1000，系统不允许再跟随其他人；
+			//  -3表示被跟随的人设置了隐私保护，
+			//  提交申请失败；
+			//	  1表示跟随成功；
+			//	  2表示已经跟随；
+			//	  3表示被跟随的用户设置了隐私保护，已经提交了跟随申请。
+			// 当type=2、3、4、5、6时，返回结果为0表示操作失败，1表示操作成功。
+			if(data.result == 0) {
+				data.message = '你被该用户屏蔽，不能与他成为好友关系';
+				data.success = true;
+			} else if(data.result == 1) {
+				data = true;
+			} else if(data.result == 2) {
+				data.message = '已经跟随';
+				data.success = true;
+			} else if(data.result == 3) {
+				data.message = '用户设置了隐私保护，已经提交了跟随申请';
+				data.success = true;
+			} else if(data.result == -1) {
+				data.success = false;
+			} else if(data.result == -2) {
+				data.message = '你跟随的人数超过了1000';
+				data.success = false;
+			} else if(data.result == -3) {
+				data.message = '他设置了隐私保护，无法跟随';
+				data.success = false;
+			}
+			return data;
 		}
 		if($.isArray(data)) {
 	    	for(var i in data) {
@@ -2047,6 +2089,7 @@ $.extend(DiguAPI, {
 			data.t_url = tpl + data.id;
 			this.format_result_item(data.user, 'user', args);
 		} else if(play_load == 'user' && data && data.id) {
+			data.id = data.name || data.id;
 			data.t_url = data.url || ('http://digu.com/' + (data.name || data.id));
             data.gender = this.config.gender_map[data.gender];
 			// 将小头像从 _24x24 => _48x48
@@ -3836,6 +3879,67 @@ $.extend(DoubanAPI, {
 	}
 });
 
+var TianyaAPI = $.extend({}, sinaApi);
+$.extend(TianyaAPI, {
+	config: $.extend({}, sinaApi.config, {
+		host: 'http://open.tianya.cn/api',
+		source: '05e787211a7ff69311b695634f7fe3b9', 
+		oauth_key: '05e787211a7ff69311b695634f7fe3b9',
+        oauth_secret: 'a29252a52eaa835d',
+        result_format: '', // 豆瓣由alt参数确定返回值格式
+        
+		userinfo_has_counts: false, // 用户信息中是否包含粉丝数、微博数等信息
+        support_comment: false,
+		support_repost: false,
+		support_repost_timeline: false,
+		support_max_id: false,
+		support_favorites: false,
+		support_do_favorite: false,
+		support_mentions: false,
+		support_upload: false,
+		need_processMsg: false,
+		//support_cursor_only: true,
+		support_search: false,
+		support_sent_direct_messages: false,
+		oauth_host: 'http://open.tianya.cn',
+		oauth_authorize: 	  '/oauth/authorize.php',
+        oauth_request_token:  '/oauth/request_token.php',
+        oauth_access_token:   '/oauth/access_token.php',
+        friends_timeline: '/people/%40me/miniblog/contacts',
+        user_timeline: '/people/{{id}}/miniblog',
+        update: '/miniblog/saying',
+        destroy: '/miniblog/{{id}}',
+        direct_messages: '/doumail/inbox',
+        sent_direct_messages: '/doumail/outbox',
+        friends: '/people/{{user_id}}/contacts',
+        followers: '/people/{{user_id}}/friends',
+        new_message: '/doumails',
+        destroy_msg: '/doumail/{{id}}',
+        comment: '/miniblog/{{id}}/comments_post',
+        reply: '/miniblog/{{id}}/comments_post',
+        comments: '/miniblog/{{id}}/comments',
+        user_search: '/people',
+		verify_credentials: '/user/info.php'
+	}),
+	
+	counts: function(data, callback) {
+		callback();
+	},
+
+    rate_limit_status: function(data, callback){
+        callback({error: _u.i18n("comm_no_api")});
+    },
+	
+	before_sendRequest: function(args) {
+		delete args.data.source;
+	},
+
+	// urlencode，子类覆盖是否需要urlencode处理
+	url_encode: function(text) {
+		return text;
+	}
+});
+
 // facebook: http://developers.facebook.com/docs/api
 var FacebookAPI = $.extend({}, sinaApi);
 $.extend(FacebookAPI, {
@@ -4398,6 +4502,7 @@ var T_APIS = {
 	'plurk': PlurkAPI,
     'identi_ca': StatusNetAPI,
     'tumblr': TumblrAPI,
+    'tianya': TianyaAPI,
 	'twitter': TwitterAPI // fxxx gxfxw first.
 };
 

@@ -1032,6 +1032,10 @@
 		"message": "跟随 '{{name}}' 成功",
 		"description": "跟随 '{{name}}' 成功"
 	},
+	"msg_f_create_fail": {
+        "message": "跟随 '{{name}}' 失败",
+        "description": "跟随 '{{name}}' 失败"
+    },
 	"msg_f_destroy_success": {
 		"message": "你已取消跟随 '{{name}}'",
 		"description": "你已取消跟随 '{{name}}'"

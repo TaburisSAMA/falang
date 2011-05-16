@@ -81,7 +81,8 @@ var T_LIST = {
 	'buzz': ['friends_timeline'],
 	'facebook': ['friends_timeline'],
 	'plurk': ['friends_timeline'],
-	'douban': ['friends_timeline', 'direct_messages']
+	'douban': ['friends_timeline', 'direct_messages'],
+	'tianya': []
 };
 T_LIST.t163 = T_LIST.tsina = T_LIST.tsohu = T_LIST.all;
 T_LIST.tqq = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa 
@@ -96,6 +97,7 @@ var T_NAMES = {
 	'douban': '豆瓣',
 	'fanfou': '饭否',
 	'digu': '嘀咕',
+	'tianya': '天涯微博',
 	'zuosa': '做啥',
 	'leihou': '雷猴',
 	'renjian': '人间网',

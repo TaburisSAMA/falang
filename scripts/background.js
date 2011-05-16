@@ -84,14 +84,23 @@ var friendships = {
     	var user = getUser();
         var params = {id:user_id, user:user};
         tapi.friendships_create(params, function(user_info, textStatus, statuCode){
-            if(user_info === true || user_info.id){
+        	var message = '';
+            if(user_info === true || user_info.id || user_info.success) {
             	if(user_info.screen_name) {
             		screen_name = user_info.screen_name;
             	}
-                showMsg(_u.i18n("msg_f_create_success").format({name: screen_name}));
+            	message = _u.i18n("msg_f_create_success").format({name: screen_name});
+            	if(user_info !== true && user_info.message) {
+            		message += ', ' + user_info.message;
+            	}
             } else {
             	user_info = null;
+            	message = _u.i18n("msg_f_create_fail").format({name: screen_name});
+            	if(user_info && user_info.message) {
+            		message += ', ' + user_info.message;
+            	}
             }
+            showMsg(message);
             if(callback){ callback(user_info, textStatus, statuCode); }
             hideLoading();
         });

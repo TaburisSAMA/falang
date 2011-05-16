@@ -1016,6 +1016,10 @@
 		"message": "Follow '{{name}}' success",
 		"description": "跟随 '{{name}}' 成功"
 	},
+	"msg_f_create_fail": {
+        "message": "Follow '{{name}}' fail",
+        "description": "跟随 '{{name}}' 失败"
+    },
 	"msg_f_destroy_success": {
 		"message": "You have been canceled following the '{{name}}'",
 		"description": "你已取消跟随 '{{name}}'"
