@@ -96,7 +96,7 @@ function buildStatusHtml(statuses, t, c_user){
     if(config.support_repost && config.support_repost_timeline) {
     	var tpl = '<span class="repostCounts">(<a href="javascript:void(0);" title="'
     		+ _u.i18n("comm_show_repost_timeline") 
-    		+ '" timeline_type="repost" onclick="showRepostTimeline(this, {{id}});">{{repost_count}}</a>)</span>';
+    		+ '" timeline_type="repost" onclick="showRepostTimeline(this, \'{{id}}\');">{{repost_count}}</a>)</span>';
     	BUTTON_TPLS.repostCounts = tpl;
     	BUTTON_TPLS.rtRepostCounts = tpl.replace(/{{repost_count}}/g, 
     			'{{retweeted_status.repost_count}}')

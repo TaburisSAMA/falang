@@ -1244,7 +1244,7 @@ var ShortenUrl = {
 		'seso.me': 'http://seso.me/api/?longurl={{url}}',
 		'tinyurl.com': 'http://tinyurl.com/api-create.php?url={{url}}',
 		'to.ly': 'http://to.ly/api.php?longurl={{url}}',
-		'zi.mu': 'http://zi.mu/api.php?format=simple&action=shorturl&url={{url}}',
+//		'zi.mu': 'http://zi.mu/api.php?format=simple&action=shorturl&url={{url}}',
 		'fa.by': 'http://fa.by/?module=ShortURL&file=Add&mode=API&url={{url}}',
 //		'sqze.it': {api: 'http://long-shore.com/api/squeeze/', format: 'json', method: 'post', param_name: 'long_url', result_name: 'url'},
 //		'2.ly': {api: 'http://2.ly/api/short', format: 'json', method: 'get', param_name: 'longurl', result_name: 'url'},

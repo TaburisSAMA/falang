@@ -1334,7 +1334,6 @@ function showComments(ele, tweetId, page, notHide, page_params){
     } else {
     	page = 1;
     }
-    
     var method = timeline_type == 'comment' ? 'comments' : 'repost_timeline';
     tapi[method](params, function(data, textStatus){
     	data = data || {};

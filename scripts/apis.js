@@ -2874,7 +2874,7 @@ $.extend(T163API, {
         oauth_callback: FAWAVE_OAUTH_CALLBACK_URL,
         support_counts: false,
         support_comment: true,
-        support_repost_timeline: false,
+        support_repost_timeline: true,
         support_repost_comment: true,
         support_repost_comment_to_root: true,
         support_search_max_id: false,
@@ -2889,7 +2889,7 @@ $.extend(T163API, {
         comments: '/statuses/comments/{{id}}',
         friends_timeline: '/statuses/home_timeline',
         comments_timeline: '/statuses/comments_to_me',
-        repost_timeline: '/statuses/{{id}}/retweeted_by',
+        repost_timeline: '/statuses/retweets/{{id}}',
         
         gender_map: {0:'n', 1:'m', 2:'f'}
 	}),
