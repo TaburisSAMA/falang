@@ -2115,6 +2115,11 @@ function doRT(ele, is_rt, is_rt_rt){//RT
         }
     }
     if(!original_pic) {
+    	// 尝试从视频预览图中获取 img.video_image
+    	original_pic = $(ele).closest('li').find('img.video_image').attr('src');
+    }
+    
+    if(!original_pic) {
     	// 没图片，则打开文本框
     	showMsgInput();
     }

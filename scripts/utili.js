@@ -1902,7 +1902,7 @@ var VideoService = {
 							this);
 					});
 					if(screen_pic) {
-						var img_html = '<br/><img title="' + flash_title + '" src="' + screen_pic + '" /><br/>';
+						var img_html = '<br/><img class="video_image" title="' + flash_title + '" src="' + screen_pic + '" /><br/>';
 //						if(flash_title) {
 //							img_html = '<br/>' + flash_title + img_html;
 //						}

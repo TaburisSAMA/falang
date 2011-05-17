@@ -57,12 +57,22 @@ function init(){
         var source_url = params.image_url;
         $("#imgPreview").html('<img class="pic" src="' + source_url + '" />');
         $('#imageUrl').val(source_url);
-        _shortenUrl(source_url, settings, function(shorturl){
-            if(shorturl) {
-            	//$("#imgPreview img").attr('shorturl', shorturl);
-            	$txt.val($txt.val().replace(source_url, shorturl)).focus();
-            }
-        });
+        if(source_url.indexOf('126.fm') >= 0) {
+        	// 163的图片需要先还原
+        	ShortenUrl.expand(source_url, function(data) {
+        		var longurl = data.url || data;
+        		if(longurl) {
+        			$('#imageUrl').val(longurl);
+        		}
+        	});
+        } else {
+        	_shortenUrl(source_url, settings, function(shorturl){
+                if(shorturl) {
+                	$txt.val($txt.val().replace(source_url, shorturl)).focus();
+                }
+            });
+        }
+        
         //$('#uploadForm').hide();
     }
 };
