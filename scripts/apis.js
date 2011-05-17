@@ -7,6 +7,7 @@ if(typeof BlobBuilder === 'undefined' && typeof WebKitBlobBuilder !== 'undefined
 }
 
 var OAUTH_CALLBACK_URL = chrome.extension.getURL('oauth_cb.html');
+var FAWAVE_OAUTH_CALLBACK_URL = 'http://fawave.net4team.net/';
 var RE_JSON_BAD_WORD = /[\u000B\u000C]/ig; //具体见：http://www.cnblogs.com/rubylouvre/archive/2011/02/12/1951760.html
 
 // 伪装成微博AIR
@@ -2870,6 +2871,7 @@ $.extend(T163API, {
 		oauth_key: 'cXU8SDfNTtF0esHy',
         oauth_secret: 'KDKVAlZYlx4Yvzwx9BQEbTAVhkdjXQ8I',
         oauth_authorize: '/oauth/authenticate',
+        oauth_callback: FAWAVE_OAUTH_CALLBACK_URL,
         support_counts: false,
         support_comment: true,
         support_repost_timeline: false,
@@ -3979,7 +3981,7 @@ $.extend(FacebookAPI, {
         
         oauth_authorize: 	  '/oauth/authorize',
         oauth_request_token:  '/oauth/request_token',
-        oauth_callback: 'http://fawave.net4team.net/',
+        oauth_callback: FAWAVE_OAUTH_CALLBACK_URL,
         oauth_access_token:   '/oauth/access_token',
         oauth_scope: [
         	'offline_access', 

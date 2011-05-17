@@ -19,8 +19,8 @@ var SUPPORT_AUTH_TYPES = {
 	'facebook': ['oauth'],
 	'plurk': ['baseauth'],
     'identi_ca': ['oauth', 'baseauth'],
-    'tumblr': ['baseauth'],
-    'tianya': ['oauth']
+    'tumblr': ['baseauth']
+    //'tianya': ['oauth']
 };
 
 var AUTH_TYPE_NAME = {
@@ -1213,7 +1213,10 @@ function cleanLocalStorageData(){
 // facebook: 
 // https://chrome.google.com/extensions/detail/aicelmgbddfgmpieedjiggifabdpcnln/?code=3362948c9a062a22ef18c6d5-1013655641|T7VuPCHU79f6saU7MiQwHGG_mVc
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
-	if(changeInfo.status == 'loading' && (tab.url.indexOf(OAUTH_CALLBACK_URL) == 0 || tab.url.indexOf(FacebookAPI.config.oauth_callback + '?code=') == 0)) {
+	console.log(tab.url, changeInfo);
+	if(changeInfo.status == 'loading' && (tab.url.indexOf(OAUTH_CALLBACK_URL) == 0 
+			|| tab.url.indexOf(FAWAVE_OAUTH_CALLBACK_URL) == 0
+			|| tab.url.indexOf(FacebookAPI.config.oauth_callback + '?code=') == 0)) {
 		var d = decodeForm(tab.url);
 		var pin = d.oauth_verifier || d.code || 'impin';
 		$('#account-pin').val(pin);
