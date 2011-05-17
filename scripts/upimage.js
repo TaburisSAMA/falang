@@ -17,15 +17,20 @@ function initOnLoad(){
 };
 
 function init(){
-	initSelectSendAccounts(true);
+	// 判断是否截图
+    var params = decodeForm(window.location.search);
+    var is_upload = true;
+    if(params.image_url) {
+    	is_upload = false;
+    }
+	initSelectSendAccounts(is_upload);
 	initTxtContentEven();
     $("#txtContent").focus();
     at_user_autocomplete('#txtContent');
     $(window).unload(function(){ initOnUnload(); }); 
     
-    // 判断是否截图
-    var params = decodeForm(window.location.search);
     if(params.tabId) {
+    	//$('#uploadForm').hide();
     	chrome.tabs.get(parseInt(params.tabId), function(tab) {
     		// 设置标题和缩短网址
     		var title = tab.title || '';
@@ -44,6 +49,21 @@ function init(){
         		$("#imgPreview").html('<img class="pic" src="' + dataurl + '" />');
         	});
     	});
+    } else if(params.image_url) {
+    	// 有图片
+    	var $txt = $("#txtContent");
+        var settings = Settings.get();
+        countInputText();
+        var source_url = params.image_url;
+        $("#imgPreview").html('<img class="pic" src="' + source_url + '" />');
+        $('#imageUrl').val(source_url);
+        _shortenUrl(source_url, settings, function(shorturl){
+            if(shorturl) {
+            	//$("#imgPreview img").attr('shorturl', shorturl);
+            	$txt.val($txt.val().replace(source_url, shorturl)).focus();
+            }
+        });
+        //$('#uploadForm').hide();
     }
 };
 
@@ -104,12 +124,60 @@ function sendMsg(){ //覆盖popup.js的同名方法
     stat.successCount = 0;
     for(var i in users){
         var user = users[i];
-        upInfo.append(TP_USER_UPLOAD_INFO.format(user));
+        var config = tapi.get_config(user);
         var pic = {file: file};
         var data = {status: msg};
-        
-        _uploadWrap(user, data, pic, stat, selLi);
+        if(config.support_upload) {
+        	upInfo.append(TP_USER_UPLOAD_INFO.format(user));
+        	_uploadWrap(user, data, pic, stat, selLi);
+        } else { // only support update
+        	_updateWrap(user, data, stat, selLi);
+        }
     }
+};
+
+function _finish_callback(user, stat, selLi, data, textStatus, error_code) {
+	//processUploadResult(data, textStatus, error_code);
+
+    stat.sendedCount++;
+    if(textStatus != 'error' && data && !data.error){
+        stat.successCount++;
+        $("#accountsForSend li[uniquekey=" + user.uniqueKey +"]").removeClass('sel');
+        $("#u_uploadinfo_" + user.uniqueKey).find('.progressInfo').append(' (<span>'+ _u.i18n("comm_success") +'</span>)');
+    }else if(data.error){
+        _showMsg('error: ' + data.error);
+        $("#u_uploadinfo_" + user.uniqueKey).addClass('error').find('.progressInfo').append(' (<span style="color:red">'+ _u.i18n("comm_fail") +'</span>)');
+    }
+    if(stat.successCount >= stat.userCount){//全部发送成功
+        _showMsg(_u.i18n("msg_send_success"));
+        selLi.addClass('sel');
+        var ifw = $("#imageFileWrap");
+        ifw.html(ifw.html());
+        $("#txtContent").val('');
+        $("#btnSend").attr('disabled', true);
+        $("#imgPreview").html('');
+        $("#imageUrl").val('');
+        $("#progressBar span").html("");
+    }
+    if(stat.sendedCount >= stat.userCount){//全部发送完成
+        selLi = null;
+        $("#progressBar")[0].style.width = "0%";
+        enabledUpload();
+        _hideLoading();
+        if(stat.successCount > 0){ //有发送成功的
+            setTimeout(callCheckNewMsg, 1000);
+            var failCount = stat.userCount - stat.successCount;
+            if(stat.userCount > 1 && failCount > 0){ //多个用户的
+                _showMsg(_u.i18n("msg_send_complete").format({successCount:stat.successCount, errorCount:failCount}));
+            }
+        }
+    }
+};
+
+function _updateWrap(user, data, stat, selLi){
+	tapi.update({user: user, data: data}, function(result_data, status_code, error_code) {
+		_finish_callback(user, stat, selLi, result_data, status_code, error_code);
+	});
 };
 
 function _uploadWrap(user, data, pic, stat, selLi){
@@ -122,40 +190,7 @@ function _uploadWrap(user, data, pic, stat, selLi){
             onprogress(ev, user, stat);
         }, 
         function(data, textStatus, error_code) {
-            //processUploadResult(data, textStatus, error_code);
-
-            stat.sendedCount++;
-            if(textStatus != 'error' && data && !data.error){
-                stat.successCount++;
-                $("#accountsForSend li[uniquekey=" + user.uniqueKey +"]").removeClass('sel');
-                $("#u_uploadinfo_" + user.uniqueKey).find('.progressInfo').append(' (<span>'+ _u.i18n("comm_success") +'</span>)');
-            }else if(data.error){
-                _showMsg('error: ' + data.error);
-                $("#u_uploadinfo_" + user.uniqueKey).addClass('error').find('.progressInfo').append(' (<span style="color:red">'+ _u.i18n("comm_fail") +'</span>)');
-            }
-            if(stat.successCount >= stat.userCount){//全部发送成功
-                _showMsg(_u.i18n("msg_send_success"));
-                selLi.addClass('sel');
-                var ifw = $("#imageFileWrap");
-                ifw.html(ifw.html());
-                $("#txtContent").val('');
-                $("#btnSend").attr('disabled', true);
-                $("#imgPreview").html('');
-                $("#progressBar span").html("");
-            }
-            if(stat.sendedCount >= stat.userCount){//全部发送完成
-                selLi = null;
-                $("#progressBar")[0].style.width = "0%";
-                enabledUpload();
-                _hideLoading();
-                if(stat.successCount > 0){ //有发送成功的
-                    setTimeout(callCheckNewMsg, 1000);
-                    var failCount = stat.userCount - stat.successCount;
-                    if(stat.userCount > 1 && failCount > 0){ //多个用户的
-                        _showMsg(_u.i18n("msg_send_complete").format({successCount:successCount, errorCount:failCount}));
-                    }
-                }
-            }
+        	_finish_callback(user, stat, selLi, data, textStatus, error_code);
         }
     );
 };
@@ -243,9 +278,11 @@ function selectUrl(ele){
 function disabledUpload(){
     $("#btnSend").attr('disabled', true);
     $("#imageFile").attr('disabled', true);
+    $("#imageUrl").attr('disabled', true);
 };
 
 function enabledUpload(){
     $("#btnSend").removeAttr('disabled');
     $("#imageFile").removeAttr('disabled');
+    $("#imageUrl").removeAttr('disabled');
 };

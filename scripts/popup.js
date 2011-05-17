@@ -2050,7 +2050,6 @@ function doRT(ele, is_rt, is_rt_rt){//RT
     data = unescape(data);
     data = JSON.parse(data);
     var t = $("#txtContent");
-    showMsgInput();
     t.val('').blur();
     if(is_rt) {
     	data = data.retweeted_status;
@@ -2084,6 +2083,10 @@ function doRT(ele, is_rt, is_rt_rt){//RT
         		: htmlToText(data.retweeted_status.retweeted_status.text));
         }
     }
+    if(!original_pic) {
+    	// 没图片，则打开文本框
+    	showMsgInput();
+    }
     var name = config.rt_at_name ? (_msg_user.name || _msg_user.id) : _msg_user.screen_name;
     val = repost_pre + ' ' + '@' + name + ' ' + val;
     if(original_pic) {
@@ -2091,12 +2094,12 @@ function doRT(ele, is_rt, is_rt_rt){//RT
     	var settings = Settings.get();
     	var longurl = original_pic;
     	val += config.image_shorturl_pre + longurl;
-        _shortenUrl(longurl, settings, function(shorturl) {
-        	if(shorturl){
-                t.blur().val(t.val().replace(longurl, shorturl)).focus();
-                countInputText();
-            }
-        });
+//        _shortenUrl(longurl, settings, function(shorturl) {
+//        	if(shorturl){
+//                t.blur().val(t.val().replace(longurl, shorturl)).focus();
+//                countInputText();
+//            }
+//        });
     }
     if(data.crosspostSource) {
     	// 有原文url地址，并尝试缩短
@@ -2112,6 +2115,10 @@ function doRT(ele, is_rt, is_rt_rt){//RT
     }
     t.val(val);
     t.focus(); //光标在头部
+    if(original_pic) {
+    	// 有图片，则打开图片上传
+    	openUploadImage(null, original_pic);
+    }
 };
 
 function _delCache(id, t, unique_key) {
@@ -2315,11 +2322,15 @@ function showGeoMap(user_img, latitude, longitude){
 };
 
 //打开上传图片窗口
-function openUploadImage(tabId){
+function openUploadImage(tabId, image_url){
     initOnUnload();
     var l = (window.screen.availWidth-510)/2;
     tabId = tabId || '';
-    window.open('upimage.html?tabId=' + tabId, '_blank', 'left=' + l + ',top=30,width=510,height=600,menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
+    var url = 'upimage.html?tabId=' + tabId;
+    if(image_url) {
+    	url += '&image_url=' + image_url;
+    }
+    window.open(url, '_blank', 'left=' + l + ',top=30,width=510,height=600,menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
 };
 
 //在新窗口打开popup页
