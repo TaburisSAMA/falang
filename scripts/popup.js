@@ -1289,16 +1289,17 @@ function showCounts(t, ids){
 //@tweetId: 微博ID
 //@page: 分页
 //@notHide: 不要隐藏评论列表
-function showComments(ele, tweetId, page, notHide){
+function showComments(ele, tweetId, page, notHide, page_params){
 	if(!tweetId) {
 		return;
 	}
 	var $ele = $(ele);
 	// 获取status的screen_name
-	var $user_info = $ele.parents('.userName').find('a:first');
+	var comment_p = $ele.closest('.commentWrap');
+	var $user_info = comment_p.find('.userName a:first');
 	var screen_name = $user_info.attr('user_screen_name');
 	var user_id = $user_info.attr('user_id');
-    var comment_p = $ele.closest('.commentWrap');
+    
     var commentWrap = comment_p.children('.comments');
     var $comment_list = commentWrap.children('.comment_list');
     var current_type = comment_p.attr('timeline_type') || 'comment';
@@ -1323,10 +1324,17 @@ function showComments(ele, tweetId, page, notHide){
     var user = getUser();
     var params = {id:tweetId, count:COMMENT_PAGE_SIZE, user:user};
     if(page) {
-    	params.page = page;
+    	if(page_params) {
+    		for(var k in page_params) {
+    			params[k] = page_params[k];
+    		}
+    	} else {
+    		params.page = page;
+    	}
     } else {
     	page = 1;
     }
+    
     var method = timeline_type == 'comment' ? 'comments' : 'repost_timeline';
     tapi[method](params, function(data, textStatus){
     	data = data || {};
@@ -1334,8 +1342,13 @@ function showComments(ele, tweetId, page, notHide){
         if(comments){
             if(comments.length && comments.length>0){
                 var _html = [];
+                var last_comment_id = null, first_comment_id = null;
                 for(var i in comments){
                     _html.push(buildComment(comments[i], tweetId, screen_name, user_id, timeline_type));
+                    last_comment_id = comments[i].id;
+                    if(!first_comment_id) {
+                    	first_comment_id = last_comment_id;
+                    }
                 }
                 $comment_list.html(_html.join(''));
                 commentWrap.show();
@@ -1351,7 +1364,14 @@ function showComments(ele, tweetId, page, notHide){
                     }else{
                         commentWrap.find('.comment_paging a:eq(1)').show();
                     }
-                    commentWrap.find('.comment_paging').attr('page',page).show();
+                    $page = commentWrap.find('.comment_paging');
+                    $page.attr('page',page).show();
+                    if(first_comment_id) {
+                    	$page.attr('first_id',first_comment_id);
+                    }
+                    if(last_comment_id) {
+                    	$page.attr('last_id',last_comment_id);
+                    }
                 }
                 if(data.comment_count) {
                 	$ele.html(data.comment_count);
@@ -1386,7 +1406,17 @@ function commentPage(ele, tweetId, is_pre){
     }
     page = is_pre ? page - 1 : page + 1;
     page_wrap.hide();
-    showComments(ele, tweetId, page, true);
+    var user = getUser();
+    var page_params = null;
+    if(page && user.blogType == 't163') {
+    	// 163只支持 since_id和max_id翻页
+    	if(is_pre) {
+    		page_params = {since_id: page_wrap.attr('first_id')};
+    	} else {
+    		page_params = {max_id: page_wrap.attr('last_id')};
+    	}
+    }
+    showComments(ele, tweetId, page, true, page_params);
 }
 
 //<<<<<<<<<<<======
@@ -1838,8 +1868,10 @@ function sendComment(msg, comment_id, notSendMord){
     if(cid){ //如果是回复别人的微博
     	m = 'reply';
     	data.cid = cid;
-        data.comment = data.comment.replace(_u.i18n("msg_comment_reply_default").format({username:$('#replyUserName').val()}), '');
-    	var reply_user_id = $('#replyUserId').val();
+    	if(user.blogType !== 't163') { // 163不支持reply_user_id;
+    		data.comment = data.comment.replace(_u.i18n("msg_comment_reply_default").format({username:$('#replyUserName').val()}), '');
+    	}
+        var reply_user_id = $('#replyUserId').val();
     	data.reply_user_id = reply_user_id;
     } 
     tapi[m](data, function(sinaMsg, textStatus){
@@ -2003,7 +2035,7 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
  * cid:回复的评论ID
  */
 function doComment(ele, userName, userId, tweetId, 
-		replyUserName, replyUserId, cid){
+		replyUserName, replyUserId, cid) {
     $('#actionType').val('comment');
     $('#commentTweetId').val(tweetId);
     $('#commentUserId').val(userId);

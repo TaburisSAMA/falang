@@ -2991,13 +2991,17 @@ $.extend(T163API, {
 				delete args.data.screen_name;
 			}
 		} else if(args.url == this.config.comment || args.url == this.config.reply) {
-			args.data.in_reply_to_status_id = args.data.id;
+			// 请求参数
+			// id：必选参数，值为被评论微博的ID。如果回复某条评论，则此值为该评论的id。
+			// status ：必选参数，评论内容。
+			// is_retweet：可选参数，是否转发 默认不转发 1为转发
+			// is_comment_to_root：是否评论给原微博 默认不评论 1为评论
+			//args.data.id = args.data.cid || args.data.id;
 			args.data.status = args.data.comment;
-			args.url = this.config.update;
-			args.is_comment = true;
-			args.data.dispatch_to_followers = '0';
+			args.url = this.config.reply;
+			// args.is_comment = true;
+			// args.data.dispatch_to_followers = '0';
 			delete args.data.comment;
-			delete args.data.id;
 			delete args.data.cid;
 			delete args.data.reply_user_id;
 		} else if(args.url == this.config.repost) {
@@ -3168,6 +3172,9 @@ $.extend(T163API, {
 				}
 			};
 			data.status.user = this.format_result_item(data.status.user, 'user', args);
+			if(!data.user) { // 评论竟然没有用户？！
+				data.user = data.status.user;
+			}
 			data.status = this.format_result_item(data.status, 'status', args);
 			
 			if(data.root_in_reply_to_status_id 
