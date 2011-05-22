@@ -609,8 +609,8 @@
 		"description": "点此选择文件或者将文件拖放至此"
 	},
 	"btn_show_user_title": {
-	    "message": "左键查看微薄，右键打开主页",
-		"description": "左键查看微薄，右键打开主页"
+	    "message": "左键查看微博，右键打开主页",
+		"description": "左键查看微博，右键打开主页"
 	},
 
 	//设置页面
