@@ -896,10 +896,10 @@ function _getFansList(to_t, read_more){
     	screen_name = c_user.screen_name;
     	user_id = c_user.id;
     	get_c_user_fans = true;
-    	$("#fans_tab span font").html(_u.i18n("comm_me"));
+    	$("#fans_tab span font").html(_u.i18n("comm_my"));
     }
     if(!get_c_user_fans) {
-    	$("#fans_tab span font").html(screen_name);
+    	$("#fans_tab span font").html(screen_name + _u.i18n("comm_de"));
     }
     var params = {user:c_user, count:PAGE_SIZE, screen_name: screen_name};
     if(user_id) {
