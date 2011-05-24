@@ -2894,7 +2894,7 @@ $.extend(T163API, {
         gender_map: {0:'n', 1:'m', 2:'f'}
 	}),
 	
-	processSearch: DiguAPI.processSearch,
+	//processSearch: DiguAPI.processSearch,
 	
 //	processEmotional: function(str){
 //	    str = str.replace(/\[([\u4e00-\u9fff,\uff1f,\w]{1,10})\]/g, this._replaceEmotional);
@@ -2969,6 +2969,22 @@ $.extend(T163API, {
 				callback(null, 'error');
 			}
 		}, this);
+	},
+	
+	// 提供图片上传服务
+	upload_image: function(user, pic, before_request, onprogress, callback) {
+		if(!before_request) {
+			before_request = function() {};
+		}
+		if(!onprogress) {
+			onprogress = function() {};
+		}
+		this._upload(user, {}, pic, before_request, onprogress, function(data, text_status, code) {
+			if(data && data.upload_image_url) {
+				data = data.upload_image_url;
+			}
+			callback(data, text_status, code);
+		});
 	},
 	
 	before_sendRequest: function(args, user) {
@@ -3889,14 +3905,15 @@ $.extend(DoubanAPI, {
 });
 
 var TianyaAPI = $.extend({}, sinaApi);
+TianyaAPI._apply_auth = TianyaAPI.apply_auth;
 $.extend(TianyaAPI, {
 	config: $.extend({}, sinaApi.config, {
 		host: 'http://open.tianya.cn/api',
-		source: '05e787211a7ff69311b695634f7fe3b9', 
-		oauth_key: '05e787211a7ff69311b695634f7fe3b9',
-        oauth_secret: 'a29252a52eaa835d',
+		source: '12d4d19aee679b8713297c2583fe21b204dd9ca0a', 
+		oauth_key: '12d4d19aee679b8713297c2583fe21b204dd9ca0a',
+        oauth_secret: '0b3b77ad0586343a18670a18e44d7457',
         result_format: '', // 豆瓣由alt参数确定返回值格式
-        
+        oauth_callback: FAWAVE_OAUTH_CALLBACK_URL,
 		userinfo_has_counts: false, // 用户信息中是否包含粉丝数、微博数等信息
         support_comment: false,
 		support_repost: false,
@@ -3914,23 +3931,21 @@ $.extend(TianyaAPI, {
 		oauth_authorize: 	  '/oauth/authorize.php',
         oauth_request_token:  '/oauth/request_token.php',
         oauth_access_token:   '/oauth/access_token.php',
-        friends_timeline: '/people/%40me/miniblog/contacts',
-        user_timeline: '/people/{{id}}/miniblog',
-        update: '/miniblog/saying',
-        destroy: '/miniblog/{{id}}',
-        direct_messages: '/doumail/inbox',
-        sent_direct_messages: '/doumail/outbox',
-        friends: '/people/{{user_id}}/contacts',
-        followers: '/people/{{user_id}}/friends',
-        new_message: '/doumails',
-        destroy_msg: '/doumail/{{id}}',
-        comment: '/miniblog/{{id}}/comments_post',
-        reply: '/miniblog/{{id}}/comments_post',
-        comments: '/miniblog/{{id}}/comments',
-        user_search: '/people',
+        update: '/yabo/add.php',
 		verify_credentials: '/user/info.php'
 	}),
 	
+	apply_auth: function(url, args, user) {
+		if(url && url.indexOf('access_token.php') < 0 && user.oauth_token_secret) {
+			// oauth_token
+			// oauth_token_secret
+			console.log(user.oauth_token_secret);
+			args.data.oauth_token = user.oauth_token_key;
+			args.data.oauth_token_secret = user.oauth_token_secret;
+		} else {
+			this._apply_auth(url, args, user);
+		}
+	},
 	counts: function(data, callback) {
 		callback();
 	},
@@ -3939,13 +3954,29 @@ $.extend(TianyaAPI, {
         callback({error: _u.i18n("comm_no_api")});
     },
 	
-	before_sendRequest: function(args) {
-		delete args.data.source;
+	before_sendRequest: function(args, user) {
+		args.data.outformat = 'json';
+		if(args.url === this.config.update) {
+			args.type = 'get';
+			args.data.word = args.data.status;
+			delete args.data.status;
+		}
 	},
-
 	// urlencode，子类覆盖是否需要urlencode处理
 	url_encode: function(text) {
 		return text;
+	},
+	format_result_item: function(data, play_load, args) {
+		if(play_load === 'user') {
+			console.log(data);
+			data = data.user;
+			data.id = data.user_id;
+			data.screen_name = data.user_name;
+			data.created_at = new Date(data.register_date);
+			data.birthday = new Date(data.birthday);
+			data.profile_image_url = data.head;
+		}
+		return data;
 	}
 });
 

@@ -203,7 +203,7 @@ var refreshTimeLimit = {
         'sent_direct_messages': 60
     }
 };
-refreshTimeLimit.digu = refreshTimeLimit.twitter = refreshTimeLimit.identi_ca = refreshTimeLimit.tsohu = refreshTimeLimit.t163 = refreshTimeLimit.fanfou = refreshTimeLimit.plurk = refreshTimeLimit.tsina;
+refreshTimeLimit.tianya = refreshTimeLimit.digu = refreshTimeLimit.twitter = refreshTimeLimit.identi_ca = refreshTimeLimit.tsohu = refreshTimeLimit.t163 = refreshTimeLimit.fanfou = refreshTimeLimit.plurk = refreshTimeLimit.tsina;
 refreshTimeLimit.renjian = refreshTimeLimit.zuosa = refreshTimeLimit.follow5 = refreshTimeLimit.leihou = refreshTimeLimit.douban = refreshTimeLimit.buzz = refreshTimeLimit.tqq;
 
 function showMsg(msg){
@@ -247,14 +247,14 @@ var Settings = {
             direct_messages: 120
         },
         isSetBadgeText:{ //是否提醒未读信息数
-            friends_timeline: true,
+            friends_timeline: false,
             mentions: true,
             comments_timeline: true,
             direct_messages: true
         },
         isShowInPage:{ //是否在页面上提示新信息
-            friends_timeline: true,
-            mentions: true,
+            friends_timeline: false,
+            mentions: false,
             comments_timeline: true,
             direct_messages: true
         },
