@@ -2115,13 +2115,15 @@ function doRT(ele, is_rt, is_rt_rt){//RT
         }
     }
     if(!original_pic) {
-    	// 尝试从视频预览图中获取 img.video_image
-    	var closest_li = $(ele).closest('li');
-    	original_pic = closest_li.find('img.video_image').attr('src');
-    	if(!original_pic) {
-    		// 尝试从链接中获取图片
-    		original_pic = closest_li.find('a.image_preview').attr('original');
-    	}
+    	// 尝试从链接中获取图片
+		original_pic = closest_li.find('a.image_preview').attr('original');
+//    	// 尝试从视频预览图中获取 img.video_image
+//    	var closest_li = $(ele).closest('li');
+//    	original_pic = closest_li.find('img.video_image').attr('src');
+//    	if(!original_pic) {
+//    		// 尝试从链接中获取图片
+//    		original_pic = closest_li.find('a.image_preview').attr('original');
+//    	}
     }
     
     if(!original_pic) {
