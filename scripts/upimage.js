@@ -68,7 +68,8 @@ function init(){
         } else {
         	_shortenUrl(source_url, settings, function(shorturl){
                 if(shorturl) {
-                	$txt.val($txt.val().replace(source_url, shorturl)).focus();
+                	//$txt.val($txt.val().replace(source_url, shorturl)).focus();
+                	$('#imgPreview img').attr('short_url', shorturl);
                 }
             });
         }
@@ -184,6 +185,12 @@ function _finish_callback(user, stat, selLi, data, textStatus, error_code) {
 };
 
 function _updateWrap(user, status, stat, selLi){
+	// 增加图片链接
+	var image_url = $('#imgPreview img').attr('short_url') || $('#imgPreview img').attr('src');
+	if(image_url) {
+		var config = tapi.get_config(user);
+		status += config.image_shorturl_pre + image_url;
+	}
 	tapi.update({user: user, status: status}, function(result_data, status_code, error_code) {
 		_finish_callback(user, stat, selLi, result_data, status_code, error_code);
 	});

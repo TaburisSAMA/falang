@@ -1413,6 +1413,11 @@ var Instagram = {
 	 * big: <img src="http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_7.jpg" class="photo" /> 
 	 * middle: http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_6.jpg
 	 * small: http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_5.jpg
+	 * 
+	 * http://images.instagram.com/media/2011/05/20/c67a2c94bed9459ca2d398375b799219_5.jpg
+	 * http://images.instagram.com/media/2011/05/20/c67a2c94bed9459ca2d398375b799219_6.jpg
+	 * http://images.instagram.com/media/2011/05/20/c67a2c94bed9459ca2d398375b799219_7.jpg
+	 * 
 	 */
 	host: 'instagr.am',
 	url_re: /http:\/\/instagr\.am\/p\//i,
@@ -1434,6 +1439,31 @@ var Instagram = {
 		});
 	}
 };
+
+var Instagram2 = {
+		/* 
+		 * big: <img src="http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_7.jpg" class="photo" /> 
+		 * middle: http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_6.jpg
+		 * small: http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_5.jpg
+		 * 
+		 * http://images.instagram.com/media/2011/05/20/c67a2c94bed9459ca2d398375b799219_5.jpg
+		 * http://images.instagram.com/media/2011/05/20/c67a2c94bed9459ca2d398375b799219_6.jpg
+		 * http://images.instagram.com/media/2011/05/20/c67a2c94bed9459ca2d398375b799219_7.jpg
+		 * 
+		 */
+		host: 'instagram.com',
+		url_re: /http:\/\/images\.instagram\.com\/media\/[^\_]+(\_\d\.)\w+/i,
+		sync: true,
+		get: function(url, callback) {
+			var m = this.url_re.exec(url);
+			var pics = {
+				thumbnail_pic: url.replace(m[1], '_5.'),
+				bmiddle_pic: url.replace(m[1], '_6.'),
+				original_pic: url.replace(m[1], '_7.')
+			};
+			callback(pics);
+		}
+	};
 
 var Flickr = {
 	host: 'www.flickr.com',
@@ -1472,6 +1502,7 @@ var Twitpic = {
 	 */
 	host: 'twitpic.com',
 	url_re: /http:\/\/(twitpic\.com)\/\w+/i,
+	sync: true,
 	get: function(url, callback) {
 		var tpl = 'http://twitpic.com/show/{{size}}/{{id}}';
 		var re = /twitpic.com\/(\w+)/i;
@@ -1520,6 +1551,7 @@ var Plixi = {
 	 */
 	host: 'plixi.com',
 	url_re: /http:\/\/(plixi\.com\/p|tweetphoto\.com)\//i,
+	sync: true,
 	get: function(url, callback) {
 		var tpl = 'http://api.plixi.com/api/tpapi.svc/imagefromurl?size={{size}}&url=' + url;
 		var pics = {
@@ -1539,6 +1571,7 @@ var Yfrog = {
 	 */
 	host: 'yfrog.com',
 	url_re: /http:\/\/yfrog\.com\/\w+/i,
+	sync: true,
 	get: function(url, callback) {
 		var pics = {
 			thumbnail_pic: url + ':small',
@@ -1553,6 +1586,7 @@ var Yfrog = {
 var Twitgoo = {
 	host: 'twitgoo.com',
 	url_re: /http:\/\/twitgoo\.com\/\w+/i,
+	sync: true,
 	get: function(url, callback) {
 		var pics = {
 			thumbnail_pic: url + '/mini',
@@ -1604,6 +1638,7 @@ var MobyPicture = {
 var Imgur = {
 	host: 'imgur.com',
 	url_re: /http:\/\/(i\.)?imgur\.com\/\w+\.\w+/i,
+	sync: true,
 	get: function(url, callback) {
 		var re = /imgur.com\/(\w+)\.(\w+)/i;
 		var tpl = 'http://i.imgur.com/{{word}}.{{ext}}';
@@ -1729,10 +1764,46 @@ var Imgur = {
     }
 };
 
+var SinaImage = {
+	host: 'sinaimg.cn',
+	url_re: /sinaimg\.cn\/(\w+)\/\w+/i,
+	sync: true,
+	get: function(url, callback, ele) {
+		var m = this.url_re.exec(url);
+		callback({
+			thumbnail_pic: url.replace(m[1], 'thumbnail'),
+			bmiddle_pic: url.replace(m[1], 'bmiddle'),
+			original_pic: url.replace(m[1], 'large')
+		});
+	}
+};
+
+var QQImage = {
+	// http://app.qpic.cn/mblogpic/19dd9c4ece7b86262466/2000
+	// => 
+	// http://app.qpic.cn/mblogpic/19dd9c4ece7b86262466/160
+	// http://app.qpic.cn/mblogpic/19dd9c4ece7b86262466/460
+	// http://app.qpic.cn/mblogpic/19dd9c4ece7b86262466/2000
+	host: 'qpic.cn',
+	sync: true,
+	url_re: /qpic\.cn\/mblogpic\/\w+\/(\w+)/i,
+	get: function(url, callback, ele) {
+		var m = this.url_re.exec(url);
+		callback({
+			thumbnail_pic: url.replace(m[1], '160'),
+			bmiddle_pic: url.replace(m[1], '460'),
+			original_pic: url.replace(m[1], '2000')
+		});
+	}
+};
+
 // 图片服务
 var ImageService = {
 	services: {
+		SinaImage: SinaImage,
+		QQImage: QQImage,
 		Instagram: Instagram, 
+		Instagram2: Instagram2,
 		Plixi: Plixi, 
 		Imgur: Imgur,
 		Twitpic: Twitpic,
@@ -1755,6 +1826,9 @@ var ImageService = {
 				$(ele).attr('rhref', url).attr('title', title).attr('href', 'javascript:void(0);').attr('service', name).click(function() {
 					ImageService.show(this, $(this).attr('service'), $(this).attr('rhref'));
 				});
+				if(item.sync) {
+					$(ele).click();
+				}
 				return true;
 			}
 		}
@@ -1766,7 +1840,7 @@ var ImageService = {
 			if(!pics) {
 				return;
 			}
-			var tpl = '<div><a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="{{bmiddle_pic}}" original="{{original_pic}}" onmousedown="rOpenPic(event, this)" title="'+ _u.i18n("comm_mbright_to_open_pic") +'"><img class="imgicon pic" src="{{thumbnail_pic}}"></a></div>';
+			var tpl = '<div><a target="_blank" class="image_preview" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="{{bmiddle_pic}}" original="{{original_pic}}" onmousedown="rOpenPic(event, this)" title="'+ _u.i18n("comm_mbright_to_open_pic") +'"><img class="imgicon pic" src="{{thumbnail_pic}}"></a></div>';
 			$(ele).hide().parent().after(tpl.format(pics));
 		}, ele);
 	},

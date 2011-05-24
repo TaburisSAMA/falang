@@ -2116,7 +2116,12 @@ function doRT(ele, is_rt, is_rt_rt){//RT
     }
     if(!original_pic) {
     	// 尝试从视频预览图中获取 img.video_image
-    	original_pic = $(ele).closest('li').find('img.video_image').attr('src');
+    	var closest_li = $(ele).closest('li');
+    	original_pic = closest_li.find('img.video_image').attr('src');
+    	if(!original_pic) {
+    		// 尝试从链接中获取图片
+    		original_pic = closest_li.find('a.image_preview').attr('original');
+    	}
     }
     
     if(!original_pic) {
@@ -2125,18 +2130,18 @@ function doRT(ele, is_rt, is_rt_rt){//RT
     }
     var name = config.rt_at_name ? (_msg_user.name || _msg_user.id) : _msg_user.screen_name;
     val = repost_pre + ' ' + '@' + name + ' ' + val;
-    if(original_pic) {
-    	// 有图片，自动带上图片地址，并尝试缩短
-    	var settings = Settings.get();
-    	var longurl = original_pic;
-    	val += config.image_shorturl_pre + longurl;
+//    if(original_pic) {
+//    	// 有图片，自动带上图片地址，并尝试缩短
+//    	var settings = Settings.get();
+//    	var longurl = original_pic;
+//    	val += config.image_shorturl_pre + longurl;
 //        _shortenUrl(longurl, settings, function(shorturl) {
 //        	if(shorturl){
 //                t.blur().val(t.val().replace(longurl, shorturl)).focus();
 //                countInputText();
 //            }
 //        });
-    }
+//    }
     if(data.crosspostSource) {
     	// 有原文url地址，并尝试缩短
 //    	var settings = Settings.get();
