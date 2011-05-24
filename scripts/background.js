@@ -832,6 +832,11 @@ r_method_manager = {
     test: function(request, sender, sendResponse){
         sendResponse({farewell: "goodbye"});
     },
+    activelog: function(request, sender, sendResponse){
+        var active = request.active;
+        var params = request.params;
+        ActiveLog.log(active, params, sendResponse);
+    },
     getLookingTemplate: function(request, sender, sendResponse){
         var _l_tp = Settings.get().lookingTemplate;
         sendResponse({lookingTemplate: _l_tp});

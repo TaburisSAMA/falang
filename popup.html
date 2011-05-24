@@ -543,6 +543,7 @@
 	<!-- 模板选择 End -->
 
 	<script type="text/javascript">
+		chrome.extension.sendRequest({method:'activelog', active: 'popup'});
 		var _gaq = _gaq || [];
 		 _gaq.push(['_setAccount', 'UA-19689660-1']);
 		 _gaq.push(['_trackPageview']);

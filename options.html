@@ -364,12 +364,20 @@
 		<tr>
 			<th><script>_u.wi('sett_itemName_auto_short_url')</script></th>
 			<td>
-				<input type="checkbox" name="autoShortUrl" value="1" checked="checked" id="autoShortUrl"><label for="autoShortUrl"><script>_u.wi('sett_des_auto_short_url')</script></label>, 
-				<label for="autoShortUrlCount"><script>_u.wi('sett_des_auto_short_url_words')</script>:</label><input type="text" id="autoShortUrlCount" value="15" />
-				<script>_u.wi('sett_des_shorten_url_service')</script>:
+				<input type="checkbox" name="autoShortUrl" value="1" checked="checked" id="autoShortUrl"><label for="autoShortUrl"><script>_u.wi('sett_des_auto_short_url')</script>, </label> 
+				<label for="autoShortUrlCount"><script>_u.wi('sett_des_auto_short_url_words')</script>:</label><input type="text" id="autoShortUrlCount" style="width: 40px;" value="15" />
+				<label> <script>_u.wi('sett_des_shorten_url_service')</script>:</label>
 				<select id="shorten_url_service"></select>
 			</td>
 		</tr>
+		<tr style="display:none;">
+            <th><script>_u.wi('sett_itemName_enable_image_service')</script></th>
+            <td>
+                <label><script>_u.wi('sett_des_image_service_words')</script></label>
+                <label><script>_u.wi('sett_des_image_service')</script>:</label>
+                <select id="image_service"></select>
+            </td>
+        </tr>
 		<tr>
             <th><a href="http://www.instapaper.com/" target="_blank"><script>_u.wi('sett_itemName_instapaper')</script></a></th>
             <td><span class="jTip" jTitle="" jWidth="400">?
@@ -381,15 +389,6 @@
                 <button style="display:none;" id="delete_instapaper_account_btn"><img src="images/delete.png" /><script>_u.wi('comm_del_user')</script></button>
             </td>
         </tr>
-		<tr style="display:none;">
-			<th>图片服务：</th>
-			<td>
-				<input type="checkbox" name="enableImageService"
-					value="1" checked="checked" id="enableImageService"><label for="enableImageService">开启图片服务，让twitter等不支持图片上传的微博也可以发图片</label>, 
-				图片服务:
-				<select id="image_service"></select>
-			</td>
-		</tr>
 		<tr>
 			<th></th>
 			<td>
@@ -449,6 +448,7 @@
 </div>
 
 	<script type="text/javascript">
+	   chrome.extension.sendRequest({method:'activelog', active: 'options'});
 		var _gaq = _gaq || [];
 		 _gaq.push(['_setAccount', 'UA-19689660-1']);
 		 _gaq.push(['_trackPageview']);

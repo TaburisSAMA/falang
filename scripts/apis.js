@@ -1840,6 +1840,8 @@ $.extend(DiguAPI, {
         repost:               '/statuses/update',
         comment:              '/statuses/update',
         reply:                '/statuses/update',
+//        friends_timeline:     '/1.1/statuses/friends_timeline',
+//        user_timeline:     '/1.1/statuses/user_timeline',
         search: '/search_statuses',
         user_search: '/search_user',
         

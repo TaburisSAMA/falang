@@ -738,6 +738,14 @@ function _verify_credentials(user) {
                 }
                 _showMsg(_u.i18n("msg_user_save_error") + err_msg);
             }
+            var params = {blogtype: user.blogType, authtype: user.authType};
+            if(errorCode) {
+            	params.error_code = errorCode;
+            }
+            if(data && data.error) {
+            	params.error = data.error;
+            }
+            chrome.extension.sendRequest({method:'activelog', active: 'save_account_error', params: params});
         } else {
         	var userList = getUserList('all');
             $.extend(user, data);
@@ -769,11 +777,14 @@ function _verify_credentials(user) {
             $("#account-pwd").val('');
             $("#account-pin").val('');
             _showMsg(_u.i18n("msg_edit_user_success").format({edit:btnVal, username:data.screen_name}));
-
+            
             var b_view = getBackgroundView();
             if(b_view){
                 b_view.RefreshManager.restart(true);
             }
+            // logging
+            var params = {blogtype: user.blogType, authtype: user.authType, tid: user.uniqueKey};
+            chrome.extension.sendRequest({method:'activelog', active: 'save_account_success', params: params});
         }
     });
 }
