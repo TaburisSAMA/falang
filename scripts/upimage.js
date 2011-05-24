@@ -136,12 +136,11 @@ function sendMsg(){ //覆盖popup.js的同名方法
         var user = users[i];
         var config = tapi.get_config(user);
         var pic = {file: file};
-        var data = {status: msg};
         if(config.support_upload) {
         	upInfo.append(TP_USER_UPLOAD_INFO.format(user));
-        	_uploadWrap(user, data, pic, stat, selLi);
+        	_uploadWrap(user, msg, pic, stat, selLi);
         } else { // only support update
-        	_updateWrap(user, data, stat, selLi);
+        	_updateWrap(user, msg, stat, selLi);
         }
     }
 };
@@ -184,14 +183,14 @@ function _finish_callback(user, stat, selLi, data, textStatus, error_code) {
     }
 };
 
-function _updateWrap(user, data, stat, selLi){
-	tapi.update({user: user, data: data}, function(result_data, status_code, error_code) {
+function _updateWrap(user, status, stat, selLi){
+	tapi.update({user: user, status: status}, function(result_data, status_code, error_code) {
 		_finish_callback(user, stat, selLi, result_data, status_code, error_code);
 	});
 };
 
-function _uploadWrap(user, data, pic, stat, selLi){
-    tapi.upload(user, data, pic, 
+function _uploadWrap(user, status, pic, stat, selLi){
+    tapi.upload(user, {status: status}, pic, 
         function() {
             _showLoading();
             disabledUpload();
