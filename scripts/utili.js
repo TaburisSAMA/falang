@@ -247,7 +247,7 @@ var Settings = {
             direct_messages: 120
         },
         isSetBadgeText:{ //是否提醒未读信息数
-            friends_timeline: false,
+            friends_timeline: true,
             mentions: true,
             comments_timeline: true,
             direct_messages: true
