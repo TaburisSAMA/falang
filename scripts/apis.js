@@ -2903,10 +2903,10 @@ $.extend(T163API, {
 //	    return str;
 //	},
 	_replaceEmotional: function(m, g1){
-	    var tpl = '<img title="{{title}}" src="{{src}}" />';
-	    if(g1) {
+	    if(window.T163_EMOTIONS && g1) {
 	        var face = T163_EMOTIONS[g1];
 	        if(face) {
+                var tpl = '<img title="{{title}}" src="{{src}}" />';
 	            return tpl.format({title: m, src: T163_EMOTIONS_URL_PRE + face});
 	        }
 	    }
