@@ -365,7 +365,11 @@ function enterAddShortenUrl(e){
 function initIamDoing(){
 	function shareDoing(capture) {
 		return function() {
-			chrome.tabs.getSelected(null, function(tab){
+			var params = decodeForm(window.location.search);
+			if(params.windowId) {
+				params.windowId = parseInt(params.windowId);
+			}
+			chrome.tabs.getSelected(params.windowId, function(tab){
 	            var loc_url = tab.url;
 	            if(loc_url){
 	            	if(capture) {
@@ -2376,15 +2380,30 @@ function openUploadImage(tabId, image_url){
     window.open(url, '_blank', 'left=' + l + ',top=30,width=510,height=600,menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
 };
 
-//在新窗口打开popup页
+// 在新窗口打开popup页
 function openPopupInNewWin(){
+	var params = decodeForm(window.location.search);
+	if(params.windowId) {
+		__openPopupInNewWin(params.windowId);
+	} else {
+		chrome.tabs.getSelected(null, function(tab) {
+			__openPopupInNewWin(tab.windowId);
+		});
+	}
+};
+
+function __openPopupInNewWin(windowId){
     initOnUnload();
     var W = Settings.get().popupWidth, H = Settings.get().popupHeight;
     var l = (window.screen.availWidth-W)/2;
     window.theViewName = 'not_popup';
     var url = 'popup.html?is_new_win=true';
-    getBackgroundView().new_win_popup.window = window.open(url, 'FaWave', 'left=' + l + ',top=30,width=' + W + ',height=' + (H+10) + ',menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
-};
+    if(windowId) {
+    	url += '&windowId=' + windowId;
+    }
+    getBackgroundView().new_win_popup.window = window.open(url, 'FaWave', 'left=' 
+    	+ l + ',top=30,width=' + W + ',height=' + (H+10) + ',menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
+}
 
 //新消息提示模式：提示模式、免打扰模式
 function changeAlertMode(to_mode){
