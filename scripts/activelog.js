@@ -32,7 +32,7 @@
 	} catch(e) {
 		$.get(chrome.extension.getURL('manifest.json'), function(info){
 			ActiveLog.version = info.version;
-		}, json);
+		}, 'json');
 	}
 	window.ActiveLog = ActiveLog;
 })();
