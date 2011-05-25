@@ -15,7 +15,26 @@
 </head>
 <body>
 	<script type="text/javascript">
-	    ActiveLog.log('bg');
+	   setTimeout(function() {
+		   // 加载版本号需要时间
+		   var users = getUserList('all');
+		   var all = 0, disabled = 0, enabled = 0;
+		   var types = {};
+		   for(var i = 0, len = users.length; i < len; i++) {
+			   all += 1;
+			   if(users[i].disabled) {
+				   disabled += 1;
+			   } else {
+				   enabled += 1;
+			   }
+			   var t = users[i].blogType || 'tsina';
+			   types[t] = (types[t] || 0) + 1;
+		   }
+		   types.all = all;
+		   types.enabled = enabled;
+		   types.disabled = disabled;
+		   ActiveLog.log('bg', types);
+	   }, 1000);
 		var _gaq = _gaq || [];
 		_gaq.push(['_setAccount', 'UA-19689660-1']);
 		_gaq.push(['_trackPageview']);
