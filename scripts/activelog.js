@@ -13,7 +13,15 @@
 			params.app = this.app;
 			params.uid = this.uid;
 			params.v = this.version;
-			$.get(this.api, params, cb || function() {});
+			cb = cb || function() {};
+			$.ajax({
+				url: this.api, 
+				data: params, 
+				type: 'get',
+				success: cb,
+				error: cb,
+				timeout: 10000
+			});
 		}
 	};
 	window.ActiveLog = ActiveLog;
