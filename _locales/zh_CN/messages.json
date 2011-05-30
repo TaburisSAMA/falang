@@ -944,7 +944,7 @@
 		"description": "分享网页的模板"
 	},
 	"sett_shared_template": {
-		"message": "我正在看: {{title}} {{url}} ",
+		"message": "{{title}} {{url}} ",
 		"description": "分享正在看的网页时的模板"
 	},
 	"sett_jTip_shared_template": {
