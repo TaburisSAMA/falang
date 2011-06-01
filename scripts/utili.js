@@ -1215,6 +1215,10 @@ var UrlUtil = {
         }
         return '';
     },
+    urlRe: new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&\\-/#=;:!\\+~]+)(?:\\](.+)\\[/url\\]|)', 'ig'),
+    findUrls: function(text) {
+    	return text.match(this.urlRe);
+    },
     showFaviconBefore: function(ele, url){
         var d = UrlUtil.getDomain(url);
         if(d){
@@ -1852,6 +1856,12 @@ var ImageService = {
 };
 
 var VideoService = {
+	// 判断是否qq支持的视频链接 youku,tudou,ku6
+	is_qq_support: function(url) {
+		return this.services.youku.url_re.test(url) 
+			|| this.services.ku6.url_re.test(url) 
+			|| this.services.tudou.url_re.test(url);
+	},
 	services: {
 		youku: {
 			url_re: /youku\.com\/v_show\/id_([^\.]+)\.html/i,

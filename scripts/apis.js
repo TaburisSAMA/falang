@@ -57,6 +57,7 @@ var sinaApi = {
 		support_user_search: true, // 支持搜人
 		support_search_max_id: true,
 		support_favorites_max_id: false, // 收藏分页使用max_id
+		rt_need_source: true, // RT的时候是否需要原始微博
 		
 		need_processMsg: true, //是否需要处理消息的内容
 		comment_need_user_id: false, // 评论是否需要使用到用户id，默认为false，兼容所有旧接口
@@ -174,8 +175,7 @@ var sinaApi = {
 	        if(!notEncode){
 	            str = HTMLEnCode(str);
 	        }
-	        var re = new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&\\-/#=;:!\\+~]+)(?:\\](.+)\\[/url\\]|)', 'ig');
-	        str = str.replace(re, this._replaceUrl);
+	        str = str.replace(UrlUtil.urlRe, this._replaceUrl);
 	        
 	        str = this.processAt(str, str_or_status); //@***
 	
@@ -1512,6 +1512,19 @@ $.extend(TQQAPI, {
 		        	args.data.reid = args.data.sina_id;
 		        	delete args.data.sina_id;
 		        	args.url = '/t/reply';
+		        } else {
+		        	// 判断是否有视频链接
+		        	if(args.data.content) {
+		        		var urls = UrlUtil.findUrls(args.data.content) || [];
+		        		for(var i = 0, len = urls.length; i < len; i++) {
+		        			var url = urls[i];
+		        			if(VideoService.is_qq_support(url)) {
+		        				args.url = '/t/add_video';
+		        				args.data.url = url;
+		        				break;
+		        			}
+		        		}
+		        	}
 		        }
 		        break;
         }
@@ -2592,6 +2605,7 @@ $.extend(TwitterAPI, {
 	    support_repost_timeline: false,
 	    support_sent_direct_messages: false,
 	    support_upload: false,
+	    rt_need_source: false,
 	    oauth_callback: 'oob',
 	    search: '/search_statuses',
 	    repost: '/statuses/update',

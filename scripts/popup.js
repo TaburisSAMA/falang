@@ -1348,7 +1348,7 @@ function showComments(ele, tweetId, page, notHide, page_params){
                 var last_comment_id = null, first_comment_id = null;
                 for(var i in comments){
                     _html.push(buildComment(comments[i], tweetId, screen_name, user_id, timeline_type));
-                    last_comment_id = comments[i].id;
+                    last_comment_id = comments[i].timestamp || comments[i].id;
                     if(!first_comment_id) {
                     	first_comment_id = last_comment_id;
                     }
@@ -1411,12 +1411,23 @@ function commentPage(ele, tweetId, is_pre){
     page_wrap.hide();
     var user = getUser();
     var page_params = null;
-    if(page && user.blogType == 't163') {
-    	// 163只支持 since_id和max_id翻页
-    	if(is_pre) {
-    		page_params = {since_id: page_wrap.attr('first_id')};
-    	} else {
-    		page_params = {max_id: page_wrap.attr('last_id')};
+    if(page) {
+    	if(user.blogType == 't163') {
+    		// 163只支持 since_id和max_id翻页
+        	if(is_pre) {
+        		page_params = {since_id: page_wrap.attr('first_id')};
+        	} else {
+        		page_params = {max_id: page_wrap.attr('last_id')};
+        	}
+    	} else if(user.blogType == 'tqq') {
+    		// PageFlag：（根据dwTime），0：第一页，1：向下翻页，2向上翻页；
+    		// tqq: TwitterId: 第一页 时填0,继续向下翻页，填上一次请求返回的最后一条记录ID，翻页用
+        	if(is_pre) {
+        		// 必须+1，否则会带上第一天记录
+        		page_params = {since_id: parseInt(page_wrap.attr('first_id')) + 1};
+        	} else {
+        		page_params = {max_id: page_wrap.attr('last_id')};
+        	}
     	}
     }
     showComments(ele, tweetId, page, true, page_params);
@@ -2097,7 +2108,7 @@ function doRT(ele, is_rt, is_rt_rt){//RT
     var need_processMsg = config.need_processMsg;
     var val = need_processMsg ? data.text : htmlToText(data.text);
     var original_pic = data.original_pic;
-    if(data.retweeted_status) {
+    if(config.rt_need_source && data.retweeted_status) {
     	if(data.retweeted_status.original_pic) {
     		original_pic = data.retweeted_status.original_pic;
     	}
