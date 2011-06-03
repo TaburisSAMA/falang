@@ -706,11 +706,13 @@ var ADs = {
         if(!ADs.adlist || ADs.currentIndex >= ADs.adlist.length){
             ADs.fetchAds();
         }else{
-            var ran = Math.round(Math.random()*8)%2;
-            if(ran===1){
-                ADs.currentIndex++;
-                return ADs.adlist[ ADs.currentIndex ];
-            }
+        	ADs.currentIndex++;
+            return ADs.adlist[ ADs.currentIndex ];
+//            var ran = Math.round(Math.random()*8)%2;
+//            if(ran===1){
+//                ADs.currentIndex++;
+//                return ADs.adlist[ ADs.currentIndex ];
+//            }
         }
         return null;
     }
