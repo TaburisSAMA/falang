@@ -56,19 +56,22 @@ var methodManager = {
         } else if(link) {
         	text += ' ' + link;
         }
-        $("#fawaveTxtContentInp").focus();
+        $txt = $("#fawaveTxtContentInp");
+        $txt.focus();
         if(text){ 
-        	$("#fawaveTxtContentInp").val(text); 
+        	$txt.val(text); 
         }
         if(info.mediaType == 'image') {
         	$('#imgPreview').html('<img style="max-width: 400px; max-height: 150px;" src="' + info.srcUrl + '" />');
         }
         fawaveCountInputText();
+        $txt.data('source_url', '').data('short_url', '');
         if(link) {
         	chrome.extension.sendRequest({method:'shortenUrl', long_url:link}, function(response){
 	            if(response.short_url){
-	                $("#fawaveTxtContentInp").val($("#fawaveTxtContentInp").val().replace(link, response.short_url));
+	            	$txt.val($txt.val().replace(link, response.short_url));
 	                fawaveCountInputText();
+	                $txt.data('source_url', link).data('short_url', response.short_url);
 	            }
 	        });
         }
@@ -299,8 +302,8 @@ function fawaveInitTemplate(){
         $("#fawaveSendMsgWrap").hide();
     });
 
-    $("#fawaveSendMsgWrap .btn-negative").click(function(){
-        $("#fawaveTxtContentInp").val('');
+    $("#fawaveSendMsgWrap .btn-negative").click(function() {
+        $("#fawaveTxtContentInp").val('').data('source_url', '').data('short_url', '');
         $("#fawave-share-page-chk").attr("checked", false);
         $("#fawave-share-page-chk-and-capture").attr("checked", false);
         //showFawaveAlertMsg('');
@@ -405,15 +408,18 @@ function fawaveToggleLooking(ele, capture){
     chrome.extension.sendRequest({method:'getLookingTemplate'}, function(response){
         var fawaveLookingTemplate = response.lookingTemplate;
         var loc_url = window.location.href, s_url = $(ele).data('short_url');
+        $("#fawaveTxtContentInp").data('source_url', loc_url).data('short_url', s_url);
         loc_url = s_url || loc_url;
         var title = document.title;
         var result = fawaveFormatText(fawaveLookingTemplate, {title:(title||''), url:loc_url});
+        $("#fawaveTxtContentInp").val(result);
         if($(ele).attr('checked')){
-            $("#fawaveTxtContentInp").val(result);
             if(!s_url){
                 chrome.extension.sendRequest({method:'shortenUrl', long_url:loc_url}, function(response){
                     if(response.short_url){
-                        $("#fawaveTxtContentInp").val($("#fawaveTxtContentInp").val().replace(loc_url, response.short_url));
+                    	var $txt = $("#fawaveTxtContentInp");
+                    	$txt.val($txt.val().replace(loc_url, response.short_url))
+                    		.data('source_url', loc_url).data('short_url', response.short_url);
                         $(ele).data('short_url', response.short_url);
                         fawaveCountInputText();
                     }
@@ -440,7 +446,11 @@ function fawaveToggleLooking(ele, capture){
 };
 
 function sendFawaveMsg(){
-    var msg = $.trim($("#fawaveTxtContentInp").val());
+	var $txt = $("#fawaveTxtContentInp");
+    var msg = $.trim($txt.val())
+      , source_url = $txt.data('source_url')
+      , short_url = $txt.data('short_url')
+      , use_source_url = source_url && short_url;
     var image_url = $('#imgPreview img').attr('src');
     if(!msg){
         showFawaveSendMsg(_u.i18n("msg_need_content"));
@@ -469,7 +479,14 @@ function sendFawaveMsg(){
     stat.successCount = 0;
     $("#fawaveSendMsgWrap input, #fawaveSendMsgWrap button, #fawaveSendMsgWrap textarea").attr('disabled', true);
     for(var i in users){
-        _sendFawaveMsgWrap(msg, image_url, users[i], stat, selLi);
+    	var status = msg;
+    	if(use_source_url) {
+    		var config = tapi.get_config(users[i]);
+    		if(config.support_auto_shorten_url) {
+    			status = status.replace(short_url, source_url);
+    		}
+    	}
+        _sendFawaveMsgWrap(status, image_url, users[i], stat, selLi);
     }
 };
 

@@ -58,6 +58,7 @@ var sinaApi = {
 		support_user_search: true, // 支持搜人
 		support_search_max_id: true,
 		support_favorites_max_id: false, // 收藏分页使用max_id
+		support_auto_shorten_url: true, // 是否会自动对url进行缩短，如何会，则无须使用缩短服务
 		rt_need_source: true, // RT的时候是否需要原始微博
 		
 		need_processMsg: true, //是否需要处理消息的内容
@@ -167,7 +168,7 @@ var sinaApi = {
     /**
      * 处理内容
      */
-    processMsg: function (str_or_status, notEncode) {
+    processMsg: function(str_or_status, notEncode) {
     	var str = str_or_status;
     	if(str_or_status.text !== undefined) {
     		str = str_or_status.text;
@@ -216,18 +217,6 @@ var sinaApi = {
         if(g1.indexOf('http') != 0){
             _url = 'http://' + g1;
         }
-        // 增加图片预览功能
-//        if(window.ImageService){ //page.js 里面没有加载这个
-//            var service = ImageService.check(_url);
-//            if(service) {
-//                return '<a target="_blank" onclick="previewPic(this, \"{{service.name}}\");" href="javascript:void();" rhref="{{url}}" title="左键点击预览图片，右键直接打开网址">{{value}}</a>'.format({
-//                    url: _url, 
-//                    title: g1, 
-//                    value: g2||g1,
-//                    service: service
-//                });
-//            }
-//        }
         return '<a target="_blank" class="link" href="{{url}}">{{value}}</a>'.format({
             url: _url, title: g1, value: g2||g1
         });
@@ -1257,6 +1246,7 @@ function make_base_auth_url(domain, user, password) {
 // 腾讯微博api
 var TQQAPI = $.extend({}, sinaApi);
 TQQAPI._user_timeline = TQQAPI.user_timeline;
+TQQAPI._processMsg = TQQAPI.processMsg;
 
 $.extend(TQQAPI, {
 	config: $.extend({}, sinaApi.config, {
@@ -1332,6 +1322,14 @@ $.extend(TQQAPI, {
             4: '服务器内部错误'
         }
 	}),
+	
+	processMsg: function(str_or_status, notEncode) {
+		var status = this._processMsg(str_or_status, notEncode);
+		if(str_or_status.video && str_or_status.video.picurl) {
+			status += '<br/><img class="video_image" title="' + str_or_status.video.title + '" src="' + str_or_status.video.picurl + '" />';
+		}
+		return status;
+	},
 	
 	//page.js里面调用的时候没有加载表情字典,所以需要判断
 	_emotion_rex: window.TQQ_EMOTIONS ? new RegExp('\/(' + Object.keys(window.TQQ_EMOTIONS).join('|') + ')', 'g') : null,
@@ -1513,21 +1511,22 @@ $.extend(TQQAPI, {
 		        	args.data.reid = args.data.sina_id;
 		        	delete args.data.sina_id;
 		        	args.url = '/t/reply';
-		        } else {
-		        	// 判断是否有视频链接
-		        	if(args.data.content) {
-		        		var urls = UrlUtil.findUrls(args.data.content) || [];
-		        		for(var i = 0, len = urls.length; i < len; i++) {
-		        			var url = urls[i];
-		        			if(VideoService.is_qq_support(url)) {
-		        				args.url = '/t/add_video';
-		        				args.data.url = url;
-		        				break;
-		        			}
-		        		}
-		        	}
 		        }
 		        break;
+        }
+        if(args.url === this.config.update) {
+        	// 判断是否有视频链接
+        	if(args.data.content) {
+        		var urls = UrlUtil.findUrls(args.data.content) || [];
+        		for(var i = 0, len = urls.length; i < len; i++) {
+        			var url = urls[i];
+        			if(VideoService.is_qq_support(url)) {
+        				args.url = '/t/add_video';
+        				args.data.url = url;
+        				break;
+        			}
+        		}
+        	}
         }
 	},
 	
@@ -1604,6 +1603,8 @@ $.extend(TQQAPI, {
 			status.text = data.origtext; //data.text;
             status.created_at = new Date(data.timestamp * 1000);
             status.timestamp = data.timestamp;
+            status.video = data.video;
+            status.music = data.music;
             if(data.image){
                 status.thumbnail_pic = data.image[0] + '/160';
                 status.bmiddle_pic = data.image[0] + '/460';
@@ -1840,6 +1841,7 @@ $.extend(DiguAPI, {
 	    support_repost_timeline: false,
 	    support_max_id: false,
 	    support_sent_direct_messages: false,
+	    support_auto_shorten_url: false,
 	    repost_pre: '转载:',
 	    support_search_max_id: false,
 	    
@@ -2144,6 +2146,7 @@ $.extend(ZuosaAPI, {
 	    support_sent_direct_messages: false,
 	    support_max_id: false,
 	    support_search_max_id: false,
+	    support_auto_shorten_url: false,
 	    
 	    upload: '/statuses/update',
 	    repost: '/statuses/update',
@@ -2314,6 +2317,7 @@ $.extend(LeiHouAPI, {
 		support_do_favorite: false,
 		support_destroy_msg: false,
 		support_user_search: false,
+		support_auto_shorten_url: false,
 	
 	    upload: '/statuses/update',
 	    repost: '/statuses/update',
@@ -2457,6 +2461,7 @@ $.extend(Follow5API, {
 	    support_sent_direct_messages: false,
 	    support_favorites: false, // 判断是否支持收藏列表
 		support_do_favorite: false, // 判断是否支持收藏功能
+		support_auto_shorten_url: false,
 
 	    verify_credentials: '/users/verify_credentials',
 	    direct_messages: '/destroy_messages', 
@@ -2605,6 +2610,7 @@ $.extend(TwitterAPI, {
 	    support_repost: false,
 	    support_repost_timeline: false,
 	    support_sent_direct_messages: false,
+	    support_auto_shorten_url: false,
 	    support_upload: false,
 	    rt_need_source: false,
 	    oauth_callback: 'oob',
@@ -2711,6 +2717,7 @@ $.extend(StatusNetAPI, {
 	    support_upload: false,
 	    support_repost_timeline: false,
 	    support_sent_direct_messages: false,
+	    support_auto_shorten_url: false,
 	    support_user_search: false, //暂时屏蔽
 	    oauth_callback: 'oob',
 	    search: '/search_statuses',
@@ -2758,6 +2765,7 @@ $.extend(FanfouAPI, {
 	    support_repost: false,
 	    support_repost_timeline: false,
 	    support_sent_direct_messages: false,
+	    support_auto_shorten_url: false,
 	    upload: '/photos/upload',
 	    search: '/search/public_timeline',
 	    favorites_create: '/favorites/create/{{id}}',
@@ -3259,6 +3267,7 @@ $.extend(RenjianAPI, {
 		support_sent_direct_messages: false,
 	    support_search: false,
 	    support_user_search: false,
+	    support_auto_shorten_url: false,
 		favorites: '/statuses/likes',
         favorites_create: '/statuses/like/{{id}}',
         favorites_destroy: '/statuses/unlike/{{id}}',
@@ -3440,6 +3449,7 @@ $.extend(BuzzAPI, {
 		support_mentions: false,
 		support_direct_messages: false,
 		support_sent_direct_messages: false,
+		support_auto_shorten_url: false,
 		support_upload: false,
 		need_processMsg: false,
 		support_geo: false,
@@ -3711,6 +3721,7 @@ $.extend(DoubanAPI, {
 		need_processMsg: false,
 		support_cursor_only: true,
 		support_search: false,
+		support_auto_shorten_url: false,
 		// support_sent_direct_messages: false,
 //		oauth_callback: null,
 		oauth_host: 'http://www.douban.com',
@@ -3941,6 +3952,7 @@ $.extend(TianyaAPI, {
 		support_mentions: false,
 		support_upload: false,
 		need_processMsg: false,
+		support_auto_shorten_url: false,
 		//support_cursor_only: true,
 		support_search: false,
 		support_sent_direct_messages: false,
@@ -4018,6 +4030,7 @@ $.extend(FacebookAPI, {
         support_do_comment: true,
         support_mentions: false,
         support_favorites: false,
+        support_auto_shorten_url: false,
         
         
         direct_messages: '/me/inbox',
@@ -4278,6 +4291,7 @@ $.extend(PlurkAPI, {
         support_mentions: false,
 //        support_user_search: false, // 暂时屏蔽
         support_cursor_only: true,  // 只支持游标方式翻页
+        support_auto_shorten_url: false,
         repost_pre: 'RT', // 转发前缀
         verify_credentials: '/Users/login',
         update: '/Timeline/plurkAdd',
@@ -4530,6 +4544,7 @@ $.extend(TumblrAPI, {
 		support_cursor_only: true,  // 只支持游标方式翻页
 		support_mentions: false,
 		support_direct_messages: false,
+		support_auto_shorten_url: false,
 		need_processMsg: false,
 		
 		verify_credentials: '/authenticate'

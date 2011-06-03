@@ -379,10 +379,13 @@ function initIamDoing(){
 		                var $txt = $("#txtContent");
 		                var settings = Settings.get();
 		                $txt.val(formatText(settings.lookingTemplate, {title: title, url: loc_url}));
+		                $txt.data('source_url', '').data('short_url', '');
 		                showMsgInput();
 		                _shortenUrl(loc_url, settings, function(shorturl){
 				            if(shorturl) {
 				                $txt.val($txt.val().replace(loc_url, shorturl));
+				                // 记录下原始url
+				                $txt.data('source_url', loc_url).data('short_url', shorturl);
 				            }
 				        });
 	            	}
@@ -1719,7 +1722,9 @@ function sendReplyMsg(msg){
 //发送微博
 function sendMsg(msg){
     var btn = $("#btnSend"),
-        txt = $("#txtContent");
+        txt = $("#txtContent"),
+        source_url = txt.data('source_url'),
+        short_url = txt.data('short_url');
         
     
     btn.attr('disabled','true');
@@ -1746,8 +1751,17 @@ function sendMsg(msg){
     stat.userCount = users.length;
     stat.sendedCount = 0;
     stat.successCount = 0;
-    for(var i in users){
-        _sendMsgWraper(msg, users[i], stat, selLi);
+    var use_source_url = source_url && short_url;
+    for(var i in users) {
+    	var status = msg;
+    	// 判断是否使用缩短网址
+    	if(use_source_url) {
+    		var config = tapi.get_config(users[i]);
+    		if(config.support_auto_shorten_url) {
+    			status = status.replace(short_url, source_url);
+    		}
+    	}
+        _sendMsgWraper(status, users[i], stat, selLi);
     }
 };
 
@@ -1768,6 +1782,8 @@ function _sendMsgWraper(msg, user, stat, selLi){
             selLi.addClass('sel');
             $("#txtContent").val('');
             showMsg(_u.i18n("msg_send_success"));
+            // 清除url数据
+            $("#txtContent").data('source_url', '').data('short_url', '');
         }
         if(stat.sendedCount >= stat.userCount){//全部发送完成
             selLi = null;
@@ -2092,11 +2108,17 @@ function doNewMessage(ele, userName, toUserId){//悄悄话
 };
 
 function doRT(ele, is_rt, is_rt_rt){//RT
-    var data = $(ele).closest('li').find('.msgObjJson').text();
+	var $li = $(ele).closest('li');
+    var data = $li.find('.msgObjJson').text();
     data = unescape(data);
     data = JSON.parse(data);
     var t = $("#txtContent");
     t.val('').blur();
+    // 如果有链接还原，则记录下来
+    var $link = $li.find('a.link');
+    if($link.attr('rhref')) {
+    	t.data('source_url', $link.attr('rhref')).data('short_url', $link.html());
+    }
     if(is_rt) {
     	data = data.retweeted_status;
     } else if(is_rt_rt) {
@@ -2131,7 +2153,7 @@ function doRT(ele, is_rt, is_rt_rt){//RT
     }
     if(!original_pic) {
     	// 尝试从链接中获取图片
-		original_pic = $(ele).closest('li').find('a.image_preview').attr('original');
+		original_pic = $li.find('a.image_preview').attr('original');
 //    	// 尝试从视频预览图中获取 img.video_image
 //    	var closest_li = $(ele).closest('li');
 //    	original_pic = closest_li.find('img.video_image').attr('src');
