@@ -9,6 +9,7 @@ if(typeof BlobBuilder === 'undefined' && typeof WebKitBlobBuilder !== 'undefined
 var OAUTH_CALLBACK_URL = chrome.extension.getURL('oauth_cb.html');
 var FAWAVE_OAUTH_CALLBACK_URL = 'http://fawave.net4team.net/';
 var RE_JSON_BAD_WORD = /[\u000B\u000C]/ig; //具体见：http://www.cnblogs.com/rubylouvre/archive/2011/02/12/1951760.html
+var URL_RE = new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&\\-/#=;:!\\+~]+)(?:\\](.+)\\[/url\\]|)', 'ig');
 
 // 伪装成微博AIR
 var TSINA_APPKEYS = {
@@ -175,7 +176,7 @@ var sinaApi = {
 	        if(!notEncode){
 	            str = HTMLEnCode(str);
 	        }
-	        str = str.replace(UrlUtil.urlRe, this._replaceUrl);
+	        str = str.replace(URL_RE, this._replaceUrl);
 	        
 	        str = this.processAt(str, str_or_status); //@***
 	
