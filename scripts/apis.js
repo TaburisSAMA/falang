@@ -1581,7 +1581,11 @@ $.extend(TQQAPI, {
 			user.city = data.city_code;
 			user.verified = data.isvip;
 			user.gender = this.config.gender_map[data.sex||0];
-			user.profile_image_url = data.head + '/50'; // 竟然直接获取的地址无法拿到头像
+			if(data.head) {
+				user.profile_image_url = data.head + '/50'; // 竟然直接获取的地址无法拿到头像
+			} else {
+				user.profile_image_url = 'http://mat1.gtimg.com/www/mb/images/head_50.jpg';
+			}
 			user.followers_count = data.fansnum;
 			user.friends_count = data.idolnum;
 			user.statuses_count = data.tweetnum;

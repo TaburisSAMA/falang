@@ -8,10 +8,18 @@
 		app: 'fawave',
 		// chrome.extension.getURL('oauth_cb.html')
 		// "chrome-extension://kdkhkblabbkmgfjfpbijlbijdemdodol/"
-		uid: /\/\/(\w+)\//i.exec(chrome.extension.getURL(''))[1],
+		uid: null,
 		version: 'null',
 		log: function(active, params, cb) {
 			params = params || {};
+			if(!this.uid) {
+				var settings = Settings.get();
+				if(settings && !settings.uid) {
+					settings.uid = UUID.uuid4();
+					Settings.save();
+				}
+				this.uid = settings.uid;
+			}
 			params.at = active;
 			params.app = this.app;
 			params.uid = this.uid;
