@@ -1736,7 +1736,7 @@ function sendMsg(msg){
     btn.attr('disabled','true');
     txt.attr('disabled','true');
     
-    var users = [], selLi = $("#accountsForSend .sel");
+    var users = [], selLi = $("#accountsForSend .sel"), current_user = getUser();
     if(selLi.length){
         selLi.each(function(){
             var uniqueKey = $(this).attr('uniqueKey');
@@ -1758,16 +1758,25 @@ function sendMsg(msg){
     stat.sendedCount = 0;
     stat.successCount = 0;
     var use_source_url = source_url && short_url;
-    for(var i in users) {
-    	var status = msg;
+    var matchs = tapi.findSearchText(current_user, msg);
+    for(var i = 0, len = users.length; i < len; i++) {
+    	var status = msg
+    	  , user = users[i];
     	// 判断是否使用缩短网址
     	if(use_source_url) {
-    		var config = tapi.get_config(users[i]);
+    		var config = tapi.get_config(user);
     		if(config.support_auto_shorten_url) {
     			status = status.replace(short_url, source_url);
     		}
     	}
-        _sendMsgWraper(status, users[i], stat, selLi);
+    	// 处理主题转化
+    	if(matchs.length > 0 && current_user.blogType !== user.blogType) {
+    		for(var j = 0; j < matchs.length; j++) {
+    			var match = matchs[j];
+    			status = status.replace(match[0], tapi.formatSearchText(user, match[1]));
+    		}
+    	}
+        _sendMsgWraper(status, user, stat, selLi);
     }
 };
 

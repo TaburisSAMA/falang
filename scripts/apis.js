@@ -181,9 +181,9 @@ var sinaApi = {
 	        
 	        str = this.processAt(str, str_or_status); //@***
 	
-	        str = this.processEmotional(str);
+	        str = this.processEmotional(str); 
 	
-	        str = this.processSearch(str);
+	        str = this.processSearch(str); //#xxXX#
 	
 	        str = str.replace( /([\uE001-\uE537])/gi, this.getIphoneEmoji);
         }
@@ -193,14 +193,30 @@ var sinaApi = {
     getIphoneEmoji: function(str){
         return "<span class=\"iphoneEmoji "+ str.charCodeAt(0).toString(16).toUpperCase()+"\"></span>";
     },
-    processSearch: function (str) {
+    searchMatchReg: /#([^#]+)#/g,
+    processSearch: function(str) {
     	var search_url = this.config.search_url;
-        str = str.replace(/#([^#]+)#/g, function(m, g1) {
+        str = str.replace(this.searchMatchReg, function(m, g1) {
         	// 修复#xxx@xxx#嵌套问题
         	var search = g1.remove_html_tag();
         	return '<a target="_blank" href="'+ search_url + '{{search}}" title="Search #{{search}}">#{{search}}#</a>'.format({search: search});
         });
         return str;
+    },
+    // return [[hash1, hash_value], ..., [#xxx#, xxx]]
+    findSearchText: function(str) {
+    	var matchs = str.match(this.searchMatchReg);
+    	var result = [];
+    	if(matchs) {
+    		for(var i = 0, len = matchs.length; i < len; i++) {
+    			var s = matchs[i];
+    			result.push([s, s.substring(1, s.length - 1)]);
+    		}
+    	}
+    	return result;
+    },
+    formatSearchText: function(str) { // 格式化主题
+    	return '#' + str.trim() + '#';
     },
     processAt: function (str) { //@*** u4e00-\u9fa5:中文字符 \u2E80-\u9FFF:中日韩字符
         str = str.replace(/@([\w\-\u2E80-\u9FFF\_]+)/g, '<a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$1" title="'+ _u.i18n("btn_show_user_title") +'">@$1</a>');
@@ -1915,10 +1931,25 @@ $.extend(DiguAPI, {
         
         return str;
     },
+    searchMatchReg: /(^|[^a-zA-Z0-9\/])(#)([\w\u4e00-\u9fa5|\_]+)/g,
     processSearch: function (str) {
-        str = str.replace(/(^|[^a-zA-Z0-9\/])(#)([\w\u4e00-\u9fa5|\_]+)/g, '$1<a title="Search $2$3" href="' + this.config.search_url + '%23$3" target="_blank">$2$3</a>');
-        //str = str.replace(/[^\w]#([\w\u4e00-\u9fa5|\_]+)/g, ' <a target="_blank" href="'+ this.config.search_url +'%23$1" title="Search #$1">#$1</a>');
+        str = str.replace(this.searchMatchReg, '$1<a title="Search $2$3" href="' + this.config.search_url + '%23$3" target="_blank">$2$3</a>');
         return str;
+    },
+    // return [[hash1, hash_value], ..., [#xxx#, xxx]]
+    findSearchText: function(str) {
+    	var matchs = str.match(this.searchMatchReg);
+    	var result = [];
+    	if(matchs) {
+    		for(var i = 0, len = matchs.length; i < len; i++) {
+    			var s = matchs[i].trim();
+    			result.push([s, s.substring(1)]);
+    		}
+    	}
+    	return result;
+    },
+    formatSearchText: function(str) { // 格式化主题
+    	return '#' + str.trim();
     },
     processEmotional: function(str){
         str = str.replace(/\[:(\d{2})\]|\{([\u4e00-\u9fa5,\uff1f]{2,})\}/g, this._replaceEmotional);
@@ -2628,12 +2659,30 @@ $.extend(TwitterAPI, {
         friends_timeline: '/statuses/home_timeline',
         search: '/search'
 	}),
-       
+    
+	searchMatchReg: /(^|&lt;|a-zA-Z_0-9|\s)(#|$)([\w\u4e00-\u9fa5|\_]*|$)/g,
     processSearch: function (str) {
-        str = str.replace(/(^|&lt;|a-zA-Z_0-9|\s)(#|$)([\w\u4e00-\u9fa5|\_]*|$)/g,'$1<a class="tag" title="$3" href="https://twitter.com/search?q=%23$3" target="_blank">$2$3</a>');
-        //str = str.replace(/[^\w]#([\w\u4e00-\u9fa5|\_]+)/g, ' <a target="_blank" href="'+ this.config.search_url +'%23$1" title="Search #$1">#$1</a>');
+        str = str.replace(this.searchMatchReg,
+        	'$1<a class="tag" title="$3" href="https://twitter.com/search?q=%23$3" target="_blank">$2$3</a>');
         return str;
     },
+    
+    // return [[hash1, hash_value], ..., [#xxx#, xxx]]
+    findSearchText: function(str) {
+    	var matchs = str.match(this.searchMatchReg);
+    	var result = [];
+    	if(matchs) {
+    		for(var i = 0, len = matchs.length; i < len; i++) {
+    			var s = matchs[i].trim();
+    			result.push([s, s.substring(1)]);
+    		}
+    	}
+    	return result;
+    },
+    formatSearchText: function(str) { // 格式化主题
+    	return '#' + str.trim();
+    },
+    
     processEmotional: function(str){
         return str;
     },
@@ -2926,12 +2975,6 @@ $.extend(T163API, {
         gender_map: {0:'n', 1:'m', 2:'f'}
 	}),
 	
-	//processSearch: DiguAPI.processSearch,
-	
-//	processEmotional: function(str){
-//	    str = str.replace(/\[([\u4e00-\u9fff,\uff1f,\w]{1,10})\]/g, this._replaceEmotional);
-//	    return str;
-//	},
 	_replaceEmotional: function(m, g1){
 	    if(window.T163_EMOTIONS && g1) {
 	        var face = T163_EMOTIONS[g1];
@@ -4799,6 +4842,16 @@ var tapi = {
     // id
     status_show: function(data, callback, context) {
     	return this.api_dispatch(data).status_show(data, callback, context);
+    },
+    
+    // str
+    findSearchText: function(user, str) {
+    	return this.api_dispatch(user).findSearchText(str);
+    },
+    
+    // str
+    formatSearchText: function(user, str) {
+    	return this.api_dispatch(user).formatSearchText(str);
     }
 };
 
