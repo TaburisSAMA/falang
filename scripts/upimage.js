@@ -133,15 +133,24 @@ function sendMsg(){ //覆盖popup.js的同名方法
     stat.userCount = users.length;
     stat.sendedCount = 0;
     stat.successCount = 0;
+    var matchs = tapi.findSearchText(c_user, msg);
     for(var i in users){
         var user = users[i];
         var config = tapi.get_config(user);
         var pic = {file: file};
+        var status = msg;
+        // 处理主题转化
+    	if(matchs.length > 0 && c_user.blogType !== user.blogType) {
+    		for(var j = 0; j < matchs.length; j++) {
+    			var match = matchs[j];
+    			status = status.replace(match[0], tapi.formatSearchText(user, match[1]));
+    		}
+    	}
         if(config.support_upload) {
         	upInfo.append(TP_USER_UPLOAD_INFO.format(user));
-        	_uploadWrap(user, msg, pic, stat, selLi);
+        	_uploadWrap(user, status, pic, stat, selLi);
         } else { // only support update
-        	_updateWrap(user, msg, stat, selLi);
+        	_updateWrap(user, status, stat, selLi);
         }
     }
 };

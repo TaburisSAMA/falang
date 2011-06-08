@@ -478,15 +478,23 @@ function sendFawaveMsg(){
     stat.sendedCount = 0;
     stat.successCount = 0;
     $("#fawaveSendMsgWrap input, #fawaveSendMsgWrap button, #fawaveSendMsgWrap textarea").attr('disabled', true);
+    var matchs = tapi.findSearchText(CURRENT_USER, msg);
     for(var i in users){
-    	var status = msg;
+    	var status = msg, user = users[i];
     	if(use_source_url) {
-    		var config = tapi.get_config(users[i]);
+    		var config = tapi.get_config(user);
     		if(config.support_auto_shorten_url) {
     			status = status.replace(short_url, source_url);
     		}
     	}
-        _sendFawaveMsgWrap(status, image_url, users[i], stat, selLi);
+    	// 处理主题转化
+    	if(matchs.length > 0 && CURRENT_USER.blogType !== user.blogType) {
+    		for(var j = 0; j < matchs.length; j++) {
+    			var match = matchs[j];
+    			status = status.replace(match[0], tapi.formatSearchText(user, match[1]));
+    		}
+    	}
+        _sendFawaveMsgWrap(status, image_url, user, stat, selLi);
     }
 };
 

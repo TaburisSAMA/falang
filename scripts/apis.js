@@ -2660,12 +2660,18 @@ $.extend(TwitterAPI, {
         search: '/search'
 	}),
     
-	searchMatchReg: /(^|&lt;|a-zA-Z_0-9|\s)(#|$)([\w\u4e00-\u9fa5|\_]*|$)/g,
-    processSearch: function (str) {
+	//searchMatchReg: /(^|&lt;|a-zA-Z_0-9|\s)(#|$)([\w\u4e00-\u9fa5|\_]*|$)/g,
+	searchMatchReg: /(#([\w\_]+))/g,
+	processSearch: function (str) {
         str = str.replace(this.searchMatchReg,
-        	'$1<a class="tag" title="$3" href="https://twitter.com/search?q=%23$3" target="_blank">$2$3</a>');
+        	'<a class="tag" title="$2" href="https://twitter.com/search?q=%23$2" target="_blank">$1</a>');
         return str;
     },
+//    processSearch: function (str) {
+//        str = str.replace(this.searchMatchReg,
+//        	'$1<a class="tag" title="$3" href="https://twitter.com/search?q=%23$3" target="_blank">$2$3</a>');
+//        return str;
+//    },
     
     // return [[hash1, hash_value], ..., [#xxx#, xxx]]
     findSearchText: function(str) {
