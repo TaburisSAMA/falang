@@ -119,6 +119,8 @@ function init(){
     });
     
     adShow();
+    
+    restoreActionCache();
 };
 
 function initializeMap(){};//给载入地图api调用
@@ -178,8 +180,8 @@ function initTabs(){
 
 function initOnUnload(){
     var c = $("#txtContent").val();
-    localStorage.setObject(UNSEND_TWEET_KEY, c||'');
-
+    localStorage.setObject(UNSEND_TWEET_KEY, c || '');
+    localStorage.setObject(UNSEND_REPLY_KEY, $("#replyTextarea").val() || '');
     if(Settings.get().sendAccountsDefaultSelected == 'remember'){
         if($("#accountsForSend").data('inited')){
             var keys = '';
@@ -231,6 +233,10 @@ function initTxtContentEven(){
 //>>>发送微博事件初始化 结束<<<
 
 //>>>回复事件初始化开始<<<
+    var unsendReply = localStorage.getObject(UNSEND_REPLY_KEY);
+    if(unsendReply) {
+    	$("#replyTextarea").val(unsendReply);
+    }
     $("#replyTextarea").keyup(function(){
         countReplyText();
     });
@@ -270,7 +276,7 @@ function sendMsgByActionType(c){//c:要发送的内容
             default:
                 showMsg('Wrong Send Type');
         }
-    }else{
+    } else {
         showMsg(_u.i18n("msg_need_content"));
     }
 };
@@ -1966,6 +1972,9 @@ function hideReplyInput(){
     // 清空旧数据
     $('#ye_dialog_window input[type="hidden"]').val('');
     $('#ye_dialog_window input[type="checkbox"]').val('');
+    $('#replyTextarea').val('');
+    // 清除 ActionCache
+    cleanActionCache();
 };
 
 function resizeFawave(w, h){
@@ -1982,8 +1991,8 @@ function resizeFawave(w, h){
 	$("#styleCustomResize").html(wh_css);
 };
 
-//====>>>>>>>>>>>>>>>
 function doReply(ele, screen_name, tweetId, name){//@回复
+	ActionCache.set('doReply', [null, screen_name, tweetId, name]);
     $('#actionType').val('reply');
     $('#replyTweetId').val(tweetId || '');
     $('#replyUserName').val(name);
@@ -1995,7 +2004,7 @@ function doReply(ele, screen_name, tweetId, name){//@回复
     $('#txt_sendOneMore2').text('').hide();
 
     $('#ye_dialog_window').show();
-    $('#replyTextarea').val('').focus();
+    $('#replyTextarea').focus();
     countReplyText();
 };
 
@@ -2006,7 +2015,8 @@ function doReply(ele, screen_name, tweetId, name){//@回复
     @rtUserName: 转发微博的用户名
     @reTweetId: 转发的微薄id
 */
-function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
+function doRepost(ele, userName, tweetId, rtUserName, reTweetId){ // 转发
+	ActionCache.set('doRepost', [null, userName, tweetId, rtUserName, reTweetId]);
 	var user = getUser();
     var config = tapi.get_config(user);
     $('#actionType').val('repost');
@@ -2030,34 +2040,39 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
     }
 
     $('#ye_dialog_window').show();
-    var d = $(ele).closest('li').find('.msgObjJson').text();
-    try{
-        d = unescape(d);
-        d = JSON.parse(d);
-    }
-    catch(err){
-        d = null;
-    }
-    var v = '';
-    var $t = $('#replyTextarea');
-    $t.focus().val('').blur();
-    if(reTweetId && d && d.retweeted_status){
-        if(user.blogType=='tqq'){
-            var data = $(ele).closest('li').find('.msgObjJson').text();
-            data = unescape(data);
-            try{
-                data = JSON.parse(data);
-                userName = data.user.name || userName;
-            }catch(err){
-            }
+    var d = {};
+    if(ele) {
+    	d = $(ele).closest('li').find('.msgObjJson').text();
+        try{
+            d = unescape(d);
+            d = JSON.parse(d);
         }
-        v = config.repost_delimiter + '@' + userName + ':' + d.text;
-    } else {
-    	v = _u.i18n("comm_repost_default");
+        catch(err){
+            d = null;
+        }
+    }
+    var $t = $('#replyTextarea');
+    var value = $t.val() || '';
+    $t.focus().blur();
+    if(!value) {
+    	if(reTweetId && d && d.retweeted_status){
+            if(user.blogType=='tqq' && ele){
+                var data = $(ele).closest('li').find('.msgObjJson').text();
+                data = unescape(data);
+                try{
+                    data = JSON.parse(data);
+                    userName = data.user.name || userName;
+                }catch(err){
+                }
+            }
+            value = config.repost_delimiter + '@' + userName + ':' + d.text;
+        } else {
+        	value = _u.i18n("comm_repost_default");
+        }
     }
 	// 光标在前
-	$t.val(v).focus();
-    if(v== _u.i18n("comm_repost_default")){$t.select();}
+	$t.val(value).focus();
+    if(value == _u.i18n("comm_repost_default")){$t.select();}
     countReplyText();
 };
 
@@ -2066,7 +2081,11 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){//转发
  */
 function doComment(ele, userName, userId, tweetId, 
 		replyUserName, replyUserId, cid) {
-    $('#actionType').val('comment');
+	if(typeof ele === 'string') {
+		ele = document.getElementById(ele);
+	}
+	ActionCache.set('doComment', [$(ele).attr('id'), userName, userId, tweetId, replyUserName, replyUserId, cid]);
+	$('#actionType').val('comment');
     $('#commentTweetId').val(tweetId);
     $('#commentUserId').val(userId);
     $('#replyUserName').val(replyUserName);
@@ -2074,7 +2093,10 @@ function doComment(ele, userName, userId, tweetId,
     $('#commentCommentId').val(cid||'');
     $('#ye_dialog_title').html(_u.i18n("msg_comment_who").format({username:userName}));
     $('#ye_dialog_window').show();
-    var _txt = replyUserName ? (_u.i18n("msg_comment_reply_default").format({username:replyUserName})) : '';
+    var _txt = $('#replyTextarea').val();
+    if(!_txt) {
+    	_txt = replyUserName ? (_u.i18n("msg_comment_reply_default").format({username:replyUserName})) : '';
+    }
     var user = getUser();
 	var config = tapi.get_config(user);
 	if(config.support_repost) { // 支持repost才显示
@@ -2092,6 +2114,7 @@ function doComment(ele, userName, userId, tweetId,
 };
 
 function doNewMessage(ele, userName, toUserId){//悄悄话
+	ActionCache.set('doNewMessage', [null, userName, toUserId]);
     $('#actionType').val('newmsg');
     $('#whisperToUserId').val(toUserId);
     $('#replyUserName').val(userName);
@@ -2103,7 +2126,7 @@ function doNewMessage(ele, userName, toUserId){//悄悄话
     $('#txt_sendOneMore2').text('').hide();
 
     $('#ye_dialog_window').show();
-    $('#replyTextarea').val('').focus();
+    $('#replyTextarea').focus();
     countReplyText();
 };
 
@@ -2679,4 +2702,22 @@ function adShow(){
     if(ad){
         $("#topAd").html('<a href="{{url}}" target="_blank" title="{{title}}">{{title}}</a>'.format(ad));
     }
+};
+
+var __action_names = ['doComment', 'doRepost', 'doNewMessage', 'doReply'];
+
+function restoreActionCache() {
+    for(var i = 0, len = __action_names.length; i < len; i++) {
+    	var action = __action_names[i];
+    	var action_args = ActionCache.get(action);
+        if(action_args) {
+        	window[action].apply(this, action_args);
+        }
+	}
+};
+
+function cleanActionCache() {
+	for(var i = 0, len = __action_names.length; i < len; i++) {
+		ActionCache.set(__action_names[i], null);
+	}
 };

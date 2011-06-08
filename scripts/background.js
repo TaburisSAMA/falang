@@ -795,7 +795,8 @@ try {
 var sharedContextmenuId = null;
 function createSharedContextmenu(){
     if(!sharedContextmenuId){
-        sharedContextmenuId = chrome.contextMenus.create({"title": _u.i18n("comm_share_whit_fawave"), 
+        sharedContextmenuId = chrome.contextMenus.create({
+        	"title": _u.i18n("comm_share_whit_fawave"), 
             "contexts": ['all'],
             "onclick": function(info, tab) {
                 var text = info.selectionText;
@@ -821,16 +822,7 @@ if(Settings.get().enableContextmenu){
     createSharedContextmenu();
 };
 
-
-//与page.js通讯
-chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-    // sender.tab ? sender.tab.url
-    if(request.method){
-        r_method_manager[request.method](request, sender, sendResponse);
-    }
-});
-
-r_method_manager = {
+var r_method_manager = {
     test: function(request, sender, sendResponse){
         sendResponse({farewell: "goodbye"});
     },
@@ -845,7 +837,8 @@ r_method_manager = {
     },
     shortenUrl: function(request, sender, sendResponse){
         var longurl = request.long_url;
-        if(Settings.get().isSharedUrlAutoShort && longurl.indexOf('chrome-extension://') != 0 && longurl.replace(/^https?:\/\//i, '').length > Settings.get().sharedUrlAutoShortWordCount){
+        if(Settings.get().isSharedUrlAutoShort && longurl.indexOf('chrome-extension://') != 0 
+        		&& longurl.replace(/^https?:\/\//i, '').length > Settings.get().sharedUrlAutoShortWordCount){
             ShortenUrl.short(longurl, function(shorturl){
                 sendResponse({short_url: shorturl});
             });
@@ -892,3 +885,11 @@ r_method_manager = {
     	});
     }
 };
+
+//与page.js通讯
+chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+    // sender.tab ? sender.tab.url
+    if(request.method){
+        r_method_manager[request.method](request, sender, sendResponse);
+    }
+});

@@ -44,6 +44,7 @@ var SINA = 'idi_sina';
 var SETTINGS_KEY = 'fawave_SETTINGS_KEY';
 
 var UNSEND_TWEET_KEY = 'idi_UNSEND_TWEET_KEY';//未发送的tweet，保存下次显示
+var UNSEND_REPLY_KEY = 'idi_UNSEND_REPLY_KEY';//未发送的回复，评论，转发，保存下次显示
 
 var FRIENDS_TIMELINE_KEY = 'idi_friends_timeline';
 var REPLIES_KEY = 'idi_replies';
@@ -2390,4 +2391,35 @@ var UUID = {
 	 randomInt: function() {
 		 return Math.floor(0x100000000 * Math.random());
 	 }
+};
+
+
+var ActionCache = {
+	_cache: null,
+	_get_cache: function() {
+		if(!this._cache) {
+			var bg = getBackgroundView() || {};
+			if(!bg.__action_cache) {
+				bg.__action_cache = {};
+			}
+			this._cache = bg.__action_cache;
+		}
+		return this._cache;
+	},
+	set: function(key, value) {
+		var cache = this._get_cache();
+		if(value == null) {
+			delete cache[key];
+		} else {
+			cache[key] = JSON.stringify(value);
+		}
+	},
+	get: function(key) {
+		var cache = this._get_cache();
+		var value = cache[key];
+		if(value) {
+			value = JSON.parse(value);
+		}
+		return value;
+	}
 };

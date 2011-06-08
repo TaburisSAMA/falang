@@ -1328,6 +1328,9 @@ $.extend(TQQAPI, {
 		if(str_or_status.video && str_or_status.video.picurl) {
 			status += '<br/><img class="video_image" title="' + str_or_status.video.title + '" src="' + str_or_status.video.picurl + '" />';
 		}
+//		if(str_or_status.music && str_or_status.music.url) {
+//			status += '<br/><audio controls="controls" title="' + str_or_status.music.title + '" src="' + str_or_status.music.url + '"></audio>';
+//		}
 		return status;
 	},
 	
