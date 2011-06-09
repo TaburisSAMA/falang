@@ -274,8 +274,11 @@
 							<a href="#{tweet.related_dialogue_url}" title="#{_u.i18n('comm_show_related_dialogue')}" target="_blank"><img src="images/inreply.png" /></a>
 							<?js } ?>
 							<?js if(support_instapaper){ ?>
-							<a href="javascript:void(0);" onclick="javascript:read_later(this);" title="#{_u.i18n('btn_read_later_title')}">RL</a>
+							<a href="javascript:void(0);" onclick="javascript:read_later(this, 'instapaper');" title="#{_u.i18n('btn_read_later_title')}">RL</a>
 							<?js } ?>
+							<?js if(support_readitlater){ ?>
+                            <a href="javascript:void(0);" onclick="javascript:read_later(this, 'readitlater');" title="#{_u.i18n('btn_read_it_later_title')}">RIL</a>
+                            <?js } ?>
 							#{ btn.addFavoritesMsgBtn + btn.delFavoritesMsgBtn + btn.replyBtn + btn.retweetBtn + btn.oretweetBtn + btn.repostBtn + btn.repostCounts + btn.commentBtn + btn.commentCounts + btn.new_msgBtn + btn.delTweetBtn + btn.delCommentBtn + btn.delDirectMsgBtn }
 							<a href="javascript:void(0);" onclick="javascript:translate(this);" title="#{_u.i18n('btn_translate_title')}">#{_u.i18n("btn_translate")}</a>
 						</span>
@@ -379,7 +382,10 @@
 						#{_u.i18n("comm_repost_to_after")}: 
 						<span class="edit">
 						    <?js if(support_instapaper){ ?>
-                            <a href="javascript:void(0);" onclick="javascript:read_later(this);" title="#{_u.i18n('btn_read_later_title')}">RL</a>
+                            <a href="javascript:void(0);" onclick="javascript:read_later(this, 'instapaper');" title="#{_u.i18n('btn_read_later_title')}">RL</a>
+                            <?js } ?>
+                            <?js if(support_readitlater){ ?>
+                            <a href="javascript:void(0);" onclick="javascript:read_later(this, 'readitlater');" title="#{_u.i18n('btn_read_it_later_title')}">RIL</a>
                             <?js } ?>
 							#{ btn.rtAddFavoritesMsgBtn + btn.rtReplyBtn + btn.rtRetweetBtn + btn.rtRepostBtn + btn.rtRepostCounts + btn.rtOretweetBtn + btn.rtCommentBtn + btn.rtCommentCounts}
 							<a href="javascript:void(0);" onclick="javascript:translate(this);" title="#{_u.i18n('btn_translate_title')}">#{_u.i18n("btn_translate")}</a>

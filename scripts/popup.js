@@ -1873,7 +1873,7 @@ function sendRepost(msg, repostTweetId, notSendMord){
         }
     }
     tapi.repost(data, function(status, textStatus){
-        if(status && (status.id || status.retweeted_status.id) ){
+        if(status && (status.id || (status.retweeted_status && status.retweeted_status.id))) {
             hideReplyInput();
             txt.val('');
             setTimeout(callCheckNewMsg, 1000, 'friends_timeline');
@@ -1956,6 +1956,7 @@ function showMsgInput(){
     countInputText();
     $("#header .write").addClass('active').find('b').addClass('up');
     $("#doing").appendTo('#doingWarp');
+    ActionCache.set('showMsgInput', []);
 };
 
 function hideMsgInput(){
@@ -1965,6 +1966,7 @@ function hideMsgInput(){
     $("#submitWarp").data('status', 'hide').css('height', 0);
     $("#header .write").removeClass('active').find('b').removeClass('up');
     $("#doing").prependTo('#tl_tabs .btns');
+    ActionCache.set('showMsgInput', null);
 };
 
 function toogleMsgInput(ele){
@@ -2118,7 +2120,7 @@ function doComment(ele, userName, userId, tweetId,
     $('#chk_sendOneMore2').val('').hide();
     $('#txt_sendOneMore2').text('').hide();
 
-    $('#replyTextarea').focus().val(_txt);
+    $('#replyTextarea').val('').focus().val(_txt);
     countReplyText();
 };
 
@@ -2135,7 +2137,8 @@ function doNewMessage(ele, userName, toUserId){//悄悄话
     $('#txt_sendOneMore2').text('').hide();
 
     $('#ye_dialog_window').show();
-    $('#replyTextarea').focus();
+    var text = $('#replyTextarea').val() || '';
+    $('#replyTextarea').val('').focus().val(text);
     countReplyText();
 };
 
@@ -2673,8 +2676,9 @@ function translate(ele) {
 	});
 };
 
-// read later
-function read_later(ele) {
+// instapaper / read it later
+function read_later(ele, service_type) {
+	service_type = service_type || 'instapaper';
 	var $button = $(ele);
 	$button.hide();
 	var $ele = $(ele).parents('.userName').next();
@@ -2682,19 +2686,35 @@ function read_later(ele) {
 	if(!$ele.hasClass('tweet_text')) {
 		$ele = $ele.find('.tweet_text');
 	}
-	var $link = $ele.find('a:first');
+	var $link = $ele.find('a.link:first');
+	// 没有链接，则找图片 img.thumbnail_pic attr:original
+	if($link.length == 0) {
+		$link = $ele.next('div').find('a.thumbnail_pic:first');
+	}
 	if($link.length == 0) {
 		_showMsg("No URL");
 	} else {
-		var url = $link.attr('rhref') || $link.attr('href');
+		var url = $link.attr('original') || $link.attr('rhref') || $link.attr('href');
 		var title = $link.attr('flash_title');
-		var selection = $ele.text() + ' ' + $datelink.attr('href');
+		var selection = $ele.text();
 		var data = {url: url, selection: selection};
 		if(title) {
 			data.title = title;
 		}
-		var user = Settings.get().instapaper_user;
-		Instapaper.add(user, data, function(success, error, xhr){
+		var user = null, service = null, settings = Settings.get();
+		if(service_type === 'instapaper') {
+			user = settings.instapaper_user;
+			service = Instapaper;
+			data.selection += ' ' + $datelink.attr('href');
+		} else {
+			user = settings.readitlater_user;
+			service = ReadItLater;
+			if(!data.title) {
+				data.title = data.selection;
+			}
+			delete data.selection;
+		}
+		service.add(user, data, function(success, error, xhr){
 			if(success) {
 				_showMsg(_u.i18n("msg_save_success"));
 			} else {
@@ -2713,7 +2733,7 @@ function adShow(){
     }
 };
 
-var __action_names = ['doComment', 'doRepost', 'doNewMessage', 'doReply'];
+var __action_names = ['doComment', 'doRepost', 'doNewMessage', 'doReply', 'showMsgInput'];
 
 function restoreActionCache() {
     for(var i = 0, len = __action_names.length; i < len; i++) {

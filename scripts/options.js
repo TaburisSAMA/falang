@@ -177,44 +177,51 @@ $(function(){
     
     // 设在instapaper 帐号
     var settings = Settings.get();
-    if(settings.instapaper_user) {
-    	var instapaper_user = settings.instapaper_user;
-    	$('#instapaper_username').val(instapaper_user.username);
-    	$('#instapaper_password').val(instapaper_user.password);
-    	$('#delete_instapaper_account_btn').show();
+    var readlater_services = ['instapaper', 'readitlater'];
+    for(var i = 0, len = readlater_services.length; i < len; i++) {
+    	var service_name = readlater_services[i];
+    	var service_user = settings[service_name + '_user'];
+    	if(service_user) {
+        	$('#' + service_name + '_username').val(service_user.username);
+        	$('#' + service_name + '_password').val(service_user.password);
+        	$('#delete_' + service_name + '_account_btn').show();
+        }
+        $('#set_' + service_name + '_account_btn').attr('service', service_name).click(function(){
+        	var service_type = $(this).attr('service');
+        	var username = $.trim($('#' + service_type + '_username').val());
+        	if(!username) {
+        		$('#' + service_type + '_username').focus().select();
+        		return;
+        	}
+        	var password = $('#' + service_type + '_password').val();
+        	if(!password) {
+        		$('#' + service_type + '_password').focus();
+        		return;
+        	}
+        	var user = {username: username, password: password};
+        	var service = service_name === 'instapaper' ? Instapaper : ReadItLater;
+        	service.authenticate(user, function(success){
+        		if(success) {
+        			var settings = Settings.get();
+        			settings[service_name + '_user'] = user;
+        			Settings.save();
+        			_showMsg(_u.i18n("msg_save_success"));
+        			$('#delete_' + service_type + '_account_btn').show();
+        		} else {
+        			_showMsg(_u.i18n("msg_wrong_name_or_pwd"));
+        		}
+        	});
+        });
+        $('#delete_' + service_name + '_account_btn').attr('service', service_name).click(function(){
+        	var service_type = $(this).attr('service');
+        	var settings = Settings.get();
+        	settings[service_type + '_user'] = null;
+    		Settings.save();
+    		$('#' + service_type + '_username').val('');
+        	$('#' + service_type + '_password').val('');
+    		$(this).hide();
+        });
     }
-    $('#set_instapaper_account_btn').click(function(){
-    	var username = $.trim($('#instapaper_username').val());
-    	if(!username) {
-    		$('#instapaper_username').focus().select();
-    		return;
-    	}
-    	var password = $('#instapaper_password').val();
-    	if(!password) {
-    		$('#instapaper_password').focus();
-    		return;
-    	}
-    	var user = {username: username, password: password};
-    	Instapaper.authenticate(user, function(success){
-    		if(success) {
-    			var settings = Settings.get();
-    			settings.instapaper_user = user;
-    			Settings.save();
-    			_showMsg(_u.i18n("msg_save_success"));
-    			$('#delete_instapaper_account_btn').show();
-    		} else {
-    			_showMsg(_u.i18n("msg_wrong_name_or_pwd"));
-    		}
-    	});
-    });
-    $('#delete_instapaper_account_btn').click(function(){
-    	var settings = Settings.get();
-    	settings.instapaper_user = null;
-		Settings.save();
-		$('#instapaper_username').val('');
-    	$('#instapaper_password').val('');
-		$(this).hide();
-    });
 });
 
 //统计全局的刷新间隔设置产生的请求次数

@@ -534,6 +534,10 @@
         "message": "Read Later",
         "description": "稍后再读 Read Later"
     },
+    "btn_read_it_later_title": {
+        "message": "Read It Later",
+        "description": "稍后再读 Read It Later"
+    },
 	"btn_emotional_title": {
 	    "message": "點擊添加表情",
 		"description": "点击添加表情"
@@ -948,6 +952,11 @@
         "message": "启动Instapaper，将会在功能按键栏中出现 RL(Read Later) 按钮<br /><img src=\"/images/setting/rl.jpg\" />",
         "description": "启动Instapaper设置说明"
     },
+    
+    "sett_jTip_readitlater": {
+        "message": "启动Read It Later，将会在功能按键栏中出现 RIL(Read It Later) 按钮<br /><img src=\"/images/setting/ril.jpg\" />",
+        "description": "启动 Read It Later 设置说明"
+    },
 
 	"sett_itemName_auto_short_url": {
 		"message": "是否自動縮短URL：",
@@ -970,6 +979,11 @@
     "sett_itemName_instapaper": {
         "message": "Instapaper 帳號：",
         "description": "Instapaper 帐号"
+    },
+    
+    "sett_itemName_readitlater": {
+        "message": "Read It Later 帳號：",
+        "description": "Read It Later 帐号"
     },
 	
 	"sett_export": {

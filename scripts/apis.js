@@ -4907,7 +4907,10 @@ var VDiskAPI = {
 var Instapaper = {
 	
 	request: function(user, url, data, callback, context){
-		var headers = {Authorization: make_base_auth_header(user.username, user.password)};
+		var headers = {};
+		if(user) {
+			headers = {Authorization: make_base_auth_header(user.username, user.password)};
+		}
 		$.ajax({
 			url: url,
 			data: data,
@@ -4935,5 +4938,27 @@ var Instapaper = {
 	add: function(user, data, callback, context){
 		var api = 'https://www.instapaper.com/api/add';
 		this.request(user, api, data, callback, context);
+	}
+};
+
+/**
+ * Read It Later: http://readitlaterlist.com/api/docs/
+ */
+var ReadItLater = {
+	apikey: '5bOAabomd1c6eRl363pQy55JaNTMBf20',
+	request: Instapaper.request,
+	// https://readitlaterlist.com/v2/auth?username=name&password=123&apikey=yourapikey
+	authenticate: function(user, callback, context) {
+		var api = 'https://readitlaterlist.com/v2/auth';
+		user.apikey = this.apikey;
+		this.request(null, api, user, callback, context);
+	},
+	// https://readitlaterlist.com/v2/add?username=name&password=123&apikey=yourapikey&url=http://google.com&title=Google
+	add: function(user, data, callback, context){
+		var api = 'https://readitlaterlist.com/v2/add';
+		data.username = user.username;
+		data.password = user.password;
+		data.apikey = this.apikey;
+		this.request(null, api, data, callback, context);
 	}
 };

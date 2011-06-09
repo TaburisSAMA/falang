@@ -169,6 +169,7 @@ function buildStatusHtml(statuses, t, c_user){
             break;
 	}
 	var support_instapaper = Settings.get().instapaper_user != null;
+	var support_readitlater = Settings.get().readitlater_user != null;
     for(var i in statuses) {
     	var status = statuses[i];
     	status.repost_count = status.repost_count === undefined ? '-' : status.repost_count;
@@ -278,6 +279,7 @@ function buildStatusHtml(statuses, t, c_user){
             is_rt_rt: false,
             support_follow: c_user.blogType != 'douban',
             support_instapaper: support_instapaper,
+            support_readitlater: support_readitlater,
             btn: buttons
         };
         if(messageReplyToBtn && status.recipient && status.recipient.id != c_user.id) {
