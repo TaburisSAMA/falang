@@ -199,11 +199,11 @@ $(function(){
         		return;
         	}
         	var user = {username: username, password: password};
-        	var service = service_name === 'instapaper' ? Instapaper : ReadItLater;
+        	var service = service_type === 'instapaper' ? Instapaper : ReadItLater;
         	service.authenticate(user, function(success){
         		if(success) {
         			var settings = Settings.get();
-        			settings[service_name + '_user'] = user;
+        			settings[service_type + '_user'] = user;
         			Settings.save();
         			_showMsg(_u.i18n("msg_save_success"));
         			$('#delete_' + service_type + '_account_btn').show();
