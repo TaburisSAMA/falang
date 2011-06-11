@@ -1264,9 +1264,9 @@ var ShortenUrl = {
 			param_name: 'url', result_name: 'shortUrl'}
 	},
 	// 还原
-	// http://urlexpand0-45.appspot.com/api?u=http://is.gd/imWyT
+	// http://urlexpand0-55.appspot.com/api?u=http://is.gd/imWyT
 	// MAX_INDEX => http://yongwo.de:1235/api?u=http://is.gd/imWyT&cb=foo
-	MAX_INDEX: 46,
+	MAX_INDEX: 56,
 	expand: function(shorturl, callback, context) {
 		var url = 'http://api.yongwo.de/api/e?f=json&u=' + shorturl;
 		$.ajax({
@@ -1944,6 +1944,13 @@ var VideoService = {
 				return matchs[matchs.length - 1];
 			},
 			tpl: '<embed src="http://v.ifeng.com/include/exterior.swf?guid={{id}}&pageurl=http://www.ifeng.com&fromweb=other&AutoPlay=true" quality="high"  allowScriptAccess="always" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" width="460" height="400"></embed>'
+		},
+		// http://code.google.com/p/falang/issues/detail?id=203
+		// http://mi.xiaomi.com/yuyin/w.php?s=http://fx00402.files.xiaomi.net/11061124/7e32ba2c2df34b11bc51ad310179d5ebe10bfb0acbe6
+		xiaomi: {
+			url_re: /mi\.xiaomi\.com\/yuyin\/w\.php\?s\=(.+)/i,
+			tpl: '<object data="http://mi.xiaomi.com/flash/yuyin.swf" type="application/x-shockwave-flash" width="460" height="340">' 
+				+ '<param name="wmode" value="transparent"><param name="flashvars" value="filepath={{id}}.mp3"><param name="movie" value="http://mi.xiaomi.com/flash/yuyin.swf"></object>'
 		}
 	},
 	
