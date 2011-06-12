@@ -710,7 +710,6 @@ var sinaApi = {
 		    // set auth params
 		    auth_args.data[key] = value;
 	    }
-	    
 	    var api = user.apiProxy || this.config.host;
 		var url = api + this.config.upload + this.config.result_format;
 		// 设置认证头部
@@ -2649,9 +2648,11 @@ $.extend(TwitterAPI, {
 	    support_repost_timeline: false,
 	    support_sent_direct_messages: false,
 	    support_auto_shorten_url: false,
+	    support_search_max_id: false,
 	    support_upload: false,
 	    rt_need_source: false,
 	    oauth_callback: 'oob',
+	    upload: '/statuses/update_with_media', // https://upload.twitter.com/1/statuses/update_with_media.json
 	    search: '/search_statuses',
 	    repost: '/statuses/update',
         retweet: '/statuses/retweet/{{id}}',
@@ -2721,6 +2722,17 @@ $.extend(TwitterAPI, {
         this._sendRequest(params, callbackFn);
 	},
     
+	/**
+	 * Endpoint: https://upload.twitter.com/1/statuses/update_with_media.json 
+		Parameters: 
+		     * media (the image, I guess), 
+		     * status (the text which you will also want), 
+		     * probably all other ones which currently work with update.json 
+		(lat, lon, etc). 
+	 */
+	format_upload_params: function(user, data, pic) {
+    	pic.keyname = 'media';
+    },
 	
 	before_sendRequest: function(args) {
 		if(args.url == this.config.repost) {
@@ -2736,6 +2748,11 @@ $.extend(TwitterAPI, {
 			delete args.data.id;
 		} else if(args.url == this.config.search) {
 			args.data.rpp = args.data.count;
+			args.data.show_user = 'true';
+			delete args.data.source;
+			delete args.data.count;
+		} else if(args.url === this.config.user_search) {
+			args.data.per_page = args.data.count;
 			delete args.data.count;
 		}
     },
@@ -2745,13 +2762,25 @@ $.extend(TwitterAPI, {
             data.id = data.id_str || data.id;
             data.in_reply_to_status_id = data.in_reply_to_status_id_str || data.in_reply_to_status_id;
 			var tpl = this.config.user_home_url + '{{user.screen_name}}/status/{{id}}';
-			data.t_url = tpl.format(data);
-			this.format_result_item(data.user, 'user', args);
 			if(data.retweeted_status) {
                 data.retweeted_status.id = data.retweeted_status.id_str || data.retweeted_status.id;
 				data.retweeted_status.t_url = tpl.format(data.retweeted_status);
 				this.format_result_item(data.retweeted_status.user, 'user', args);
 			}
+			// search
+			if(data.from_user && !data.user) {
+				data.user = {
+					id: data.from_user_id_str || data.from_user_id,
+					profile_image_url: data.profile_image_url,
+					screen_name: data.from_user
+				};
+				delete data.from_user_id_str;
+				delete data.profile_image_url;
+				delete data.from_user;
+				data.source = htmldecode(data.source);
+			}
+			data.t_url = tpl.format(data);
+			this.format_result_item(data.user, 'user', args);
 		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = this.config.user_home_url + (data.screen_name || data.id);
 		}
@@ -4024,7 +4053,6 @@ $.extend(TianyaAPI, {
 		if(url && url.indexOf('access_token.php') < 0 && user.oauth_token_secret) {
 			// oauth_token
 			// oauth_token_secret
-			console.log(user.oauth_token_secret);
 			args.data.oauth_token = user.oauth_token_key;
 			args.data.oauth_token_secret = user.oauth_token_secret;
 		} else {
@@ -4053,7 +4081,6 @@ $.extend(TianyaAPI, {
 	},
 	format_result_item: function(data, play_load, args) {
 		if(play_load === 'user') {
-			console.log(data);
 			data = data.user;
 			data.id = data.user_id;
 			data.screen_name = data.user_name;

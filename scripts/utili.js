@@ -771,12 +771,16 @@ function HTMLEnCode(str){
     return str;
 };
 
+window.htmlencode = HTMLEnCode;
+
 // html转换为text
 function htmlToText(html){
    var tmp = document.createElement("DIV");
    tmp.innerHTML = html;
    return tmp.innerText;
 };
+
+window.htmldecode = htmlToText;
 
 ///UBB内容转换
 function ubbCode(str)	{

@@ -435,10 +435,10 @@ var Search = {
     		return;
     	}
     	// http://www.google.com/search?q=twitter&source=fawave&tbs=mbl:1
-    	if(c_user.blogType == 'twitter') {
-    		chrome.tabs.create({url: 'http://www.google.com/search?q=' + q + '&source=fawave&tbs=mbl:1', selected: false});
-    		return;
-    	}
+//    	if(c_user.blogType == 'twitter') {
+//    		chrome.tabs.create({url: 'http://www.google.com/search?q=' + q + '&source=fawave&tbs=mbl:1', selected: false});
+//    		return;
+//    	}
 	    var $tab = $("#tl_tabs .tab-user_timeline");
 	    $tab.attr('statusType', 'search');
 	    var $ul = $("#user_timeline_timeline ul.list");
