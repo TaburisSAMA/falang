@@ -286,11 +286,11 @@ function countInputText() {
     var c = $("#txtContent").val();
     var len = 140 - c.length;
     $("#wordCount").html(len);
-//    if(len == 140){
-//        $("#btnSend").attr('disabled', 'disabled');
-//    }else{
-//        $("#btnSend").removeAttr('disabled');
-//    }
+    if(len == 140) {
+        $("#btnSend").attr('disabled', 'disabled');
+    } else {
+        $("#btnSend").removeAttr('disabled');
+    }
     var wlength = c.len();
     $('#accountsForSend li .wordcount').each(function() {
     	var $this = $(this), len = $this.hasClass('wlength') ? wlength : c.length;
@@ -2238,8 +2238,7 @@ function doRT(ele, is_rt, is_rt_rt){//RT
 //            }
 //        });
     }
-    t.val(val);
-    t.focus(); //光标在头部
+    t.blur().val(val).focus(); //光标在头部
     if(original_pic) {
     	// 有图片，则打开图片上传
     	openUploadImage(null, original_pic);
@@ -2455,7 +2454,7 @@ function openUploadImage(tabId, image_url){
     if(image_url) {
     	url += '&image_url=' + image_url;
     }
-    window.open(url, '_blank', 'left=' + l + ',top=30,width=510,height=600,menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
+    window.open(url, '_blank', 'left=' + l + ',top=30,width=520,height=600,toolbar=no,menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
 };
 
 // 在新窗口打开popup页

@@ -1281,7 +1281,7 @@ $.extend(TQQAPI, {
         oauth_access_token:   '/cgi-bin/access_token',
         // 竟然是通过get传递
         oauth_params_by_get: true,
-        support_comment: false, // 不支持comment_timeline
+        support_comment: false, // 不支持评论列表，不支持转发 ＋ 评论
         support_do_comment: true,
         support_repost_timeline: true, // 支持查看转发列表
         support_favorites_max_id: true,
