@@ -812,8 +812,8 @@ function log(msg){
 
 // 微博字数
 String.prototype.len = function(){
-	return this.length;
-//	return Math.round(this.replace(/[^\x00-\xff]/g, "qq").length / 2);
+	//return this.length;
+	return Math.round(this.replace(/[^\x00-\xff]/g, "qq").length / 2);
 };
 
 // 将字符串参数变成dict参数

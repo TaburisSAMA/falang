@@ -30,7 +30,9 @@ var sinaApi = {
         // google app key
         google_appkey: 'AIzaSyAu4vq6sYO3WuKxP2G64fYg6T1LdIDu3pk',
         
+        max_text_length: 140,
         userinfo_has_counts: true, // 用户信息中是否包含粉丝数、微博数等信息
+        support_double_char: true, // 是否按双字节计算长度
         support_counts: true, // 是否支持批量获取转发和评论数
         support_comment: true, // 判断是否支持评论列表
         support_do_comment: true, // 判断是否支持发送评论
@@ -1038,12 +1040,13 @@ var sinaApi = {
 				delete data.from_user_id;
 			}
 			this.format_result_item(data.user, 'user', args);
-			var tpl = this.config.host + '/{{user.id}}/statuses/{{id}}';
+//			var tpl = this.config.host + '/{{user.id}}/statuses/{{id}}';
+//			// 设置status的t_url
+//			data.t_url = tpl.format(data);
+			data.t_url = 'http://weibo.com/' + data.user.id + '/' + WeiboUtility.mid2url(String(data.mid)); 
 			if(data.retweeted_status) {
 				data.retweeted_status = this.format_result_item(data.retweeted_status, 'status', args);
 			}
-			// 设置status的t_url
-			data.t_url = tpl.format(data);
 		} else if(play_load == 'message') {
 			this.format_result_item(data.sender, 'user', args);
 			this.format_result_item(data.recipient, 'user', args);
@@ -1859,6 +1862,7 @@ $.extend(DiguAPI, {
 	    source2: 'fawave',
 	    support_comment: false,
 	    support_do_comment: false,
+	    support_double_char: false,
 	    support_repost: false,
 	    support_repost_timeline: false,
 	    support_max_id: false,
@@ -2176,6 +2180,7 @@ $.extend(ZuosaAPI, {
         user_home_url: 'http://zuosa.com/',
 		source: 'fawave', 
 		repost_pre: 'ZT',
+		support_double_char: false,
 	    support_comment: false,
 	    support_do_comment: false,
 	    support_repost: false,
@@ -2345,6 +2350,7 @@ $.extend(LeiHouAPI, {
         user_home_url: 'http://leihou.com/',
 		source: 'fawave', //貌似fawave被雷猴封了？加入source=fawave就好返回404
 		repost_pre: 'RT',
+		support_double_char: false,
 	    support_comment: false,
 	    support_do_comment: false,
 	    support_repost: false,
@@ -2488,6 +2494,7 @@ $.extend(Follow5API, {
         user_home_url: 'http://follow5.com',
 		source: '34140E56A31887F770053C2AF6D7B2AC', // 需要申请
 		repost_pre: '转发:',
+		support_double_char: false,
 	    support_search: false,
 	    support_max_id: false,
 	    support_comment: false,
@@ -2650,6 +2657,7 @@ $.extend(TwitterAPI, {
 	    support_auto_shorten_url: false,
 	    support_search_max_id: false,
 	    support_upload: false,
+	    support_double_char: false,
 	    rt_need_source: false,
 	    oauth_callback: 'oob',
 	    upload: '/statuses/update_with_media', // https://upload.twitter.com/1/statuses/update_with_media.json
@@ -2802,6 +2810,7 @@ $.extend(StatusNetAPI, {
         oauth_key: 'c71100649f6c6cfb4eebbacca18de8f6',
         oauth_secret: 'f3ef411594e624f7eda7e1c0ae6b9029',
         repost_pre: 'RT',
+        support_double_char: false,
 	    support_comment: false,
 	    support_do_comment: false,
 	    support_repost: false,
@@ -2857,6 +2866,7 @@ $.extend(FanfouAPI, {
 	    support_repost_timeline: false,
 	    support_sent_direct_messages: false,
 	    support_auto_shorten_url: false,
+	    support_double_char: false,
 	    upload: '/photos/upload',
 	    search: '/search/public_timeline',
 	    favorites_create: '/favorites/create/{{id}}',
@@ -2989,12 +2999,14 @@ $.extend(T163API, {
         oauth_authorize: '/oauth/authenticate',
         oauth_callback: FAWAVE_OAUTH_CALLBACK_URL,
         support_counts: false,
+        support_double_char: false,
         support_comment: true,
         support_repost_timeline: true,
         support_repost_comment: true,
         support_repost_comment_to_root: true,
         support_search_max_id: false,
         support_favorites_max_id: true,
+        max_text_length: 163,
         repost_pre: 'RT', // 转发前缀
         repost_delimiter: '||',
         favorites: '/favorites/{{id}}',
@@ -3351,6 +3363,7 @@ $.extend(RenjianAPI, {
 		support_repost_timeline: false,
 		support_sent_direct_messages: false,
 	    support_search: false,
+	    support_double_char: false,
 	    support_user_search: false,
 	    support_auto_shorten_url: false,
 		favorites: '/statuses/likes',
@@ -4368,6 +4381,7 @@ $.extend(PlurkAPI, {
         result_format: '',
         support_counts: false,
         support_comment: false,
+        support_double_char: false,
         support_direct_messages: false,
         support_repost: false,
         support_repost_timeline: false,
@@ -4988,4 +5002,106 @@ var ReadItLater = {
 		data.apikey = this.apikey;
 		this.request(null, api, data, callback, context);
 	}
+};
+
+
+/**
+ * 新浪微博mid与url互转实用工具
+ * 作者: XiNGRZ (http://weibo.com/xingrz)
+ */
+
+var WeiboUtility = {};
+
+/**
+ * 62进制字典
+ */
+WeiboUtility.str62keys = [
+	"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+	"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+	"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
+];
+
+/**
+ * 62进制值转换为10进制
+ * @param {String} str62 62进制值
+ * @return {String} 10进制值
+ */
+WeiboUtility.str62to10 = function(str62) {
+	var i10 = 0;
+	for (var i = 0; i < str62.length; i++)
+	{
+		var n = str62.length - i - 1;
+		var s = str62[i];
+		i10 += this.str62keys.indexOf(s) * Math.pow(62, n);
+	}
+	return i10;
+};
+
+/**
+ * 10进制值转换为62进制
+ * @param {String} int10 10进制值
+ * @return {String} 62进制值
+ */
+WeiboUtility.int10to62 = function(int10) {
+	var s62 = '';
+	var r = 0;
+	while (int10 != 0)
+	{
+		r = int10 % 62;
+		s62 = this.str62keys[r] + s62;
+		int10 = Math.floor(int10 / 62);
+	}
+	return s62;
+};
+
+/**
+ * URL字符转换为mid
+ * @param {String} url 微博URL字符，如 "wr4mOFqpbO"
+ * @return {String} 微博mid，如 "201110410216293360"
+ */
+WeiboUtility.url2mid = function(url) {
+	var mid = '';
+	
+	for (var i = url.length - 4; i > -4; i = i - 4)	//从最后往前以4字节为一组读取URL字符
+	{
+		var offset1 = i < 0 ? 0 : i;
+		var offset2 = i + 4;
+		var str = url.substring(offset1, offset2);
+		
+		str = this.str62to10(str);
+		if (offset1 > 0)	//若不是第一组，则不足7位补0
+		{
+			while (str.length < 7)
+			{
+				str = '0' + str;
+			}
+		}
+		
+		mid = str + mid;
+	}
+	
+	return mid;
+};
+
+/**
+ * mid转换为URL字符
+ * @param {String} mid 微博mid，如 "201110410216293360"
+ * @return {String} 微博URL字符，如 "wr4mOFqpbO"
+ */
+WeiboUtility.mid2url = function(mid) {
+	if (typeof(mid) != 'string') return false;	//mid数值较大，必须为字符串！
+	
+	var url = '';
+	
+	for (var i = mid.length - 7; i > -7; i = i - 7)	//从最后往前以7字节为一组读取mid
+	{
+		var offset1 = i < 0 ? 0 : i;
+		var offset2 = i + 7;
+		var num = mid.substring(offset1, offset2);
+		
+		num = this.int10to62(num);
+		url = num + url;
+	}
+	
+	return url;
 };

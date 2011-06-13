@@ -284,13 +284,19 @@ function sendMsgByActionType(c){//c:要发送的内容
 //统计字数
 function countInputText() {
     var c = $("#txtContent").val();
-    var len = 140 - c.len();
+    var len = 140 - c.length;
     $("#wordCount").html(len);
-    if(len == 140){
-        $("#btnSend").attr('disabled', 'disabled');
-    }else{
-        $("#btnSend").removeAttr('disabled');
-    }
+//    if(len == 140){
+//        $("#btnSend").attr('disabled', 'disabled');
+//    }else{
+//        $("#btnSend").removeAttr('disabled');
+//    }
+    var wlength = c.len();
+    $('#accountsForSend li .wordcount').each(function() {
+    	var $this = $(this), len = $this.hasClass('wlength') ? wlength : c.length;
+    	var rest_length = +$this.attr('default') - len;
+    	$this.html(rest_length);
+    });
 };
 
 function countReplyText(){
@@ -666,15 +672,19 @@ function initSelectSendAccounts(is_upload){
                    '<img src="{{profile_image_url}}" />' +
                    '{{screen_name}}' +
                    '<img src="/images/blogs/{{blogType}}_16.png" class="blogType" />' +
+                   ' [<span class="wordcount {{class_length}}" default="{{max_text_length}}">140</span>]' +
                '</li>';
     var li = [];
     var c_user = getUser();
     for(var i in userList){
-        user = userList[i];
-        if(is_upload === true && tapi.get_config(user).support_upload === false) {
+        var user = userList[i]
+          , config = tapi.get_config(user);
+        if(is_upload === true && config.support_upload === false) {
         	continue;
         }
         user.sel = '';
+        user.class_length = config.support_double_char ? 'wlength' : 'slength';
+        user.max_text_length = config.max_text_length;
         switch(Settings.get().sendAccountsDefaultSelected){
             case 'all':
                 user.sel = 'sel';
