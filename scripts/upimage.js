@@ -30,9 +30,16 @@ function init(){
     $(window).unload(function(){ initOnUnload(); });
 
     window.document.onpaste = function(e){
-        var f = e.clipboardData &&
+        var f = null,
+            items = e.clipboardData &&
                 e.clipboardData.items.length &&
-                e.clipboardData.items[0].getAsFile();
+                e.clipboardData.items;
+        for(var i=0; i<e.clipboardData.items.length; i++){
+            if(e.clipboardData.items[i].kind == 'file'){
+                f = e.clipboardData.items[i].getAsFile();
+                break;
+            }
+        }
         if(f){
             selectFile({files:[f]});
         }
