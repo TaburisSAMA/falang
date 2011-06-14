@@ -667,6 +667,31 @@ div.mainContent{word-wrap: break-word; line-height:1.5em;}
 	color:#fff;
 }
 
+/*上传图片预览*/
+#upImgPreview{
+	display:none;
+	background: white;
+	position: absolute;
+	top: 22px;
+	z-index: 10;
+	-webkit-box-shadow: 0px 1px 5px rgba(0, 0, 0, .5);
+	-webkit-border-radius: 5px;
+}
+#upImgPreview .img img{
+	max-width:180px;
+	-webkit-border-radius: 5px;
+}
+#upImgPreview .close{
+	position: absolute;
+	background: #fff url(../images/sicon.gif) no-repeat scroll -18px 0;
+	float: right;
+	height: 3px;
+	top:3px;
+	right:3px;
+	overflow: hidden;
+	width: 7px;
+	padding: 2px;
+}
 
 #pb_map_canvas{width:400px; height:380px; position: relative;}
 #pb_map_canvas .map_user_icon{width:48px;height:48px;border:solid 1px #ccc; float:left;margin-right:5px;}
