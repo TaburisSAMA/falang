@@ -34,9 +34,7 @@ function init(){
                 e.clipboardData.items.length &&
                 e.clipboardData.items[0].getAsFile();
         if(f){
-            var fe = document.getElementById('imageFile');
-            fe.files[0] = f;
-            selectFile(fe);
+            selectFile({files:[f]});
         }
     };
     
