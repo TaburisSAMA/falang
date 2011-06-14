@@ -27,7 +27,18 @@ function init(){
 	initTxtContentEven();
     $("#txtContent").focus();
     at_user_autocomplete('#txtContent');
-    $(window).unload(function(){ initOnUnload(); }); 
+    $(window).unload(function(){ initOnUnload(); });
+
+    window.document.onpaste = function(e){
+        var f = e.clipboardData &&
+                e.clipboardData.items.length &&
+                e.clipboardData.items[0].getAsFile();
+        if(f){
+            var fe = document.getElementById('imageFile');
+            fe.files[0] = f;
+            selectFile(fe);
+        }
+    };
     
     if(params.tabId) {
     	//$('#uploadForm').hide();
