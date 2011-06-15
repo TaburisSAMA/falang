@@ -2026,7 +2026,11 @@ function hideMsgInput(){
 function toogleMsgInput(ele){
     if($("#submitWarp").data('status') != 'show'){
         showMsgInput();
+        if(window.imgForUpload){
+            $("#upImgPreview").show();
+        }
     }else{
+        $("#upImgPreview").hide();
         hideMsgInput();
     }
 };
