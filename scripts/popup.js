@@ -1827,7 +1827,7 @@ function _sendMsgWraper(msg, user, stat, selLi){
     }
     function callback(sinaMsg, textStatus){
         stat.sendedCount++;
-        if(sinaMsg === true || sinaMsg.id){
+        if(sinaMsg === true || (sinaMsg && sinaMsg.id) || (sinaMsg && sinaMsg.data && sinaMsg.data.id) || sinaMsg.id || textStatus == 'success'){
             stat.successCount++;
             $("#accountsForSend li[uniquekey=" + user.uniqueKey +"]").removeClass('sel');
         }else if(sinaMsg.error){
