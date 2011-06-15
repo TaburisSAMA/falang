@@ -29,14 +29,15 @@ function init(){
     at_user_autocomplete('#txtContent');
     $(window).unload(function(){ initOnUnload(); });
 
+	$("#txtContent")[0].onpaste = null;
     window.document.onpaste = function(e){
         var f = null,
             items = e.clipboardData &&
-                e.clipboardData.items.length &&
-                e.clipboardData.items;
-        for(var i=0; i<e.clipboardData.items.length; i++){
-            if(e.clipboardData.items[i].kind == 'file'){
-                f = e.clipboardData.items[i].getAsFile();
+				e.clipboardData.items;
+        items = items || [];
+		for(var i=0; i<items.length; i++){
+            if(items[i].kind == 'file'){
+                f = items[i].getAsFile();
                 break;
             }
         }
