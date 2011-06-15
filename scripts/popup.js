@@ -208,6 +208,32 @@ function initTxtContentEven(){
     //});
 
     txtContent[0].oninput = txtContent[0].onfocus = countInputText;
+    
+    //黏贴图片
+    txtContent[0].onpaste = function(e){
+        var f = null,
+            items = e.clipboardData &&
+                e.clipboardData.items.length &&
+                e.clipboardData.items;
+        for(var i=0; i<e.clipboardData.items.length; i++){
+            if(e.clipboardData.items[i].kind == 'file'){
+                f = e.clipboardData.items[i].getAsFile();
+                break;
+            }
+        }
+        if(f){
+            window.imgForUpload = f;
+            window.imgForUpload.fileName = 'fawave.png';
+            var reader = new FileReader();
+            reader.onload = function(e){
+                $("#upImgPreview .img").html('<img class="pic" src="' + e.target.result + '" />');
+                
+                var offset = $("#btnUploadPic").offset();
+                $("#upImgPreview").css({left:offset.left-30, top:offset.top+20}).show();
+            };
+            reader.readAsDataURL(f);
+        }
+    };
 
     txtContent.keydown(function(event){
         var c = $.trim($(this).val());
@@ -1791,10 +1817,15 @@ function sendMsg(msg){
 };
 
 function _sendMsgWraper(msg, user, stat, selLi){
-    var data = {};
-    data['status'] = msg; //放到这里重置一下，否则会被编码两次
-    data['user'] = user;
-    tapi.update(data, function(sinaMsg, textStatus){
+    //var data = {};
+    //data['status'] = msg; //放到这里重置一下，否则会被编码两次
+    //data['user'] = user;
+    //tapi.update(data, function(sinaMsg, textStatus){
+    var config = tapi.get_config(user), pic = window.imgForUpload;
+    if(!config.support_upload) {
+        pic = null;
+    }
+    function callback(sinaMsg, textStatus){
         stat.sendedCount++;
         if(sinaMsg === true || sinaMsg.id){
             stat.successCount++;
@@ -1820,11 +1851,24 @@ function _sendMsgWraper(msg, user, stat, selLi){
                 if(stat.userCount > 1 && failCount > 0){ //多个用户，并且有发送失败才显示
                     showMsg(_u.i18n("msg_send_complete").format({successCount:stat.successCount, errorCount:failCount}));
                 }
+                if(failCount <= 0) { //全部成功则清除上传的图片
+                    window.imgForUpload = null;
+                    $('#upImgPreview').hide();
+                }
             }
         }
         user = null;
         stat = null;
-    });
+    };
+    if(pic) {
+        var data = {status: msg};
+        pic = {file: pic};
+        tapi.upload(user, data, pic, function(){}, function(){}, callback);
+    } else {
+        var data = {status: msg, user:user};
+        tapi.update(data, callback);
+    }
+    //});
 };
 
 // 发生私信

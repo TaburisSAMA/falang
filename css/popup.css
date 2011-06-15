@@ -679,18 +679,25 @@ div.mainContent{word-wrap: break-word; line-height:1.5em;}
 }
 #upImgPreview .img img{
 	max-width:180px;
+	min-width:80px;
 	-webkit-border-radius: 5px;
+	-webkit-box-shadow: #AAA 0px 0px 15px;
 }
 #upImgPreview .close{
 	position: absolute;
-	background: #fff url(../images/sicon.gif) no-repeat scroll -18px 0;
+	background: #fff url(../images/cross.png) no-repeat scroll 0 0;
 	float: right;
-	height: 3px;
+	height: 12px;
 	top:3px;
 	right:3px;
 	overflow: hidden;
-	width: 7px;
+	width: 12px;
 	padding: 2px;
+}
+#upImgPreview .arrow{
+	position: absolute;
+	left:30px;
+	top:-8px;
 }
 
 #pb_map_canvas{width:400px; height:380px; position: relative;}
