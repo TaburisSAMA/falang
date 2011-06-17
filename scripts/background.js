@@ -263,40 +263,43 @@ function checkTimeline(t, p, user_uniqueKey){
     }
     $.extend(params, p);
     showLoading();
-    tapi[t](params, function(data, textStatus){
+    tapi[t](params, function(results, textStatus){
     	hideLoading();
-    	data = data || {};
+    	var data = results || {};
     	var sinaMsgs = data.items || data;
     	if(data.next_cursor !== undefined) {
     		// 保存最新的cursor，用于分页
     		setLastCursor(data.next_cursor, t, user_uniqueKey);
     	}
-    	if(!$.isArray(sinaMsgs)) {
-    		sinaMsgs = [];
-    	}
     	var popupView = getPopupView();
-        var isFirstTime = false;
         var _key = user_uniqueKey + t + '_tweets';
         if(!tweets[_key]){
             tweets[_key] = [];
-            isFirstTime = true;//如果不存在，则为第一次获取微博
         }
+        if(!$.isArray(sinaMsgs)) {
+    		sinaMsgs = [];
+    	}
+        // 避免插件启动的时候，无法获取出现的问题
+    	var isFirstTime = false;
+		if(tweets[_key].length === 0) {
+			isFirstTime = true;
+		}
         if(!last_id && tweets[_key].length > 0){
         	last_id = tweets[_key][0].cursor_id || tweets[_key][0].id;
         }
         
         if(last_id && sinaMsgs.length > 0){
-        	if(c_user.blogType == 't163' && last_id.indexOf(':') > 0) { // 兼容网易的id
+        	if(c_user.blogType === 't163' && last_id.indexOf(':') > 0) { // 兼容网易的id
         		last_id = last_id.split(':', 1)[0];
-        	} else if(c_user.blogType == 'tqq') {
+        	} else if(c_user.blogType === 'tqq') {
                 // tqq 重现修改last_id为id
         		//last_id = tweets[_key][0].id;
                 last_id = getLastMsgId(t+'_real_id', user_uniqueKey);
         	}
         	var result = filterDatasByMaxId(sinaMsgs, last_id, false);
-        	if(tweets[_key].length == 0) {
+        	if(tweets[_key].length === 0) {
         		tweets[_key] = result.olds; // 填充旧的数据
-        		if(t == 'direct_messages' || t == 'sent_direct_messages') {
+        		if(t === 'direct_messages' || t === 'sent_direct_messages') {
                 	// 将私信合并显示
                 	merge_direct_messages(user_uniqueKey, result.olds);
                 }
