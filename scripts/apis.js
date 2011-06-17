@@ -145,7 +145,7 @@ var sinaApi = {
 		    		detectedSourceLanguage = 'zh';
 		    	}
 				if(detectedSourceLanguage == target) {
-					showMsg(_u.i18n("comm_not_need_tran"));
+					showMsg(_u.i18n("comm_not_need_tran"), true);
 					callback(null);
 				} else {
 					callback(tran.translatedText);
@@ -158,9 +158,9 @@ var sinaApi = {
 		  		} catch(e) {
 		  		}
 		  		if(error.message == 'The source language could not be detected') {
-		  			showMsg(_u.i18n("comm_not_need_tran"));
+		  			showMsg(_u.i18n("comm_not_need_tran"), true);
 		  		} else {
-		  			showMsg(_u.i18n("comm_could_not_tran") + error.message);
+		  			showMsg(_u.i18n("comm_could_not_tran") + error.message, true);
 		  		}
 		  		callback(null);
 		  	}
@@ -793,7 +793,7 @@ var sinaApi = {
                     var error = data.errors || data.error;
 	                if(error || data.error_code){
 	                	data.error = error;
-	                    _showMsg('error: ' + data.error + ', error_code: ' + data.error_code);
+	                    _showMsg('error: ' + data.error + ', error_code: ' + data.error_code, false);
 	                    error_code = data.error_code || error_code;
 	                }
 	            }else{error_code = 400;}
@@ -813,13 +813,13 @@ var sinaApi = {
 	                    catch(err){
 	                        r = null;
 	                    }
-	                    if(r){_showMsg('error_code:' + r.error_code + ', error:' + r.error);}
+	                    if(r){_showMsg('error_code:' + r.error_code + ', error:' + r.error, false);}
 	                }
 	            }
 	            if(!r){
 	                textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';
 	                errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
-	                _showMsg('error: ' + textStatus + errorThrown + 'statuCode: ' + status);
+	                _showMsg('error: ' + textStatus + errorThrown + 'statuCode: ' + status, false);
 	            }
 	            callback.call(context, r || {}, 'error', status); //不管什么状态，都返回 error
 	        }
@@ -1083,13 +1083,13 @@ var sinaApi = {
     		delete args.data.source;
     	}
     	if(!args.url) {
-    		showMsg('url未指定');
+    		showMsg('url未指定', true);
             callbackFn({}, 'error', '400');
             return;
     	}
     	var user = args.user || args.data.user || localStorage.getObject(CURRENT_USER_KEY);
     	if(!user){
-            showMsg('用户未指定');
+            showMsg('用户未指定', true);
             callbackFn({}, 'error', 400);
             return;
         }
@@ -1110,7 +1110,7 @@ var sinaApi = {
     		url += this.config.result_format;
     	}
     	// 删除已经填充到url中的参数
-    	var pattern = /\{\{([\w\s\.\(\)"',-]+)?\}\}/g;
+    	var pattern = /\{\{([\w\s\.\(\)\'\",-]+)?\}\}/g;
 	    args.url.replace(pattern, function(match, key) {
 	    	delete args.data[key];
 	    });
@@ -1190,7 +1190,7 @@ var sinaApi = {
                     		error_msg += ', error_code: ' + error_code;
                     	}
                         error_code = error_code || 'unknow';
-                        showMsg(error_msg);
+                        showMsg(error_msg, false);
                     } else {
                         //成功再去格式化结果
                     	data = this.format_result(data, play_load, args);
@@ -1226,7 +1226,7 @@ var sinaApi = {
 		                    	if(!r.error && error_code){ // 错误为空，才显示错误代码
 		                    		error_msg += ', error_code: ' + error_code;
 		                    	}
-		                    	showMsg(error_msg);
+		                    	showMsg(error_msg, false);
                             }
                         }
                     }
@@ -1237,7 +1237,7 @@ var sinaApi = {
                     textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';
                     errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
                     r = {error:callmethod + ' error: ' + textStatus + errorThrown + ' statuCode: ' + status};
-                    showMsg(r.error);
+                    showMsg(r.error, false);
                 }
                 callbackFn(r||{}, 'error', status); //不管什么状态，都返回 error
                 hideLoading();

@@ -111,8 +111,13 @@ function init(){
     });
     
     // support @ autocomplete
-    at_user_autocomplete("#txtContent");
-    at_user_autocomplete("#replyTextarea");
+    at_user_autocomplete("#txtContent", false, function() {
+    	// 计数
+    	countInputText();
+    });
+    at_user_autocomplete("#replyTextarea", false, function() {
+    	countReplyText();
+    });
     at_user_autocomplete("#direct_message_user", true, function(user){
     	// 选中则发私信
     	doNewMessage($("#direct_message_user").get(0), user.screen_name, user.id);
@@ -203,10 +208,6 @@ function initTxtContentEven(){
         txtContent.val(unsendTweet);
     }
 
-    //txtContent.bind('keyup', function(){
-    //    countInputText();
-    //});
-
     txtContent[0].oninput = txtContent[0].onfocus = countInputText;
     
     //黏贴图片
@@ -259,15 +260,14 @@ function initTxtContentEven(){
 //>>>发送微博事件初始化 结束<<<
 
 //>>>回复事件初始化开始<<<
-    var unsendReply = localStorage.getObject(UNSEND_REPLY_KEY);
+    var unsendReply = localStorage.getObject(UNSEND_REPLY_KEY)
+      , $replyText = $("#replyTextarea");
     if(unsendReply) {
-    	$("#replyTextarea").val(unsendReply);
+    	$replyText.val(unsendReply);
     }
-    $("#replyTextarea").keyup(function(){
+    $replyText.keyup(function(){
         countReplyText();
-    });
-
-    $("#replyTextarea").keydown(function(event){
+    }).keydown(function(event){
         var c = $.trim($(this).val());
         if(event.ctrlKey && event.keyCode==13){
             sendMsgByActionType(c);
@@ -276,10 +276,9 @@ function initTxtContentEven(){
     });
 
     $("#replySubmit").click(function(){
-        var txt = $("#replyTextarea");
-        var c = $.trim(txt.val());
-        sendMsgByActionType(c);
+        sendMsgByActionType($.trim($("#replyTextarea").val()));
     });
+    
 //>>>回复结束<<<
 };
 
@@ -307,33 +306,40 @@ function sendMsgByActionType(c){//c:要发送的内容
     }
 };
 
+// return text, left_length, max_length
+function _countText(text_id) {
+	var $text = $("#" + text_id);
+	var value = $text.val()
+	  , max_length = +($text.data('max_text_length') || 140)
+	  , len = max_length - ($text.data('support_double_char') ? value.len() : value.length);
+    return [value, len, max_length];
+}
+
 //统计字数
 function countInputText() {
-    var c = $("#txtContent").val();
-    var len = 140 - c.length;
-    $("#wordCount").html(len);
-    if(len == 140) {
+    var values = _countText('txtContent', 'wordCount');
+    if(values[1] === values[2]) {
         $("#btnSend").attr('disabled', 'disabled');
     } else {
         $("#btnSend").removeAttr('disabled');
     }
-    var wlength = c.len();
+    var text = values[0], wlength = text.len(), length = text.length;
     $('#accountsForSend li .wordcount').each(function() {
-    	var $this = $(this), len = $this.hasClass('wlength') ? wlength : c.length;
-    	var rest_length = +$this.attr('default') - len;
-    	$this.html(rest_length);
+    	var $this = $(this), len = $this.attr('support_double_char') ? wlength : length;
+    	var left_length = +($this.attr('max_text_length') || 140) - len;
+    	$this.html(left_length);
     });
+    $('#wordCount').html(values[1]);
 };
 
 function countReplyText(){
-    var c = $("#replyTextarea").val();
-    var len = 140 - c.len();
-    if(len > 0){
-        len = _u.i18n("msg_word_count").format({len:len});
+	var values = _countText('replyTextarea'), len = values[1], html = null;
+	if(len > 0){
+        html = _u.i18n("msg_word_count").format({len: len});
     }else{
-        len = '(<em style="color:red;">'+ _u.i18n("msg_word_overstep").format({len:len}) +'</em>)';
+        html = '(<em style="color:red;">'+ _u.i18n("msg_word_overstep").format({len:len}) +'</em>)';
     }
-    $("#replyInputCount").html(len);
+    $('#replyInputCount').html(html);
 };
 
 function cleanTxtContent(){
@@ -698,7 +704,7 @@ function initSelectSendAccounts(is_upload){
                    '<img src="{{profile_image_url}}" />' +
                    '{{screen_name}}' +
                    '<img src="/images/blogs/{{blogType}}_16.png" class="blogType" />' +
-                   ' [<span class="wordcount {{class_length}}" default="{{max_text_length}}">140</span>]' +
+                   ' [<span class="wordcount" support_double_char="{{support_double_char}}" max_text_length="{{max_text_length}}">{{max_text_length}}</span>]' +
                '</li>';
     var li = [];
     var c_user = getUser();
@@ -709,7 +715,7 @@ function initSelectSendAccounts(is_upload){
         	continue;
         }
         user.sel = '';
-        user.class_length = config.support_double_char ? 'wlength' : 'slength';
+        user.support_double_char = config.support_double_char ? 'true' : '';
         user.max_text_length = config.max_text_length;
         switch(Settings.get().sendAccountsDefaultSelected){
             case 'all':
@@ -2005,8 +2011,9 @@ function showMsgInput(){
     var h = window.innerHeight - 70 - h_submitWrap;
     $(".list_warp").css('height', h);
     $("#submitWarp").data('status', 'show').css('height', h_submitWrap);
-    var _txt = $("#txtContent").val();
-    $("#txtContent").focus().val('').val(_txt); //光标在最后面
+    var $text = $("#txtContent"), value = $text.val();
+    $text.focus().val('').val(value); //光标在最后面
+    _initText($text);
     countInputText();
     $("#header .write").addClass('active').find('b').addClass('up');
     $("#doing").appendTo('#doingWarp');
@@ -2060,6 +2067,14 @@ function resizeFawave(w, h){
 	$("#styleCustomResize").html(wh_css);
 };
 
+/**
+ * 根据当前配置，初始化文本的基本属性
+ */
+function _initText($text, config) {
+	var config = config || tapi.get_config(getUser());
+	$text.data('max_text_length', config.max_text_length).data('support_double_char', config.support_double_char);
+}
+
 function doReply(ele, screen_name, tweetId, name){//@回复
 	ActionCache.set('doReply', [null, screen_name, tweetId, name]);
     $('#actionType').val('reply');
@@ -2073,7 +2088,9 @@ function doReply(ele, screen_name, tweetId, name){//@回复
     $('#txt_sendOneMore2').text('').hide();
 
     $('#ye_dialog_window').show();
-    $('#replyTextarea').focus();
+    var $replyText = $('#replyTextarea'), text = $replyText.val();
+    $replyText.val('').focus().val(text);
+    _initText($replyText);
     countReplyText();
 };
 
@@ -2086,8 +2103,8 @@ function doReply(ele, screen_name, tweetId, name){//@回复
 */
 function doRepost(ele, userName, tweetId, rtUserName, reTweetId){ // 转发
 	ActionCache.set('doRepost', [null, userName, tweetId, rtUserName, reTweetId]);
-	var user = getUser();
-    var config = tapi.get_config(user);
+	var user = getUser()
+	  , config = tapi.get_config(user);
     $('#actionType').val('repost');
     $('#repostTweetId').val(tweetId);
     $('#replyUserName').val(userName);
@@ -2142,6 +2159,7 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){ // 转发
 	// 光标在前
 	$t.val(value).focus();
     if(value == _u.i18n("comm_repost_default")){$t.select();}
+    _initText($t, config);
     countReplyText();
 };
 
@@ -2177,8 +2195,10 @@ function doComment(ele, userName, userId, tweetId,
 	}
     $('#chk_sendOneMore2').val('').hide();
     $('#txt_sendOneMore2').text('').hide();
-
-    $('#replyTextarea').val('').focus().val(_txt);
+    
+    var $replyText = $('#replyTextarea');
+    $replyText.val('').focus().val(_txt);
+    _initText($replyText, config);
     countReplyText();
 };
 
@@ -2195,8 +2215,9 @@ function doNewMessage(ele, userName, toUserId){//悄悄话
     $('#txt_sendOneMore2').text('').hide();
 
     $('#ye_dialog_window').show();
-    var text = $('#replyTextarea').val() || '';
-    $('#replyTextarea').val('').focus().val(text);
+    var $replyText = $('#replyTextarea'), text = $replyText.val() || '';
+    $replyText.val('').focus().val(text);
+    _initText($replyText);
     countReplyText();
 };
 
@@ -2247,13 +2268,6 @@ function doRT(ele, is_rt, is_rt_rt){//RT
     if(!original_pic) {
     	// 尝试从链接中获取图片
 		original_pic = $li.find('a.image_preview').attr('original');
-//    	// 尝试从视频预览图中获取 img.video_image
-//    	var closest_li = $(ele).closest('li');
-//    	original_pic = closest_li.find('img.video_image').attr('src');
-//    	if(!original_pic) {
-//    		// 尝试从链接中获取图片
-//    		original_pic = closest_li.find('a.image_preview').attr('original');
-//    	}
     }
     
     if(!original_pic) {
@@ -2262,29 +2276,9 @@ function doRT(ele, is_rt, is_rt_rt){//RT
     }
     var name = config.rt_at_name ? (_msg_user.name || _msg_user.id) : _msg_user.screen_name;
     val = repost_pre + ' ' + '@' + name + ' ' + val;
-//    if(original_pic) {
-//    	// 有图片，自动带上图片地址，并尝试缩短
-//    	var settings = Settings.get();
-//    	var longurl = original_pic;
-//    	val += config.image_shorturl_pre + longurl;
-//        _shortenUrl(longurl, settings, function(shorturl) {
-//        	if(shorturl){
-//                t.blur().val(t.val().replace(longurl, shorturl)).focus();
-//                countInputText();
-//            }
-//        });
-//    }
     if(data.crosspostSource) {
-    	// 有原文url地址，并尝试缩短
-//    	var settings = Settings.get();
     	var longurl = data.crosspostSource;
-    	val += ' [原]' + longurl;
-//        _shortenUrl(longurl, settings, function(shorturl) {
-//        	if(shorturl){
-//                t.blur().val(t.val().replace(longurl, shorturl)).focus();
-//                countInputText();
-//            }
-//        });
+    	val += ' ' + longurl;
     }
     t.blur().val(val).focus(); //光标在头部
     if(original_pic) {
@@ -2749,7 +2743,7 @@ function read_later(ele, service_type) {
 		$link = $ele.next('div').find('a.thumbnail_pic:first');
 	}
 	if($link.length == 0) {
-		_showMsg("No URL");
+		_showMsg("No URL", true);
 	} else {
 		var url = $link.attr('original') || $link.attr('rhref') || $link.attr('href');
 		var title = $link.attr('flash_title');
@@ -2773,9 +2767,9 @@ function read_later(ele, service_type) {
 		}
 		service.add(user, data, function(success, error, xhr){
 			if(success) {
-				_showMsg(_u.i18n("msg_save_success"));
+				_showMsg(_u.i18n("msg_save_success"), true);
 			} else {
-				_showMsg('Read later fail.');
+				_showMsg('Read later fail.', true);
 				$button.show();
 			}
 		});

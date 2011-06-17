@@ -207,21 +207,44 @@ var refreshTimeLimit = {
 refreshTimeLimit.tianya = refreshTimeLimit.digu = refreshTimeLimit.twitter = refreshTimeLimit.identi_ca = refreshTimeLimit.tsohu = refreshTimeLimit.t163 = refreshTimeLimit.fanfou = refreshTimeLimit.plurk = refreshTimeLimit.tsina;
 refreshTimeLimit.renjian = refreshTimeLimit.zuosa = refreshTimeLimit.follow5 = refreshTimeLimit.leihou = refreshTimeLimit.douban = refreshTimeLimit.buzz = refreshTimeLimit.tqq;
 
-function showMsg(msg){
+function showMsg(msg, show_now){
     var popupView = getPopupView();
     if(popupView){
-        popupView._showMsg(msg);
+        popupView._showMsg(msg, show_now);
     }
 };
-function _showMsg(msg){
-    $('<div class="messageInfo">' + msg + '</div>')
-    .appendTo('#msgInfoWarp')
-    .fadeIn('slow')
-    .animate({opacity: 1.0}, 3000)
-    .fadeOut('slow', function() {
-      $(this).remove();
-    });
+// 缓冲错误信息，不要一次过显示一堆
+var __msg_buffers = [];
+// show_now: 是否马上显示，用于非错误提示
+function _showMsg(msg, show_now){
+	if(show_now) {
+		__displayMessage(msg, show_now);
+	} else {
+		__msg_buffers.push(msg);
+        if(__msg_buffers.length === 1) {
+        	__displayMessage(msg);
+        }
+	}
 };
+
+function __displayMessage(msg, show_now) {
+	$('<div class="messageInfo">' + msg + '</div>')
+        .appendTo('#msgInfoWarp')
+        .fadeIn('slow')
+        .animate({opacity: 1.0}, 3000)
+        .fadeOut('slow', function() {
+        	$(this).remove();
+        	if(!show_now) {
+        		var next_msg = __msg_buffers.shift();
+            	if(next_msg === msg) {
+            		next_msg = __msg_buffers.shift();
+            	}
+            	if(next_msg) {
+            		__displayMessage(next_msg);
+            	}
+        	}
+        });
+}
 
 function showLoading(){
     var popupView = getPopupView();
@@ -1191,7 +1214,7 @@ var popupBox = {
                     });
                 }
             } else {
-                showMsg("Geocoder failed due to: " + status);
+                showMsg("Geocoder failed due to: " + status, true);
             }
         });
     },
@@ -1728,7 +1751,7 @@ var Imgur = {
                     var error = data.errors || data.error;
 	                if(error || data.error_code){
 	                	data.error = error;
-	                    _showMsg('error: ' + data.error + ', error_code: ' + data.error_code);
+	                    _showMsg('error: ' + data.error + ', error_code: ' + data.error_code, false);
 	                    error_code = data.error_code || error_code;
 	                }
 	            }else{error_code = 400;}
@@ -1748,13 +1771,13 @@ var Imgur = {
 	                    catch(err){
 	                        r = null;
 	                    }
-	                    if(r){_showMsg('error_code:' + r.error_code + ', error:' + r.error);}
+	                    if(r){_showMsg('error_code:' + r.error_code + ', error:' + r.error, false);}
 	                }
 	            }
 	            if(!r){
 	                textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';
 	                errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
-	                _showMsg('error: ' + textStatus + errorThrown + 'statuCode: ' + status);
+	                _showMsg('error: ' + textStatus + errorThrown + 'statuCode: ' + status, false);
 	            }
 	            callback({}, 'error', status); //不管什么状态，都返回 error
 	        }
