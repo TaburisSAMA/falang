@@ -1272,44 +1272,33 @@ var ShortenUrl = {
 	// MAX_INDEX => http://yongwo.de:1235/api?u=http://is.gd/imWyT&cb=foo
 	MAX_INDEX: 56,
 	expand: function(shorturl, callback, context) {
-		var url = 'http://api.yongwo.de/api/e?f=json&u=' + shorturl;
-		$.ajax({
-			url: url,
-			dataType: 'json',
-			success: function(data, status, xhr) {
-				callback.call(context, data);
-			}, 
-			error: function(xhr, status) {
-				callback.call(context, null);
-			}
-		});
-//		this.expand_sinaurl(shorturl, function(data){
-//			if(!data) {
-//				var url = 'http://api.yongwo.de/api/e?u=' + shorturl;
-//				$.ajax({
-//					url: url,
-//					success: function(data, status, xhr) {
-//						callback.call(context, data);
-//					}, 
-//					error: function(xhr, status) {
-//						callback.call(context, null);
-//					}
-//				});
-//			} else {
-//				callback.call(context, data);
-//			}
-//		}, context);
+		var m = this.SINAURL_RE.exec(shorturl);
+		if(m) {
+			this.expand_sinaurl(shorturl, callback, context);
+		} else {
+			var url = 'http://api.yongwo.de/api/e?f=json&u=' + shorturl;
+    		$.ajax({
+    			url: url,
+    			dataType: 'json',
+    			success: function(data, status, xhr) {
+    				callback.call(context, data);
+    			}, 
+    			error: function(xhr, status) {
+    				callback.call(context, null);
+    			}
+    		});
+		}
 	},
 	
-	SINAURL_RE: /http:\/\/(t|sinaurl)\.cn\/(\w+)/i,
+	SINAURL_RE: /http:\/\/(?:t|sinaurl)\.cn\/(\w+)/i,
 	// 新浪短址特殊处理
 	// http://t.sina.com.cn/mblog/sinaurl_info.php?url=h6yl4g
 	expand_sinaurl: function(shorturl, callback, context) {
 		var m = this.SINAURL_RE.exec(shorturl);
 		if(m) {
-			var id = m[2];
+			var id = m[1];
 			$.ajax({
-				url: 'http://t.sina.com.cn/mblog/sinaurl_info.php?url=' + id,
+				url: 'http://weibo.com/mblog/sinaurl_info.php?url=' + id,
 				dataType: 'json',
 				success: function(data, status, xhr) {
 					data = data.data[id];
