@@ -308,8 +308,8 @@ var Settings = {
 
         font: 'Arial', //字体
         fontSite: 12, //字体大小
-        popupWidth: 480, //弹出窗大小
-        popupHeight: 520, 
+        popupWidth: 550, //弹出窗大小
+        popupHeight: 550, 
         theme: 'pip_io', //主题样式
         translate_target: 'zh', // 默认翻译语言
         shorten_url_service: 't.cn', // 默认缩址服务
