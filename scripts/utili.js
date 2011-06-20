@@ -2514,7 +2514,7 @@ var TextImage = {
 	    for(var i = 0, len = lines.length; i < len; i++) {
 	    	ctx.fillText.apply(ctx, lines[i]);
 	    }
-		return can.toDataURL();
+		return can.toDataURL('image/jpeg'); // png目前饭否，嘀咕，和雷猴都处理不太好。
 	},
 	SEP_RE: /\s|[^\x00-\xff]/i,
 	// 找出分割字符
