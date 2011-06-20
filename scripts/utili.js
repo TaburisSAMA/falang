@@ -2510,11 +2510,14 @@ var TextImage = {
 	    // 需要在设置了高度后再设置textBaseline 才会生效
 	    ctx.font = font;
 	    ctx.textBaseline = "top";
-	    
+	    // 白色背景
+	    ctx.fillStyle = "white";
+	    ctx.fillRect(0, 0, width, height);
+	    ctx.fillStyle = "black";
 	    for(var i = 0, len = lines.length; i < len; i++) {
 	    	ctx.fillText.apply(ctx, lines[i]);
 	    }
-		return can.toDataURL('image/jpeg'); // png目前饭否，嘀咕，和雷猴都处理不太好。
+		return can.toDataURL(); // png目前饭否，嘀咕，和雷猴都处理不太好。
 	},
 	SEP_RE: /\s|[^\x00-\xff]/i,
 	// 找出分割字符
