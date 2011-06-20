@@ -194,7 +194,7 @@
         "description": "发图"
     },
     "comm_longtext": {
-        "message": "Long Tweet",
+        "message": "LTweet",
         "description": "长微博"
     },
     "comm_edit_longtext": {
@@ -262,7 +262,7 @@
         "description": "搜索"
     },
     "comm_search_user": {
-        "message": "Search User",
+        "message": "User",
         "description": "搜人"
     },
     "comm_setting": {
