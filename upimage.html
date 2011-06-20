@@ -1,8 +1,7 @@
+<!DOCTYPE html>
 <html>
  <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta http-equiv="Authorization" content="Base 1232" />
-	<meta http-equiv="expires" content="31 Dec 2008">
+	<meta charset="utf-8" />
 	<title>发送图片 - FaWave(发微) - 多微博插件 </title>
 	<script type="text/javascript" > window.theViewName = 'upimage'; </script>
 	<link rel="stylesheet" media="screen" type="text/css" href="/css/popup.css" />
@@ -19,9 +18,9 @@
 	<script type="text/javascript" src="scripts/upimage.js" ></script>
 	<style id="styleCustom"></style>
 	<script>
-		this.document.title = _u.i18n('comm_pic') + ' -- ' + _u.i18n('defaultTitle');
-		
-		var wh_css = 'body{font-family:"'+ Settings.get().font +'";font-size:'+ Settings.get().fontSite +'px;}';
+		this.document.title = _u.i18n('comm_pic') + ' - ' + _u.i18n('defaultTitle');
+		var settings = Settings.get();
+		var wh_css = 'body{font-family:"'+ settings.font +'";font-size:'+ settings.fontSite +'px;}';
 		$("#styleCustom").html(wh_css);
 	</script>
  </head>

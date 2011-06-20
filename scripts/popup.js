@@ -2487,16 +2487,55 @@ function showGeoMap(user_img, latitude, longitude){
     }
 };
 
+// 获取弹出窗口的基本参数
+function _get_open_window_args(min_width, min_height) {
+	min_width = min_width || 520;
+	min_height = min_height || 600;
+	var settings = Settings.get()
+	  , width = settings.popupWidth || min_width
+	  , height = settings.popupHeight || min_height;
+	if(width < min_width) {
+    	width = min_width;
+    }
+    if(height < min_height) {
+    	height = min_height;
+    }
+	var left = (window.screen.availWidth - width) / 2;
+    return {
+    	width: width, height: height, left: left, top: 30, 
+    	toolbar: 'no', menubar: 'no', location: 'no', resizable: 'no',
+    	scrollbars: 'yes', status: 'yes'
+    };
+}
+
 //打开上传图片窗口
 function openUploadImage(tabId, image_url){
     initOnUnload();
-    var l = (window.screen.availWidth-510)/2;
+    var win_args = _get_open_window_args();
     tabId = tabId || '';
     var url = 'upimage.html?tabId=' + tabId;
     if(image_url) {
     	url += '&image_url=' + image_url;
     }
-    window.open(url, '_blank', 'left=' + l + ',top=30,width=520,height=600,toolbar=no,menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
+    var args_str = '';
+    for(var k in win_args) {
+    	args_str += k + '=' + win_args[k] + ',';
+    }
+    args_str = args_str.substring(0, args_str.length - 1);
+    window.open(url, '_blank', args_str);
+};
+
+// 打开长微博窗口
+function openLongText(){
+    initOnUnload();
+    var win_args = _get_open_window_args(700, 650);
+    var url = 'longtext.html';
+    var args_str = '';
+    for(var k in win_args) {
+    	args_str += k + '=' + win_args[k] + ',';
+    }
+    args_str = args_str.substring(0, args_str.length - 1);
+    window.open(url, '_blank', args_str);
 };
 
 // 在新窗口打开popup页

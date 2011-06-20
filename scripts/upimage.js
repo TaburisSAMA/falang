@@ -2,7 +2,7 @@
 
 // 检测是否支持文件上传
 function checkChrome(){
-    if(!window.BlobBuilder && !window.WebKitBlobBuilder){
+    if(!isSupportUpload()){
         $("body").html($("#needUpdateChrome")[0].outerHTML);
         $("#needUpdateChrome").show();
         return false;
@@ -113,7 +113,7 @@ function sendMsg(){ //覆盖popup.js的同名方法
         _showMsg(_u.i18n("msg_need_content"));
         check = false;
     }
-    var file = $("#imageFile")[0].files[0];
+    var file = $("#imageFile").length > 0 ? $("#imageFile")[0].files[0] : null;
     if(!file) {
     	var image_url = $('#imageUrl').val();
     	if(image_url) {
@@ -122,6 +122,12 @@ function sendMsg(){ //覆盖popup.js的同名方法
     		var dataUrl = $('#imgPreview img').attr('src');
     		if(dataUrl) {
     			file = dataUrlToBlob(dataUrl);
+    		} else {
+    			// 判断是否长微博
+    			var longtext = $('#longtext').val();
+    			if(longtext) {
+    				file = dataUrlToBlob(LongTextPage.get_data_url());
+    			}
     		}
     	}
     }
@@ -173,8 +179,6 @@ function sendMsg(){ //覆盖popup.js的同名方法
 };
 
 function _finish_callback(user, stat, selLi, data, textStatus, error_code) {
-	//processUploadResult(data, textStatus, error_code);
-
     stat.sendedCount++;
     if(textStatus != 'error' && data && !data.error){
         stat.successCount++;
@@ -194,6 +198,7 @@ function _finish_callback(user, stat, selLi, data, textStatus, error_code) {
         $("#imgPreview").html('');
         $("#imageUrl").val('');
         $("#progressBar span").html("");
+        $('#longtext').val('');
     }
     if(stat.sendedCount >= stat.userCount){//全部发送完成
         selLi = null;

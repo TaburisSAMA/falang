@@ -2446,3 +2446,89 @@ var ActionCache = {
 		return value;
 	}
 };
+
+// 文字转化成图片的服务
+var TextImage = {
+	draw: function(text, options) {
+		if(typeof text !== 'string') {
+			text = String(text);
+		}
+		options = options || {};
+		var width = options.width || 500
+		  , font_size = options.font_size || 12
+		  , font_family = options.font_family || 'Arial'
+		  , font_weight = options.font_weight || 'normal' // bold or normal
+		  , margin = options.margin || 5;
+		var font = font_weight + ' ' + font_size + "px " + font_family
+		  , left = 5, top = 5
+		  , line_width = width - margin * 2, line_height = font_size + margin
+		  , height = line_height;
+		var can = document.createElement("canvas")
+		  , ctx = can.getContext("2d");
+		can.width = width;
+		ctx.font = font;
+	    var s = '', lines = [];
+	    for(var i = 0, len = text.length; i < len; i++) {
+	    	var c = text[i];
+	    	if(c == '\n') {
+	    		// 下一行
+	    		if(top + line_height > height) {
+	    			height += line_height;
+	    		}
+	    		//ctx1.fillText(s, left, top);
+	    		lines.push([s, left, top]);
+	    		top += line_height;
+	    		s = '';
+	    		continue;
+	    	}
+	    	var text_width = ctx.measureText(s + c).width;
+	    	if(text_width > line_width) {
+	    		// 画一行, 判断断行位置
+	    		var index = this._find_sep(s);
+	    		if(index !== 0) {
+	    			c = s.substring(index) + c;
+	    			s = s.substring(0, index);
+	    		}
+	    		if(top + line_height > height) {
+	                height += line_height;
+	            }
+	    		lines.push([s, left, top]);
+	    		top += line_height;
+	    		s = c;
+	    	} else {
+	    		s += c;
+	    	}
+	    }
+	    if(s) {
+	    	if(top + line_height > height) {
+	            height += line_height;
+	        }
+	    	lines.push([s, left, top]);
+	    }
+	    can.width = width;
+	    can.height = height;
+	    // 需要在设置了高度后再设置textBaseline 才会生效
+	    ctx.font = font;
+	    ctx.textBaseline = "top";
+	    
+	    for(var i = 0, len = lines.length; i < len; i++) {
+	    	ctx.fillText.apply(ctx, lines[i]);
+	    }
+		return can.toDataURL();
+	},
+	SEP_RE: /\s|[^\x00-\xff]/i,
+	// 找出分割字符
+	_find_sep: function(s){
+		for(var i = s.length - 1; i > 0; i--) {
+			if(this.SEP_RE.test(s[i])) {
+				return i + 1;
+			}
+		}
+		return 0;
+	}
+};
+
+// 是否支持上传功能
+function isSupportUpload() {
+	return window.BlobBuilder || window.WebKitBlobBuilder;
+}
