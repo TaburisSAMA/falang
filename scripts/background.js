@@ -722,6 +722,41 @@ var ADs = {
 };
 ADs.fetchAds();
 
+var Beaut = {
+    fetch:function(){
+        if(Beaut.data){return;}
+	$.ajax({
+	    url:'http://api.yongwo.de/beaut.html',
+	    type: 'GET',
+	    dataType: 'json',
+	    cache: false,
+	    success: function(r){
+	        if(r){
+		    Beaut.data = r;
+		}
+	    },
+	    error:function(xhr, textStatus, err){
+		console.log('Beaut load error: ' + (textStatus || err) );
+	    }
+        });
+	/*
+        $.getJSON("http://api.yongwo.de/beaut.html", function(r){
+            if(r){
+                Beaut.data = r;
+            }
+        });
+	*/
+    },
+    ensure:function(){
+        clearTimeout(Beaut.timeout);
+        if(!Beaut.data){
+	    Beaut.fetch();
+	    Beaut.timeout = setTimeout(Beaut.ensure, 30*60*1000);
+	}
+    }
+};
+Beaut.ensure();
+
 //刷新账号信息
 function refreshAccountInfo(){
     var stat = {errorCount: 0, successCount: 0};
@@ -886,6 +921,9 @@ var r_method_manager = {
     	chrome.tabs.captureVisibleTab(null, {format: 'png'}, function(dataUrl) {
     		sendReponse({dataUrl: dataUrl});
     	});
+    },
+    getBeautData: function(request, sender, sendResponse){
+        sendResponse({data: Beaut.data});
     }
 };
 
