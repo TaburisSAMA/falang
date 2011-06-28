@@ -98,7 +98,7 @@ var T_NAMES = {
 	'douban': '豆瓣',
 	'fanfou': '饭否',
 	'digu': '嘀咕',
-	'tianya': '天涯微博',
+//	'tianya': '天涯微博',
 	'zuosa': '做啥',
 	'leihou': '雷猴',
 	'renjian': '人间网',

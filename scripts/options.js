@@ -19,7 +19,7 @@ var SUPPORT_AUTH_TYPES = {
 	'facebook': ['oauth'],
 	'plurk': ['baseauth'],
     'identi_ca': ['oauth', 'baseauth'],
-//    'tianya': ['oauth'],
+    'tianya': ['oauth'],
     'tumblr': ['baseauth']
 };
 
