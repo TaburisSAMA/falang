@@ -220,10 +220,15 @@ var sinaApi = {
     formatSearchText: function(str) { // 格式化主题
     	return '#' + str.trim() + '#';
     },
-    processAt: function (str) { //@*** u4e00-\u9fa5:中文字符 \u2E80-\u9FFF:中日韩字符
-        str = str.replace(/@([\w\-\u2E80-\u9FFF\_]+)/g, '<a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$1" title="'+ _u.i18n("btn_show_user_title") +'">@$1</a>');
-//        str = str.replace(/([^#])@([\w\-\u4e00-\u9fa5\_]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ this.config.user_home_url +'$2" title="左键查看微薄，右键打开主页">@$2</a>');
-        
+    processAt: function (str) { 
+    	//@*** u4e00-\u9fa5:中文字符 \u2E80-\u9FFF:中日韩字符
+    	//【观点·@任志强】今年提出的1000万套的保障房任务可能根本完不成
+    	// http://blog.oasisfeng.com/2006/10/19/full-cjk-unicode-range/
+    	// CJK标点符号：3000-303F
+        str = str.replace(/@([\w\-\_\u2E80-\u3000\u303F-\u9FFF]+)/g, 
+        	'<a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'
+        		+ this.config.user_home_url + '$1" title="'
+        		+ _u.i18n("btn_show_user_title") +'">@$1</a>');
         return str;
     },
     processEmotional: function(str){
