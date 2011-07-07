@@ -81,6 +81,10 @@
         "message": "Server returns an error result,the local resolution fails.",
         "description": "服务器返回结果错误，本地解析错误。"
     },
+    "comm_json_parse_error": {
+        "message": "Server returns an error result,the local JSON parse error.",
+        "description": "服务器返回结果错误，本地JSON解析错误。"
+    },
     "comm_fail": {
         "message": "Failure",
         "description": "失败"

@@ -1143,6 +1143,11 @@ var sinaApi = {
         		}
         	},
             success: function (data, textStatus, xhr) {
+                /******
+                 * FaWave内部错误码：
+                 *   800: JSON解析错误
+                 *   999: 服务器返回结果不对，未知错误
+                 */
             	if(play_load != 'string') {
                     data = data.replace(RE_JSON_BAD_WORD, '');
             		try{
@@ -1163,6 +1168,7 @@ var sinaApi = {
                     }
             	}
                 var error_code = null;
+
                 if(data){
                 	error_code = data.error_code || data.code;
                     var error = data.error;
@@ -1201,7 +1207,7 @@ var sinaApi = {
                     	data = this.format_result(data, play_load, args);
                     }
                 } else {
-                	error_code = 400;
+                	error_code = 999;
                 }
                 callbackFn(data, textStatus, error_code);
                 hideLoading();
@@ -5094,8 +5100,8 @@ WeiboUtility.url2mid = function(url) {
  * @return {String} 微博URL字符，如 "wr4mOFqpbO"
  */
 WeiboUtility.mid2url = function(mid) {
-	if (typeof(mid) != 'string') return false;	//mid数值较大，必须为字符串！
-	
+	if (typeof(mid) != 'string'){ return mid; }	//mid数值较大，必须为字符串！
+	if(!/^\d+$/.test(mid)){ return mid; }
 	var url = '';
 	
 	for (var i = mid.length - 7; i > -7; i = i - 7)	//从最后往前以7字节为一组读取mid

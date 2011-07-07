@@ -81,6 +81,10 @@
         "message": "服务器返回结果错误，本地解析错误。",
         "description": "服务器返回结果错误，本地解析错误。"
     },
+    "comm_json_parse_error": {
+        "message": "微博接口返回错误结果，FaWave本地JSON解析错误。",
+        "description": "微博接口返回结果错误，FaWave本地JSON解析错误。"
+    },
     "comm_fail": {
         "message": "失败",
         "description": "失败"
