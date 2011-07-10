@@ -28,7 +28,14 @@ function init(){
     $("#txtContent").focus();
     at_user_autocomplete('#txtContent');
     $(window).unload(function(){ initOnUnload(); });
-
+    // 设置自动关闭选项的上次状态
+    var checked = Settings.get().sent_success_auto_close;
+    $('#cb_success_close').change(function() {
+        var settings = Settings.get();
+        settings.sent_success_auto_close = $(this).attr('checked') ? true : false;
+        Settings.save();
+    }).attr('checked', checked);
+    
 	$("#txtContent")[0].onpaste = null;
     window.document.onpaste = function(e){
         var f = null,
@@ -199,6 +206,9 @@ function _finish_callback(user, stat, selLi, data, textStatus, error_code) {
         $("#imageUrl").val('');
         $("#progressBar span").html("");
         $('#longtext').val('');
+        if($('#cb_success_close').attr('checked')) {
+            window.close();
+        }
     }
     if(stat.sendedCount >= stat.userCount){//全部发送完成
         selLi = null;

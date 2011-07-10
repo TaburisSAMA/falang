@@ -10,6 +10,7 @@
 	<script type="text/javascript" src="scripts/lib/Base64.js" ></script>
 	<script type="text/javascript" src="scripts/emotional.js" ></script>
 	<script type="text/javascript" src="scripts/utili.js" ></script>
+	<script type="text/javascript" src="scripts/lib/md5.js" ></script>
 	<script type="text/javascript" src="scripts/lib/sha1.js" ></script>
     <script type="text/javascript" src="scripts/lib/oauth.js" ></script>
 	<script type="text/javascript" src="scripts/apis.js" ></script>
@@ -25,19 +26,20 @@
 	</script>
  </head>
 
- <body onload="initOnLoad();" style="margin:0 auto;">
+ <body onload="initOnLoad();" style="margin: 5px 5px 0 5px;">
     
-	<div id="submitWarp"  style="margin-top:10px;">
+	<div id="submitWarp">
 	  <div class="w">
 		<ul id="accountsForSend"></ul>
-		<textarea id="txtContent" ></textarea>
+		<p style="margin-right: 2px;"><textarea id="txtContent" ></textarea></p>
 		<div class="ctr">
 			<span id="wordCount">140</span>&nbsp;
 			<a id="btnAddEmotional" href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');"><img src="images/face.gif" /><script>_u.wi('comm_emotional')</script></a>
 			<script>_u.wia('#btnAddEmotional','title','btn_emotional_title');</script>&nbsp;
 			<button onclick="cleanTxtContent();" class="btn"><script>_u.wi('comm_clear')</script></button>&nbsp;
 			<button onclick="window.close();" class="btn"><script>_u.wi('comm_close')</script></button>&nbsp;
-			<input id="btnSend" type="button" value="发微!" title="ctrl + enter 发送" class="btn send" disabled="disabled" />
+			<input id="cb_success_close" checked="checked" type="checkbox" /><label for="cb_success_close"><script>_u.wi('comm_send_success_close_window')</script></label>
+			<input id="btnSend" type="button" class="btn send" disabled="disabled" />
 			<script>_u.wia('#btnSend','value','comm_send'); _u.wia('#btnSend','title','comm_send_tip');</script>
 		</div>
 	  </div>

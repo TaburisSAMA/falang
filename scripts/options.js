@@ -8,6 +8,7 @@ var SUPPORT_AUTH_TYPES = {
 	'tsohu': ['oauth', 'baseauth'],
 	't163': ['oauth', 'xauth'],
 	'fanfou': ['baseauth'],
+	'renren': ['oauth'],
 	'digu': ['baseauth'],
 	'zuosa': ['baseauth'],
 	'follow5': ['baseauth'],
@@ -844,7 +845,7 @@ function saveAccount(){
     } else if(authType == 'oauth') {
     	var request_token_key = $('#account-request-token-key').val();
     	var request_token_secret = $('#account-request-token-secret').val();
-    	if(pin && ((request_token_key && request_token_secret) || blogType == 'facebook')) {
+    	if(pin && ((request_token_key && request_token_secret) || blogType === 'facebook' || blogType === 'renren')) {
     		user.oauth_pin = pin;
     		// 设置request token
     		user.oauth_token_key = request_token_key;

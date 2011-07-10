@@ -35,6 +35,11 @@ var LongTextPage = {
 		
 		$('#btnPrevLongText').click(this._prev_button_click);
 		$('#doing').click(this._share_current_page_click);
+		
+		setTimeout(function() {
+		 // settings longtext height
+	        $longtext.height($(document).height() - $longtext.position().top - 5);
+		}, 1);
 	}, 
 	_prev_button_click: function() {
 		var $longtext = $('#longtext')

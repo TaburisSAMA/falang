@@ -128,7 +128,7 @@ var sinaApi = {
     },
     
     // 翻译
-    translate: function(text, target, callback) {
+    translate: function(text, target, callback, context) {
     	var api = 'https://www.googleapis.com/language/translate/v2';
     	if(!target || target == 'zh-CN' || target == 'zh-TW') {
     		target = 'zh';
@@ -146,9 +146,9 @@ var sinaApi = {
 		    	}
 				if(detectedSourceLanguage == target) {
 					showMsg(_u.i18n("comm_not_need_tran"), true);
-					callback(null);
+					callback.call(context, null);
 				} else {
-					callback(tran.translatedText);
+					callback.call(context, tran.translatedText);
 				}
 		  	}, 
 		  	error: function(xhr, status) {
@@ -162,7 +162,7 @@ var sinaApi = {
 		  		} else {
 		  			showMsg(_u.i18n("comm_could_not_tran") + error.message, true);
 		  		}
-		  		callback(null);
+		  		callback.call(context, null);
 		  	}
 		});
     },
@@ -320,7 +320,7 @@ var sinaApi = {
 	},
 	
     // 获取认证url
-    get_authorization_url: function(user, callbackFn) {
+    get_authorization_url: function(user, callback, context) {
     	if(user.authType == 'oauth') {
     		var login_url = null;
 //    		var me = this;
@@ -335,14 +335,14 @@ var sinaApi = {
             		}
         			login_url = this.format_authorization_url(params);
     			}
-    			callbackFn(login_url, text_status, error_code);
+    			callback.call(context, login_url, text_status, error_code);
     		}, this);
     	} else {
     		throw new Error(user.authType + ' not support get_authorization_url');
     	}
     },
     
-    get_request_token: function(user, callbackFn, context) {
+    get_request_token: function(user, callback, context) {
     	if(user.authType == 'oauth') {
     		var params = {
 	            url: this.config.oauth_request_token,
@@ -369,7 +369,7 @@ var sinaApi = {
     					text_status = 'error';
     				}
     			}
-    			callbackFn.call(context, token, text_status, error_code);
+    			callback.call(context, token, text_status, error_code);
     		});
     	} else {
     		throw new Error(user.authType + ' not support get_request_token');
@@ -377,7 +377,7 @@ var sinaApi = {
     },
     
     // 必须设置user.oauth_pin
-    get_access_token: function(user, callbackFn) {
+    get_access_token: function(user, callback, context) {
     	if(user.authType == 'oauth' || user.authType == 'xauth') {
     		var params = {
 	            url: this.config.oauth_access_token,
@@ -409,15 +409,15 @@ var sinaApi = {
             			user.oauth_token_secret = token.oauth_token_secret;
     				}
     			}
-    			callbackFn(token ? user : null, text_status, error_code);
+    			callback.call(context, token ? user : null, text_status, error_code);
     		});
     	} else {
     		throw new Error(user.authType + ' not support get_access_token');
     	}
     },
     
-    /*
-        callbackFn(data, textStatus, errorCode): 
+    /**
+     * callbackFn(data, textStatus, errorCode): 
             成功和错误都会调用的方法。
             如果失败则errorCode为服务器返回的错误代码(例如: 400)。
     */
@@ -433,7 +433,7 @@ var sinaApi = {
         this._sendRequest(params, callbackFn);
 	},
         
-    rate_limit_status: function(data, callbackFn){
+    rate_limit_status: function(data, callbackFn, context){
         if(!callbackFn) return;
         var params = {
             url: this.config.rate_limit_status,
@@ -441,11 +441,11 @@ var sinaApi = {
             play_load: 'rate',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn, context);
 	},
 	
 	// since_id, max_id, count, page 
-	friends_timeline: function(data, callbackFn){
+	friends_timeline: function(data, callbackFn, context){
 		if(!callbackFn) return;
         var params = {
             url: this.config.friends_timeline,
@@ -453,11 +453,11 @@ var sinaApi = {
             play_load: 'status',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn, context);
 	},
 	
 	// id, user_id, screen_name, since_id, max_id, count, page 
-    user_timeline: function(data, callbackFn){
+    user_timeline: function(data, callbackFn, context){
 		if(!callbackFn) return;
         var params = {
             url: this.config.user_timeline,
@@ -465,11 +465,11 @@ var sinaApi = {
             play_load: 'status',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn, context);
 	},
 	
 	// id, count, page
-    comments_timeline: function(data, callbackFn){
+    comments_timeline: function(data, callbackFn, context){
 		if(!callbackFn) return;
         var params = {
             url: this.config.comments_timeline,
@@ -477,7 +477,7 @@ var sinaApi = {
             play_load: 'comment',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn, context);
 	},
 	
 	// id, count, page
@@ -492,7 +492,7 @@ var sinaApi = {
 	},
 
 	// since_id, max_id, count, page 
-    mentions: function(data, callbackFn){
+    mentions: function(data, callbackFn, context){
 		if(!callbackFn) return;
         var params = {
             url: this.config.mentions,
@@ -500,11 +500,11 @@ var sinaApi = {
             play_load: 'status',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn, context);
 	},
 
 	// id, user_id, screen_name, cursor, count
-    followers: function(data, callbackFn){
+    followers: function(data, callbackFn, context){
 		if(!callbackFn) return;
         var params = {
             url: this.config.followers,
@@ -512,11 +512,11 @@ var sinaApi = {
             play_load: 'user',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn, context);
 	},
 
 	// id, user_id, screen_name, cursor, count
-    friends: function(data, callbackFn){
+    friends: function(data, callbackFn, context){
 		if(!callbackFn) return;
         var params = {
             url: this.config.friends,
@@ -524,11 +524,11 @@ var sinaApi = {
             play_load: 'user',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn, context);
 	},
 
 	// page
-    favorites: function(data, callbackFn){
+    favorites: function(data, callbackFn, context){
 		if(!callbackFn) return;
         var params = {
             url: this.config.favorites,
@@ -536,11 +536,11 @@ var sinaApi = {
             play_load: 'status',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn, context);
 	},
 
 	// id
-    favorites_create: function(data, callbackFn){
+    favorites_create: function(data, callbackFn, context){
 		if(!callbackFn) return;
         var params = {
             url: this.config.favorites_create,
@@ -548,11 +548,11 @@ var sinaApi = {
             play_load: 'status',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn, context);
 	},
 
 	// id
-    favorites_destroy: function(data, callbackFn){
+    favorites_destroy: function(data, callbackFn, context){
 		if(!callbackFn) return;
         var params = {
             url: this.config.favorites_destroy,
@@ -560,11 +560,11 @@ var sinaApi = {
             play_load: 'status',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn, context);
 	},
 
 	// ids
-    counts: function(data, callbackFn){
+    counts: function(data, callbackFn, context){
         if(!callbackFn) return;
         var params = {
             url: this.config.counts,
@@ -572,11 +572,11 @@ var sinaApi = {
             play_load: 'count',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn, context);
     },
 
     // id
-    user_show: function(data, callbackFn){
+    user_show: function(data, callbackFn, context){
         if(!callbackFn) return;
         var params = {
             url: this.config.user_show,
@@ -584,7 +584,7 @@ var sinaApi = {
             play_load: 'user',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn, context);
     },
 
     // since_id, max_id, count
@@ -610,7 +610,7 @@ var sinaApi = {
 	},
 
 	// id
-    destroy_msg: function(data, callbackFn){
+    destroy_msg: function(data, callbackFn, context){
 		if(!callbackFn) return;
         var params = {
             url: this.config.destroy_msg,
@@ -618,7 +618,7 @@ var sinaApi = {
             play_load: 'message',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn, context);
 	},
 
     /*data的参数列表：
@@ -627,7 +627,7 @@ var sinaApi = {
     receiveUserId 必须，接收方的用户id
     source 可选，显示在网站上的来自哪里对应的标识符。如果想显示指定的字符，请与官方人员联系。
     */
-    new_message: function(data, callbackFn){//悄悄话
+    new_message: function(data, callbackFn, context){//悄悄话
 		if(!callbackFn) return;
         var params = {
             url: this.config.new_message,
@@ -635,17 +635,17 @@ var sinaApi = {
             play_load: 'message',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callbackFn, context);
 	},
 	
 	// id
-	status_show: function(data, callback) {
+	status_show: function(data, callback, context) {
 		var params = {
 			url: this.config.status_show,
 			play_load: 'status',
 			data: data
 		};
-		this._sendRequest(params, callback);
+		this._sendRequest(params, callback, context);
 	},
 	
 	get_geo: function() {
@@ -664,7 +664,7 @@ var sinaApi = {
         data[this.config.longitude_field] = geo.longitude;
 	},
     
-    update: function(data, callback){
+    update: function(data, callback, context){
 		var geo = this.get_geo();
 		if(geo) {
 			this.format_geo_arguments(data, geo);
@@ -675,7 +675,7 @@ var sinaApi = {
             play_load: 'status',
             data: data
         };
-        this._sendRequest(params, callback);
+        this._sendRequest(params, callback, context);
     },
     
     // 格式上传参数，方便子类覆盖做特殊处理
@@ -719,6 +719,10 @@ var sinaApi = {
 	    }
 	    var api = user.apiProxy || this.config.host;
 		var url = api + this.config.upload + this.config.result_format;
+		if(this.config.use_method_param) {
+			// 只使用method 做参数, 走rest api
+			url = api;
+		}
 		// 设置认证头部
         this.apply_auth(url, auth_args, user);
         for(var key in auth_args.data) {
@@ -831,83 +835,83 @@ var sinaApi = {
 	    });
     },
 
-    repost: function(data, callbackFn){
-        if(!callbackFn) return;
+    repost: function(data, callback, context){
+        if(!callback) return;
         var params = {
             url: this.config.repost,
             type: 'post',
             play_load: 'status',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callback, context);
     },
 
-    comment: function(data, callbackFn){
-        if(!callbackFn) return;
+    comment: function(data, callback, context){
+        if(!callback) return;
         var params = {
             url: this.config.comment,
             type: 'post',
             play_load: 'comment',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callback, context);
     },
 
-    reply: function(data, callbackFn){
-        if(!callbackFn) return;
+    reply: function(data, callback, context){
+        if(!callback) return;
         var params = {
             url: this.config.reply,
             type: 'post',
             play_load: 'comment',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callback, context);
     },
 
-    comments: function(data, callbackFn){
-        if(!callbackFn) return;
+    comments: function(data, callback, context){
+        if(!callback) return;
         var params = {
             url: this.config.comments,
             type: 'get',
             play_load: 'comment',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callback, context);
     },
 
     // id
-    comment_destroy: function(data, callbackFn){
-        if(!callbackFn) return;
+    comment_destroy: function(data, callback, context){
+        if(!callback) return;
         var params = {
             url: this.config.comment_destroy,
             type: 'post',
             play_load: 'comment',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callback, context);
     },
 
-    friendships_create: function(data, callbackFn){
-        if(!callbackFn) return;
+    friendships_create: function(data, callback, context){
+        if(!callback) return;
         var params = {
             url: this.config.friendships_create,
             type: 'post',
             play_load: 'user',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callback, context);
     },
 
     // id
-    friendships_destroy: function(data, callbackFn){
-        if(!callbackFn) return;
+    friendships_destroy: function(data, callback, context){
+        if(!callback) return;
         var params = {
             url: this.config.friendships_destroy,
             type: 'post',
             play_load: 'user',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callback, context);
     },
 
     friendships_show: function(data, callbackFn){
@@ -998,13 +1002,13 @@ var sinaApi = {
     },
     
     // q, page, count
-    user_search: function(data, callback) {
+    user_search: function(data, callback, context) {
     	var params = {
             url: this.config.user_search,
             play_load: 'user',
             data: data
         };
-        this._sendRequest(params, callback);
+        this._sendRequest(params, callback, context);
     },
     
     // 格式化数据格式，其他微博实现兼容新浪微博的数据格式
@@ -1078,7 +1082,7 @@ var sinaApi = {
 		return error;
 	},
 	
-    _sendRequest: function(params, callbackFn) {
+    _sendRequest: function(params, callbackFn, context) {
     	var args = {type: 'get', play_load: 'status', headers: {}};
     	$.extend(args, params);
     	args.data = args.data || {};
@@ -1171,7 +1175,7 @@ var sinaApi = {
 
                 if(data){
                 	error_code = data.error_code || data.code;
-                    var error = data.error;
+                    var error = data.error || data.error_msg;
                     if(data.ret && data.ret != 0){ //腾讯
                         if(data.msg == 'have no tweet'){
                             data.data = {info:[]};
@@ -1195,7 +1199,7 @@ var sinaApi = {
                     }
                     if(error || error_code){
                     	data.error = error;
-                    	textStatus = this.format_error(data.error || data.wrong || data.message, error_code);
+                    	textStatus = this.format_error(data.error || data.wrong || data.message || data.error_msg, error_code);
                     	var error_msg = callmethod + ' error: ' + textStatus;
                     	if(!textStatus && error_code){ // 错误为空，才显示错误代码
                     		error_msg += ', error_code: ' + error_code;
@@ -1209,7 +1213,7 @@ var sinaApi = {
                 } else {
                 	error_code = 999;
                 }
-                callbackFn(data, textStatus, error_code);
+                callbackFn.call(context, data, textStatus, error_code);
                 hideLoading();
             },
             error: function (xhr, textStatus, errorThrown) {
@@ -1250,7 +1254,7 @@ var sinaApi = {
                     r = {error:callmethod + ' error: ' + textStatus + errorThrown + ' statuCode: ' + status};
                     showMsg(r.error, false);
                 }
-                callbackFn(r||{}, 'error', status); //不管什么状态，都返回 error
+                callbackFn.call(context, r||{}, 'error', status); //不管什么状态，都返回 error
                 hideLoading();
             }
         });
@@ -4382,6 +4386,381 @@ $.extend(FacebookAPI, {
 	}
 });
 
+// http://wiki.dev.renren.com/wiki/API
+var RenrenAPI = $.extend({}, sinaApi);
+RenrenAPI._format_result = RenrenAPI.format_result;
+RenrenAPI._user_timeline = RenrenAPI.user_timeline;
+RenrenAPI._friends_timeline = RenrenAPI.friends_timeline;
+RenrenAPI._verify_credentials = RenrenAPI.verify_credentials;
+$.extend(RenrenAPI, {
+	config: $.extend({}, sinaApi.config, {
+		host: 'http://api.renren.com/restserver.do',
+		oauth_host: 'https://graph.renren.com',
+        user_home_url: 'http://www.renren.com/',
+		source: '4f3e0d2c2ccc4ccf8c30767b08da9253', 
+		oauth_key: '4f3e0d2c2ccc4ccf8c30767b08da9253',
+        oauth_secret: 'be199423964443a583780ec10b8381fb',
+        call_id: 0,
+        result_format: '',
+        //userinfo_has_counts: false,
+        support_counts: false,
+        support_cursor_only: true,  // 只支持游标方式翻页
+        support_friends_only: true, // 只支持friends
+        support_repost: false,
+        support_repost_timeline: false,
+        support_sent_direct_messages: false,
+        support_comment: false,
+        support_do_comment: true,
+        support_mentions: false,
+        support_favorites: false,
+        support_auto_shorten_url: false,
+        use_method_param: true, // only one api path
+        
+        direct_messages: '/me/inbox',
+        verify_credentials: 'users.getLoggedInUser', //'users.getLoggedInUser => uid => users.getProfileInfo',
+        user_profile: 'users.getProfileInfo',
+        user_profile_fields: ['base_info', 'status', 'visitors_count', 'blogs_count', 'albums_count',
+                              'friends_count', 'guestbook_count', 'status_count'].join(','),
+        friends_timeline: 'feed.get',
+        // http://wiki.dev.renren.com/wiki/Type%E5%88%97%E8%A1%A8
+        friends_timeline_type: '10,20,21,30,32,50,51,52',
+        destroy: '/{{id}}_delete',
+        user_timeline: 'status.gets',
+        update: 'status.set',
+        upload: 'photos.upload',
+        friends: '/{{user_id}}/friends',
+        followers: '/{{user_id}}/friends',
+        users: 'users.getInfo',
+        photos: 'photos.get',
+        comment: '/{{id}}/comments',
+        favorites_create: '/{{id}}/likes',
+        favorites_destroy: '/{{id}}/likes',
+        new_message: '/{{id}}/notes',
+        
+        oauth_authorize: 	  '/oauth/authorize',
+        oauth_callback: FAWAVE_OAUTH_CALLBACK_URL,
+        oauth_access_token:   '/oauth/token',
+        oauth_scope: [
+        	'read_user_feed', 
+        	'read_user_message',
+        	'read_user_photo', 'read_user_status', 'read_user_comment',
+        	'publish_feed', 
+        	'send_request',
+        	'send_message', 'photo_upload',
+        	'status_update', 'publish_comment',
+        	'operate_like'
+        ].join(' ')
+	}),
+	
+	url_encode: function(text) {
+		return text;
+	},
+	
+	apply_auth: function(url, args, user) {
+		
+	},
+	
+	get_access_token: function(user, callbackFn) {
+    	var params = {
+            url: this.config.oauth_access_token,
+            type: 'get',
+            user: user,
+            play_load: 'string',
+            apiHost: this.config.oauth_host,
+            data: {
+				client_id: this.config.oauth_key, 
+	    		redirect_uri: this.config.oauth_callback,
+	    		client_secret: this.config.oauth_secret,
+	    		code: user.oauth_pin,
+	    		grant_type: 'authorization_code'
+			},
+            need_source: false
+        };
+		this._sendRequest(params, function(token_str, text_status, error_code) {
+			var token = null;
+			if(text_status != 'error') {
+				token = JSON.parse(token_str);
+				if(!token.access_token) {
+					token = null;
+					error_code = token_str;
+					text_status = 'error';
+				} else {
+					user.oauth_token_key = token.access_token;
+					user.oauth_expires_in = token.expires_in;
+					user.oauth_scope = token.scope;
+				}
+			}
+			callbackFn(token ? user : null, text_status, error_code);
+		});
+    },
+    
+	// 获取认证url
+    get_authorization_url: function(user, callback) {
+    	var params = {
+    		client_id: this.config.oauth_key, 
+    		redirect_uri: this.config.oauth_callback,
+    		scope: this.config.oauth_scope,
+    		response_type: 'code'
+    	};
+    	var login_url = this.format_authorization_url(params);
+    	callback(login_url, 'success', 200);
+    },
+    
+    // http://wiki.dev.renren.com/wiki/Calculate_signature
+    signature: function(params, user) {
+    	params.access_token = user.oauth_token_key;
+    	params.api_key = this.config.oauth_key;
+    	params.v = '1.0';
+    	params.call_id = ++this.config.call_id;
+    	var kvs = [];
+    	for(var k in params) {
+    		kvs.push([k, params[k]]);
+    	}
+    	kvs.sort(function(a,b) {
+            if (a[0] < b[0]) return -1;
+            if (a[0] > b[0]) return 1;
+            if (a[1] < b[1]) return  -1;
+            if (a[1] > b[1]) return 1;
+            return 0;
+        });
+    	var sig = "";
+        for (var p = 0; p < kvs.length; ++p) {
+            var value = kvs[p][1];
+            if (value == null) continue;
+            sig += kvs[p][0] + '=' + value;
+        }
+    	sig = hex_md5(sig + this.config.oauth_secret);
+    	params.sig = sig;
+    },
+    
+    before_sendRequest: function(args, user) {
+		delete args.data.source;
+		delete args.data.since_id;
+		if(args.play_load == 'string') {
+			return;
+		}
+		if(args.url === this.config.user_timeline) {
+			args.data.uid = args.data.id;
+			delete args.data.id;
+			delete args.data.screen_name;
+		}
+		if(args.url === this.config.friends_timeline) {
+			args.data.type = this.config.friends_timeline_type;
+		}
+		args.type = 'post';
+		args.data.format = 'json';
+		args.data.method = args.url;
+		args.url = '';
+		var old_status = args.data.status;
+		if(args.data.status) {
+			// 必须先将字符串变成utf8编码进行签名计算, sb人人
+			args.data.status = Base64._utf8_encode(args.data.status);
+		}
+		this.signature(args.data, user);
+		if(old_status) {
+			// 将之前编码的字符串还原回来, fxxx
+			args.data.status = old_status;
+		}
+	},
+	
+	format_upload_params: function(user, data, pic) {
+		delete data.source;
+		data.method = this.config.upload;
+		data.caption = data.status;
+		delete data.status;
+		data.format = 'json';
+		var old_caption = data.caption;
+		if(data.caption) {
+			// 必须先将字符串变成utf8编码进行签名计算, sb人人
+			data.caption = Base64._utf8_encode(data.caption);
+		}
+		this.signature(data, user);
+		if(old_caption) {
+			// 将之前编码的字符串还原回来, fxxx
+			data.caption = old_caption;
+		}
+		pic.keyname = 'upload';
+    },
+	
+	format_result: function(data, play_load, args) {
+		return this._format_result(data, play_load, args);
+	},
+	
+	format_result_item: function(data, play_load, args) {
+		if(play_load == 'user' && data && data.uid) {
+			// http://www.renren.com/profile.do?id=263668818
+			data.id = data.uid;
+			delete data.uid;
+			data.t_url = 'http://www.renren.com/profile.do?id=' + data.id;
+			data.profile_image_url = data.tinyurl || data.headurl;
+			delete data.tinyurl;
+			delete data.headurl;
+			data.screen_name = data.name;
+			data.description = data.network_name;
+			data.gender = 'n';
+			if(data.sex !== undefined) {
+				data.gender = data.sex === 1 ? 'm' : 'f';
+			}
+			if(data.base_info) {
+				data.gender = data.base_info.gender == '1' ? 'm' : 'f';
+				if(data.base_info.hometown) {
+					data.province = data.base_info.hometown.province;
+					data.city = data.base_info.hometown.city;
+				}
+			}
+			delete data.base_info;
+			if(data.hometown_location) {
+				data.province = data.hometown_location.province;
+				data.city = data.hometown_location.city;
+			}
+			delete data.hometown_location;
+			data.followers_count = data.visitors_count;
+			data.friends_count = data.friends_count;
+			data.statuses_count = data.status_count;
+		} else if(play_load == 'status' || play_load == 'message') {
+			// http://wiki.dev.renren.com/wiki/Feed.get
+			data.id = data.post_id;
+			delete data.post_id;
+			if(data.message) {
+				data.text = data.message;
+			} else {
+				var title = data.title || '';
+				if(title) {
+					title += ' ';
+				}
+				data.text = title + (data.description || '');
+			}
+			delete data.message;
+			//data.t_url = data.link;
+			if(data.attachment && data.attachment.length > 0 && data.attachment[0].media_type === 'photo') {
+				data.thumbnail_pic = data.attachment[0].src;
+				data.bmiddle_pic = data.thumbnail_pic;
+				data.original_pic = data.thumbnail_pic;
+				data.pic_id = data.attachment[0].media_id;
+				data.pic_owner_id = data.attachment[0].owner_id;
+				//delete data.attachment;
+			}
+			if(data.source_name) {
+				data.source = '<a href="{{source_url}}" target="_blank">{{source_name}}</a>'.format(data);
+				delete data.source_name;
+				delete data.source_url;
+			}
+//			if(data.headurl) {
+//				data.user = {
+//					headurl: data.headurl,
+//					name: data.name,
+//					uid: data.actor_id
+//				};
+//				data.user = this.format_result_item(data.user, 'user', args);
+//			}
+			data.uid = data.actor_id;
+			data.created_at = data.update_time;
+			delete data.update_time;
+		}
+		return data;
+	},
+	
+	verify_credentials: function(user, callback) {
+		var that = this;
+		this._verify_credentials(user, function(result, code_text, code) {
+			var params = {
+				url: that.config.user_profile,
+				play_load: 'user',
+				data: {user: user, uid: result.id, fields: that.config.user_profile_fields}
+			};
+			that._sendRequest(params, callback);
+		});
+	},
+	
+	_fill_pics: function(user, items, code_text, code, callback, context) {
+		var items_map = {};
+		items = items || [];
+		for(var i = 0, len = items.length; i < len; i++) {
+			var pid = items[i].pic_id;
+			if(pid) {
+				var list = items_map[pid] || [];
+				list.push(items[i]);
+				items_map[pid] = list;
+			}
+		}
+		if(Object.keys(items_map).length === 0) {
+			return callback.call(context, items, code_text, code);
+		}
+		var params = {
+			url: this.config.photos,
+			play_load: 'photo',
+			data: {
+				user: user, 
+				uid: user.id,
+				pids: Object.keys(items_map).join(',')
+			}
+		};
+		this._sendRequest(params, function(photos) {
+			if(photos) {
+				for(var i = 0, len = photos.length; i < len; i++) {
+					var photo = photos[i];
+					var list = items_map[photo.id];
+					for(var j = 0, jlen = list.length; j < jlen; j++) {
+						list[j].bmiddle_pic = photo.url_large;
+						list[j].original_pic = photo.url_large;
+					}
+				}
+			}
+			callback.call(context, items, code_text, code);
+		}, this);
+	},
+	
+	_fill_users: function(user, items, code_text, code, callback, context) {
+		// 批量获取用户信息
+		if(items && items.length > 0 && items[0].uid) {
+			var items_map = {};
+			for(var i = 0, len = items.length; i < len; i++) {
+				var uid = items[i].uid;
+				var list = items_map[uid] || [];
+				list.push(items[i]);
+				items_map[uid] = list;
+			}
+			var params = {
+				url: this.config.users,
+				play_load: 'user',
+				data: {
+					user: user, 
+					uids: Object.keys(items_map).join(','),
+					fields: 'uid,name,sex,star,zidou,vip,birthday,email_hash,tinyurl,headurl,mainurl,hometown_location,work_history,university_history'
+				}
+			};
+			this._sendRequest(params, function(users) {
+				if(users) {
+					for(var i = 0, len = users.length; i < len; i++) {
+						var user = users[i];
+						var list = items_map[user.id];
+						for(var j = 0, jlen = list.length; j < jlen; j++) {
+							list[j].user = user;
+						}
+					}
+				}
+				callback.call(context, items, code_text, code);
+			}, this);
+		} else {
+			callback.call(context, items, code_text, code);
+		}
+	},
+	
+	user_timeline: function(data, callback, context) {
+		var user = data.user;
+		this._user_timeline(data, function(items, code_text, code) {
+			this._fill_users(user, items, code_text, code, callback, context);
+		}, this);
+	},
+	
+	friends_timeline: function(data, callback, context) {
+		var user = data.user;
+		this._friends_timeline(data, function(items, code_text, code) {
+			this._fill_users(user, items, code_text, code, callback, context);
+		}, this);
+	}
+});
+
 // plurk: http://www.plurk.com/API/issueKey
 var PlurkAPI = $.extend({}, sinaApi);
 PlurkAPI._upload = PlurkAPI.upload;
@@ -4677,6 +5056,7 @@ var T_APIS = {
 	'fanfou': FanfouAPI,
 	'renjian': RenjianAPI,
 	'douban': DoubanAPI,
+	'renren': RenrenAPI,
 	'buzz': BuzzAPI,
 	'facebook': FacebookAPI,
 	'plurk': PlurkAPI,

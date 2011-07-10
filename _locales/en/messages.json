@@ -277,6 +277,10 @@
         "message": "Tweet!",
         "description": "发送"
     },
+    "comm_send_success_close_window": {
+        "message": "Auto close window",
+        "description": "自动关闭窗口"
+    },
     "comm_send_tip": {
         "message": "ctrl + enter to send",
         "description": "ctrl + enter 发送"

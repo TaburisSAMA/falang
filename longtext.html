@@ -11,6 +11,7 @@
 	<script src="scripts/lib/Base64.js" ></script>
 	<script src="scripts/emotional.js" ></script>
 	<script src="scripts/utili.js" ></script>
+	<script src="scripts/lib/md5.js" ></script>
 	<script src="scripts/lib/sha1.js" ></script>
     <script src="scripts/lib/oauth.js" ></script>
 	<script src="scripts/apis.js" ></script>
@@ -27,7 +28,7 @@
 	</script>
  </head>
 
- <body onload="LongTextPage.init();" style="margin:0 5px;">
+ <body onload="LongTextPage.init();" style="margin: 5px 5px 0 5px;">
     
 	<div id="submitWarp">
 	  <div class="w">
@@ -41,6 +42,7 @@
             <script>_u.wia('#doing','title','btn_share_title');</script>&nbsp;
 			<button onclick="cleanTxtContent();" class="btn"><script>_u.wi('comm_clear')</script></button>&nbsp;
 			<button onclick="window.close();" class="btn"><script>_u.wi('comm_close')</script></button>&nbsp;
+			<input id="cb_success_close" checked="checked" type="checkbox" /><label for="cb_success_close">自动关闭窗口</label>
 			<input id="btnSend" type="button" class="btn send" disabled="disabled" />
 			<script>_u.wia('#btnSend', 'value', 'comm_send'); _u.wia('#btnSend', 'title', 'comm_send_tip');</script>
 		</div>

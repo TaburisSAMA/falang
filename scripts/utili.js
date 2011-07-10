@@ -81,6 +81,7 @@ var T_LIST = {
 	'digu': ['friends_timeline','mentions', 'direct_messages'],
 	'buzz': ['friends_timeline'],
 	'facebook': ['friends_timeline'],
+	'renren': ['friends_timeline'],
 	'plurk': ['friends_timeline'],
 	'douban': ['friends_timeline', 'direct_messages'],
 	'tianya': []
@@ -97,6 +98,7 @@ var T_NAMES = {
 	't163': '网易微博',
 	'douban': '豆瓣',
 	'fanfou': '饭否',
+	'renren': '人人网',
 	'digu': '嘀咕',
 //	'tianya': '天涯微博',
 	'zuosa': '做啥',
@@ -318,6 +320,7 @@ var Settings = {
         isGeoEnabled: false, //默认不开启上报地理位置信息
         isGeoEnabledUseIP: false, //true 使用ip判断， false 使用浏览器来判断
         geoPosition: null, //获取到的地理位置信息，默认为空
+        sent_success_auto_close: true, // 弹出窗口全部发送成功自动关闭
 
         lookingTemplate: _u.i18n('sett_shared_template')
     },
@@ -2506,7 +2509,7 @@ var TextImage = {
 	    	lines.push([s, left, top]);
 	    }
 	    can.width = width;
-	    can.height = height;
+	    can.height = height + 30; // 空白30px放水印logo
 	    // 需要在设置了高度后再设置textBaseline 才会生效
 	    ctx.font = font;
 	    ctx.textBaseline = "top";

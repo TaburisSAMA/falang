@@ -277,6 +277,10 @@
         "message": "發微！",
         "description": "发送"
     },
+    "comm_send_success_close_window": {
+        "message": "自動關閉窗口",
+        "description": "自动关闭窗口"
+    },
     "comm_send_tip": {
         "message": "ctrl + enter 發送",
         "description": "ctrl + enter 发送"

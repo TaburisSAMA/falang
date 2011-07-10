@@ -112,3 +112,7 @@
     bottom:-5px;
     position: absolute;
 }
+
+#btnAddEmotional img {
+    vertical-align: top;
+}
