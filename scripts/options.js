@@ -1200,7 +1200,7 @@ function refreshAccountWarp(user, stat){
 //            stat.userList[i] = user;
 //            userList[data.uniqueKey] = data;
             stat.successCount++;
-            _showMsg(_u.i18n("msg_update_account_info_success"));
+            _showMsg(_u.i18n("msg_update_account_info_success").format({blogname:blogName, username:user.screen_name}), true);
         }
         if((stat.errorCount + stat.successCount) == stat.userList.length){
         	// 全部刷新完，更新
