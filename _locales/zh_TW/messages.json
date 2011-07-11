@@ -1001,6 +1001,10 @@
         "message": "启动Read It Later，将会在功能按键栏中出现 RIL(Read It Later) 按钮<br /><img src=\"/images/setting/ril.jpg\" />",
         "description": "启动 Read It Later 设置说明"
     },
+    "sett_jTip_vdisk": {
+        "message": "启动 \"微盤VDisk\"，將可以上傳任意文件",
+        "description": "启动 VDisk 设置说明"
+    },
 
     "sett_itemName_auto_short_url": {
         "message": "是否自動縮短URL：",
@@ -1029,7 +1033,10 @@
         "message": "Read It Later 帳號：",
         "description": "Read It Later 帐号"
     },
-    
+    "sett_itemName_vdisk": {
+        "message": "微盤VDisk 帳號：",
+        "description": "微盘VDisk 帐号"
+    },
     "sett_export": {
         "message": "导出设置",
         "description": "导出设置"

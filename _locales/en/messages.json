@@ -1001,6 +1001,10 @@
         "message": "Enable 'Read It Later'，RIL(Read It Later) button will show in toolbar<br /><img src=\"/images/setting/ril.jpg\" />",
         "description": "启动 Read It Later 设置说明"
     },
+    "sett_jTip_vdisk": {
+        "message": "Enable \"微盘VDisk\"，you can upload files",
+        "description": "启动 VDisk 设置说明"
+    },
     
     "sett_itemName_auto_short_url": {
         "message": "Auto Shorten The Url: ",
@@ -1028,6 +1032,11 @@
     "sett_itemName_readitlater": {
         "message": "Read It Later Account：",
         "description": "Read It Later 帐号"
+    },
+    
+    "sett_itemName_vdisk": {
+        "message": "VDisk Account：",
+        "description": "微盘VDisk 帐号"
     },
     
     "sett_export": {
