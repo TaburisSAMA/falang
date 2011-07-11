@@ -637,8 +637,16 @@
         "description": "右键点击打开原图"
     },
     "btn_select_pic_title": {
-        "message": "Click to select file or drag and drop file here",
-        "description": "点此选择文件或者将文件拖放至此"
+        "message": "Click to select file or image, even drag and drop file here",
+        "description": "点此选择文件或图片，甚至直接将文件拖放至此"
+    },
+    "btn_select_file_only_title": {
+        "message": "Click to select file, even drag and drop file here",
+        "description": "点此选择文件，甚至直接将文件拖放至此"
+    },
+    "comm_enter_image_url": {
+        "message": "Enter Image URL",
+        "description": "输入图片URL"
     },
     "btn_show_user_title": {
         "message": "Left Click to view Tweet, Right click to View home",
@@ -1055,8 +1063,12 @@
         "description": "已超出{{len}}字"
     },
     "msg_file_too_large": {
-        "message": "File is too large, select the files less than 2M。",
+        "message": "File is too large, select the files less than 10M。",
         "description": "文件太大，请选择小于2M的文件。"
+    },
+    "msg_pic_too_large": {
+        "message": "Image is too large, select the images less than 2M。",
+        "description": "图片太大，请选择小于2M的图片。"
     },
     "msg_pic_type_error": {
         "message": "File type is not correct, only supports JPEG, GIF, PNG images。",
@@ -1121,6 +1133,10 @@
     "msg_need_pic": {
         "message": "Please select an image to upload.",
         "description": "请选择要上传的图片。"
+    },
+    "msg_need_file_or_pic": {
+        "message": "Please select an file or image to upload.",
+        "description": "请选择要上传的文件或图片。"
     },
     "msg_send_error": {
         "message": "{{username}} Send error.",

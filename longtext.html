@@ -50,9 +50,15 @@
 	  </div>
 	</div><!-- submitWarp END -->
     <ul id="uploadinfo"></ul>
-    <div class="fileSel graph" style="display:none;">
-        <strong id="progressBar" class="bar" style="width: 0%;"><span></span></strong>
-    </div>
+    <form id="uploadForm">
+        <div class="fileSel graph">
+            <strong id="progressBar" class="bar" style="width: 0%;"><span></span></strong>
+            <div class="selTip"><script>_u.wi('btn_select_file_only_title')</script></div>
+        </div>
+        <span id="imageFileWrap" style="display:block;">
+            <input type="file" id="imageFile" onchange="selectFile(this, true);" />
+        </span>
+    </form>
 	<div id="longtextWarp">
 		<p><label for="font_size"><script>_u.wi('comm_font_size')</script>:</label>
 	    <select id="font_size">

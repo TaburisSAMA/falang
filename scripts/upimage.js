@@ -109,7 +109,6 @@ var TP_USER_UPLOAD_INFO = '<li id="u_uploadinfo_{{uniqueKey}}">'
     + '</li>';
 
 function sendMsg(){ //覆盖popup.js的同名方法
-    var check = true;
     var c_user = getUser();
     if(!c_user){
         _showMsg(_u.i18n("msg_need_add_account"));
@@ -138,11 +137,12 @@ function sendMsg(){ //覆盖popup.js的同名方法
     		}
     	}
     }
-    if(!checkFile(file)){
-        check = false;
+    
+    // 检测是否含有文件，如果没有图片又没有上传过文件，则提示
+    if(!file && $('#imageFileWrap').attr('uploaded') !== '1') {
+        _showMsg(_u.i18n("msg_need_file_or_pic"));
+        return;
     }
-
-    if(!check){ return; }
 	
     var users = [], selLi = $("#accountsForSend .sel");
     if(selLi.length){
@@ -176,7 +176,7 @@ function sendMsg(){ //覆盖popup.js的同名方法
     			status = status.replace(match[0], tapi.formatSearchText(user, match[1]));
     		}
     	}
-        if(config.support_upload) {
+        if(config.support_upload && pic.file) {
         	upInfo.append(TP_USER_UPLOAD_INFO.format(user));
         	_uploadWrap(user, status, pic, stat, selLi);
         } else { // only support update
@@ -253,15 +253,16 @@ function _uploadWrap(user, status, pic, stat, selLi){
 };
 
 var FILECHECK = {
-	maxFileSize: 2*1024000,
+	maxFileSize: 10*1024000,
+	maxImageSize: 2*1024000,
     fileTypes: '__image/gif__image/jpeg__image/jpg__image/png__'
 };
 
-function checkFile(file){
+function checkImage(file){
     var check = true;
     if(file){
-        if(file.size > FILECHECK.maxFileSize){
-            _showMsg(_u.i18n("msg_file_too_large"));
+        if(file.size > FILECHECK.maxImageSize){
+            _showMsg(_u.i18n("msg_pic_too_large"));
             check = false;
         }
         if(file.type && FILECHECK.fileTypes.indexOf('__' + file.type + '__') < 0){
@@ -269,12 +270,53 @@ function checkFile(file){
             check = false;
         }
     }else{
-        _showMsg(_u.i18n("msg_need_pic"));
+        //_showMsg(_u.i18n("msg_need_pic"));
         check = false;
     }
     return check;
 };
 
+function handleFile(file, handle_image) {
+    if(file) {
+        if(file.size > FILECHECK.maxFileSize){
+            _showMsg(_u.i18n("msg_file_too_large"));
+            return true;
+        }
+        if(!handle_image && file.type && FILECHECK.fileTypes.indexOf('__' + file.type + '__') >= 0){
+            return false;
+        }
+        var settings = Settings.get()
+          , user = settings.vdisk_user;
+        disabledUpload();
+        VDiskAPI.upload(user, file, function(err, result) {
+            enabledUpload();
+            resetFileUpload();
+            $("#progressBar")[0].style.width = "0%";
+            $("#progressBar span").html("");
+            if(err) {
+                return _showMsg(err.message);
+            }
+            var url = result.download_page;
+            var $txt = $('#txtContent'), text = $txt.val();
+            if(text) {
+                text += ' ';
+            }
+            $txt.val(text + file.fileName + ' ' + url).focus();
+            $('#imageFileWrap').attr('uploaded', '1');
+            _shortenUrl(url, settings, function(shorturl) {
+                if(shorturl) {
+                    $txt.val($txt.val().replace(url, shorturl));
+                }
+            });
+        }, function onprogress(rpe){
+            var precent = parseInt((rpe.loaded / rpe.total) * 100);
+            $("#progressBar")[0].style.width = precent + "%";
+            $("#progressBar span").html(precent + "%");
+        });
+        return true;
+    }
+    return false;
+};
 
 function onprogress(rpe, user, stat){
     if(!user){return;}
@@ -302,14 +344,18 @@ function size(bytes){   // simple function to show a friendly size
 };
 
 
-function selectFile(fileEle){
+function selectFile(fileEle, file_only){
     var file = fileEle.files[0];
-    $("#imgPreview").html('');
-    $('#imageUrl').val('');
     $("#progressBar")[0].style.width = "0%";
     $("#progressBar span").html("");
     if(file){
-        var check = checkFile(file);
+        if(handleFile(file, file_only)) {
+            // 已经被处理
+            return;
+        }
+        $("#imgPreview").html('');
+        $('#imageUrl').val('');
+        var check = checkImage(file);
         if(check){
             var reader = new FileReader();
             reader.onload = function(e){
@@ -317,13 +363,16 @@ function selectFile(fileEle){
             };
             reader.readAsDataURL(file);
         }
+    } else {
+        $("#imgPreview").html('');
+        $('#imageUrl').val('');
     }
 };
 
 function selectUrl(ele){
     var url = $(ele).val();
     $("#imgPreview").html('');
-    $('#uploadForm').get(0).reset();
+    resetFileUpload();
     $('#imageUrl').val(url);
     $("#progressBar")[0].style.width = "0%";
     $("#progressBar span").html("");
@@ -343,3 +392,10 @@ function enabledUpload(){
     $("#imageFile").removeAttr('disabled');
     $("#imageUrl").removeAttr('disabled');
 };
+
+function resetFileUpload() {
+    var $parent = $('#imageFile').parent();
+    var clone = $('#imageFile').clone();
+    $('#imageFile').remove();
+    $parent.append(clone);
+}

@@ -5352,17 +5352,16 @@ var VDiskAPI = {
             }
         });
     },
-    upload: function(user, fileobj, callback) {
+    upload: function(user, fileobj, callback, onprogress) {
         var that = this;
         that.get_token(user, function(err, result){
             if(err) {
                 return callback(err);
             }
-            data.token = result.token;
-            that._upload(data, fileobj, callback);
+            that._upload({token: result.token}, fileobj, callback, onprogress);
         });
     },
-    _upload: function(data, fileobj, callback) {
+    _upload: function(data, fileobj, callback, onprogress) {
         data.dir_id = '0';
         data.cover = 'yes';
         var blobbuilder = build_upload_params(data, fileobj);
@@ -5373,6 +5372,15 @@ var VDiskAPI = {
             dataType: 'json',
             contentType: blobbuilder.contentType,
             processData: false,
+            beforeSend: function(req) {
+                if(onprogress) {
+                    if(req.upload){
+                        req.upload.onprogress = function(ev){
+                            onprogress(ev);
+                        };
+                    }
+                }
+            },
             success: function(data) {
                 // download_page: "http://vdisk.me/?m=share&a=download&ss=1d80JHmqxQlFxKbVpbeiKU4keIqEXUeIiT8OTwIC8NPZJY4RJq5dIcihXenhO7WkmfgHaMkVY3Zm5p5L5w"
                 var error = null, result = null;

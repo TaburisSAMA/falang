@@ -637,8 +637,16 @@
         "description": "右键点击打开原图"
     },
     "btn_select_pic_title": {
-        "message": "點此選擇文件或者將文件拖放至此",
-        "description": "点此选择文件或者将文件拖放至此"
+        "message": "點此選擇文件或圖片，甚至直接將文件拖放至此",
+        "description": "点此选择文件或图片，甚至直接将文件拖放至此"
+    },
+    "btn_select_file_only_title": {
+        "message": "點此選擇文件，甚至直接將文件拖放至此",
+        "description": "点此选择文件，甚至直接将文件拖放至此"
+    },
+    "comm_enter_image_url": {
+        "message": "輸入圖片URL",
+        "description": "输入图片URL"
     },
     "btn_show_user_title": {
         "message": "左鍵查看微博，右鍵打開主頁",
@@ -1054,9 +1062,13 @@
         "message": "已超出{{len}}字",
         "description": "已超出{{len}}字"
     },
+    "msg_pic_too_large": {
+        "message": "圖片太大，請選擇小於2M的圖片。",
+        "description": "图片太大，请选择小于2M的图片。"
+    },
     "msg_file_too_large": {
-        "message": "文件太大，請選擇小於2M的文件。",
-        "description": "文件太大，请选择小于2M的文件。"
+        "message": "文件太大，請選擇小於10M的文件。",
+        "description": "文件太大，请选择小于10M的文件。"
     },
     "msg_pic_type_error": {
         "message": "文件类型不正确，仅支持JPEG,GIF,PNG图片。",
@@ -1121,6 +1133,10 @@
     "msg_need_pic": {
         "message": "請選擇要上傳的圖片。",
         "description": "请选择要上传的图片。"
+    },
+    "msg_need_file_or_pic": {
+        "message": "請選擇要上傳的文件或圖片。",
+        "description": "请选择要上传的文件或图片。"
     },
     "msg_send_error": {
         "message": "{{username}} 發送出錯.",

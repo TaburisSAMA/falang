@@ -2577,7 +2577,8 @@ function build_upload_params(data, pic) {
     /* Generate headers. [PIC] */            
     builder += 'Content-Disposition: form-data; name="' + pic.keyname + '"';
     if(pic.fileName) {
-      builder += '; filename="' + url_encode(pic.fileName) + '"';
+        //builder += '; filename="' + url_encode(pic.fileName) + '"';
+        builder += '; filename="' + pic.fileName + '"';
     }
     builder += crlf;
 
