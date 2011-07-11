@@ -176,9 +176,9 @@ $(function(){
     	$('#enableImageService').removeAttr('checked');
     }
     
-    // 设在instapaper 帐号
+    // 设在instapaper, read it later, vdisk 帐号
     var settings = Settings.get();
-    var readlater_services = ['instapaper', 'readitlater'];
+    var readlater_services = ['instapaper', 'readitlater', 'vdisk'];
     for(var i = 0, len = readlater_services.length; i < len; i++) {
     	var service_name = readlater_services[i];
     	var service_user = settings[service_name + '_user'];
@@ -200,18 +200,39 @@ $(function(){
         		return;
         	}
         	var user = {username: username, password: password};
-        	var service = service_type === 'instapaper' ? Instapaper : ReadItLater;
-        	service.authenticate(user, function(success){
-        		if(success) {
-        			var settings = Settings.get();
-        			settings[service_type + '_user'] = user;
-        			Settings.save();
-        			_showMsg(_u.i18n("msg_save_success"));
-        			$('#delete_' + service_type + '_account_btn').show();
-        		} else {
-        			_showMsg(_u.i18n("msg_wrong_name_or_pwd"));
-        		}
-        	});
+        	var services = {
+    	        instapaper: Instapaper,
+    	        readitlater: ReadItLater,
+    	        vdisk: VDiskAPI
+        	};
+        	var service = services[service_type];
+        	var save_user = function(st, user) {
+        	    var settings = Settings.get();
+                settings[st + '_user'] = user;
+                Settings.save();
+                _showMsg(_u.i18n("msg_save_success"));
+                $('#delete_' + st + '_account_btn').show();
+        	};
+        	if(service_type === 'vdisk') {
+        	    if($('#vdisk_use_sinat').attr('checked')) {
+        	        user.app_type = 'sinat';
+        	    }
+        	    service.get_token(user, function(err, result) {
+        	        if(err) {
+        	            _showMsg(err.message || _u.i18n("msg_wrong_name_or_pwd"));
+        	        } else {
+        	            save_user(service_type, user);
+        	        }
+        	    });
+        	} else {
+        	    service.authenticate(user, function(result){
+                    if(result) {
+                        save_user(service_type, user);
+                    } else {
+                        _showMsg(_u.i18n("msg_wrong_name_or_pwd"));
+                    }
+                });
+        	}
         });
         $('#delete_' + service_name + '_account_btn').attr('service', service_name).click(function(){
         	var service_type = $(this).attr('service');

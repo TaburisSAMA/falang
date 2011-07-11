@@ -5295,8 +5295,14 @@ var tapi = {
 
 // 微盘api, http://vdisk.me/api/doc
 var VDiskAPI = {
-	appkey: '306790',
-	app_secret: 'c26f2cc9138bb726bfcac1311cbd39bb',
+//	appkey: '306790',
+//	app_secret: 'c26f2cc9138bb726bfcac1311cbd39bb',
+	appkey: '243370',
+    app_secret: 'ead5d2e0987e60ef43b2c9d80a893326',
+	URL_GET_TOKEN: 'http://openapi.vdisk.me/?m=auth&a=get_token',
+	URL_KEEP_TOKEN: 'http://openapi.vdisk.me/?m=user&a=keep_token',
+	URL_UPLOAD_FILE: 'http://openapi.vdisk.me/?m=file&a=upload_file',
+	URL_UPLOAD_SHARE_FILE: 'http://openapi.vdisk.me/?m=file&a=upload_share_file',
 	
 	_sha256: function(basestring) {
 	 	return HMAC_SHA256_MAC(this.app_secret, basestring);
@@ -5316,19 +5322,72 @@ var VDiskAPI = {
 	 */
 	
 	get_token: function(user, callback) {
-		user = {username: 'fengmk2@gmail.com', password: '112358'};
+		//user = {username: 'fengmk2@gmail.com', password: '112358', app_type: 'sinat'};
 		var params = {
 			account: user.username,
 			password: user.password,
 			appkey: this.appkey,
-			time: Math.floor(new Date().getTime() / 1000)
+			app_type: user.app_type,
+			time: new Date().getTime().toString().substring(0, 10) //10位
 		};
+		//params.time = Math.floor(new Date().getTime() / 1000);
 		var basestring = 'account={{account}}&appkey={{appkey}}&password={{password}}&time={{time}}'.format(params);
 		params.signature = this._sha256(basestring);
-		$.post('http://openapi.vdisk.me/?m=auth&a=get_token', params, function(data){
-			console.log(data);
-		});
-	}
+        $.ajax({
+            url: this.URL_GET_TOKEN,
+            type: 'post',
+            dataType: 'json',
+            data: params,
+            success : function(data){
+                var error = null, result = null;
+                if(data.err_code === 0) {
+                    result = data.data;
+                } else {
+                    error = new Error(data.err_msg);
+                }
+                callback(error, result);
+            },
+            error: function(xhr, text_status, err) {
+                callback(err);
+            }
+        });
+    },
+    upload: function(user, fileobj, callback) {
+        var that = this;
+        that.get_token(user, function(err, result){
+            if(err) {
+                return callback(err);
+            }
+            data.token = result.token;
+            that._upload(data, fileobj, callback);
+        });
+    },
+    _upload: function(data, fileobj, callback) {
+        data.dir_id = '0';
+        data.cover = 'yes';
+        var blobbuilder = build_upload_params(data, fileobj);
+        $.ajax({
+            url: this.URL_UPLOAD_SHARE_FILE,
+            data: blobbuilder.getBlob(),
+            type: 'post',
+            dataType: 'json',
+            contentType: blobbuilder.contentType,
+            processData: false,
+            success: function(data) {
+                // download_page: "http://vdisk.me/?m=share&a=download&ss=1d80JHmqxQlFxKbVpbeiKU4keIqEXUeIiT8OTwIC8NPZJY4RJq5dIcihXenhO7WkmfgHaMkVY3Zm5p5L5w"
+                var error = null, result = null;
+                if(data.err_code === 0) {
+                    result = data.data;
+                } else {
+                    error = new Error(data.err_msg);
+                }
+                callback(error, result);
+            },
+            error: function(xhr, status, err) {
+                callback(err);
+            }
+        });
+    }
 };
 
 /**

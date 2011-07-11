@@ -2538,3 +2538,67 @@ var TextImage = {
 function isSupportUpload() {
 	return window.BlobBuilder || window.WebKitBlobBuilder;
 }
+
+function url_encode(text) {
+    return OAuth.percentEncode(text);
+}
+
+function build_upload_params(data, pic) {
+    pic.keyname = pic.keyname || 'file';
+    var boundary = '----multipartformboundary' + (new Date).getTime();
+    var dashdash = '--';
+    var crlf = '\r\n';
+
+    /* Build RFC2388 string. */
+    var builder = '';
+
+    builder += dashdash;
+    builder += boundary;
+    builder += crlf;
+    
+    for(var key in data) {
+        var value = url_encode(data[key]);
+        data[key] = value;
+    }
+    for(var key in data) {
+        /* Generate headers. key */            
+        builder += 'Content-Disposition: form-data; name="' + key + '"';
+        builder += crlf;
+        builder += crlf; 
+         /* Append form data. */
+        builder += data[key];
+        builder += crlf;
+        
+        /* Write boundary. */
+        builder += dashdash;
+        builder += boundary;
+        builder += crlf;
+    }
+    /* Generate headers. [PIC] */            
+    builder += 'Content-Disposition: form-data; name="' + pic.keyname + '"';
+    if(pic.fileName) {
+      builder += '; filename="' + url_encode(pic.fileName) + '"';
+    }
+    builder += crlf;
+
+    builder += 'Content-Type: '+ (pic.fileType || pic.type);
+    builder += crlf;
+    builder += crlf;
+    if(typeof BlobBuilder === 'undefined') {
+        var BlobBuilder = WebKitBlobBuilder;
+    }
+    var bb = new BlobBuilder();
+    bb.append(builder);
+    bb.append(pic);
+    builder = crlf;
+    
+    /* Mark end of the request.*/ 
+    builder += dashdash;
+    builder += boundary;
+    builder += dashdash;
+    builder += crlf;
+
+    bb.append(builder);
+    bb.contentType = 'multipart/form-data; boundary=' + boundary;
+    return bb;
+}
