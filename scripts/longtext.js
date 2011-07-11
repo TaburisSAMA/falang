@@ -88,6 +88,8 @@ var LongTextPage = {
 			font_weight: $longtext.css('font-weight'),
 			width: $longtext.width()
 		};
-		return TextImage.draw($longtext.val(), options);
+		var text = $longtext.val() 
+		    + '\n\n--------------------------------\n发长微博 用@FaWave';
+		return TextImage.draw(text, options);
 	}
 };
