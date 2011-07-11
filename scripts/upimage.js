@@ -287,6 +287,10 @@ function handleFile(file, handle_image) {
         }
         var settings = Settings.get()
           , user = settings.vdisk_user;
+        if(!user) {
+            // 提示用戶綁定帳號
+            return false;
+        }
         disabledUpload();
         VDiskAPI.upload(user, file, function(err, result) {
             enabledUpload();

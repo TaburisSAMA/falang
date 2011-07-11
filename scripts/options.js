@@ -1219,7 +1219,7 @@ function refreshAccountWarp(user, stat){
 //                c_user = userList[c_user.uniqueKey.toLowerCase()];
                 setUser(c_user);
             }
-            _showMsg(_u.i18n("msg_update_accounts_info_complete").format({successCount:successCount, errorCount:errorCount}));
+            _showMsg(_u.i18n("msg_update_accounts_info_complete").format({successCount:stat.successCount, errorCount:stat.errorCount}));
             $("#refresh-account").removeAttr("disabled");
             if($("#needRefresh").css('display') != 'none'){ //如果是强制需要刷新用户信息的，则在刷新后刷新页面
                 window.location.reload(); //TODO: 修改为不用刷新页面的
