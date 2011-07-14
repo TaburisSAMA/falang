@@ -645,7 +645,7 @@
         "description": "右键点击打开原图"
     },
     "btn_select_pic_title": {
-        "message": "点此选择文件或图片，甚至直接将文件拖放至此",
+        "message": "点此选择文件或图片，或直接将文件拖放至此绿框内",
         "description": "点此选择文件或图片，甚至直接将文件拖放至此"
     },
     "btn_select_file_only_title": {

@@ -116,3 +116,7 @@
 #btnAddEmotional img {
     vertical-align: top;
 }
+
+.drag_on{
+	border:dotted 3px #900;
+}

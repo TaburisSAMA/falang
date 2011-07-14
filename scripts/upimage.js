@@ -28,6 +28,16 @@ function init(){
     $("#txtContent").focus();
     at_user_autocomplete('#txtContent');
     $(window).unload(function(){ initOnUnload(); });
+    // 文件拖动
+    $("#imageFile")[0].addEventListener('dragenter', function(){
+    	$("#uploadForm .dragFile").addClass('drag_on');
+    }, false);
+    $("#imageFile")[0].addEventListener('dragleave', function(){
+    	$("#uploadForm .dragFile").removeClass('drag_on');
+    }, false);
+    $("#imageFile")[0].addEventListener('drop', function(){
+    	$("#uploadForm .dragFile").removeClass('drag_on');
+    }, false);
     // 设置自动关闭选项的上次状态
     var checked = Settings.get().sent_success_auto_close;
     $('#cb_success_close').change(function() {
@@ -349,6 +359,7 @@ function size(bytes){   // simple function to show a friendly size
 
 
 function selectFile(fileEle, file_only){
+	$("#uploadForm .dragFile").removeClass('drag_on');
     var file = fileEle.files[0];
     $("#progressBar")[0].style.width = "0%";
     $("#progressBar span").html("");
