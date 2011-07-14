@@ -1,3 +1,4 @@
+html, body{ height:100%; }
 #msginfowarp { position: fixed; }
 #needUpdateChrome{
 	background-color: #FEFEB6;

@@ -38,6 +38,11 @@ function init(){
     $("#imageFile")[0].addEventListener('drop', function(){
     	$("#uploadForm .dragFile").removeClass('drag_on');
     }, false);
+    document.body.addEventListener('dragover', function(e){
+    	if((e.srcElement && e.srcElement.id != 'imageFile')){
+			e.preventDefault();
+    	}
+	}, false);
     // 设置自动关闭选项的上次状态
     var checked = Settings.get().sent_success_auto_close;
     $('#cb_success_close').change(function() {
