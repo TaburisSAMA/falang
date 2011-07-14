@@ -1942,15 +1942,6 @@ function sendRepost(msg, repostTweetId, notSendMord){
         btn.removeAttr('disabled');
         txt.removeAttr('disabled');
     });
-
-//    if(!notSendMord){
-//        if($('#chk_sendOneMore').attr("checked") && $('#chk_sendOneMore').val()){ //同时给XXX评论
-//            sendComment(msg, $('#chk_sendOneMore').val(), true);
-//        }
-//        if($('#chk_sendOneMore2').attr("checked") && $('#chk_sendOneMore2').val()){ //同时给原作者 XXX评论
-//            sendComment(msg, $('#chk_sendOneMore2').val(), true);
-//        }
-//    }
 };
 
 function sendComment(msg, comment_id, notSendMord){

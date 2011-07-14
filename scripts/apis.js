@@ -58,7 +58,7 @@ var sinaApi = {
 		support_friendships_create: true,
 		support_search: true,
 		support_user_search: true, // 支持搜人
-		support_search_max_id: true,
+		support_search_max_id: false,
 		support_favorites_max_id: false, // 收藏分页使用max_id
 		support_auto_shorten_url: true, // 是否会自动对url进行缩短，如何会，则无须使用缩短服务
 		rt_need_source: true, // RT的时候是否需要原始微博
@@ -189,7 +189,7 @@ var sinaApi = {
 	
 	        str = str.replace( /([\uE001-\uE537])/gi, this.getIphoneEmoji);
         }
-        return str || '';
+        return str || '&nbsp;';
     },
     
     getIphoneEmoji: function(str){
@@ -792,34 +792,34 @@ var sinaApi = {
 	                data = JSON.parse(data);
 	            }
 	            catch(err){
-	                log(data);
-	                //data = null;
 	                data = {error: _u.i18n("comm_error_return"), error_code:500};
 	                textStatus = 'error';
 	            }
 	            var error_code = null;
-	            if(data){
+	            if(data) {
                     var error = data.errors || data.error;
 	                if(error || data.error_code){
 	                	data.error = error;
 	                    _showMsg('error: ' + data.error + ', error_code: ' + data.error_code, false);
 	                    error_code = data.error_code || error_code;
 	                }
-	            }else{error_code = 400;}
+	            } else {
+	                error_code = 400;
+	            }
 	            callback.call(context, data, textStatus, error_code);
 	        },
 	        error: function (xhr, textStatus, errorThrown) {
 	            var r = null, status = 'unknow';
-	            if(xhr){
-	                if(xhr.status){
+	            if(xhr) {
+	                if(xhr.status) {
 	                    status = xhr.status;
 	                }
-	                if(xhr.responseText){
+	                if(xhr.responseText) {
 	                    var r = xhr.responseText;
-	                    try{
+	                    try {
 	                        r = JSON.parse(r);
 	                    }
-	                    catch(err){
+	                    catch(err) {
 	                        r = null;
 	                    }
 	                    if(r){_showMsg('error_code:' + r.error_code + ', error:' + r.error, false);}
@@ -1075,7 +1075,7 @@ var sinaApi = {
 		
 	},
 	
-	format_error: function(error, error_code) {
+	format_error: function(error, error_code, data) {
 		if(this.config.ErrorCodes){
 			error = this.config.ErrorCodes[error] || error;
 		}
@@ -1176,8 +1176,8 @@ var sinaApi = {
                 if(data){
                 	error_code = data.error_code || data.code;
                     var error = data.error || data.error_msg;
-                    if(data.ret && data.ret != 0){ //腾讯
-                        if(data.msg == 'have no tweet'){
+                    if(data.ret && data.ret !== 0){ //腾讯
+                        if(data.msg === 'have no tweet'){
                             data.data = {info:[]};
                         }else{
                             error = data.msg;
@@ -1199,7 +1199,7 @@ var sinaApi = {
                     }
                     if(error || error_code){
                     	data.error = error;
-                    	textStatus = this.format_error(data.error || data.wrong || data.message || data.error_msg, error_code);
+                    	textStatus = this.format_error(data.error || data.wrong || data.message || data.error_msg, error_code, data);
                     	var error_msg = callmethod + ' error: ' + textStatus;
                     	if(!textStatus && error_code){ // 错误为空，才显示错误代码
                     		error_msg += ', error_code: ' + error_code;
@@ -1236,7 +1236,7 @@ var sinaApi = {
 									r = r.error;
                             	}
                             	var error_code = r.error_code || r.code || r.type;
-                            	r.error = this.format_error(r.error || r.wrong || r.message || r.error_text, error_code);
+                            	r.error = this.format_error(r.error || r.wrong || r.message || r.error_text, error_code, r);
 		                    	var error_msg = callmethod + ' error: ' + r.error;
 		                    	if(!r.error && error_code){ // 错误为空，才显示错误代码
 		                    		error_msg += ', error_code: ' + error_code;
@@ -1346,15 +1346,67 @@ $.extend(TQQAPI, {
         user_search:	      '/search/user',
         verify_credentials: '/user/info',
         
-        gender_map: {0:'n', 1:'m', 2:'f'},
-
-        ErrorCodes: {
-            1: '参数错误',
-            2: '频率受限',
-            3: '鉴权失败',
-            4: '服务器内部错误'
-        }
+        gender_map: {0:'n', 1:'m', 2:'f'}
 	}),
+	
+	// http://code.google.com/p/falang/issues/detail?id=224
+	RET_ERRORS: {
+	    0: '成功返回',
+	    1: '参数错误',
+	    2: '频率受限',
+	    3: '鉴权失败',
+	    4: '服务器内部错误'
+	},
+	// RET=4,二级错误字段【发表接口】errcode 说明：
+	RET4_ERRCODES: {
+	    0: '表示成功',
+	    4: '表示有过多脏话',
+	    5: '禁止访问，如城市，uin黑名单限制等',
+	    6: '该记录不存在',
+	    8: '内容超过最大长度：420字节 （以进行短url处理后的长度计）',
+	    9: '包含垃圾信息：广告，恶意链接、黑名单号码等',
+	    10: '发表太快，被频率限制',
+	    11: '源微博已删除',
+	    12: '源微博审核中',
+	    13: '重复发表'
+	},
+	// Ret=3,二级错误字段【验签失败】errcode 说明：
+	RET3_ERRCODES: {
+	    1: '无效TOKEN,被吊销',
+	    2: '请求重放',
+	    3: 'access_token不存在',
+	    4: 'access_token超时',
+	    5: 'oauth 版本不对',
+	    6: 'oauth 签名方法不对',
+	    7: '参数错',
+	    8: '处理失败',
+	    9: '验证签名失败',
+	    10: '网络错误',
+	    11: '参数长度不对',
+	    12: '处理失败12',
+	    13: '处理失败13',
+	    14: '处理失败14',
+	    15: '处理失败15'
+    },
+	
+	format_error: function(error_msg, error_code, err) {
+	    // err.ret => err.errcode
+	    var message = null;
+	    if(err) {
+	        if(err.ret === 3) {
+	            message = this.RET3_ERRCODES[err.errcode];
+	        } else if(err.ret === 4) {
+	            message = this.RET4_ERRCODES[err.errcode];
+	        }
+	        if(!message) {
+	            message = this.RET_ERRORS[err.ret];
+	            if(message) {
+	                message += ': ' + error_msg;
+	            }
+	        }
+	    }
+	    return message || error_msg;
+	},
 	
 	processMsg: function(str_or_status, notEncode) {
 		var status = this._processMsg(str_or_status, notEncode);
