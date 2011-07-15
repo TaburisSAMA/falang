@@ -491,8 +491,10 @@ function setUnreadTimelineCount(count, t, user_uniqueKey){
     count += getUnreadTimelineCount(t, user_uniqueKey);
     localStorage.setObject(user_uniqueKey + t + UNREAD_TIMELINE_COUNT_KEY, count);
     if(getAlertMode()=='dnd'){ //免打扰模式
-        chrome.browserAction.setBadgeText({text: '/'});
+        chrome.browserAction.setBadgeText({text: ''});
+        chrome.browserAction.setIcon({path: 'icons/icon48-dnd.png'});
     }else{
+        chrome.browserAction.setIcon({path: 'icons/icon48.png'});
         if(setBadgeText){
             var total = 0;
             var userList = getUserList();
@@ -524,8 +526,10 @@ function removeUnreadTimelineCount(t, user_uniqueKey){
         syncUnreadCountToSinaPage(t, user_uniqueKey);
     }
     if(getAlertMode()=='dnd'){ //免打扰模式
-        chrome.browserAction.setBadgeText({text: '/'});
+        chrome.browserAction.setBadgeText({text: ''});
+        chrome.browserAction.setIcon({path: 'icons/icon48-dnd.png'});
     }else{
+        chrome.browserAction.setIcon({path: 'icons/icon48.png'});
         var total = 0;
         var userList = getUserList();
         for(var j in userList){
