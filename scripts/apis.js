@@ -54,6 +54,7 @@ var sinaApi = {
         // google app key
         google_appkey: 'AIzaSyAu4vq6sYO3WuKxP2G64fYg6T1LdIDu3pk',
         
+        user_timeline_need_friendship: true, // 获取用户微博列表时是否需要额外获取与当前用户的关系信息
         max_text_length: 140,
         max_image_size: 5 * 1024 * 1024,
         userinfo_has_counts: true, // 用户信息中是否包含粉丝数、微博数等信息
@@ -483,7 +484,7 @@ var sinaApi = {
 	
 	// id, user_id, screen_name, since_id, max_id, count, page 
     user_timeline: function(data, callback, context) {
-        var need_friendship = data.need_friendship;
+        var need_friendship = this.config.user_timeline_need_friendship && data.need_friendship;
         delete data.need_friendship;
         var params = {
             url: this.config.user_timeline,
@@ -520,8 +521,9 @@ var sinaApi = {
         // 获取friendships_show
         if(need_friendship) {
             var args = {};
-            if(data.id) {
-                args.target_id = data.id;
+            args.target_id = data.id || data.name;
+            if(!args.target_id) {
+                delete args.target_id;
             }
             if(data.screen_name) {
                 args.target_screen_name = data.screen_name;
@@ -1244,9 +1246,16 @@ var sinaApi = {
                     if(data.ret && data.ret !== 0){ //腾讯
                         if(data.msg === 'have no tweet'){
                             data.data = {info:[]};
-                        }else{
+                        } else if(data.ret === 4 && data.errcode === 0) { 
+                            error = null;
+                            data = {};
+                        } else {
                             error = data.msg;
                             error_code = data.ret;
+                        }
+                    } else {
+                        if(data.msg === 'have no tweet'){
+                            data.data = {info:[]};
                         }
                     }
                     if(!error && data.errors){
@@ -1345,6 +1354,8 @@ function make_base_auth_url(domain, user, password) {
 var TQQAPI = $.extend({}, sinaApi);
 TQQAPI._user_timeline = TQQAPI.user_timeline;
 TQQAPI._processMsg = TQQAPI.processMsg;
+TQQAPI._followers = TQQAPI.followers;
+TQQAPI._friends = TQQAPI.friends;
 
 $.extend(TQQAPI, {
 	config: $.extend({}, sinaApi.config, {
@@ -1374,6 +1385,7 @@ $.extend(TQQAPI, {
         longitude_field: 'jing', // 经度参数名
         friends_timeline: '/statuses/home_timeline',
         repost_timeline: 	  '/t/re_list_repost',
+        user_timeline_need_friendship: false, // show_user信息中已经包含
         
         mentions:             '/statuses/mentions_timeline',
         followers:            '/friends/user_fanslist',
@@ -1424,7 +1436,7 @@ $.extend(TQQAPI, {
 	},
 	// RET=4,二级错误字段【发表接口】errcode 说明：
 	RET4_ERRCODES: {
-	    0: '表示成功',
+//	    0: '表示成功',
 	    4: '表示有过多脏话',
 	    5: '禁止访问，如城市，uin黑名单限制等',
 	    6: '该记录不存在',
@@ -1538,10 +1550,6 @@ $.extend(TQQAPI, {
 		callback();
 	},
 	
-//	counts: function(data, callback) {
-//		callback();
-//	},
-	
 	format_upload_params: function(user, data, pic) {
     	if(data.status){
             data.content = data.status;
@@ -1550,15 +1558,59 @@ $.extend(TQQAPI, {
     },
     
     // 先获取用户信息 user_show
-    user_timeline: function(data, callback) {
-    	var $this = this;
+    user_timeline: function(data, callback, context) {
+    	var both = new Combo(function(user_info_args, user_timeline_args) {
+    	    var results = user_timeline_args[0];
+            if(results) {
+                results.user = user_info_args[0];
+            }
+            callback.apply(context, user_timeline_args);
+        });
+    	// 并发执行
     	var params = {name: data.id || data.screen_name};
-    	this.user_show(params, function(user_info) {
-    		$this._user_timeline(data, function(results, error) {
-    			results.user = user_info;
-    			callback(results, error);
-    		});
-    	});
+    	this.user_show(params, both.add());
+    	this._user_timeline(data, both.add());
+    },
+    
+    _get_friendships: function(followers_args, callback, context) {
+        var ids = [];
+        var result = followers_args[0];
+        if(result && result.items) {
+            for(var i = 0, len = result.items.length; i < len; i++) {
+                ids.push(String(result.items[i].id));
+            }
+        }
+        if(ids.length > 0) {
+            this.friendships_show({target_ids: ids.join(',')}, function() {
+                var infos = arguments[0];
+                if(infos) {
+                    for(var i = 0, len = result.items.length; i < len; i++) {
+                        var user = result.items[i];
+                        var info = infos[user.id];
+                        if(info) {
+                            for(var k in info) {
+                                user[k] = info[k];
+                            }
+                        }
+                    }
+                }
+                callback.apply(context, followers_args);
+            });
+        } else {
+            callback.apply(context, followers_args);
+        }
+    },
+    
+    followers: function(data, callback, context) {
+        this._followers(data, function() {
+            this._get_friendships(arguments, callback, context);
+        }, this);
+    },
+
+    friends: function(data, callback, context){
+        this._friends(data, function() {
+            this._get_friendships(arguments, callback, context);
+        }, this);
     },
 	
 	before_sendRequest: function(args, user) {
@@ -1666,6 +1718,16 @@ $.extend(TQQAPI, {
 		        	args.url = '/t/reply';
 		        }
 		        break;
+            case this.config.friendships_show:
+                // Names: 其他人的帐户名列表（最多30个）
+                // Flag: 0 检测听众，1检测收听的人 2 两种关系都检测
+                args.data.flag = 2;
+                // 批量获取
+                args.data.names = args.data.target_ids || args.data.target_id;
+                delete args.data.target_screen_name;
+                delete args.data.target_id;
+                delete args.data.target_ids;
+                break;
         }
         if(args.url === this.config.update) {
         	// 判断是否有视频链接
@@ -1720,6 +1782,33 @@ $.extend(TQQAPI, {
 	    } else {
 	    	data = this.format_result_item(data, play_load, args, users);
 	    }
+		if(args.url === this.config.friendships_show) {
+		    /** 
+		     * {"data":{"debehe":{"isfans":true,"isidol":false}},"errcode":0,"msg":"ok","ret":0}
+		     * =>
+		     * {
+                 "id":debehe      
+                 ,"name":"debehe"
+                 ,"following":true
+                 ,"followed_by":false
+               }
+             *
+		     */
+		    if(data) {
+		        for(var key in data) {
+		            var item = data[key];
+		            item.following = !!item.isfans;
+		            item.followed_by = !!item.isidol;
+		            item.blacked_by = !!item.ismyblack;
+		            item.name = item.id = key;
+		        }
+		        var keys = Object.keys(data);
+		        if(keys.length === 1) {
+		            // 单个获取只返回第一个
+		            data = data[keys[0]];
+		        }
+		    }
+		}
 		return data;
 	},
 
@@ -1746,6 +1835,12 @@ $.extend(TQQAPI, {
 			if(data.tag) {
 				user.tags = data.tag;
 			}
+			// Ismyidol: 是否为accesstoken用户的收听的人
+			// Ismyfans: 是否为accesstoken 用户的听众
+			// Ismyblack: 是否在 accesstoken 用户的黑名单内
+			user.following = !!data.Ismyfans;
+			user.followed_by = !!data.Ismyidol;
+			user.blacked_by = !!data.Ismyblack;
 			data = user;
 		} else if(play_load == 'status' || play_load == 'comment' || play_load == 'message') {
 			// type:微博类型 1-原创发表、2-转载、3-私信 4-回复 5-空回 6-提及 7: 点评

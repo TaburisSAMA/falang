@@ -494,9 +494,7 @@
 							</span>
 						    <?js } else if(user.following === true) { ?>
 						    <span class="followed">
-                                <?js if(user.following === true) { ?>
                                 #{_u.i18n("comm_f_following")}
-                                <?js } ?>
                             </span>
 						    <?js } ?>
 						    
@@ -539,11 +537,15 @@
 							rhref="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?></a>
 						<a class="follow" href="javascript:" onclick="doReply(this, '#{user.screen_name}', '')">@</a>
 						<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">#{_u.i18n("abb_direct_message")}</a>
-						<?js if(support_follow && user.unfollow === undefined && tType =='friends'){ ?>
-						<a class="follow" href="javascript:" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">#{_u.i18n("comm_f_destroy")}</a>
-						<?js }else if(support_follow){ ?>
-						<a class="follow" href="javascript:" onclick="f_create('#{user.id}', this, '#{user.screen_name}')"><span class="plus">+</span>#{_u.i18n("comm_f_create")}</a>
-						<?js } ?>
+					<?js if(support_follow) { ?>
+						<a class="follow follow_button_destroy" <?js if(user.followed_by !== true && tType !== 'friends') { ?>style="display:none;"<?js } ?> href="javascript:;#{tType}" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">#{_u.i18n("comm_f_destroy")}</a>
+                        <a class="follow follow_button_create" <?js if(user.followed_by === true || tType === 'friends') { ?>style="display:none;"<?js } ?> href="javascript:;" onclick="f_create('#{user.id}', this, '#{user.screen_name}')"><span class="plus">+</span>#{_u.i18n("comm_f_create")}</a>
+                        <?js if((user.followed_by === true || tType === 'friends') && user.following === true) { ?>
+                            <span class="followed">
+                            #{_u.i18n("comm_f_followed_by_and_following")}
+                            </span>
+                        <?js } ?>
+					<?js } ?>	
 					</div>
 					<p>
 				     <img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 
