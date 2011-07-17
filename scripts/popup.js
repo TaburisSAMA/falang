@@ -1362,22 +1362,20 @@ function getSinaTimeline(t, notCheckNew){
                 if(msg.retweeted_status.retweeted_status) {
                 	ids.push(msg.retweeted_status.retweeted_status.id);
                 }
-            }else if(msg.status){
+            }else if(msg.status) {
                 ids.push(msg.status.id);
                 if(msg.status.retweeted_status) {
                 	ids.push(msg.status.retweeted_status.id);
                 }
             }
-        }
-        if(ids.length > 0) {
             if(ids.length > 100) {
                 var ids2 = ids.slice(0, 99);
                 ids = ids.slice(99, ids.length);
                 showCounts(t, ids2);
             }
-            if(ids.length > 0) {
-            	showCounts(t, ids);
-            }
+        }
+        if(ids.length > 0) {
+            showCounts(t, ids);
         }
         resetScrollTop(t);
         if(cache.length >= (PAGE_SIZE/2)) {
@@ -1391,6 +1389,7 @@ function getSinaTimeline(t, notCheckNew){
 
 //显示评论数和回复数
 function showCounts(t, ids){
+//    console.log('show counts', t, ids.length);
 	if(!ids || ids.length <= 0){
 		return;
 	}
