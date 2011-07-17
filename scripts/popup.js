@@ -77,8 +77,17 @@ function init(){
     // 显示上次打开的tab
     var b_view = getBackgroundView();
     var last_tab = b_view.get_last_data_type(c_user.uniqueKey) || 'friends_timeline';
-    $("#tl_tabs .tab-" + last_tab).addClass('active');
-    getSinaTimeline(last_tab); // 只显示首页的，其他的tab点击的时候再去获取
+    var $tab = $("#tl_tabs .tab-" + last_tab);
+    if($tab.hasClass('only_click')) {
+        $tab.click();
+    } else {
+        $tab.addClass('active');
+        // 切换tab
+        $('.list_p').hide();
+        $($tab.attr('href')).show();
+        getSinaTimeline(last_tab); // 只显示首页的，其他的tab点击的时候再去获取
+        window.currentTab = $tab.attr('href');
+    }
 
     initMsgHover();
 
