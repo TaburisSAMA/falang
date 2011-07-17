@@ -55,6 +55,7 @@ var sinaApi = {
         google_appkey: 'AIzaSyAu4vq6sYO3WuKxP2G64fYg6T1LdIDu3pk',
         
         max_text_length: 140,
+        max_image_size: 5 * 1024 * 1024,
         userinfo_has_counts: true, // 用户信息中是否包含粉丝数、微博数等信息
         support_double_char: true, // 是否按双字节计算长度
         support_counts: true, // 是否支持批量获取转发和评论数
@@ -826,7 +827,7 @@ var sinaApi = {
 	    if(before_request) {
 	    	before_request();
 	    }
-		
+		var that = this;
 	    $.ajax({
 	        url: url,
 	        cache: false,
@@ -849,20 +850,26 @@ var sinaApi = {
 	            }
 	        },
 	        success: function(data, textStatus) {
-	            try{
+	            try {
 	                data = JSON.parse(data);
 	            }
-	            catch(err){
-	                data = {error: _u.i18n("comm_error_return"), error_code:500};
+	            catch(err) {
+	                data = {error: _u.i18n("comm_error_return") + ' [json parse error]', error_code: 500};
 	                textStatus = 'error';
 	            }
 	            var error_code = null;
 	            if(data) {
-                    var error = data.errors || data.error;
-	                if(error || data.error_code){
+	                error_code = data.error_code;
+                    var error = data.errors || data.error || data.wrong || data.error_msg;
+                    if(data.ret && data.ret !== 0) { //腾讯
+                        error = data.msg;
+                        error_code = data.ret;
+                    }
+	                if(error){
 	                	data.error = error;
-	                    _showMsg('error: ' + data.error + ', error_code: ' + data.error_code, false);
-	                    error_code = data.error_code || error_code;
+	                	textStatus = 'error';
+	                	var message = that.format_error(error, error_code, data);
+	                    _showMsg('error: ' + message + ', error_code: ' + error_code, false);
 	                }
 	            } else {
 	                error_code = 400;
@@ -1362,7 +1369,7 @@ $.extend(TQQAPI, {
         rt_at_name: true, // RT的@name而不是@screen_name
         repost_delimiter: ' || ', //转发时的分隔符
         support_counts: false, // 只有rt_count这个，不过貌似有问题，总是404。暂时隐藏
-        
+        max_image_size: 2 * 1024 * 1024,
         latitude_field: 'wei', // 纬度参数名
         longitude_field: 'jing', // 经度参数名
         friends_timeline: '/statuses/home_timeline',

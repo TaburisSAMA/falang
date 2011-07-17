@@ -121,7 +121,8 @@ var TP_USER_UPLOAD_INFO = '<li id="u_uploadinfo_{{uniqueKey}}">'
     + '<span class="progressInfo"></span>'
     + '</li>';
 
-function sendMsg(){ //覆盖popup.js的同名方法
+function sendMsg() { 
+    // 覆盖popup.js的同名方法
     var c_user = getUser();
     if(!c_user){
         _showMsg(_u.i18n("msg_need_add_account"));
@@ -158,17 +159,17 @@ function sendMsg(){ //覆盖popup.js的同名方法
     }
 	
     var users = [], selLi = $("#accountsForSend .sel");
-    if(selLi.length){
-        selLi.each(function(){
+    if(selLi.length) {
+        selLi.each(function() {
             var uniqueKey = $(this).attr('uniqueKey');
             var _user = getUserByUniqueKey(uniqueKey, 'send');
-            if(_user){
+            if(_user) {
                 users.push(_user);
             }
         });
-    }else if(!$("#accountsForSend li").length){
+     }else if(!$("#accountsForSend li").length) {
         users.push(c_user);
-    }else{
+    } else {
         _showMsg(_u.i18n("msg_need_select_account"));
         return;
     }
@@ -177,9 +178,19 @@ function sendMsg(){ //覆盖popup.js的同名方法
     stat.sendedCount = 0;
     stat.successCount = 0;
     var matchs = tapi.findSearchText(c_user, msg);
-    for(var i in users){
+    for(var i = 0, len = users.length; i < len; i++) {
         var user = users[i];
         var config = tapi.get_config(user);
+        // 判断文件是否过大
+        if(file.size > config.max_image_size) {
+            // rpe.loaded / rpe.total
+            upInfo.append(TP_USER_UPLOAD_INFO.format(user));
+            onprogress({loaded: 0, total: file.size}, user, stat);
+            var max_size = parseInt(config.max_image_size / 1024 / 1024);
+            _finish_callback(user, stat, selLi, 
+                {error: _u.i18n("msg_pic_too_large").format({max_size: max_size})}, 'error', 500);
+            continue;
+        }
         var pic = {file: file};
         var status = msg;
         // 处理主题转化
@@ -200,15 +211,16 @@ function sendMsg(){ //覆盖popup.js的同名方法
 
 function _finish_callback(user, stat, selLi, data, textStatus, error_code) {
     stat.sendedCount++;
-    if(textStatus != 'error' && data && !data.error){
+    if(textStatus != 'error' && data && !data.error) {
         stat.successCount++;
         $("#accountsForSend li[uniquekey=" + user.uniqueKey +"]").removeClass('sel');
         $("#u_uploadinfo_" + user.uniqueKey).find('.progressInfo').append(' (<span>'+ _u.i18n("comm_success") +'</span>)');
-    }else if(data.error){
+    } else if (data.error) {
         _showMsg('error: ' + data.error);
         $("#u_uploadinfo_" + user.uniqueKey).addClass('error').find('.progressInfo').append(' (<span style="color:red">'+ _u.i18n("comm_fail") +'</span>)');
     }
-    if(stat.successCount >= stat.userCount){//全部发送成功
+    if(stat.successCount >= stat.userCount) {
+        // 全部发送成功
         _showMsg(_u.i18n("msg_send_success"));
         selLi.addClass('sel');
         var ifw = $("#imageFileWrap");
@@ -223,7 +235,8 @@ function _finish_callback(user, stat, selLi, data, textStatus, error_code) {
             window.close();
         }
     }
-    if(stat.sendedCount >= stat.userCount){//全部发送完成
+    if(stat.sendedCount >= stat.userCount) { 
+        // 全部发送完成
         selLi = null;
         $("#progressBar")[0].style.width = "0%";
         enabledUpload();
@@ -250,7 +263,7 @@ function _updateWrap(user, status, stat, selLi){
 	});
 };
 
-function _uploadWrap(user, status, pic, stat, selLi){
+function _uploadWrap(user, status, pic, stat, selLi) {
     tapi.upload(user, {status: status}, pic, 
         function() {
             _showLoading();
@@ -266,8 +279,8 @@ function _uploadWrap(user, status, pic, stat, selLi){
 };
 
 var FILECHECK = {
-	maxFileSize: 10*1024000,
-	maxImageSize: 5*1024000,
+	maxFileSize: 10*1024*1024,
+	maxImageSize: 5*1024*1024,
     fileTypes: '__image/gif__image/jpeg__image/jpg__image/png__'
 };
 
@@ -275,7 +288,8 @@ function checkImage(file){
     var check = true;
     if(file){
         if(file.size > FILECHECK.maxImageSize){
-            _showMsg(_u.i18n("msg_pic_too_large"));
+            var max_size = parseInt(FILECHECK.maxImageSize / 1024 / 1024);
+            _showMsg(_u.i18n("msg_pic_too_large").format({max_size: max_size}));
             check = false;
         }
         if(file.type && FILECHECK.fileTypes.indexOf('__' + file.type + '__') < 0){
@@ -291,8 +305,9 @@ function checkImage(file){
 
 function handleFile(file, handle_image) {
     if(file) {
-        if(file.size > FILECHECK.maxFileSize){
-            _showMsg(_u.i18n("msg_file_too_large"));
+        if(file.size > FILECHECK.maxFileSize) {
+            var max_size = parseInt(FILECHECK.maxFileSize / 1024 / 1024);
+            _showMsg(_u.i18n("msg_file_too_large").format({max_size: max_size}));
             return true;
         }
         if(!handle_image && file.type && FILECHECK.fileTypes.indexOf('__' + file.type + '__') >= 0){

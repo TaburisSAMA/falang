@@ -664,7 +664,7 @@ function setAlertMode(mode){
 };
 //<<--
 
-//-- 新信息是否自动插入 --
+//-- 新信息是否自动插入，默认不自动插入 --
 function getAutoInsertMode(){
     var mode = localStorage.getObject(AUTO_INSERT_MODE_KEY);
     return mode || 'notautoinsert';

@@ -1082,12 +1082,12 @@
         "description": "已超出{{len}}字"
     },
     "msg_pic_too_large": {
-        "message": "圖片太大，請選擇小於2M的圖片。",
-        "description": "图片太大，请选择小于2M的图片。"
+        "message": "圖片太大，請選擇小於{{max_size}}MB的圖片。",
+        "description": "图片太大，请选择小于{{max_size}}MB的图片。"
     },
     "msg_file_too_large": {
-        "message": "文件太大，請選擇小於10M的文件。",
-        "description": "文件太大，请选择小于10M的文件。"
+        "message": "文件太大，請選擇小於{{max_size}}MB的文件。",
+        "description": "文件太大，请选择小于{{max_size}}MB的文件。"
     },
     "msg_pic_type_error": {
         "message": "文件类型不正确，仅支持JPEG,GIF,PNG图片。",
