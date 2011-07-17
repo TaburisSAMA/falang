@@ -1331,7 +1331,9 @@ var ShortenUrl = {
 				url: 'http://weibo.com/mblog/sinaurl_info.php?url=' + id,
 				dataType: 'json',
 				success: function(data, status, xhr) {
-					data = data.data[id];
+				    if(data && data.data) {
+				        data = data.data[id];
+				    }
 					callback.call(context, data);
 				}, 
 				error: function(xhr, status) {
@@ -2215,15 +2217,28 @@ function at_user_autocomplete(ele_id, match_all_text, select_callback) {
 //@user search
 function at_user_search(query, callback, context) {
 	var query_regex = new RegExp(query, 'i');
-	var current_user = getUser();
+	var current_user = null;
+	// 当前不是对话框回复的话，则代表是发微博
+	if($("#ye_dialog_window").css('display') === 'none') {
+	    // 根据当前选择的用户来获取at数据
+	    // 如果只选择了一个用户，则使用选择的用户
+	    // 如果没有选择或者选择大于1人，则使用当前用户
+	    var $selected = $('#accountsForSend li.sel');
+	    if($selected.length === 1) {
+	        current_user = getUserByUniqueKey($selected.attr('uniquekey'), 'all');
+	    } 
+	}
+	if(!current_user) {
+	    current_user = getUser();
+	}
+//	console.log(current_user.screen_name)
 	var b_view = getBackgroundView();
 	var hits = {}, hit_count = 0;
 	var config = tapi.get_config(current_user);
 	var data_types = [b_view.friendships.friend_data_type].concat(T_LIST.all);
-	for(var index=0; index < data_types.length; index++) {
+	for(var index=0, index_len = data_types.length; index < index_len; index++) {
 		var tweets = b_view.get_data_cache(data_types[index], current_user.uniqueKey) || [];
-		var len = tweets.length;
-	    for(var i=0; i<len; i++){
+	    for(var  i= 0, len = tweets.length; i < len; i++){
 	    	var tweet = tweets[i];
 	    	var items = [tweet.user || tweet];
 	    	var retweeted_status = tweet.retweeted_status || tweet.status;
@@ -2233,7 +2248,7 @@ function at_user_search(query, callback, context) {
 	    			items.push(retweeted_status.retweeted_status.user);
 	    		}
 	    	}
-	    	for(var j=0; j<items.length; j++) {
+	    	for(var j = 0, jlen = items.length; j < jlen; j++) {
 	    		var user = items[j];
 	    		if(_check_name(user, query_regex)){
 	            	if(!hits[user.id]) {

@@ -109,6 +109,18 @@
         "message": "取消關注",
         "description": "取消关注"
     },
+    "comm_f_followed_by": {
+        "message": "已關注",
+        "description": "已关注"
+    },
+    "comm_f_following": {
+        "message": "你的粉絲",
+        "description": "你的粉丝"
+    },
+    "comm_f_followed_by_and_following": {
+        "message": "相互關注",
+        "description": "互相关注"
+    },
     "comm_gender_unknow": {
         "message": "性別未知",
         "description": "性别未知"

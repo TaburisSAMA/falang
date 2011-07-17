@@ -73,8 +73,12 @@ function init(){
     initTxtContentEven();
 
     initChangeUserList();
-
-    getSinaTimeline('friends_timeline'); //只显示首页的，其他的tab点击的时候再去获取
+    
+    // 显示上次打开的tab
+    var b_view = getBackgroundView();
+    var last_tab = b_view.get_last_data_type(c_user.uniqueKey) || 'friends_timeline';
+    $("#tl_tabs .tab-" + last_tab).addClass('active');
+    getSinaTimeline(last_tab); // 只显示首页的，其他的tab点击的时候再去获取
 
     initMsgHover();
 
@@ -130,7 +134,7 @@ function init(){
 
 function initializeMap(){};//给载入地图api调用
 
-function initTabs(){
+function initTabs() {
     window.currentTab = '#friends_timeline_timeline';
     $('#tl_tabs li').click(function() {
         var t = $(this), currentIsActive = t.hasClass('active');
@@ -141,42 +145,57 @@ function initTabs(){
         //添加当前激活的状态
         t.siblings().removeClass('active').end().addClass('active');
         //切换tab前先保护滚动条位置
-        var old_t = getCurrentTab().replace('#','').replace(/_timeline$/i,'');
-        if(!currentIsActive){ //如果当前不是激活的（点击的不是当前tab）
+        var old_t = getCurrentTab().replace('#', '').replace(/_timeline$/i, '');
+        var c_t = t.attr('href').replace('#','').replace(/_timeline$/i,'');
+        if(c_t != old_t) { // 如果是数据类型不一样了，才需要记录当前位置
             saveScrollTop(old_t);
         }
         //切换tab
         $('.list_p').hide();
-        var c_t = t.attr('href').replace('#','').replace(/_timeline$/i,'');
         var c_ul = $(t.attr('href'));
         c_ul.show();
         window.currentTab = t.attr('href');
-        if(c_t =='user_timeline'){ //用户自己的微薄，清空内容。防止查看别人的微薄的时候内容混合
+        if(c_t === 'user_timeline') { //用户自己的微薄，清空内容。防止查看别人的微薄的时候内容混合
             getUserTimeline();
             checkShowGototop();
             return;
-        }else if(c_t =='followers'){
+        }else if(c_t === 'followers') {
         	window.currentTab = ''; // 防止自动滚动
         	showFollowers();
             checkShowGototop();
             return;
-        } else if(c_t == 'favorites') {
+        } else if(c_t === 'favorites') {
         	getFavorites(true);
             checkShowGototop();
             return;
         }
-        //如果有未读信息，则清空列表，重新获取
-        if(t.find(".unreadCount").html()) {
-            c_ul.find('ul.list').html('');
-        };
-        if(!c_ul.find('ul.list').html()){
-            getSinaTimeline(c_t);
+        var last_top = 0;
+        if(!currentIsActive) {
+            last_top = resetScrollTop(c_t);
         }
-        resetScrollTop(c_t); //复位到上次滚动条的位置
-        removeUnreadTimelineCount(c_t);
-        t.find(".unreadCount").html('');
-        updateDockUserUnreadCount(c_user.uniqueKey);
-
+        // TODO: 如果是当前tab点击，必定加载新数据 ?????
+        var load_new = !!t.find(".unreadCount").html();
+        if(load_new) {
+            var is_not_auto_insert = getAutoInsertMode() === 'notautoinsert';
+            if(is_not_auto_insert) { 
+                // 如果不是当前tab，则需根据上次的位置来判断是否要获取新的
+                if(last_top > 50) {
+                    load_new = false;
+                }
+            }
+        }
+        if(load_new) {
+            // 如果有未读信息，则清空列表，重新获取
+            _load_new_data(c_t);
+        } else if(!c_ul.find('ul.list').html()){
+            // 加载缓存着的数据
+            getSinaTimeline(c_t);
+        } else {
+            if(currentIsActive) {
+                // 如果没有更新又是当前tab，则等价于滚动到最顶的操作
+                setScrollTotop();
+            }
+        }
         checkShowGototop(); //检查是否要显示返回顶部按钮
     });
     
@@ -198,10 +217,13 @@ function initOnUnload(){
             localStorage.setObject(LAST_SELECTED_SEND_ACCOUNTS, keys);
         }
     }
+    // 保持当前滚动条位置
+    var c_t = getCurrentTab().replace('#','').replace(/_timeline$/i,'');
+    saveScrollTop(c_t);
 };
 
 function initTxtContentEven(){
-//>>>发送微博事件初始化 开始<<<
+    //>>>发送微博事件初始化 开始<<<
     var unsendTweet = localStorage.getObject(UNSEND_TWEET_KEY);
     var txtContent = $("#txtContent");
     if(unsendTweet){
@@ -257,9 +279,9 @@ function initTxtContentEven(){
             showMsg(_u.i18n("msg_need_content"));
         }
     });
-//>>>发送微博事件初始化 结束<<<
+    //>>>发送微博事件初始化 结束<<<
 
-//>>>回复事件初始化开始<<<
+    //>>>回复事件初始化开始<<<
     var unsendReply = localStorage.getObject(UNSEND_REPLY_KEY)
       , $replyText = $("#replyTextarea");
     if(unsendReply) {
@@ -279,7 +301,7 @@ function initTxtContentEven(){
         sendMsgByActionType($.trim($("#replyTextarea").val()));
     });
     
-//>>>回复结束<<<
+    //>>>回复结束<<<
 };
 
 function sendMsgByActionType(c){//c:要发送的内容
@@ -323,12 +345,13 @@ function countInputText() {
     } else {
         $("#btnSend").removeAttr('disabled');
     }
-    var text = values[0], wlength = text.len(), length = text.length;
-    $('#accountsForSend li .wordcount').each(function() {
-    	var $this = $(this), len = $this.attr('support_double_char') ? wlength : length;
-    	var left_length = +($this.attr('max_text_length') || 140) - len;
-    	$this.html(left_length);
-    });
+    var text = values[0], wlength = text.len(); //, length = text.length;
+    $('#wordCount_double').html(140 - wlength);
+//    $('#accountsForSend li .wordcount').each(function() {
+//    	var $this = $(this), len = $this.attr('support_double_char') ? wlength : length;
+//    	var left_length = +($this.attr('max_text_length') || 140) - len;
+//    	$this.html(left_length);
+//    });
     $('#wordCount').html(values[1]);
 };
 
@@ -353,7 +376,8 @@ function _shortenUrl(longurl, settings, callback) {
 		return;
 	}
 	var settings = settings || Settings.get();
-	if(settings.isSharedUrlAutoShort && longurl.replace(/^https?:\/\//i, '').length > settings.sharedUrlAutoShortWordCount){
+	if(settings.isSharedUrlAutoShort 
+	        && longurl.replace(/^https?:\/\//i, '').length > settings.sharedUrlAutoShortWordCount) {
     	ShortenUrl.short(longurl, callback);
     }
 };
@@ -648,41 +672,41 @@ function changeUser(uniqueKey){
         return;
     }
     var to_user = getUserByUniqueKey(uniqueKey);
-    if(to_user){
+    if(to_user) {
+        // 获取当前的tab
+        var activeLi = $("#tl_tabs li.active");
+        var cur_t = activeLi.attr('href').replace(/_timeline$/, '').substring(1);
+        // 记录位置和记录当前tab
+        saveScrollTop(cur_t);
+        activeLi.removeClass('active');
+        
         setUser(to_user);
         showHeaderUserInfo(to_user);
         var b_view = getBackgroundView();
         b_view.onChangeUser();
-    	// 获取当前的tab
-        var activeLi = $("#tl_tabs li.active");
-    	var cur_t = activeLi.attr('href').replace(/_timeline$/, '').substring(1);
-        
-        var userT = T_LIST[to_user.blogType];
-        var _li = null, _t = '', cur_t_new = '';
+        var _li = null, _t = '';
         $("#tl_tabs li").each(function(){
             _li = $(this);
             _t = _li.attr('href').replace(/_timeline$/i,'').substring(1);
             $("#" + _t + '_timeline .list').html('');
-//            showReadMore(_t); //TODO: show or hide ?
             hideReadMore(_t);
         });
         checkSupportedTabs(to_user);
-        if(activeLi.css('display')=='none'){ //如果不支持的tab刚好是当前tab
-            activeLi.removeClass('active');
+        
+        // TODO: 获取上次正在查看的tab
+        var last_tab = b_view.get_last_data_type(uniqueKey);
+        activeLi = $("#tl_tabs .tab-" + last_tab);
+        if(activeLi.css('display') == 'none'){ //如果不支持的tab刚好是当前tab
             window.currentTab = '#friends_timeline_timeline';
-            cur_t_new = 'friends_timeline';
-            $("#tl_tabs .tab-friends_timeline").addClass('active');
-            $('#friends_timeline_timeline').show();
+            cur_t = 'friends_timeline';
+            activeLi = $("#tl_tabs .tab-friends_timeline"); // .addClass('active');
+            //$('#friends_timeline_timeline').show();
         }
-
-        cur_t = cur_t_new || cur_t;
         $("#tl_tabs .unreadCount").html('');
         $("#accountListDock").find('.current').removeClass('current')
             .end().find('.'+to_user.uniqueKey).addClass('current');
         addUnreadCountToTabs();
-        if(cur_t) { // 需要刷新一下数据
-        	$("#tl_tabs li.active").click();
-        }
+        activeLi.click();
     }
 };
 
@@ -700,12 +724,17 @@ function initSelectSendAccounts(is_upload){
     }
     var userList = getUserList('send');
     if(userList.length < 2){ return; } //多个用户才显示
-    var li_tp = '<li class="{{sel}}" uniqueKey="{{uniqueKey}}" onclick="toggleSelectSendAccount(this)">' +
-                   '<img src="{{profile_image_url}}" />' +
-                   '{{screen_name}}' +
-                   '<img src="/images/blogs/{{blogType}}_16.png" class="blogType" />' +
-                   ' [<span class="wordcount" support_double_char="{{support_double_char}}" max_text_length="{{max_text_length}}">{{max_text_length}}</span>]' +
-               '</li>';
+    var li_tpl = '<li class="{{sel}}" uniqueKey="{{uniqueKey}}" onclick="toggleSelectSendAccount(this)">' +
+        '<img src="{{profile_image_url}}" />' +
+        '{{screen_name}}' +
+        '<img src="/images/blogs/{{blogType}}_16.png" class="blogType" /></li>';
+//    var li_tpl = '<li class="{{sel}}" uniqueKey="{{uniqueKey}}" onclick="toggleSelectSendAccount(this)">' +
+//                   '<img src="{{profile_image_url}}" />' +
+//                   '{{screen_name}}' +
+//                   '<img src="/images/blogs/{{blogType}}_16.png" class="blogType" />';
+//    var li_tpl_end = '</li>';
+//    var counter_tpl = ' [<span class="wordcount" support_double_char="{{support_double_char}}" ' 
+//        + ' max_text_length="{{max_text_length}}">{{max_text_length}}</span>]';
     var li = [];
     var c_user = getUser();
     for(var i in userList){
@@ -715,8 +744,8 @@ function initSelectSendAccounts(is_upload){
         	continue;
         }
         user.sel = '';
-        user.support_double_char = config.support_double_char ? 'true' : '';
-        user.max_text_length = config.max_text_length;
+//        user.support_double_char = config.support_double_char ? 'true' : '';
+//        user.max_text_length = config.max_text_length;
         switch(Settings.get().sendAccountsDefaultSelected){
             case 'all':
                 user.sel = 'sel';
@@ -735,7 +764,12 @@ function initSelectSendAccounts(is_upload){
             default:
                 break;
         }
-        li.push(li_tp.format(user));
+//        var tpl = li_tpl;
+//        if(!user.support_double_char) {
+//            tpl += counter_tpl;
+//        }
+//        tpl += li_tpl_end;
+        li.push(li_tpl.format(user));
     }
     afs.html('TO(<a class="all" href="javascript:" onclick="toggleSelectAllSendAccount()">'+ _u.i18n("abb_all") +'</a>): ' + li.join(''));
     afs.data('inited', 'true');
@@ -778,11 +812,13 @@ function addUnreadCountToTabs(){
     for(var j in userList){
         var user = userList[j];
         var user_unread = 0;
+        var is_not_auto_insert = getAutoInsertMode() === 'notautoinsert';
         for(var i in T_LIST[user.blogType]){
             ur = getUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
             if(ur>0 && c_user.uniqueKey == user.uniqueKey){ //当前用户，则设置timeline tab上的提示
                 tab = $("#tl_tabs .tab-" + T_LIST[user.blogType][i]);
-                if(tab.length == 1 && !tab.hasClass('active')){
+                // 判断是否自动加载新数据
+                if(tab.length == 1 && (is_not_auto_insert || !tab.hasClass('active'))){
                     //tab.find('.unreadCount').html('(' + ur + ')');
                     tab.find('.unreadCount').html(ur);
                     user_unread += ur;
@@ -858,6 +894,8 @@ function f_create(user_id, ele, screen_name){
     b_view.friendships.create(user_id, screen_name, function(user_info, textStatus, statuCode){
         if(!user_info){
         	$ele.show();
+        } else {
+            $ele.parent().find('.follow_button_destroy').show();
         }
     });
 };
@@ -870,6 +908,10 @@ function f_destroy(user_id, ele, screen_name){
     b_view.friendships.destroy(user_id, screen_name, function(user_info, textStatus, statuCode){
         if(!user_info){
         	$ele.show();
+        } else {
+            var $parent = $ele.parent();
+            $parent.find('.followed').hide();
+            $parent.find('.follow_button_create').show();
         }
     });
 };
@@ -878,20 +920,41 @@ function f_destroy(user_id, ele, screen_name){
 //滚动条位置
 var SCROLL_TOP_CACHE = {};
 //@t : timeline类型
-function saveScrollTop(t){
-	var _cache = get_current_user_cache(SCROLL_TOP_CACHE);
-    _cache[t] = $("#" + t + "_timeline .list_warp").scrollTop();
+function saveScrollTop(t) {
+    var b_view = getBackgroundView();
+    var _cache = b_view.get_view_status(t);
+    var scrollTop = _cache.scrollTop = $("#" + t + "_timeline .list_warp").scrollTop();
+    var total_height = 0, item_index = 0;
+    $("#" + t + "_timeline .list_warp ul.list > li").each(function(index) {
+        var height = $(this).height();
+        item_index = index;
+        if(total_height <= scrollTop && (total_height + height) > scrollTop) {
+//            console.log('check_size', item_index)
+            return false;
+        }
+        total_height += height;
+    });
+//    console.log('saveScrollTop', t, item_index)
+    _cache.size = item_index + 5;
+    b_view.set_view_status(t, _cache);
 };
 
 //复位到上次的位置
 //@t : timeline类型
-function resetScrollTop(t){
-    if(t == 'user_timeline'){
-        $("#" + t + "_timeline .list_warp").scrollTop(0);
-    }else{
-    	var _cache = get_current_user_cache(SCROLL_TOP_CACHE);
-        $("#" + t + "_timeline .list_warp").scrollTop(_cache[t] || 0);
+//返回上次位置
+function resetScrollTop(t, top) {
+    var last_top = top || 0;
+    if(t == 'user_timeline') {
+        $("#" + t + "_timeline .list_warp").scrollTop(last_top);
+    } else {
+        if(top === undefined) {
+            var b_view = getBackgroundView();
+            var _cache = b_view.get_view_status(t);
+            last_top = _cache.scrollTop || 0;
+        }
+        $("#" + t + "_timeline .list_warp").scrollTop(last_top);
     }
+    return last_top;
 };
 //====>>>>>>>>>>>>>>>>>>>>>>
 
@@ -1058,7 +1121,8 @@ function getUserTimeline(screen_name, user_id, read_more) {
     var max_id = null;
     var cursor = null;
     var page = 1;
-    var user_id = user_id || '';
+    user_id = user_id || '';
+    var params = {count: PAGE_SIZE, user: c_user, need_friendship: true};
     if(read_more) {
     	// 滚动的话，获取上次的参数
     	max_id = $tab.attr('max_id');
@@ -1066,16 +1130,18 @@ function getUserTimeline(screen_name, user_id, read_more) {
         cursor = $tab.attr('cursor');
         user_id = $tab.attr('user_id');
         screen_name = $tab.attr('screen_name');
+        params.need_friendship = false;
     } else if(screen_name === undefined) {
     	// 直接点击tab，获取当前用户的
     	screen_name = c_user.screen_name;
     	user_id = c_user.id;
     	$ul.html('');
+    	params.need_friendship = false;
     }  else {
     	// 否则就是直接点击查看用户信息了
     	$ul.html('');
     }
-    var params = {count: PAGE_SIZE, screen_name: screen_name, user: c_user};
+    params.screen_name = screen_name;
     if(user_id) {
     	params.id = user_id;
     }
@@ -1167,7 +1233,6 @@ function getFavorites(is_click){
         return;
     }
     var list = $("#favorites_timeline .list");
-    var t = $("#tl_tabs .tab-favorites_timeline");
     var cursor = list.attr('cursor');
     var max_id = list.attr('max_id');
     var page = list.attr('page');
@@ -1236,6 +1301,20 @@ function getFavorites(is_click){
     });
 };
 
+function _load_new_data(data_type) {
+    $('#tl_tabs li.active').find(".unreadCount").html('');
+    removeUnreadTimelineCount(data_type);
+    updateDockUserUnreadCount(getUser().uniqueKey);
+    var b_view = getBackgroundView();
+    var view_status = b_view.get_view_status(data_type);
+    view_status.index = 0;
+    view_status.size = null;
+    b_view.set_view_status(data_type, view_status);
+    $("#" + data_type + "_timeline ul.list").html('');
+    saveScrollTop(data_type);
+    getSinaTimeline(data_type);
+};
+
 //获取时间线微博列表
 //@t : 类型
 function getSinaTimeline(t, notCheckNew){
@@ -1246,17 +1325,27 @@ function getSinaTimeline(t, notCheckNew){
     if('direct_messages' == data_type) {
     	data_type = 'messages';
     }
-    var cache = b_view.get_data_cache(data_type, c_user.uniqueKey);
+    var cache = b_view.get_data_cache(data_type, c_user.uniqueKey)
+      , view_status = b_view.get_view_status(t, c_user.uniqueKey);
+    view_status.index = view_status.index || 0;
+    view_status.size = view_status.size || PAGE_SIZE;
+    if(view_status.size < PAGE_SIZE) {
+        view_status.size = PAGE_SIZE;
+    }
     hideReadMoreLoading(t);
-    if(cache && cache.length > 0){
-        var msgs = cache.slice(0, PAGE_SIZE);
-        var htmls = [];
-        var ids = [];
+    if(cache && cache.length > 0) {
+//        var is_not_auto_insert = getAutoInsertMode() === 'notautoinsert';
+//        if(!is_not_auto_insert) {
+//            view_status.index = 0;
+//            view_status.size = PAGE_SIZE;
+//        }
+        var msgs = cache.slice(view_status.index, view_status.size), htmls = [], ids = [];
         htmls = buildStatusHtml(msgs, t);
+        //var need_reset_scroll = _ul.children().length > 0;
         _ul.append(htmls.join(''));
         // 处理缩址
         ShortenUrl.expandAll();
-        for(var i in msgs){
+        for(var i = 0, len = msgs.length; i < len; i++) {
             var msg = msgs[i];
             ids.push(msg.id);
             if(msg.retweeted_status){
@@ -1271,8 +1360,8 @@ function getSinaTimeline(t, notCheckNew){
                 }
             }
         }
-        if(ids.length>0){
-            if(ids.length > 100){
+        if(ids.length > 0) {
+            if(ids.length > 100) {
                 var ids2 = ids.slice(0, 99);
                 ids = ids.slice(99, ids.length);
                 showCounts(t, ids2);
@@ -1281,10 +1370,11 @@ function getSinaTimeline(t, notCheckNew){
             	showCounts(t, ids);
             }
         }
+        resetScrollTop(t);
         if(cache.length >= (PAGE_SIZE/2)) {
             showReadMore(t);
         }
-    } else if(!notCheckNew){
+    } else if(!notCheckNew) {
     	showReadMoreLoading(t);
         b_view.checkTimeline(t);
     }
@@ -1541,12 +1631,12 @@ function scrollPaging(){
         //hideReadMore(tl, true);
         return;
     }
-    var is_followers_tab = false;
     c_t = getCurrentTab();
     var h = $(c_t + ' .list')[0].scrollHeight;
     var list_warp = $(c_t + ' .list_warp');
     h = h - list_warp.height();
-    if(list_warp.scrollTop() >= h){
+    var scroll_top = list_warp.scrollTop();
+    if(scroll_top >= h){
 //    	log('scroll ' + tl);
         if(c_t == '#followers_timeline'){ //粉丝列表特殊处理
             readMoreFans();
@@ -1589,9 +1679,7 @@ function checkShowGototop(){
 };
 
 function setScrollTotop(){
-    var c_t = getCurrentTab();
-    var list_warp = $(c_t + ' .list_warp');
-    list_warp.scrollTop(0);
+    $(getCurrentTab() + ' .list_warp').scrollTop(0);
 };
 
 function readMoreFans(){
@@ -1600,7 +1688,6 @@ function readMoreFans(){
 
 function readMore(t){
     hideReadMore(t);
-    var moreEle = $("#" + t + "ReadMore");
     showLoading();
     var _b_view = getBackgroundView();
     var c_user = getUser();
@@ -1642,10 +1729,13 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
     var _ul = $("#" + t + "_timeline ul.list");
     
     var unread = getUnreadTimelineCount(t);
-    for(var i=0; i<msgs.length; i++){
+    for(var i=0, len = msgs.length; i < len; i++) {
         var _msg_user = msgs[i].user || msgs[i].sender;
-        if(_msg_user && _msg_user.id != c_user.id){
-        	unread += 1;
+//        if(_msg_user && _msg_user.id !== c_user.id){
+//        	unread += 1;
+//        }
+        if(_msg_user) {
+            unread += 1;
         }
     }
     if(!li.hasClass('active')) {
@@ -1653,7 +1743,6 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
     	_ul.html('');
     	if(unread > 0){
             li.find('.unreadCount').html(unread);
-            //li.find('.unreadCount').html('(' + unread + ')');
             updateDockUserUnreadCount(user_uniqueKey);
         }
         return false;
@@ -1695,9 +1784,9 @@ function addPageMsgs(msgs, t, append, data_type){
     ShortenUrl.expandAll();
     var ids = [];
     if(t != 'direct_messages') {
-	    for(var i=0; i<msgs.length; i++){
-	    	var status = msgs[i];
-	    	var retweeted_status = status.retweeted_status || status.status;
+	    for(var i = 0, len = msgs.length; i < len; i++){
+	    	var status = msgs[i]
+	    	  , retweeted_status = status.retweeted_status || status.status;
         	ids.push(status.id);
             if(retweeted_status){
                 ids.push(retweeted_status.id);
@@ -1723,17 +1812,25 @@ function addPageMsgs(msgs, t, append, data_type){
         var h_new = _ul.height();
         list_warp.scrollTop(h_new - h_old + st_old);
     }
+    if(append) {
+        // 设置缓存的页数
+        var b_view = getBackgroundView();
+        var view_status = b_view.get_view_status(t);
+        view_status.size = view_status.size || 0;
+        view_status.size += msgs.length;
+        b_view.set_view_status(t, view_status);
+    }
     return msgs;
 };
 
 //发送 @回复
 function sendReplyMsg(msg){
-    var btn = $("#replySubmit"),
-        txt = $("#replyTextarea"),
-        screen_name = $("#ye_dialog_title").text();
-    var user = getUser();
-    var config = tapi.get_config(user);
-    var tweetId = $("#replyTweetId").val();
+    var btn = $("#replySubmit")
+      , txt = $("#replyTextarea")
+      , screen_name = $("#ye_dialog_title").text()
+      , user = getUser()
+      , config = tapi.get_config(user)
+      , tweetId = $("#replyTweetId").val();
     // 判断是否需要填充 @screen_name
     if(config.reply_dont_need_at_screen_name !== true || !tweetId) {
     	if(config.rt_at_name) {
@@ -2004,7 +2101,7 @@ function showMsgInput(){
     $("#submitWarp").data('status', 'show').css('height', h_submitWrap);
     var $text = $("#txtContent"), value = $text.val();
     $text.focus().val('').val(value); //光标在最后面
-    _initText($text);
+    //_initText($text);
     countInputText();
     $("#header .write").addClass('active').find('b').addClass('up');
     $("#doing").appendTo('#doingWarp');
@@ -2062,8 +2159,9 @@ function resizeFawave(w, h){
  * 根据当前配置，初始化文本的基本属性
  */
 function _initText($text, config) {
-	var config = config || tapi.get_config(getUser());
-	$text.data('max_text_length', config.max_text_length).data('support_double_char', config.support_double_char);
+	config = config || tapi.get_config(getUser());
+	$text.data('max_text_length', config.max_text_length)
+	    .data('support_double_char', config.support_double_char);
 }
 
 function doReply(ele, screen_name, tweetId, name){//@回复
@@ -2588,10 +2686,6 @@ fawave.face = {
         				}
         			});
         			var $face_icons = $('<div style="display:none;" class="face_icons ' + face_type[0] + '_faces"></div>');
-//        			if(current_blogtype == face_type[0]) {
-//        				$face_tab.addClass('active');
-//        				$face_icons.show();
-//        			}
         			$('#face_box .face_tab p').append($face_tab);
             		$('#face_box .faceItemPicbg').append($face_icons);
             		var exists = {};

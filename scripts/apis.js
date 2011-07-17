@@ -6,6 +6,30 @@ if(typeof BlobBuilder === 'undefined' && typeof WebKitBlobBuilder !== 'undefined
 	var BlobBuilder = WebKitBlobBuilder;
 }
 
+function Combo(callback) {
+    this.callback = callback;
+    this.items = 0;
+    this.results = [];
+}
+
+Combo.prototype = {
+    add: function () {
+      var self = this,
+          id = this.items;
+      this.items++;
+      return function () {
+        self.check(id, arguments);
+      };
+    },
+    check: function (id, arguments) {
+      this.results[id] = Array.prototype.slice.call(arguments);
+      this.items--;
+      if (this.items == 0) {
+        this.callback.apply(this, this.results);
+      }
+    }
+};
+
 var OAUTH_CALLBACK_URL = chrome.extension.getURL('oauth_cb.html');
 var FAWAVE_OAUTH_CALLBACK_URL = 'http://fawave.net4team.net/';
 var RE_JSON_BAD_WORD = /[\u000B\u000C]/ig; //具体见：http://www.cnblogs.com/rubylouvre/archive/2011/02/12/1951760.html
@@ -457,15 +481,52 @@ var sinaApi = {
 	},
 	
 	// id, user_id, screen_name, since_id, max_id, count, page 
-    user_timeline: function(data, callbackFn, context){
-		if(!callbackFn) return;
+    user_timeline: function(data, callback, context) {
+        var need_friendship = data.need_friendship;
+        delete data.need_friendship;
         var params = {
             url: this.config.user_timeline,
             type: 'get',
             play_load: 'status',
             data: data
         };
-        this._sendRequest(params, callbackFn, context);
+        
+        // Make a Combo object.
+        var both = new Combo(function(statuses_result, friendship_result) {
+            var friendship = null;
+            if(friendship_result && friendship_result[0]) {
+                friendship = friendship_result[0].target || friendship_result[0];
+            }
+            if(!friendship) {
+                return callback.apply(context, statuses_result);
+            }
+            var user = null;
+            if(statuses_result[0]) {
+                var statuses = statuses_result[0].items || statuses_result[0];
+                user = statuses_result[0].user;
+                if(!user && statuses.length > 0) {
+                    user = statuses[0].user || statuses[0].sender;
+                }
+            }
+            if(user) {
+                user.following = friendship.following;
+                user.followed_by = friendship.followed_by;
+            }
+            
+            return callback.apply(context, statuses_result);
+        });
+        this._sendRequest(params, both.add());
+        // 获取friendships_show
+        if(need_friendship) {
+            var args = {};
+            if(data.id) {
+                args.target_id = data.id;
+            }
+            if(data.screen_name) {
+                args.target_screen_name = data.screen_name;
+            }
+            this.friendships_show(args, both.add());
+        }
 	},
 	
 	// id, count, page
@@ -904,7 +965,6 @@ var sinaApi = {
 
     // id
     friendships_destroy: function(data, callback, context){
-        if(!callback) return;
         var params = {
             url: this.config.friendships_destroy,
             type: 'post',
@@ -913,48 +973,46 @@ var sinaApi = {
         };
         this._sendRequest(params, callback, context);
     },
-
-    friendships_show: function(data, callbackFn){
-        if(!callbackFn) return;
+    // [source_id, source_screen_name, ]target_id, target_screen_name
+    friendships_show: function(data, callback, context){
         var params = {
             url: this.config.friendships_show,
             type: 'get',
-            play_load: 'user',
+            play_load: 'object',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callback, context);
     },
 
     // type
-    reset_count: function(data, callbackFn){
-        if(!callbackFn) return;
+    reset_count: function(data, callback, context){
         var params = {
             url: this.config.reset_count,
             type: 'post',
             play_load: 'result',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callback, context);
     },
     
     // user_id, count, page
-    tags: function(data, callback) {
+    tags: function(data, callback, context) {
     	var params = {
             url: this.config.tags,
             play_load: 'tag',
             data: data
         };
-        this._sendRequest(params, callback);
+        this._sendRequest(params, callback, context);
     },
     
     // count, page
-    tags_suggestions: function(data, callback) {
+    tags_suggestions: function(data, callback, context) {
     	var params = {
             url: this.config.tags_suggestions,
             play_load: 'tag',
             data: data
         };
-        this._sendRequest(params, callback);
+        this._sendRequest(params, callback, context);
     },
     
     // tags

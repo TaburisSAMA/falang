@@ -25,7 +25,9 @@ function init(){
     }
 	initSelectSendAccounts(is_upload);
 	initTxtContentEven();
-    $("#txtContent").focus();
+	var $txtContent = $("#txtContent");
+//    _initText($txtContent);
+    $txtContent.focus();
     at_user_autocomplete('#txtContent');
     $(window).unload(function(){ initOnUnload(); });
     // 文件拖动
@@ -51,7 +53,7 @@ function init(){
         Settings.save();
     }).attr('checked', checked);
     
-	$("#txtContent")[0].onpaste = null;
+    $txtContent[0].onpaste = null;
     window.document.onpaste = function(e){
         var f = null,
             items = e.clipboardData &&
@@ -74,12 +76,12 @@ function init(){
     		// 设置标题和缩短网址
     		var title = tab.title || '';
     		var loc_url = tab.url;
-            var $txt = $("#txtContent");
             var settings = Settings.get();
-            $txt.val(formatText(settings.lookingTemplate, {title: title, url: loc_url})).focus();
+            $("#txtContent").val(formatText(settings.lookingTemplate, {title: title, url: loc_url})).focus();
             countInputText();
             _shortenUrl(loc_url, settings, function(shorturl){
 	            if(shorturl) {
+	                var $txt = $("#txtContent");
 	                $txt.val($txt.val().replace(loc_url, shorturl)).focus();
 	            }
 	        });
@@ -90,7 +92,6 @@ function init(){
     	});
     } else if(params.image_url) {
     	// 有图片
-    	var $txt = $("#txtContent");
         var settings = Settings.get();
         countInputText();
         var source_url = params.image_url;
@@ -107,13 +108,10 @@ function init(){
         } else {
         	_shortenUrl(source_url, settings, function(shorturl){
                 if(shorturl) {
-                	//$txt.val($txt.val().replace(source_url, shorturl)).focus();
                 	$('#imgPreview img').attr('short_url', shorturl);
                 }
             });
         }
-        
-        //$('#uploadForm').hide();
     }
 };
 

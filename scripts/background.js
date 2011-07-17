@@ -10,15 +10,47 @@ var tweets = {},
     LAST_PAGES = {};
 var SHORT_URLS = {};
 
-window.checking={}; //正在检查是否有最新微博
-window.paging={}; //正在获取分页微博
-
+window.checking = {}; //正在检查是否有最新微博
+window.paging = {}; //正在获取分页微博
+window.__view_status = {}; // 上次的浏览状态
 
 function _format_data_key(data_type, end_str, user_uniquekey) {
 	if(!user_uniquekey){
 		user_uniquekey = getUser().uniqueKey;
     }
 	return user_uniquekey + data_type + end_str;
+};
+
+function get_view_status(data_type, user_uniquekey) {
+    var key = _format_data_key(data_type, '_status', user_uniquekey);
+    var status = window.__view_status[key];
+    if(!status) {
+        status = {
+            index: 0,
+            size: null,
+            scrollTop: 0
+        };
+        window.__view_status[key] = status;
+    }
+    return  status;
+};
+
+function set_view_status(data_type, status, user_uniquekey) {
+    if(!user_uniquekey){
+        user_uniquekey = getUser().uniqueKey;
+    }
+    var key = _format_data_key(data_type, '_status', user_uniquekey);
+    window.__view_status[key] = status;
+    set_last_data_type(data_type, user_uniquekey);
+};
+
+// 获取上次当前用户正在访问的data_type
+function get_last_data_type(user_uniquekey) {
+    return window.__view_status[user_uniquekey + '_last_tab'] || 'friends_timeline';
+};
+
+function set_last_data_type(data_type, user_uniquekey) {
+    window.__view_status[user_uniquekey + '_last_tab'] = data_type;
 };
 
 /**
@@ -129,9 +161,10 @@ var friendships = {
     fetch_friends: function(user_uniquekey, callback, context) {
     	var user;
     	if(user_uniquekey) {
-    		user = getUserByUniqueKey(user_uniquekey);
-    	} else {
-    		user = getUser();
+    		user = getUserByUniqueKey(user_uniquekey, 'all');
+    	}
+    	if(!user) {
+    	    user = getUser();
     	}
     	var friend_data_type = this.friend_data_type;
     	var count = 200;
@@ -141,7 +174,6 @@ var friendships = {
     	if(fetch_cursor == null) {
     		// 第一次获取
     		fetch_cursor = '-1';
-//    		console.log('first fetch friends');
     	} else if(fetch_cursor == '0') {
     		if(new Date().getTime() - friendships.fetch_times[user_uniquekey] < 60000) {
     			// 上次爬取时间和这次间隔在60秒以内的，直接返回空，不爬取
@@ -161,7 +193,10 @@ var friendships = {
     		count: count
     	};
     	tapi.friends(params, function(data){
-    		var friends = data.users || data.items || data;
+    		var friends = null;
+    		if(data) {
+    		    data.users || data.items || data;
+    		}
     		// 重新获取一次cache，防止期间cache被更新了，之前的引用就失效了
     		var cache = get_data_cache(friend_data_type, user.uniqueKey) || [];
     		if(friends && friends.length > 0) {
@@ -177,8 +212,11 @@ var friendships = {
                 friends = result.news;
                 if(friends.length > 0) {
                 	var rt_at_name = tapi.get_config(user).rt_at_name;
-                    for(var i=0; i<friends.length; i++) {
+                    for(var i=0, len = friends.length; i < len; i++) {
         				var friend = friends[i];
+        				if(!friend) {
+        				    continue;
+        				}
         				// 只保存最简单的数据，减少内存占用
         				friends[i] = {id: friend.id, screen_name: friend.screen_name};
         				if(rt_at_name) {
@@ -193,12 +231,10 @@ var friendships = {
                     set_data_cache(cache, friend_data_type, user.uniqueKey);
                 }
     		}
-    		if(friendships.fetch_cursors[user_uniquekey] != '0') {
+    		if(data && friendships.fetch_cursors[user_uniquekey] != '0') {
     			friendships.fetch_cursors[user_uniquekey] = String(data.next_cursor);
-//    			console.log('fetch_done_once');
     		}
     		friendships.fetch_times[user_uniquekey] = new Date().getTime();
-//    		console.log('fetch new', friends.length, 'cursor', data.next_cursor, cache.length);
     		callback.call(context, friends || []);
     	});
     }
@@ -251,7 +287,6 @@ function checkTimeline(t, p, user_uniqueKey){
     	checkTimeline('sent_direct_messages', p, user_uniqueKey);
     }
     setDoChecking(user_uniqueKey, t, 'checking', true);
-    var need_set_count = true;
     var params = {user:c_user, count:PAGE_SIZE};
     var last_id = getLastMsgId(t, user_uniqueKey);
     if(last_id){
@@ -327,14 +362,26 @@ function checkTimeline(t, p, user_uniqueKey){
             	merge_direct_messages(user_uniqueKey, sinaMsgs);
             }
             var _unreadCount = 0, _msg_user = null;
-            var c_user_id = String(c_user.id);
-            for(var i in sinaMsgs){
+//            var c_user_id = String(c_user.id);
+            for(var i = 0, len = sinaMsgs.length; i < len; i++) {
                 _msg_user = sinaMsgs[i].user || sinaMsgs[i].sender;
-                if(_msg_user && String(_msg_user.id) != c_user_id){
+//                if(_msg_user && String(_msg_user.id) !== c_user_id){
+//                    _unreadCount += 1;
+//                }
+                if(_msg_user){
                     _unreadCount += 1;
                 }
             }
             if(popupView){
+                // 保持当前浏览状态
+                var is_not_auto_insert = getAutoInsertMode() === 'notautoinsert';
+                if(is_not_auto_insert) {
+                    var view_status = get_view_status(t, c_user.uniqueKey);
+                    view_status.index = view_status.index || 0;
+                    view_status.index += sinaMsgs.length;
+                    set_view_status(t, view_status, c_user.uniqueKey);
+                }
+                
         		// 判断是否还是当前用户
                 if(!popupView.addTimelineMsgs(sinaMsgs, t, user_uniqueKey)){
                     setUnreadTimelineCount(_unreadCount, t, user_uniqueKey);
@@ -455,7 +502,7 @@ function getTimelinePage(user_uniqueKey, t, p){
                 	}
                     var result = filterDatasByMaxId(sinaMsgs, max_id, true);
                     sinaMsgs = result.news;
-                    for(var i in sinaMsgs){
+                    for(var i = 0, len = sinaMsgs.length; i < len; i++) {
                         sinaMsgs[i].readed = true;
                     }
                     tweets[t_key] = tweets[t_key].concat(sinaMsgs);
@@ -675,8 +722,6 @@ setUnreadTimelineCount(0, 'friends_timeline'); //设置提示信息（上次关�
 
 RefreshManager.start(true);
 
-
-
 function checkNewMsg(t, uniqueKey){
     try{
         checkTimeline(t, null, uniqueKey);
@@ -736,7 +781,7 @@ var Beaut = {
 		}
 	    },
 	    error:function(xhr, textStatus, err){
-		console.log('Beaut load error: ' + (textStatus || err) );
+	        //console.log('Beaut load error: ' + (textStatus || err) );
 	    }
         });
 	/*

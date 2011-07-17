@@ -55,7 +55,10 @@
 			<ul id="accountsForSend"></ul>
 			<textarea id="txtContent" ></textarea>
 			<div class="ctr">
-				<span id="wordCount">140</span>
+			    &nbsp;
+				<span id="wordCount_double">140</span>
+				/
+                <span id="wordCount">140</span>
 				&nbsp;
 				<a id="btnAddEmotional" href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');">
 					<img src="images/face.gif" />
@@ -126,13 +129,13 @@
 					<a id="btnAlertMode" href="javascript:void(0);" title="" mode="alert" onclick="changeAlertMode()"><img src="images/alert_mode.png" /></a>
 					<a id="btnAutoInsert" href="javascript:void(0);" title="" mode="notautoinsert" onclick="changeAutoInsertMode()"><img src="images/notautoinsert.png" /></a>
 				</span>
-				<li class="tab-friends_timeline active" href="#friends_timeline_timeline"><script>_u.wi('comm_TabName_friends_timeline')</script><span class="unreadCount"></span></li>
+				<li class="tab-friends_timeline" href="#friends_timeline_timeline"><script>_u.wi('comm_TabName_friends_timeline')</script><span class="unreadCount"></span></li>
 				<li class="tab-mentions" href="#mentions_timeline"><script>_u.wi('comm_TabName_mentions')</script><span class="unreadCount"></span></li>
 				<li class="tab-comments_timeline" href="#comments_timeline_timeline"><script>_u.wi('comm_TabName_comments_timeline')</script><span class="unreadCount"></span></li>
 				<li class="tab-direct_messages" href="#direct_messages_timeline"><script>_u.wi('comm_TabName_direct_messages')</script><span class="unreadCount"></span></li>
-				<li class="tab-favorites" href="#favorites_timeline"><script>_u.wi('comm_TabName_favorites')</script><span class="unreadCount"></span></li>
-				<li class="tab-followers" href="#followers_timeline"><script>_u.wi('comm_TabName_followers')</script><span class="unreadCount"></span></li>
-				<li class="tab-user_timeline" href="#user_timeline_timeline"><script>_u.wi('comm_TabName_user_timeline')</script><span class="unreadCount"></span></li>
+				<li class="tab-favorites only_click" href="#favorites_timeline"><script>_u.wi('comm_TabName_favorites')</script><span class="unreadCount"></span></li>
+				<li class="tab-followers only_click" href="#followers_timeline"><script>_u.wi('comm_TabName_followers')</script><span class="unreadCount"></span></li>
+				<li class="tab-user_timeline only_click" href="#user_timeline_timeline"><script>_u.wi('comm_TabName_user_timeline')</script><span class="unreadCount"></span></li>
 			</ul>
 			<div class="clearFix"></div>
 		</div>
@@ -478,9 +481,25 @@
 					<?js if(!user.is_me){ ?>
 					<a class="follow" href="javascript:" onclick="doReply(this, '#{user.screen_name}', '', '#{user.id}')">@</a>
 					<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">#{_u.i18n("abb_direct_message")}</a>
-						<?js if(support_follow){ ?>
-						<a class="follow" href="javascript:" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">#{_u.i18n("comm_f_destroy")}</a>
-						<a class="follow" href="javascript:" onclick="f_create('#{user.id}', this, '#{user.screen_name}')"><span class="plus">+</span>#{_u.i18n("comm_f_create")}</a>
+						<?js if(support_follow) { ?>
+							<a class="follow follow_button_destroy" <?js if(user.followed_by === false) { ?>style="display:none;"<?js } ?> href="javascript:;" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">#{_u.i18n("comm_f_destroy")}</a>
+							<a class="follow follow_button_create" <?js if(user.followed_by === true) { ?>style="display:none;"<?js } ?> href="javascript:;" onclick="f_create('#{user.id}', this, '#{user.screen_name}')"><span class="plus">+</span>#{_u.i18n("comm_f_create")}</a>
+							<?js if(user.followed_by === true) { ?>
+							<span class="followed">
+							    <?js if(user.following === true) { ?>
+							    #{_u.i18n("comm_f_followed_by_and_following")}
+							    <?js } else { ?>
+	                            #{_u.i18n("comm_f_followed_by")}
+	                            <?js } ?>
+							</span>
+						    <?js } else if(user.following === true) { ?>
+						    <span class="followed">
+                                <?js if(user.following === true) { ?>
+                                #{_u.i18n("comm_f_following")}
+                                <?js } ?>
+                            </span>
+						    <?js } ?>
+						    
 						<?js } ?>
 					<?js } ?>
 					</div>

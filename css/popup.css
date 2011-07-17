@@ -50,7 +50,7 @@ textarea:focus{outline: none;}
 	-webkit-transition: height .6s ease;
 }
 #submitWarp .ctr{margin-top:2px; position:relative;}
-#wordCount{font-size:13px;font-weight: bold; /*position:absolute; top:0; right:0;*/}
+#wordCount, #wordCount_double{font-size:13px;font-weight: bold; /*position:absolute; top:0; right:0;*/}
 #header{
 	font-size:12px;
 	position: relative;
@@ -290,7 +290,7 @@ li .thumbnail_pic .img_loading{position:absolute;left:42%;top:43%;}
 
 .tab2{
 	background-color: #FAFAFA;
-	margin: 5px 0;
+	margin: 3px 0;
 	padding: 5px 0;
 }
 .tab2 p span{
@@ -301,6 +301,7 @@ li .thumbnail_pic .img_loading{position:absolute;left:42%;top:43%;}
 	padding: 3px 6px;
 	border-bottom: none;
 	color:#888;
+	-webkit-border-radius: 4px 4px 0 0;
 }
 .tab2 p span.active{
 	background-color: #FAFAFA;
@@ -553,11 +554,12 @@ div.mainContent{word-wrap: break-word; line-height:1.5em;}
 }
 .tipbox .user_head, .userinfo_detail .user_head, .fans .user_head{
 	float:left;
-	border:solid 1px #ccc;
-	padding:2px;
-	/*margin-right: 8px;*/
 }
-.user_head img{width:48px; height:48px;}
+.user_head img{
+	max-width:48px; max-height:48px;
+	-webkit-border-radius: 4px;
+    -webkit-box-shadow: 0 0 3px #aaa;
+}
 .tipbox .user_info img{border:none; -webkit-box-shadow: none;}
 .tipbox .user_info, 
 .userinfo_detail .user_info, 
@@ -571,10 +573,10 @@ div.mainContent{word-wrap: break-word; line-height:1.5em;}
 	margin:6px 3px;
 	padding:6px;
 	-webkit-border-radius:3px;
-	-webkit-box-shadow:0 0 9px #888;
+	-webkit-box-shadow:0 0 5px #888;
 }
 .userinfo_detail p, .fans p{margin:3px 0;}
-.userinfo_detail .follow, .fans .follow{
+.userinfo_detail .follow, .fans .follow, .userinfo_detail .followed, .fans .followed{
 	float:right;
 	margin:0 2px;
 	background: white;
@@ -582,18 +584,22 @@ div.mainContent{word-wrap: break-word; line-height:1.5em;}
 	color: #06C;
 	padding: 1px 2px;
 	text-decoration:none;
+	-webkit-border-radius: 3px;
 }
-.userinfo_detail .follow:hover, .fans .follow:hover{
+.userinfo_detail .follow:hover, .fans .follow:hover {
 	background: #7BB0E5;
-	border: 1px solid #408CD9;
 	color: white;
+}
+.userinfo_detail .followed, .fans .followed {
+    background: #F77004;
+    border: 1px solid #F77004;
+    color: white;
 }
 .userinfo_detail .plus{}
 .userinfo_detail .des, .fans .des{margin-top: 8px;}
 
 .fans{
-	margin:6px 3px 9px;
-	-webkit-box-shadow:0 0 9px #888;
+	margin: 2px 3px 8px;
 }
 
 /* Dock */

@@ -11,7 +11,7 @@ function buildStatusHtml(statuses, t, c_user){
     var TEMPLATE_RT_RT = null;
     var theme = Settings.get().theme;
     var rt_replace_pre = null, rt_rt_replace_pre = null;
-    if(theme=='pip_io' || theme=='work') {
+    if(theme === 'pip_io' || theme === 'work') {
     	rt_replace_pre = '<!-- {{retweeted_status_out}} -->';
     	rt_rt_replace_pre = '<!-- {{retweeted_retweeted_status_out}} -->';
     } else {
@@ -170,7 +170,11 @@ function buildStatusHtml(statuses, t, c_user){
 	}
 	var support_instapaper = Settings.get().instapaper_user != null;
 	var support_readitlater = Settings.get().readitlater_user != null;
-    for(var i in statuses) {
+	var comments_count_tpl = '<a href="javascript:void(0);" timeline_type="comment" title="'
+        + _u.i18n("btn_show_comments_title") 
+        + '" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>';
+	
+    for(var i = 0, len = statuses.length; i < len; i++) {
     	var status = statuses[i];
     	status.repost_count = status.repost_count === undefined ? '-' : status.repost_count;
     	status.user = status.user || status.sender;
@@ -179,10 +183,6 @@ function buildStatusHtml(statuses, t, c_user){
          * status.status 评论
          */
     	status.retweeted_status = status.retweeted_status || status.status;
-    	
-    	var comments_count_tpl = '<a href="javascript:void(0);" timeline_type="comment" title="'
-    		+ _u.i18n("btn_show_comments_title") 
-    		+ '" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>';
     	if(status.comments_count === undefined) {
     		status.comments_count = '0';
     	}
@@ -289,7 +289,6 @@ function buildStatusHtml(statuses, t, c_user){
         	var html = Shotenjin.render(TEMPLATE, context);
             var need_rt_rt = status.retweeted_status 
             	&& status.retweeted_status.retweeted_status;
-            var rt_rt_tpl = null;
             if(status.retweeted_status) {
             	html = html.replace(rt_replace_pre, Shotenjin.render(TEMPLATE_RT, context));
             	if(need_rt_rt) {
