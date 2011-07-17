@@ -22,6 +22,10 @@ function buildStatusHtml(statuses, t, c_user){
     var config = tapi.get_config(c_user);
  	var support_do_comment = config.support_do_comment;
  	var support_do_favorite = config.support_do_favorite;
+ 	var need_set_readed = false; // 必须设置为已读
+ 	if(t === 'user_timeline' || t === 'favorites') {
+ 	   need_set_readed = true;
+ 	}
  	var BUTTON_TPLS = {
         showMapBtn: '<a class="geobtn" href="javascript:" onclick="showGeoMap(\'{{user.profile_image_url}}\', {{geo.coordinates[0]}}, {{geo.coordinates[1]}});" title="'+ _u.i18n("btn_geo_title") +'"><img src="images/mapspin2a.png"/></a>',
         delTweetBtn: '<a class="deltweet" href="javascript:void(0);" onclick="doDelTweet(\'{{id}}\', this);" title="'+ _u.i18n("btn_del_tweet_title") +'">'+ _u.i18n("abb_delete") +'</a>',
@@ -267,6 +271,9 @@ function buildStatusHtml(statuses, t, c_user){
         		+ _u.i18n("btn_rted_title") + '"></a>';
         }
         var status_type = status.status_type || t;
+        if(need_set_readed) {
+            status.readed = true;
+        }
         var context = {
             provinces: provinces,
             tType: status_type,
