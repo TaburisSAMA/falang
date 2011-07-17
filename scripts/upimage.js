@@ -267,7 +267,7 @@ function _uploadWrap(user, status, pic, stat, selLi){
 
 var FILECHECK = {
 	maxFileSize: 10*1024000,
-	maxImageSize: 2*1024000,
+	maxImageSize: 5*1024000,
     fileTypes: '__image/gif__image/jpeg__image/jpg__image/png__'
 };
 
