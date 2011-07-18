@@ -1365,7 +1365,7 @@ function getSinaTimeline(t, notCheckNew){
             removeUnreadTimelineCount(t);
             updateDockUserUnreadCount(getUser().uniqueKey);
         }
-        var msgs = cache.slice(view_status.index, view_status.size), htmls = [], ids = [];
+        var msgs = cache.slice(view_status.index, view_status.index + view_status.size), htmls = [], ids = [];
         htmls = buildStatusHtml(msgs, t);
         //var need_reset_scroll = _ul.children().length > 0;
         _ul.append(htmls.join(''));
