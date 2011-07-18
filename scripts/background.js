@@ -363,7 +363,7 @@ function checkTimeline(t, p, user_uniqueKey) {
                 	merge_direct_messages(user_uniqueKey, result.olds);
                 }
         		if(popupView){
-        			popupView.addTimelineMsgs(result.olds, t, user_uniqueKey);
+        			popupView.addTimelineMsgs(result.olds, t, user_uniqueKey, isFirstTime);
         		}
         	}
         	sinaMsgs = result.news;
@@ -407,7 +407,7 @@ function checkTimeline(t, p, user_uniqueKey) {
                 }
                 
         		// 判断是否还是当前用户
-                if(!popupView.addTimelineMsgs(sinaMsgs, t, user_uniqueKey)){
+                if(!popupView.addTimelineMsgs(sinaMsgs, t, user_uniqueKey, isFirstTime)){
                     setUnreadTimelineCount(_unreadCount, t, user_uniqueKey);
                     popupView.updateDockUserUnreadCount(user_uniqueKey);
                 } else {

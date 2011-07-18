@@ -207,6 +207,7 @@ function initTabs() {
             _load_new_data(c_t);
         } else if(!c_ul.find('ul.list').html()){
             // 加载缓存着的数据
+            // TODO: 判断是否需要清空未读数据
             getSinaTimeline(c_t);
         } else {
             if(currentIsActive) {
@@ -1330,9 +1331,6 @@ function getFavorites(is_click){
 };
 
 function _load_new_data(data_type) {
-    $('#tl_tabs li.active').find(".unreadCount").html('');
-    removeUnreadTimelineCount(data_type);
-    updateDockUserUnreadCount(getUser().uniqueKey);
     var b_view = getBackgroundView();
     var view_status = b_view.get_view_status(data_type);
     view_status.index = 0;
@@ -1362,11 +1360,12 @@ function getSinaTimeline(t, notCheckNew){
     }
     hideReadMoreLoading(t);
     if(cache && cache.length > 0) {
-//        var is_not_auto_insert = getAutoInsertMode() === 'notautoinsert';
-//        if(!is_not_auto_insert) {
-//            view_status.index = 0;
-//            view_status.size = PAGE_SIZE;
-//        }
+        if(view_status.index === 0) {
+            // 清空未读数据
+            $('#tl_tabs li.active').find(".unreadCount").html('');
+            removeUnreadTimelineCount(t);
+            updateDockUserUnreadCount(getUser().uniqueKey);
+        }
         var msgs = cache.slice(view_status.index, view_status.size), htmls = [], ids = [];
         htmls = buildStatusHtml(msgs, t);
         //var need_reset_scroll = _ul.children().length > 0;
@@ -1742,7 +1741,7 @@ function readMore(t){
  * 如果当前tab是激活的，就返回true，否则返回false(即为未读). 
  * 修改：根据用户设置是否自动提示新消息来返回true or false
  * */
-function addTimelineMsgs(msgs, t, user_uniqueKey){
+function addTimelineMsgs(msgs, t, user_uniqueKey, is_first_time){
     var c_user = getUser();
     if(!user_uniqueKey){
         user_uniqueKey = c_user.uniqueKey;
@@ -1774,12 +1773,18 @@ function addTimelineMsgs(msgs, t, user_uniqueKey){
         }
         return false;
     } else {
-    	if(getAutoInsertMode() === 'notautoinsert') {
+    	if(!is_first_time && getAutoInsertMode() === 'notautoinsert') {
     	    if(unread > 0){
                 li.find('.unreadCount').html(unread);
     	    }
     	    return false;
     	} else {
+    	    if(is_first_time) {
+    	        // 第一次加载，清空未读提示
+    	        li.find('.unreadCount').html('');
+    	        removeUnreadTimelineCount(t);
+    	        updateDockUserUnreadCount(user_uniqueKey);
+    	    }
     	    addPageMsgs(msgs, t, false);
     	    return true;
     	}
