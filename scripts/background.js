@@ -421,8 +421,7 @@ function checkTimeline(t, p, user_uniqueKey) {
             }
             if(!insert_success) {
                 // 如果未能成功插入数据，则记录下当前索引开始的位置
-                var is_not_auto_insert = getAutoInsertMode() === 'notautoinsert';
-                if(is_not_auto_insert) {
+                if(isNotAutoInsertMode()) {
                     var view_status = get_view_status(t, user_uniqueKey);
                     view_status.index = view_status.index || 0;
                     view_status.index += sinaMsgs.length;

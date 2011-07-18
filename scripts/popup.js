@@ -198,11 +198,10 @@ function initTabs() {
 
 // 判断是否需要加载新数据
 function _load_new_data(data_type, is_current_tab) {
-    var is_not_auto_insert = getAutoInsertMode() === 'notautoinsert';
     var load_new = true;
     var b_view = getBackgroundView();
     var view_status = b_view.get_view_status(data_type);
-    if(!is_current_tab && is_not_auto_insert) { 
+    if(!is_current_tab && isNotAutoInsertMode()) { 
         // 非自动插入模式，如果不是当前tab，则需根据上次的位置来判断是否要获取新的
         if(view_status.scrollTop && view_status.scrollTop > 50) {
             load_new = false;
@@ -851,14 +850,13 @@ function addUnreadCountToTabs(){
     for(var j in userList){
         var user = userList[j];
         var user_unread = 0;
-        var is_not_auto_insert = getAutoInsertMode() === 'notautoinsert';
+        var is_not_auto_insert = isNotAutoInsertMode();
         for(var i in T_LIST[user.blogType]){
             ur = getUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
             if(ur>0 && c_user.uniqueKey == user.uniqueKey){ //当前用户，则设置timeline tab上的提示
                 tab = $("#tl_tabs .tab-" + T_LIST[user.blogType][i]);
                 // 判断是否自动加载新数据
                 if(tab.length == 1 && (is_not_auto_insert || !tab.hasClass('active'))){
-                    //tab.find('.unreadCount').html('(' + ur + ')');
                     tab.find('.unreadCount').html(ur);
                     user_unread += ur;
                 }else{
@@ -1773,7 +1771,7 @@ function addTimelineMsgs(msgs, t, user_uniqueKey, is_first_time){
         }
         return false;
     } else {
-    	if(!is_first_time && getAutoInsertMode() === 'notautoinsert') {
+    	if(!is_first_time && isNotAutoInsertMode()) {
     	    if(unread > 0){
                 li.find('.unreadCount').html(unread);
     	    }
@@ -2690,10 +2688,10 @@ function changeAutoInsertMode(to_mode){
     var btn = $("#btnAutoInsert");
     if(!to_mode){
         var mode = btn.attr('mode');
-        to_mode = (mode == 'notautoinsert') ? 'autoinsert' : 'notautoinsert';
+        to_mode = mode === 'notautoinsert' ? 'autoinsert' : 'notautoinsert';
     }
     setAutoInsertMode(to_mode);
-    var tip = (to_mode=='notautoinsert') ? _u.i18n("btn_not_auto_insert_title") : _u.i18n("btn_auto_insert_title");
+    var tip = to_mode === 'notautoinsert' ? _u.i18n("btn_not_auto_insert_title") : _u.i18n("btn_auto_insert_title");
     btn.attr('mode', to_mode).attr('title', tip).find('img').attr('src', 'images/' + to_mode + '.png');
 };
 

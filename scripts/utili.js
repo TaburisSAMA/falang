@@ -655,6 +655,11 @@ function getAutoInsertMode(){
     return mode || 'notautoinsert';
 };
 
+// 判断是否非自动插入模式
+function isNotAutoInsertMode() {
+    return getAutoInsertMode() === 'notautoinsert';
+};
+
 function setAutoInsertMode(mode){
     localStorage.setObject(AUTO_INSERT_MODE_KEY, mode);
 };
