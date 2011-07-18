@@ -211,6 +211,7 @@ function sendMsg() {
         } else { // only support update
             if(!image_url) {
                 // 没有图片连接，则等待其他上传完得到图片后再发送
+                onprogress({loaded: 0, total: 100}, user, stat);
                 stat.unsupport_uploads.push([user, status, stat, selLi]);
             } else {
                 _updateWrap(user, status, stat, selLi, image_url);
@@ -306,7 +307,9 @@ function _updateWrap(user, status, stat, selLi, image_url){
 //		status += config.image_shorturl_pre + image_url;
 		status += ' ' + image_url;
 	}
+	onprogress({loaded: 50, total: 100}, user, stat);
 	tapi.update({user: user, status: status}, function(result_data, status_code, error_code) {
+	    onprogress({loaded: 100, total: 100}, user, stat);
 		_finish_callback(user, stat, selLi, result_data, status_code, error_code);
 	});
 };

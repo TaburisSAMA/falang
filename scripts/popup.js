@@ -238,7 +238,7 @@ function initOnUnload(){
     // 保持当前滚动条位置
     var c_t = getCurrentTab();
     if(c_t) {
-        c_t.replace('#','').replace(/_timeline$/i,'');
+        c_t = c_t.replace('#','').replace(/_timeline$/i,'');
         saveScrollTop(c_t);
     }
 };
