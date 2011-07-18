@@ -76,22 +76,8 @@ function init(){
     
     // 显示上次打开的tab
     var b_view = getBackgroundView();
-    var last_tab = b_view.get_last_data_type(c_user.uniqueKey) || 'friends_timeline';
-    var $tab = $("#tl_tabs .tab-" + last_tab);
-    if($tab.length === 0) {
-        last_tab = 'friends_timeline';
-    }
-    $tab = $("#tl_tabs .tab-" + last_tab);
-    if($tab.hasClass('only_click')) {
-        $tab.click();
-    } else {
-        $tab.addClass('active');
-        // 切换tab
-        $('.list_p').hide();
-        $($tab.attr('href')).show();
-        window.currentTab = $tab.attr('href');
-        getSinaTimeline(last_tab); // 只显示首页的，其他的tab点击的时候再去获取
-    }
+    var last_data_type = b_view.get_last_data_type(c_user.uniqueKey) || 'friends_timeline';
+    _change_tab(last_data_type);
 
     initMsgHover();
 
@@ -160,14 +146,14 @@ function initTabs() {
         if(t.hasClass('tab-none')) {
             return;
         };
-        //添加当前激活的状态
-        t.siblings().removeClass('active').end().addClass('active');
         //切换tab前先保护滚动条位置
         var old_t = getCurrentTab().replace('#', '').replace(/_timeline$/i, '');
         var c_t = t.attr('href').replace('#','').replace(/_timeline$/i,'');
         if(c_t != old_t) { // 如果是数据类型不一样了，才需要记录当前位置
             saveScrollTop(old_t);
         }
+        //添加当前激活的状态
+        t.siblings().removeClass('active').end().addClass('active');
         //切换tab
         $('.list_p').hide();
         var c_ul = $(t.attr('href'));
@@ -187,38 +173,49 @@ function initTabs() {
             checkShowGototop();
             return;
         }
-        var last_top = 0;
-        if(!currentIsActive) {
-            last_top = resetScrollTop(c_t);
-        }
         // TODO: 如果是当前tab点击，必定加载新数据 ?????
         var load_new = !!t.find(".unreadCount").html();
         if(load_new) {
-            var is_not_auto_insert = getAutoInsertMode() === 'notautoinsert';
-            if(is_not_auto_insert) { 
-                // 如果不是当前tab，则需根据上次的位置来判断是否要获取新的
-                if(last_top > 50) {
-                    load_new = false;
-                }
-            }
+            load_new = _load_new_data(c_t, currentIsActive);
         }
-        if(load_new) {
-            // 如果有未读信息，则清空列表，重新获取
-            _load_new_data(c_t);
-        } else if(!c_ul.find('ul.list').html()){
-            // 加载缓存着的数据
-            // TODO: 判断是否需要清空未读数据
-            getSinaTimeline(c_t);
-        } else {
-            if(currentIsActive) {
+        if(!load_new) {
+            // 未加载新数据
+            if(!c_ul.find('ul.list').html()){
+                // 加载缓存着的数据
+                getSinaTimeline(c_t);
+            } else if(currentIsActive) {
                 // 如果没有更新又是当前tab，则等价于滚动到最顶的操作
                 setScrollTotop();
+            } else {
+                resetScrollTop(c_t);
             }
         }
-        checkShowGototop(); //检查是否要显示返回顶部按钮
+        checkShowGototop(); // 检查是否要显示返回顶部按钮
     });
     
     checkSupportedTabs();
+};
+
+// 判断是否需要加载新数据
+function _load_new_data(data_type, is_current_tab) {
+    var is_not_auto_insert = getAutoInsertMode() === 'notautoinsert';
+    var load_new = true;
+    var b_view = getBackgroundView();
+    var view_status = b_view.get_view_status(data_type);
+    if(!is_current_tab && is_not_auto_insert) { 
+        // 非自动插入模式，如果不是当前tab，则需根据上次的位置来判断是否要获取新的
+        if(view_status.scrollTop && view_status.scrollTop > 50) {
+            load_new = false;
+        }
+    }
+    if(load_new) {
+        view_status.index = 0;
+        view_status.size = null;
+        view_status.scrollTop = 0;
+        b_view.set_view_status(data_type, view_status);
+        $("#" + data_type + "_timeline ul.list").html('');
+        getSinaTimeline(data_type);
+    }
 };
 
 function initOnUnload(){
@@ -688,15 +685,34 @@ function showHeaderUserInfo(c_user){
     h_user.find('.info .nums').html(nums);
 };
 
+function _change_tab(data_type) {
+    var $tab = $("#tl_tabs .tab-" + data_type);
+    if($tab.length === 0) {
+        data_type = 'friends_timeline';
+        $tab = $("#tl_tabs .tab-" + data_type);
+    }
+    if($tab.hasClass('only_click')) {
+        $tab.click();
+    } else {
+        $tab.siblings().removeClass('active').end().addClass('active');
+        // 切换tab
+        $('.list_p').hide();
+        $($tab.attr('href')).show();
+        window.currentTab = $tab.attr('href');
+        getSinaTimeline(data_type);
+    }
+}
+
 function changeUser(uniqueKey){
     var c_user = getUser();
-    if(c_user.uniqueKey == uniqueKey){
+    // 获取当前的tab
+    var activeLi = $("#tl_tabs li.active");
+    if(c_user.uniqueKey === uniqueKey) {
+        activeLi.click();
         return;
     }
     var to_user = getUserByUniqueKey(uniqueKey);
     if(to_user) {
-        // 获取当前的tab
-        var activeLi = $("#tl_tabs li.active");
         if(activeLi.length === 0) {
             activeLi = $("#tl_tabs li:first");
         }
@@ -719,19 +735,17 @@ function changeUser(uniqueKey){
         checkSupportedTabs(to_user);
         
         // TODO: 获取上次正在查看的tab
-        var last_tab = b_view.get_last_data_type(uniqueKey);
-        activeLi = $("#tl_tabs .tab-" + last_tab);
+        var last_data_type = b_view.get_last_data_type(uniqueKey) || 'friends_timeline';
+        activeLi = $("#tl_tabs .tab-" + last_data_type);
         if(activeLi.css('display') == 'none'){ //如果不支持的tab刚好是当前tab
             window.currentTab = '#friends_timeline_timeline';
-            cur_t = 'friends_timeline';
-            activeLi = $("#tl_tabs .tab-friends_timeline"); // .addClass('active');
-            //$('#friends_timeline_timeline').show();
+            last_data_type = 'friends_timeline';
         }
         $("#tl_tabs .unreadCount").html('');
         $("#accountListDock").find('.current').removeClass('current')
             .end().find('.'+to_user.uniqueKey).addClass('current');
         addUnreadCountToTabs();
-        activeLi.click();
+        _change_tab(last_data_type);
     }
 };
 
@@ -954,12 +968,10 @@ function saveScrollTop(t) {
         var height = $(this).height();
         item_index = index;
         if(total_height <= scrollTop && (total_height + height) > scrollTop) {
-//            console.log('check_size', item_index)
             return false;
         }
         total_height += height;
     });
-//    console.log('saveScrollTop', t, item_index)
     _cache.size = item_index + 5;
     b_view.set_view_status(t, _cache);
 };
@@ -1330,17 +1342,6 @@ function getFavorites(is_click){
     });
 };
 
-function _load_new_data(data_type) {
-    var b_view = getBackgroundView();
-    var view_status = b_view.get_view_status(data_type);
-    view_status.index = 0;
-    view_status.size = null;
-    b_view.set_view_status(data_type, view_status);
-    $("#" + data_type + "_timeline ul.list").html('');
-    saveScrollTop(data_type);
-    getSinaTimeline(data_type);
-};
-
 //获取时间线微博列表
 //@t : 类型
 function getSinaTimeline(t, notCheckNew){
@@ -1407,7 +1408,6 @@ function getSinaTimeline(t, notCheckNew){
 
 //显示评论数和回复数
 function showCounts(t, ids){
-//    console.log('show counts', t, ids.length);
 	if(!ids || ids.length <= 0){
 		return;
 	}
