@@ -78,6 +78,10 @@ function init(){
     var b_view = getBackgroundView();
     var last_tab = b_view.get_last_data_type(c_user.uniqueKey) || 'friends_timeline';
     var $tab = $("#tl_tabs .tab-" + last_tab);
+    if($tab.length === 0) {
+        last_tab = 'friends_timeline';
+    }
+    $tab = $("#tl_tabs .tab-" + last_tab);
     if($tab.hasClass('only_click')) {
         $tab.click();
     } else {
@@ -85,8 +89,8 @@ function init(){
         // 切换tab
         $('.list_p').hide();
         $($tab.attr('href')).show();
-        getSinaTimeline(last_tab); // 只显示首页的，其他的tab点击的时候再去获取
         window.currentTab = $tab.attr('href');
+        getSinaTimeline(last_tab); // 只显示首页的，其他的tab点击的时候再去获取
     }
 
     initMsgHover();
@@ -139,6 +143,11 @@ function init(){
     adShow();
     
     restoreActionCache();
+    
+    // 处理未读微博的样式
+//    $('li.unread-item').live('mouseleave', function() {
+//        $(this).die('mouseleave').removeClass('unread-item');
+//    });
 };
 
 function initializeMap(){};//给载入地图api调用
@@ -215,7 +224,7 @@ function initOnUnload(){
     var c = $("#txtContent").val();
     localStorage.setObject(UNSEND_TWEET_KEY, c || '');
     localStorage.setObject(UNSEND_REPLY_KEY, $("#replyTextarea").val() || '');
-    if(Settings.get().sendAccountsDefaultSelected == 'remember'){
+    if(Settings.get().sendAccountsDefaultSelected == 'remember') {
         if($("#accountsForSend").data('inited')){
             var keys = '';
             $("#accountsForSend li.sel").each(function(){
@@ -227,8 +236,11 @@ function initOnUnload(){
         }
     }
     // 保持当前滚动条位置
-    var c_t = getCurrentTab().replace('#','').replace(/_timeline$/i,'');
-    saveScrollTop(c_t);
+    var c_t = getCurrentTab();
+    if(c_t) {
+        c_t.replace('#','').replace(/_timeline$/i,'');
+        saveScrollTop(c_t);
+    }
 };
 
 function initTxtContentEven(){
@@ -384,7 +396,7 @@ function _shortenUrl(longurl, settings, callback) {
 	if(longurl.indexOf('chrome-extension://') == 0) { // 插件地址就不处理了
 		return;
 	}
-	var settings = settings || Settings.get();
+	settings = settings || Settings.get();
 	if(settings.isSharedUrlAutoShort 
 	        && longurl.replace(/^https?:\/\//i, '').length > settings.sharedUrlAutoShortWordCount) {
     	ShortenUrl.short(longurl, callback);
@@ -684,6 +696,9 @@ function changeUser(uniqueKey){
     if(to_user) {
         // 获取当前的tab
         var activeLi = $("#tl_tabs li.active");
+        if(activeLi.length === 0) {
+            activeLi = $("#tl_tabs li:first");
+        }
         var cur_t = activeLi.attr('href').replace(/_timeline$/, '').substring(1);
         // 记录位置和记录当前tab
         saveScrollTop(cur_t);
@@ -953,16 +968,15 @@ function saveScrollTop(t) {
 //返回上次位置
 function resetScrollTop(t, top) {
     var last_top = top || 0;
-    if(t == 'user_timeline') {
-        $("#" + t + "_timeline .list_warp").scrollTop(last_top);
-    } else {
+    var $warp = $("#" + t + "_timeline .list_warp");
+    if(t !== 'user_timeline') {
         if(top === undefined) {
             var b_view = getBackgroundView();
             var _cache = b_view.get_view_status(t);
             last_top = _cache.scrollTop || 0;
         }
-        $("#" + t + "_timeline .list_warp").scrollTop(last_top);
     }
+    $warp.scrollTop(last_top);
     return last_top;
 };
 //====>>>>>>>>>>>>>>>>>>>>>>
@@ -1125,6 +1139,10 @@ function getUserTimeline(screen_name, user_id, read_more) {
         return;
     }
     var $tab = $("#tl_tabs .tab-user_timeline");
+    if($tab.data('is_loading')) {
+        return;
+    }
+    $tab.data('is_loading', true);
     $tab.attr('statusType', 'user_timeline');
     var $ul = $("#user_timeline_timeline ul.list");
     var max_id = null;
@@ -1176,7 +1194,8 @@ function getUserTimeline(screen_name, user_id, read_more) {
     showLoading();
     var m = 'user_timeline';
     hideReadMore(m);
-    tapi[m](params, function(data, textStatus){
+    tapi[m](params, function(data, textStatus) {
+        $tab.data('is_loading', false);
     	// 如果用户已经切换，则不处理
     	var now_user = getUser();
     	if(now_user.uniqueKey != c_user.uniqueKey) {
@@ -1907,8 +1926,7 @@ function sendMsg(msg){
     var use_source_url = source_url && short_url;
     var matchs = tapi.findSearchText(current_user, msg);
     for(var i = 0, len = users.length; i < len; i++) {
-    	var status = msg
-    	  , user = users[i];
+    	var status = msg, user = users[i];
     	// 判断是否使用缩短网址
     	if(use_source_url) {
     		var config = tapi.get_config(user);
@@ -1918,7 +1936,7 @@ function sendMsg(msg){
     	}
     	// 处理主题转化
     	if(matchs.length > 0 && current_user.blogType !== user.blogType) {
-    		for(var j = 0; j < matchs.length; j++) {
+    	    for(var j = 0, jlen = matchs.length; j < jlen; j++) {
     			var match = matchs[j];
     			status = status.replace(match[0], tapi.formatSearchText(user, match[1]));
     		}
@@ -2010,42 +2028,42 @@ function sendWhisper(msg){
 };
 
 function sendRepost(msg, repostTweetId, notSendMord){
-    var btn, txt, data;
-    btn = $("#replySubmit");
-    txt = $("#replyTextarea");
+    var $btn = $("#replySubmit"), $txt = $("#replyTextarea");
     repostTweetId = repostTweetId || $('#repostTweetId').val();
-    data = {status: msg, id:repostTweetId};
-    var user = getUser();
-    var config = tapi.get_config(user);
+    var data = {status: msg, id:repostTweetId}
+      , user = getUser()
+      , config = tapi.get_config(user);
     data.user = user;
-    btn.attr('disabled','true');
-    txt.attr('disabled','true');
+    $btn.attr('disabled','true');
+    $txt.attr('disabled','true');
     // 处理是否评论
-    if(!notSendMord){
-        if($('#chk_sendOneMore').attr("checked") && $('#chk_sendOneMore').val()){ //同时给XXX评论
+    if(!notSendMord) {
+        var $chk_sendOneMore = $('#chk_sendOneMore');
+        if($chk_sendOneMore.attr("checked") && $chk_sendOneMore.val()) { // 同时给XXX评论
             if(config.support_repost_comment) {
             	data.is_comment = 1;
             } else {
-            	sendComment(msg, $('#chk_sendOneMore').val(), true);
+            	sendComment(msg, $chk_sendOneMore.val(), true);
             }
         }
-        if($('#chk_sendOneMore2').attr("checked") && $('#chk_sendOneMore2').val()){ //同时给原作者 XXX评论
+        var $chk_sendOneMore2 = $('#chk_sendOneMore2');
+        if($chk_sendOneMore2.attr("checked") && $chk_sendOneMore2.val()) { // 同时给原作者 XXX评论
         	if(config.support_repost_comment_to_root) {
         		data.is_comment_to_root = 1;
         	} else {
-        		sendComment(msg + '.', $('#chk_sendOneMore2').val(), true);
+        		sendComment(msg + '.', $chk_sendOneMore2.val(), true);
         	}
         }
     }
     tapi.repost(data, function(status, textStatus){
         if(status && (status.id || (status.retweeted_status && status.retweeted_status.id))) {
             hideReplyInput();
-            txt.val('');
+            $txt.val('');
             setTimeout(callCheckNewMsg, 1000, 'friends_timeline');
             showMsg(_u.i18n("msg_repost_success"));
         }
-        btn.removeAttr('disabled');
-        txt.removeAttr('disabled');
+        $btn.removeAttr('disabled');
+        $txt.removeAttr('disabled');
     });
 };
 
@@ -2676,60 +2694,61 @@ function changeAutoInsertMode(to_mode){
 
 //表情添加
 fawave.face = {
-    show: function(ele, target_id){
+    show: function(ele, target_id) {
         var f = $("#face_box");
-        if(f.css('display') == 'none' || $("#face_box_target_id").val() != target_id) {
-        	// 初始化表情
-        	if($('#face_box .faceItemPicbg .face_icons').length == 0) {
-        		// FACE_TYPES   [typename, faces, url_pre, tpl, type_title]
-        		for(var i=0; i<FACE_TYPES.length; i++) {
-        			var face_type = FACE_TYPES[i];
-        			var $face_tab = $('<span face_type="' + face_type[0] + '">' + face_type[4] + '</span>');
-        			$face_tab.click(function(){
-        				if(!$(this).hasClass('active')) {
-        					$('.face_tab span').removeClass('active');
-            				$('#face_box .faceItemPicbg .face_icons').hide();
-            				$('#face_box .faceItemPicbg .' + $(this).attr('face_type') + '_faces').show();
-            				$(this).addClass('active');
-        				}
-        			});
-        			var $face_icons = $('<div style="display:none;" class="face_icons ' + face_type[0] + '_faces"></div>');
-        			$('#face_box .face_tab p').append($face_tab);
-            		$('#face_box .faceItemPicbg').append($face_icons);
-            		var exists = {};
-            		$('#face_icons li a').each(function() {
-            			exists[$(this).attr('title')] = true;
-            		});
-            		var face_tpl = face_type[3];
-            		var tpl = '<li><a href="javascript:void(0)" onclick="fawave.face.insert(this)"' 
-            			+ ' value="' + face_tpl + '" title="{{name}}"><img src="{{url}}" alt="{{name}}"></a></li>';
-            		var faces = face_type[1], url_pre = face_type[2];
-            		for(var name in faces) {
-            			if(exists[name]) continue;
-            			$face_icons.append(tpl.format({'name': name, 'url': url_pre + faces[name]}));
-            			exists[name] = true;
-            		}
-        		}
-        	}
-        	var current_blogtype = getUser().blogType;
-        	$('#face_box .face_tab span[face_type="' + current_blogtype + '"]').click();
-            $("#face_box_target_id").val(target_id);
-            var offset = $(ele).offset();
-            f.css({top: offset.top+20, left: offset.left}).show();
-        }else{
+        if(f.css('display') !== 'none' && $("#face_box_target_id").val() === target_id) {
             f.hide();
+            return;
         }
+    	// 初始化表情
+    	if($('#face_box .faceItemPicbg .face_icons').length === 0) {
+    		// FACE_TYPES   [typename, faces, url_pre, tpl, type_title]
+    		for(var i = 0, len = FACE_TYPES.length; i < len; i++) {
+    			var face_type = FACE_TYPES[i];
+    			var $face_tab = $('<span face_type="' + face_type[0] + '">' + face_type[4] + '</span>');
+    			$face_tab.click(function() {
+    			    var $this = $(this);
+    				if(!$this.hasClass('active')) {
+    					$('.face_tab span').removeClass('active');
+        				$('#face_box .faceItemPicbg .face_icons').hide();
+        				$('#face_box .faceItemPicbg .' + $this.attr('face_type') + '_faces').show();
+        				$this.addClass('active');
+    				}
+    			});
+    			var $face_icons = $('<div style="display:none;" class="face_icons ' + face_type[0] + '_faces"></div>');
+    			$('#face_box .face_tab p').append($face_tab);
+        		$('#face_box .faceItemPicbg').append($face_icons);
+        		var exists = {};
+        		$('#face_icons li a').each(function() {
+        			exists[$(this).attr('title')] = true;
+        		});
+        		var face_tpl = face_type[3];
+        		var tpl = '<li><a href="javascript:void(0)" onclick="fawave.face.insert(this)"' 
+        			+ ' value="' + face_tpl + '" title="{{name}}"><img src="{{url}}" alt="{{name}}"></a></li>';
+        		var faces = face_type[1], url_pre = face_type[2];
+        		for(var name in faces) {
+        			if(exists[name]) continue;
+        			$face_icons.append(tpl.format({'name': name, 'url': url_pre + faces[name]}));
+        			exists[name] = true;
+        		}
+    		}
+    	}
+    	var current_blogtype = getUser().blogType;
+    	$('#face_box .face_tab span[face_type="' + current_blogtype + '"]').click();
+        $("#face_box_target_id").val(target_id);
+        var offset = $(ele).offset();
+        f.css({top: offset.top+20, left: offset.left}).show();
     },
-    hide: function(){
+    hide: function() {
         $("#face_box").hide();
         $("#face_box_target_id").val('');
     },
-    insert: function(ele){
-        var target_textbox = $("#" + $("#face_box_target_id").val());
-        if(target_textbox.length==1){
-            var tb = target_textbox[0], str = $(ele).attr('value');
+    insert: function(ele) {
+        var $target_textbox = $("#" + $("#face_box_target_id").val());
+        if($target_textbox.length === 1) {
+            var tb = $target_textbox[0], str = $(ele).attr('value');
             var newstart = tb.selectionStart+str.length;
-            tb.value=tb.value.substr(0,tb.selectionStart)+str+tb.value.substring(tb.selectionEnd);
+            tb.value=tb.value.substr(0, tb.selectionStart) + str + tb.value.substring(tb.selectionEnd);
             tb.selectionStart = newstart;
             tb.selectionEnd = newstart;
         }
@@ -2799,7 +2818,8 @@ var SmoothScroller = {
             return;
         }
         if(_t.status.t < _t.status.d){
-            _t.status.t++; _t.T = setTimeout(_t.run, 10);
+            _t.status.t++; 
+            _t.T = setTimeout(_t.run, 10);
         }
     }
 };

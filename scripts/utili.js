@@ -211,18 +211,19 @@ refreshTimeLimit.renjian = refreshTimeLimit.zuosa = refreshTimeLimit.follow5 = r
 
 function showMsg(msg, show_now){
     var popupView = getPopupView();
-    if(popupView){
+    if(popupView) {
         popupView._showMsg(msg, show_now);
     }
 };
 // 缓冲错误信息，不要一次过显示一堆
 var __msg_buffers = [];
 // show_now: 是否马上显示，用于非错误提示
-function _showMsg(msg, show_now){
+function _showMsg(msg, show_now) {
 	if(show_now) {
 		__displayMessage(msg, show_now);
 	} else {
-		__msg_buffers.push(msg);
+	    // 已存在的信息，不显示
+        __msg_buffers.push(msg);
         if(__msg_buffers.length === 1) {
         	__displayMessage(msg);
         }
@@ -237,10 +238,17 @@ function __displayMessage(msg, show_now) {
         .fadeOut('slow', function() {
         	$(this).remove();
         	if(!show_now) {
-        		var next_msg = __msg_buffers.shift();
-            	if(next_msg === msg) {
-            		next_msg = __msg_buffers.shift();
-            	}
+        	    var next_msg = null;
+        	    while(true) {
+        	        // 过滤重复的
+        	        next_msg = __msg_buffers.shift();
+        	        if(!next_msg || next_msg !== msg || __msg_buffers.length === 0) {
+        	            if(next_msg === msg) {
+        	                next_msg = null;
+        	            }
+        	            break;
+        	        }
+        	    }
             	if(next_msg) {
             		__displayMessage(next_msg);
             	}
@@ -623,30 +631,7 @@ function getTooltip(){
     return tip;
 };
 
-//===>>>>>>>>>>>>>>>>>>>>>>>
-function setLastMsgId(id, t, user_uniqueKey){
-    if(!user_uniqueKey){
-        user_uniqueKey = getUser().uniqueKey;
-    }
-    localStorage.setObject(user_uniqueKey + t + LAST_MSG_ID, id);
-};
 
-function getLastMsgId(t, user_uniqueKey){
-    if(!user_uniqueKey){
-        user_uniqueKey = getUser().uniqueKey;
-    }
-    return localStorage.getObject(user_uniqueKey + t + LAST_MSG_ID);
-};
-
-// 保存最新的cursor
-function setLastCursor(cursor, t, user_uniqueKey) {
-    localStorage.setObject(user_uniqueKey + t + LAST_CURSOR, cursor);
-};
-// 获取最新的cursor
-function getLastCursor(t, user_uniqueKey) {
-    return localStorage.getObject(user_uniqueKey + t + LAST_CURSOR);
-};
-//<<<<<<<<<<<<<<<<=========
 
 // 获取上次选择的发送账号
 function getLastSendAccounts() {

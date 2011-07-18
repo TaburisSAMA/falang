@@ -72,6 +72,23 @@ function set_data_cache(cache, data_type, user_uniquekey) {
 	tweets[key] = cache;
 };
 
+// 上次id参数缓存
+function setLastMsgId(id, t, user_uniqueKey) {
+    localStorage.setObject(user_uniqueKey + t + LAST_MSG_ID, id);
+};
+function getLastMsgId(t, user_uniqueKey) {
+    return localStorage.getObject(user_uniqueKey + t + LAST_MSG_ID);
+};
+
+// 保存最新的cursor
+function setLastCursor(cursor, t, user_uniqueKey) {
+    localStorage.setObject(user_uniqueKey + t + LAST_CURSOR, cursor);
+};
+// 获取最新的cursor
+function getLastCursor(t, user_uniqueKey) {
+    return localStorage.getObject(user_uniqueKey + t + LAST_CURSOR);
+};
+
 /**
  * 获取本地数据中最后一条记录的id标识值，用于分页和过滤数据
  *
@@ -82,8 +99,7 @@ function set_data_cache(cache, data_type, user_uniquekey) {
  */
 function getMaxMsgId(data_type, user_uniquekey){
     var cache = get_data_cache(data_type, user_uniquekey);
-    var last_id = null;
-    if(cache && cache.length > 0){
+    if(cache && cache.length > 0) {
     	// 兼容网易的cursor_id
         // 兼容腾讯的PageTime
     	var last_index = cache.length - 1;
@@ -93,8 +109,9 @@ function getMaxMsgId(data_type, user_uniquekey){
     	if(typeof(last_id) === 'number'){
     		last_id--;
     	}
+    	return last_id;
     }
-    return last_id;
+    return null;
 };
 
 
@@ -159,7 +176,7 @@ var friendships = {
         tapi.friendships_show(params, function(sinaMsgs, textStatus){});
     },
     fetch_friends: function(user_uniquekey, callback, context) {
-    	var user;
+    	var user = null;
     	if(user_uniquekey) {
     		user = getUserByUniqueKey(user_uniquekey, 'all');
     	}
@@ -246,7 +263,6 @@ function merge_direct_messages(user_uniquekey, new_messages){
 	if(!messages) {
 		messages = [];
 	}
-	var need_sort = false;
 	if(new_messages && new_messages.length > 0) {
 		for(var i=0; i<new_messages.length; i++){
 			new_messages[i].sort_value = new Date(new_messages[i].created_at).getTime();
@@ -268,9 +284,9 @@ function merge_direct_messages(user_uniquekey, new_messages){
 //获取最新的(未看的)微博
 // @t : 获取timeline的类型
 // @p : 要附加的请求参数,类型为{}
-function checkTimeline(t, p, user_uniqueKey){
+function checkTimeline(t, p, user_uniqueKey) {
     var c_user = null;
-    if(!user_uniqueKey){
+    if(!user_uniqueKey) {
         c_user = getUser();
         user_uniqueKey = c_user.uniqueKey;
     } else {
@@ -298,8 +314,16 @@ function checkTimeline(t, p, user_uniqueKey){
     }
     $.extend(params, p);
     showLoading();
-    tapi[t](params, function(results, textStatus){
+    tapi[t](params, function(results, textStatus) {
     	hideLoading();
+    	if((results && results.error) || textStatus === 'error') {
+    	    // 有错误，返回
+    	    setTimeout(function() {
+    	        // 停顿一小段时间再获取
+    	        setDoChecking(user_uniqueKey, t, 'checking', false);
+    	    }, 10000);
+    	    return;
+    	}
     	var data = results || {};
     	var sinaMsgs = data.items || data;
     	if(data.next_cursor !== undefined) {
@@ -329,7 +353,7 @@ function checkTimeline(t, p, user_uniqueKey){
         	} else if(c_user.blogType === 'tqq') {
                 // tqq 重现修改last_id为id
         		//last_id = tweets[_key][0].id;
-                last_id = getLastMsgId(t+'_real_id', user_uniqueKey);
+                last_id = getLastMsgId(t + '_real_id', user_uniqueKey);
         	}
         	var result = filterDatasByMaxId(sinaMsgs, last_id, false);
         	if(tweets[_key].length === 0) {
@@ -435,7 +459,7 @@ function getTimelinePage(user_uniqueKey, t, p){
     if(!c_user){
         return;
     }
-    if(t == 'followers'){ log('The Wrong Page Fetch: ' + t);return; } //忽略粉丝列表
+    // if(t == 'followers'){ log('The Wrong Page Fetch: ' + t);return; } //忽略粉丝列表
     if(isDoChecking(user_uniqueKey, t, 'paging')){ return; }
     if(t == 'direct_messages' && tapi.get_config(c_user).support_sent_direct_messages) {
     	// 私信，则同时获取自己发送的
@@ -492,9 +516,9 @@ function getTimelinePage(user_uniqueKey, t, p){
     showLoading();
     tapi[t](params, function(data, textStatus) {
     	hideLoading();
-    	if(data) {
+    	if(data && !data.error && textStatus != 'error') {
     		var sinaMsgs = data.items || data;
-        	if($.isArray(sinaMsgs) && textStatus != 'error') {
+        	if($.isArray(sinaMsgs)) {
         		if(sinaMsgs.length > 0){
                     var max_id = getMaxMsgId(t, user_uniqueKey);
                     if(c_user.blogType == 'tqq' && tweets[t_key].length > 0) {

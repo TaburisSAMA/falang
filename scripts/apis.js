@@ -851,14 +851,23 @@ var sinaApi = {
 		            }
 	            }
 	        },
-	        success: function(data, textStatus) {
-	            try {
-	                data = JSON.parse(data);
-	            }
-	            catch(err) {
-	                data = {error: _u.i18n("comm_error_return") + ' [json parse error]', error_code: 500};
-	                textStatus = 'error';
-	            }
+	        success: function(data, textStatus, xhr) {
+	         // 如果没有网络，则会返回['', 'success', xhr.status === 0, xhr.statusText === '']
+                var no_net_work = false;
+                if(data === '' && textStatus === 'success' && xhr.status === 0 && xhr.statusText === '') {
+                    no_net_work = true;
+                    textStatus = 'error';
+                    data = {error: 'No network', error_code: 10000};
+                }
+                if(!no_net_work) {
+                    try {
+                        data = JSON.parse(data);
+                    }
+                    catch(err) {
+                        data = {error: _u.i18n("comm_error_return") + ' [json parse error]', error_code: 500};
+                        textStatus = 'error';
+                    }
+                }
 	            var error_code = null;
 	            if(data) {
 	                error_code = data.error_code;
@@ -1214,25 +1223,34 @@ var sinaApi = {
         		}
         	},
             success: function (data, textStatus, xhr) {
+                // 如果没有网络，则会返回['', 'success', xhr.status === 0, xhr.statusText === '']
+                var no_net_work = false;
+                if(data === '' && textStatus === 'success' && xhr.status === 0 && xhr.statusText === '') {
+                    no_net_work = true;
+                    textStatus = 'error';
+                    data = {error: 'No network', error_code: 10000};
+                }
                 /******
                  * FaWave内部错误码：
                  *   800: JSON解析错误
                  *   999: 服务器返回结果不对，未知错误
                  */
-            	if(play_load != 'string') {
+            	if(play_load != 'string' && !no_net_work) {
                     data = data.replace(RE_JSON_BAD_WORD, '');
-            		try{
+            		try {
                         data = JSON.parse(data);
                     }
-                    catch(err){
+                    catch(err) {
                     	if(xhr.status == 201 || xhr.statusText == "Created") { // rest成功
-                    		data = data;
+                    	    if(!data) {
+                    	        data = true;
+                    	    }
                     	} else {
-                    		if(data.indexOf('{"wrong":"no data"}') > -1 || data == '' || data.toLowerCase() == 'ok'){
+                    		if(data.indexOf('{"wrong":"no data"}') > -1 || data === '' || data.toLowerCase() == 'ok') {
                         		data = [];
                         	} else {
-                        	    log(data);
-                                data = {error: callmethod + ' ' + _u.i18n("comm_error_return") + err, error_code:500};
+                                data = {error: callmethod + ' ' + _u.i18n("comm_error_return") 
+                                        + ' ' + err.message, error_code:500};
                                 textStatus = 'error';
                         	}
                     	}
@@ -1240,10 +1258,10 @@ var sinaApi = {
             	}
                 var error_code = null;
 
-                if(data){
+                if(data) {
                 	error_code = data.error_code || data.code;
                     var error = data.error || data.error_msg;
-                    if(data.ret && data.ret !== 0){ //腾讯
+                    if(data.ret && data.ret !== 0) { //腾讯
                         if(data.msg === 'have no tweet'){
                             data.data = {info:[]};
                         } else if(data.ret === 4 && data.errcode === 0) { 
@@ -1254,13 +1272,14 @@ var sinaApi = {
                             error_code = data.ret;
                         }
                     } else {
-                        if(data.msg === 'have no tweet'){
+                        // 腾讯正确的结果
+                        if(data.ret !== undefined && (data.msg === 'have no tweet' || data.msg === 'have no user')) {
                             data.data = {info:[]};
                         }
                     }
-                    if(!error && data.errors){
-                        if(typeof(data.errors)==='string'){
-                            error = data.errors;
+                    if(!error && data.errors) {
+                        if(typeof(data.errors)==='string') {
+                            error = data.errors; 
                         }else if(data.errors.length){ //'{"errors":[{"code":53,"message":"Basic authentication is not supported"}]}'
                             if(data.errors[0].message){
                                 error = data.errors[0].message;
@@ -1271,7 +1290,7 @@ var sinaApi = {
                             }
                         }
                     }
-                    if(error || error_code){
+                    if(error || error_code) {
                     	data.error = error;
                     	textStatus = this.format_error(data.error || data.wrong || data.message || data.error_msg, error_code, data);
                     	var error_msg = callmethod + ' error: ' + textStatus;
@@ -1567,12 +1586,13 @@ $.extend(TQQAPI, {
             callback.apply(context, user_timeline_args);
         });
     	// 并发执行
-    	var params = {name: data.id || data.screen_name};
+    	var user = data.user;
+    	var params = {user: user, name: data.id || data.screen_name};
     	this.user_show(params, both.add());
     	this._user_timeline(data, both.add());
     },
     
-    _get_friendships: function(followers_args, callback, context) {
+    _get_friendships: function(user, followers_args, callback, context) {
         var ids = [];
         var result = followers_args[0];
         if(result && result.items) {
@@ -1581,7 +1601,7 @@ $.extend(TQQAPI, {
             }
         }
         if(ids.length > 0) {
-            this.friendships_show({target_ids: ids.join(',')}, function() {
+            this.friendships_show({user: user, target_ids: ids.join(',')}, function() {
                 var infos = arguments[0];
                 if(infos) {
                     for(var i = 0, len = result.items.length; i < len; i++) {
@@ -1602,14 +1622,16 @@ $.extend(TQQAPI, {
     },
     
     followers: function(data, callback, context) {
+        var user = data.user;
         this._followers(data, function() {
-            this._get_friendships(arguments, callback, context);
+            this._get_friendships(user, arguments, callback, context);
         }, this);
     },
 
     friends: function(data, callback, context){
+        var user = data.user;
         this._friends(data, function() {
-            this._get_friendships(arguments, callback, context);
+            this._get_friendships(user, arguments, callback, context);
         }, this);
     },
 	
@@ -1677,7 +1699,6 @@ $.extend(TQQAPI, {
 			    delete args.data.id;
                 break;
             case this.config.counts:
-//            	console.log(args.data);
 //                args.data.flag = 2;
                 break;
             case this.config.repost:
@@ -2097,6 +2118,7 @@ $.extend(DiguAPI, {
 	    support_auto_shorten_url: false,
 	    repost_pre: '转载:',
 	    support_search_max_id: false,
+	    user_timeline_need_friendship: false,
 	    
 	    verify_credentials:   '/account/verify',
 	    
@@ -2416,6 +2438,7 @@ $.extend(ZuosaAPI, {
 	    support_max_id: false,
 	    support_search_max_id: false,
 	    support_auto_shorten_url: false,
+	    user_timeline_need_friendship: false,
 	    
 	    upload: '/statuses/update',
 	    repost: '/statuses/update',
@@ -2588,6 +2611,7 @@ $.extend(LeiHouAPI, {
 		support_destroy_msg: false,
 		support_user_search: false,
 		support_auto_shorten_url: false,
+		user_timeline_need_friendship: false,
 	
 	    upload: '/statuses/update',
 	    repost: '/statuses/update',
@@ -2733,6 +2757,7 @@ $.extend(Follow5API, {
 	    support_favorites: false, // 判断是否支持收藏列表
 		support_do_favorite: false, // 判断是否支持收藏功能
 		support_auto_shorten_url: false,
+		user_timeline_need_friendship: false,
 
 	    verify_credentials: '/users/verify_credentials',
 	    direct_messages: '/destroy_messages', 
@@ -2886,6 +2911,7 @@ $.extend(TwitterAPI, {
 	    support_upload: false,
 	    support_double_char: false,
 	    rt_need_source: false,
+	    user_timeline_need_friendship: false,
 	    oauth_callback: 'oob',
 	    upload: '/statuses/update_with_media', // https://upload.twitter.com/1/statuses/update_with_media.json
 	    search: '/search_statuses',
@@ -3041,6 +3067,7 @@ $.extend(StatusNetAPI, {
 	    support_sent_direct_messages: false,
 	    support_auto_shorten_url: false,
 	    support_user_search: false, //暂时屏蔽
+	    user_timeline_need_friendship: false,
 	    oauth_callback: 'oob',
 	    search: '/search_statuses',
 	    repost: '/statuses/update',
@@ -3093,6 +3120,7 @@ $.extend(FanfouAPI, {
 	    search: '/search/public_timeline',
 	    favorites_create: '/favorites/create/{{id}}',
 	    support_user_search: false,
+	    user_timeline_need_friendship: false,
 
         gender_map:{"男":'m', '女':'f'}
 	}),
@@ -3228,6 +3256,7 @@ $.extend(T163API, {
         support_repost_comment_to_root: true,
         support_search_max_id: false,
         support_favorites_max_id: true,
+        user_timeline_need_friendship: false,
         max_text_length: 163,
         repost_pre: 'RT', // 转发前缀
         repost_delimiter: '||',
@@ -3303,20 +3332,20 @@ $.extend(T163API, {
     	delete data.long;
     },
 	
-	upload: function(user, params, pic, before_request, onprogress, callback) {
+	upload: function(user, params, pic, before_request, onprogress, callback, context) {
 		this._upload(user, {}, pic, before_request, onprogress, function(data) {
 			if(data && data.upload_image_url) {
 				params.user = user;
 				params.status += ' ' + data.upload_image_url;
-				this.update(params, callback);
+				this.update(params, callback, context);
 			} else {
-				callback(null, 'error');
+				callback.apply(context, arguments);
 			}
 		}, this);
 	},
 	
 	// 提供图片上传服务
-	upload_image: function(user, pic, before_request, onprogress, callback) {
+	upload_image: function(user, pic, before_request, onprogress, callback, context) {
 		if(!before_request) {
 			before_request = function() {};
 		}
@@ -3327,7 +3356,7 @@ $.extend(T163API, {
 			if(data && data.upload_image_url) {
 				data = data.upload_image_url;
 			}
-			callback(data, text_status, code);
+			callback.call(context, data, text_status, code);
 		});
 	},
 	
@@ -3597,6 +3626,7 @@ $.extend(RenjianAPI, {
 	    friends: '/statuses/followings/{{user_id}}',
 	    followers: '/statuses/followers/{{user_id}}',
 	    direct_messages: '/direct_messages/receive',
+	    user_timeline_need_friendship: false,
         
         gender_map: {0:'n', 1:'m', 2:'f'}
 	}),
@@ -3775,6 +3805,7 @@ $.extend(BuzzAPI, {
 		support_geo: false,
 		repost_pre: 'RT ',
 		comment_need_user_id: true,
+		user_timeline_need_friendship: false,
 		
 		oauth_host: 'https://www.google.com',
 		oauth_authorize: 	  '/accounts/OAuthAuthorizeToken',
@@ -4042,6 +4073,7 @@ $.extend(DoubanAPI, {
 		support_cursor_only: true,
 		support_search: false,
 		support_auto_shorten_url: false,
+		user_timeline_need_friendship: false,
 		// support_sent_direct_messages: false,
 //		oauth_callback: null,
 		oauth_host: 'http://www.douban.com',
@@ -4273,6 +4305,7 @@ $.extend(TianyaAPI, {
 		support_upload: false,
 		need_processMsg: false,
 		support_auto_shorten_url: false,
+		user_timeline_need_friendship: false,
 		//support_cursor_only: true,
 		support_search: false,
 		support_sent_direct_messages: false,
@@ -4349,6 +4382,7 @@ $.extend(FacebookAPI, {
         support_mentions: false,
         support_favorites: false,
         support_auto_shorten_url: false,
+        user_timeline_need_friendship: false,
         
         
         direct_messages: '/me/inbox',
@@ -4621,6 +4655,7 @@ $.extend(RenrenAPI, {
         support_mentions: false,
         support_favorites: false,
         support_auto_shorten_url: false,
+        user_timeline_need_friendship: false,
         use_method_param: true, // only one api path
         
         direct_messages: '/me/inbox',
@@ -4986,6 +5021,7 @@ $.extend(PlurkAPI, {
 //        support_user_search: false, // 暂时屏蔽
         support_cursor_only: true,  // 只支持游标方式翻页
         support_auto_shorten_url: false,
+        user_timeline_need_friendship: false,
         repost_pre: 'RT', // 转发前缀
         verify_credentials: '/Users/login',
         update: '/Timeline/plurkAdd',
@@ -5240,6 +5276,7 @@ $.extend(TumblrAPI, {
 		support_direct_messages: false,
 		support_auto_shorten_url: false,
 		need_processMsg: false,
+		user_timeline_need_friendship: false,
 		
 		verify_credentials: '/authenticate'
 	}),
@@ -5251,8 +5288,10 @@ $.extend(TumblrAPI, {
 	}
 });
 
+var TSinaAPI = WeiboAPI = sinaApi;
+
 var T_APIS = {
-	'tsina': sinaApi,
+	'tsina': TSinaAPI,
 	'tqq': TQQAPI,
 	'tsohu': TSohuAPI,
 	'digu': DiguAPI,
