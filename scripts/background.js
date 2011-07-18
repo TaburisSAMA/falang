@@ -396,21 +396,14 @@ function checkTimeline(t, p, user_uniqueKey) {
                     _unreadCount += 1;
                 }
             }
-            if(popupView){
-                // 保持当前浏览状态
-                var is_not_auto_insert = getAutoInsertMode() === 'notautoinsert';
-                if(is_not_auto_insert) {
-                    var view_status = get_view_status(t, c_user.uniqueKey);
-                    view_status.index = view_status.index || 0;
-                    view_status.index += sinaMsgs.length;
-                    set_view_status(t, view_status, c_user.uniqueKey);
-                }
-                
+            var insert_success = false; // 是否成功添加新数据
+            if(popupView) {
         		// 判断是否还是当前用户
                 if(!popupView.addTimelineMsgs(sinaMsgs, t, user_uniqueKey, isFirstTime)){
                     setUnreadTimelineCount(_unreadCount, t, user_uniqueKey);
                     popupView.updateDockUserUnreadCount(user_uniqueKey);
                 } else {
+                    insert_success = true;
                     if(current_user.uniqueKey == user_uniqueKey){
                         popupView._showMsg(_u.i18n("msg_has_new_tweet"));
                     } else {
@@ -424,6 +417,16 @@ function checkTimeline(t, p, user_uniqueKey) {
                 if(_unreadCount > 0){
                     NotificationsManager.show(c_user, t);
                     playSound(t);
+                }
+            }
+            if(!insert_success) {
+                // 如果未能成功插入数据，则记录下当前索引开始的位置
+                var is_not_auto_insert = getAutoInsertMode() === 'notautoinsert';
+                if(is_not_auto_insert) {
+                    var view_status = get_view_status(t, user_uniqueKey);
+                    view_status.index = view_status.index || 0;
+                    view_status.index += sinaMsgs.length;
+                    set_view_status(t, view_status, user_uniqueKey);
                 }
             }
     	}

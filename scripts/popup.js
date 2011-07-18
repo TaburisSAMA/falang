@@ -149,7 +149,7 @@ function initTabs() {
         //切换tab前先保护滚动条位置
         var old_t = getCurrentTab().replace('#', '').replace(/_timeline$/i, '');
         var c_t = t.attr('href').replace('#','').replace(/_timeline$/i,'');
-        if(c_t != old_t) { // 如果是数据类型不一样了，才需要记录当前位置
+        if(!currentIsActive) { // 如果是数据类型不一样了，才需要记录当前位置
             saveScrollTop(old_t);
         }
         //添加当前激活的状态

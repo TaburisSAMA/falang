@@ -489,19 +489,19 @@ function getUnreadTimelineCount(t, user_uniqueKey){
 function setUnreadTimelineCount(count, t, user_uniqueKey){
     if(!user_uniqueKey){
         var _user = getUser();
-        if(_user){
+        if(_user) {
             user_uniqueKey = _user.uniqueKey;
-        }else{
+        } else {
             return;
         }
     }
     var setBadgeText = Settings.get().isSetBadgeText[t];
     count += getUnreadTimelineCount(t, user_uniqueKey);
     localStorage.setObject(user_uniqueKey + t + UNREAD_TIMELINE_COUNT_KEY, count);
-    if(getAlertMode()=='dnd'){ //免打扰模式
+    if(getAlertMode()=='dnd') { //免打扰模式
         chrome.browserAction.setBadgeText({text: ''});
         chrome.browserAction.setIcon({path: 'icons/icon48-dnd.png'});
-    }else{
+    } else {
         chrome.browserAction.setIcon({path: 'icons/icon48.png'});
         if(setBadgeText){
             var total = 0;
