@@ -1333,7 +1333,13 @@ var ShortenUrl = {
 	expandAll: function() {
 		var b_view = getBackgroundView();
 		var cache = b_view.SHORT_URLS;
-		$('a.link:not([title*="'+ _u.i18n("comm_mbright_to_open") +'"],[videotype])').each(function() {
+		var conditions = '[title*="'+ _u.i18n("comm_mbright_to_open") +'"],[videotype]';
+		var selector = 'a.link:not(' + conditions + ')';
+		var config = tapi.get_config(getUser());
+		if(!config.need_processMsg) {
+		    selector += ', .tweet_text a:not(' + conditions + ')';
+		}
+		$(selector).each(function() {
 			var url = $(this).attr('href');
 			if(url.indexOf('javascript:') == 0) {
 				return;
