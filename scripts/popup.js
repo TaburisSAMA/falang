@@ -1720,17 +1720,19 @@ function readMore(t){
     	data_type = 'messages';
     }
     var cache = _b_view.get_data_cache(data_type, c_user.uniqueKey);
-    var timeline_offset = getTimelineOffset(t);
-    //tab上如果有未读数，则需要加上
-    var unread_count = $("#tl_tabs li.tab-" + t + " .unreadCount").html();
-    unread_count = Number(unread_count);
-    unread_count = isNaN(unread_count) ? 0 : unread_count;
-    if(!cache || (timeline_offset + unread_count) >= cache.length) {
+    var view_status = _b_view.get_view_status(t, c_user.uniqueKey);
+    var timeline_offset = getTimelineOffset(t) + (view_status.index || 0);
+//    //tab上如果有未读数，则需要加上
+//    var unread_count = $("#tl_tabs li.tab-" + t + " .unreadCount").html();
+//    unread_count = Number(unread_count);
+//    unread_count = isNaN(unread_count) ? 0 : unread_count;
+    if(!cache || timeline_offset >= cache.length) {
         _b_view.getTimelinePage(c_user.uniqueKey, t);
     } else {
         var msgs = cache.slice(timeline_offset, timeline_offset + PAGE_SIZE);
         addPageMsgs(msgs, t, true);
         showReadMore(t);
+        hideLoading();
     }
 };
 
