@@ -1931,6 +1931,10 @@ $.extend(TQQAPI, {
     				}
     			}
     		}
+    		if(!status.text && data.status === 3) {
+    		    // 对不起，原文已经被作者删除。 http://t.qq.com/p/t/39599091698961
+    		    status.text = '对不起，原文已经被作者删除。';
+    		}
     		data = status;
 		} 
 		return data;
