@@ -386,15 +386,15 @@ function checkTimeline(t, p, user_uniqueKey) {
             	merge_direct_messages(user_uniqueKey, sinaMsgs);
             }
             var _unreadCount = 0, _msg_user = null;
-//            var c_user_id = String(c_user.id);
+            var c_user_id = String(c_user.id);
             for(var i = 0, len = sinaMsgs.length; i < len; i++) {
                 _msg_user = sinaMsgs[i].user || sinaMsgs[i].sender;
-//                if(_msg_user && String(_msg_user.id) !== c_user_id){
-//                    _unreadCount += 1;
-//                }
-                if(_msg_user){
+                if(_msg_user && String(_msg_user.id) !== c_user_id){
                     _unreadCount += 1;
                 }
+//                if(_msg_user){
+//                    _unreadCount += 1;
+//                }
             }
             var insert_success = false; // 是否成功添加新数据
             if(popupView) {

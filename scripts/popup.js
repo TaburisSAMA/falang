@@ -173,11 +173,7 @@ function initTabs() {
             checkShowGototop();
             return;
         }
-        // TODO: 如果是当前tab点击，必定加载新数据 ?????
-        var load_new = !!t.find(".unreadCount").html();
-        if(load_new) {
-            load_new = _load_new_data(c_t, currentIsActive);
-        }
+        var load_new = _load_new_data(c_t, currentIsActive);
         if(!load_new) {
             // 未加载新数据
             if(!c_ul.find('ul.list').html()){
@@ -198,10 +194,11 @@ function initTabs() {
 
 // 判断是否需要加载新数据
 function _load_new_data(data_type, is_current_tab) {
-    var load_new = true;
     var b_view = getBackgroundView();
     var view_status = b_view.get_view_status(data_type);
-    if(!is_current_tab && isNotAutoInsertMode()) { 
+    view_status.index = view_status.index || 0;
+    var load_new = view_status.index !== 0; // 判断是否有新数据
+    if(load_new && !is_current_tab && isNotAutoInsertMode()) { 
         // 非自动插入模式，如果不是当前tab，则需根据上次的位置来判断是否要获取新的
         if(view_status.scrollTop && view_status.scrollTop > 50) {
             load_new = false;
@@ -698,7 +695,10 @@ function _change_tab(data_type) {
         $('.list_p').hide();
         $($tab.attr('href')).show();
         window.currentTab = $tab.attr('href');
-        getSinaTimeline(data_type);
+        if(!_load_new_data(data_type, false)) {
+            // 未加载新数据，则添加久数据
+            getSinaTimeline(data_type);
+        }
     }
 }
 
@@ -1755,14 +1755,15 @@ function addTimelineMsgs(msgs, t, user_uniqueKey, is_first_time){
     var _ul = $("#" + t + "_timeline ul.list");
     
     var unread = getUnreadTimelineCount(t);
+    var c_user_id = String(c_user.id);
     for(var i=0, len = msgs.length; i < len; i++) {
         var _msg_user = msgs[i].user || msgs[i].sender;
-//        if(_msg_user && _msg_user.id !== c_user.id){
-//        	unread += 1;
-//        }
-        if(_msg_user) {
-            unread += 1;
+        if(_msg_user && String(_msg_user.id) !== c_user_id) {
+        	unread += 1;
         }
+//        if(_msg_user) {
+//            unread += 1;
+//        }
     }
     if(!li.hasClass('active')) {
         //清空，让下次点tab的时候重新取
