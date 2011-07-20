@@ -329,6 +329,7 @@ var Settings = {
         isGeoEnabledUseIP: false, //true 使用ip判断， false 使用浏览器来判断
         geoPosition: null, //获取到的地理位置信息，默认为空
         sent_success_auto_close: true, // 弹出窗口全部发送成功自动关闭
+        remember_view_status: false, // 记住上次浏览状态
 
         lookingTemplate: _u.i18n('sett_shared_template')
     },

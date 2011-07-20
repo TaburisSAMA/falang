@@ -802,6 +802,14 @@
         "message": "记住上次选择",
         "description": "多账号发送试默认选择 记住上次选择"
     },
+    "sett_itemName_remember_view_status": {
+        "message": "记住浏览状态",
+        "description": "记住浏览状态"
+    },
+    "sett_jTip_remember_view_status": {
+        "message": "可以让你打开弹出页的时候，还原到上次浏览状态，包括上次浏览的tab和位置",
+        "description": "可以让你打开弹出页的时候，还原到上次浏览状态，包括上次浏览的tab和位置"
+    },
     "sett_send_select_current": {
         "message": "当前账号",
         "description": "多账号发送试默认选择 当前账号"

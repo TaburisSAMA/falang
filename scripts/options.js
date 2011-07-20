@@ -124,6 +124,10 @@ $(function(){
         saveAll();
     });
     
+    var settings = Settings.get();
+    // 设置是否记录上次浏览状态
+    $('#remember_view_status_cb').attr('checked', settings.remember_view_status);
+    
     // 绑定认证类型变化时的显示切换
     if($("#account-authType").change(function() {
     	if($(this).val() == 'oauth') {
@@ -342,16 +346,16 @@ function showDndAccountList(bindDnd){
                 '               <li class="disabled" onclick="changeAccountStatus(\'{{uniqueKey}}\', \'disabled\')">'+ _u.i18n("comm_disabled") +'</li></ul>' +
                 '           </div>' +
                 '       </div>' +
-                '       <span class="edit"><button onclick="delAccount(\'{{uniqueKey}}\')"><img src="images/delete.png">'+ _u.i18n("comm_del_user") +'</button></span>' +
+                '       <span class="edit"><button class="button_white button_small" onclick="delAccount(\'{{uniqueKey}}\')"><img src="images/delete.png">'+ _u.i18n("comm_del_user") +'</button></span>' +
                 '   </div>' +
                 '   <div class="item item2">' +
                 '       <span><span>'+ _u.i18n("sett_refresh_interval") +':  </span><span class="userRefreshTimeWrap">{{refTimeHtml}}</span></span>' +
                 '   </div>' +
                 '</div>' +
                 '</li>';
-        for(var i in userList){
+        for(var j = 0, jlen = userList.length; j < jlen; j++) {
             userCount++;
-            var user = userList[i];
+            var user = userList[j];
             if(!user.uniqueKey){ //兼容单微博版本
                 needRefresh = true;
             } else {
@@ -361,11 +365,11 @@ function showDndAccountList(bindDnd){
                 
                 //绑定用户自定刷新时间
                 var refTime = 0, timelimes = T_LIST[user.blogType], c_html = '';
-                for(var i in timelimes){
+                for(var i = 0, len = timelimes.length; i < len; i++) {
                     if(c_html){ c_html += ', '; }
                     c_html += tabDes[timelimes[i]];
                     c_html += '('+ Settings.get().globalRefreshTime[timelimes[i]] +')';
-                    if(user.refreshTime && user.refreshTime[timelimes[i]]){
+                    if(user.refreshTime && user.refreshTime[timelimes[i]]) {
                         refTime = user.refreshTime[timelimes[i]];
                     }else{
                         refTime = 0;
@@ -1133,6 +1137,9 @@ function saveAll(){
     } else {
     	settings.enable_image_service = false;
     }
+    
+    // 上次浏览状态设置
+    settings.remember_view_status = !!$('#remember_view_status_cb').attr('checked');
 
     Settings.save();
 

@@ -27,7 +27,7 @@ function get_view_status(data_type, user_uniquekey) {
     if(!status) {
         status = {
             index: 0,
-            size: null,
+            size: 0,
             scrollTop: 0
         };
         window.__view_status[key] = status;

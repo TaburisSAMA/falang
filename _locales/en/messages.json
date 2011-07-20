@@ -794,6 +794,14 @@
         "message": "Remember the last selected",
         "description": "多账号发送试默认选择 记住上次选择"
     },
+    "sett_itemName_remember_view_status": {
+        "message": "Remember view status",
+        "description": "记住浏览状态"
+    },
+    "sett_jTip_remember_view_status": {
+        "message": "When you open the popup page, restore the last view status for you, including the tab and scroll position",
+        "description": "可以让你打开弹出页的时候，还原到上次浏览状态，包括上次浏览的tab和位置"
+    },
     "sett_send_select_current": {
         "message": "Current account",
         "description": "多账号发送试默认选择 当前账号"

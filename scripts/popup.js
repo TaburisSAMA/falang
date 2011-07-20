@@ -198,15 +198,20 @@ function _load_new_data(data_type, is_current_tab) {
     var view_status = b_view.get_view_status(data_type);
     view_status.index = view_status.index || 0;
     var load_new = view_status.index !== 0; // 判断是否有新数据
-    if(load_new && !is_current_tab && isNotAutoInsertMode()) { 
-        // 非自动插入模式，如果不是当前tab，则需根据上次的位置来判断是否要获取新的
-        if(view_status.scrollTop && view_status.scrollTop > 50) {
-            load_new = false;
+    var settings = Settings.get();
+    if(settings.remember_view_status) {
+        if(load_new && !is_current_tab && isNotAutoInsertMode()) { 
+            // 非自动插入模式，如果不是当前tab，则需根据上次的位置来判断是否要获取新的
+            if(view_status.scrollTop && view_status.scrollTop > 50) {
+                load_new = false;
+            }
         }
+    } else {
+        load_new = true;
     }
     if(load_new) {
         view_status.index = 0;
-        view_status.size = null;
+        view_status.size = 0;
         view_status.scrollTop = 0;
         b_view.set_view_status(data_type, view_status);
         $("#" + data_type + "_timeline ul.list").html('');
@@ -959,8 +964,8 @@ var SCROLL_TOP_CACHE = {};
 //@t : timeline类型
 function saveScrollTop(t) {
     var b_view = getBackgroundView();
-    var _cache = b_view.get_view_status(t);
-    var scrollTop = _cache.scrollTop = $("#" + t + "_timeline .list_warp").scrollTop();
+    var view_status = b_view.get_view_status(t);
+    var scrollTop = view_status.scrollTop = $("#" + t + "_timeline .list_warp").scrollTop();
     var total_height = 0, item_index = 0;
     $("#" + t + "_timeline .list_warp ul.list > li").each(function(index) {
         var height = $(this).height();
@@ -970,8 +975,8 @@ function saveScrollTop(t) {
         }
         total_height += height;
     });
-    _cache.size = item_index + 5;
-    b_view.set_view_status(t, _cache);
+    view_status.size = item_index + 5;
+    b_view.set_view_status(t, view_status);
 };
 
 //复位到上次的位置
@@ -1845,14 +1850,14 @@ function addPageMsgs(msgs, t, append, data_type){
         var h_new = _ul.height();
         list_warp.scrollTop(h_new - h_old + st_old);
     }
-    if(append) {
-        // 设置缓存的页数
-        var b_view = getBackgroundView();
-        var view_status = b_view.get_view_status(t);
-        view_status.size = view_status.size || 0;
-        view_status.size += msgs.length;
-        b_view.set_view_status(t, view_status);
-    }
+//    if(append) {
+//        // 设置缓存的页数
+//        var b_view = getBackgroundView();
+//        var view_status = b_view.get_view_status(t);
+//        view_status.size = view_status.size || 0;
+//        view_status.size += msgs.length;
+//        b_view.set_view_status(t, view_status);
+//    }
     return msgs;
 };
 
