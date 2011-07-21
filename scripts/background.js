@@ -8,7 +8,7 @@ var tweets = {},
     new_win_popup = Object(),
     MAX_MSG_ID = {},
     LAST_PAGES = {};
-var SHORT_URLS = {};
+var SHORT_URLS = {}, IMAGE_URLS = {};
 
 window.checking = {}; //正在检查是否有最新微博
 window.paging = {}; //正在获取分页微博

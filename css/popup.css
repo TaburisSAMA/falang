@@ -515,10 +515,10 @@ div.mainContent{word-wrap: break-word; line-height:1.5em;}
 .layerBoxTop a.close{float:right; background:url('../images/sicon.gif') no-repeat -18px 0; width:7px; height:8px; margin-top:9px; overflow:hidden;}
 .layerBoxTop a.close:hover{background:url('../images/sicon.gif') no-repeat -18px -8px; overflow:hidden;}
 .faceItem{ padding: 8px; position:relative;}
-.faceItem .layerArrow{ left:25px;}
-.faceItem .faceItemPicbg{ width:398px;}
-.faceItem .faceItemPicbg li{ list-style:none; float:left; height:28px; width:28px; padding:0px 5px 5px 0px;}
-.faceItem .faceItemPicbg li a:link,.faceItem .faceItemPicbg li a:visited{ width:26px; height:26px; text-align:center; display:block; border:1px dashed #ddd;}
+.faceItem .layerArrow{ left:40px;}
+.faceItem .faceItemPicbg{ width:450px;}
+.faceItem .faceItemPicbg li{ list-style:none; float:left; height:28px; width:28px;padding:1px;}
+.faceItem .faceItemPicbg li a:link,.faceItem .faceItemPicbg li a:visited{ width:26px; height:26px; text-align:center; display:block; border:1px solid #ddd;}
 .faceItem .faceItemPicbg li a:hover{ border:1px dashed #999;}
 /*>>>> face end <<<<*/
 

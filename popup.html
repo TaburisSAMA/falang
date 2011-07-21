@@ -61,13 +61,13 @@
                 <span id="wordCount">140</span>
 				&nbsp;
 				<a id="btnAddEmotional" href="javascript:void(0);" onclick="fawave.face.show(this, 'txtContent');">
-					<img src="images/face.gif" />
-					<script>_u.wi('comm_emotional')</script>
-				</a><script>_u.wia('#btnAddEmotional','title','btn_emotional_title');</script>&nbsp;
-				<a id="btnUploadPic" href="javascript:void(0);" onclick="openUploadImage();" title="点击上传图片">
-					<img src="images/image.gif" />
-					<script>_u.wi('comm_pic')</script>
-				</a><script>_u.wia('#btnUploadPic','title','btn_pic_title');</script>&nbsp;
+					<img src="images/face.gif" /><script>_u.wi('comm_emotional')</script>
+				</a>
+				<script>_u.wia('#btnAddEmotional','title','btn_emotional_title');</script>&nbsp;
+				<a id="btnUploadPic" href="javascript:void(0);" onclick="openUploadImage();">
+					<img src="images/image.gif" /><script>_u.wi('comm_pic')</script>
+				</a>
+				<script>_u.wia('#btnUploadPic','title','btn_pic_title');</script>&nbsp;
 				<button onclick="cleanTxtContent();" class="btn"><script>_u.wi('comm_clear')</script></button>
 				<span id="doingWarp"></span>
 				<a id="urlShortenBtn" href="javascript:" title="缩短网址" onclick="addShortenUrl()"><img src="images/link_add.png" /></a>
@@ -208,14 +208,14 @@
 		</div><!-- div.wrap END -->
 	</div><!-- wrapper END -->
 	<div id="ye_dialog_window" >
-		<a title="关闭" href="javascript:void(0);" id="ye_dialog_close"></a>
+		<a title="关闭 Close" href="javascript:void(0);" id="ye_dialog_close"></a>
 		<div id="ye_dialog_title"></div>
 		<div id="ye_dialog_body" >
 			<div class="replyDialog">
 				<textarea class="uTextarea" id="replyTextarea"></textarea><br/>
+				<span id="replyInputCount" class="conTinge">(还可以输入140字)</span>
 				<a id="btnAddReplyEmotional" href="javascript:void(0);" onclick="fawave.face.show(this, 'replyTextarea');" title="点击添加表情"><img src="images/face.gif" /><script>_u.wi('comm_emotional')</script></a>
 				<script>_u.wia('#btnAddReplyEmotional','title','btn_emotional_title');</script>
-				<span id="replyInputCount" class="conTinge">(还可以输入140字)</span>
 				<p>
 					<input type="checkbox" id="chk_sendOneMore" /><label for="chk_sendOneMore" id="txt_sendOneMore"></label><br/>
 					<input type="checkbox" id="chk_sendOneMore2" /><label for="chk_sendOneMore2" id="txt_sendOneMore2"></label>
@@ -513,14 +513,14 @@
 						#{_u.i18n("comm_fans")}: <span><a href="javascript:showFollowers('followers', '#{user.screen_name}', '#{user.id}');">#{user.followers_count == undefined ? _u.i18n("comm_view"): user.followers_count}</a></span>　
 						#{_u.i18n("comm_tweet")}: <span><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');">#{user.statuses_count == undefined ? _u.i18n("comm_view"): user.statuses_count}</a></span></p>
 					<?js if(user.url && user.url != 'http://1'){ ?>
-					<p>#{_u.i18n("comm_blog")}：<a href="#{user.url}">#{user.url}</a></p>
+					<p>#{_u.i18n("comm_blog")}: <a href="#{user.url}">#{user.url}</a></p>
 					<?js } ?>
 				</div>
 				<?js if(user.description){ ?>
-				<div class="des">#{_u.i18n("comm_description")}：#{user.description}</div>
+				<div class="des">#{_u.i18n("comm_description")}: #{user.description}</div>
 				<?js } ?>
 				<?js if(user.tags){ ?>
-                <div class="tags">#{_u.i18n("comm_tags")}：
+                <div class="tags">#{_u.i18n("comm_tags")}: 
 	                <?js for(var i=0;i<user.tags.length;i++){ var tag = user.tags[i]; ?>
 	                <a target="_blank" href="http://t.qq.com/search/tag.php?k=#{tag.name}">#{tag.name}</a>
 	                <?js } ?>
@@ -565,8 +565,28 @@
 					<?js } ?>
 				</div>
 				<?js if(user.description){ ?>
-				<div class="des">#{_u.i18n("comm_description")}：#{user.description}</div>
+				<div class="des">#{_u.i18n("comm_description")}: #{user.description}</div>
 				<?js } ?>
+				<?js if(user.tags){ ?>
+                <div class="tags">#{_u.i18n("comm_tags")}: 
+                    <?js for(var i=0;i<user.tags.length;i++){ var tag = user.tags[i]; ?>
+                    <a target="_blank" href="http://t.qq.com/search/tag.php?k=#{tag.name}">#{tag.name}</a>
+                    <?js } ?>
+                </div>
+                <?js } ?>
+				<?js if(user.tweet && user.tweet.text) { ?>
+				<br/>
+                <div class="recent_tweet">#{_u.i18n("comm_recent_tweet")}: 
+                #{user.tweet.text}
+                |
+                <?js if(user.tweet.t_url) { ?>
+                <a href="#{user.tweet.t_url}" target="_blank">#{new Date(user.tweet.created_at).format("yyyy-MM-dd hh:mm:ss")}</a>
+                <?js } else { ?>
+                #{new Date(user.tweet.created_at).format("yyyy-MM-dd hh:mm:ss")}
+                <?js } ?>
+                #{_u.i18n('comm_post_by')} #{user.tweet.source|| _u.i18n("comm_web_site")}
+                </div>
+                <?js } ?>
 			</div>
 		</textarea>
 	</div>

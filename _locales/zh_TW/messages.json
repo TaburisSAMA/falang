@@ -65,6 +65,10 @@
         "message": "标签",
         "description": "标签"
     },
+    "comm_recent_tweet": {
+        "message": "最近微博",
+        "description": "最近微博"
+    },
     "comm_disabled": {
         "message": "停用",
         "description": "停用"

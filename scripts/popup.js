@@ -2748,7 +2748,7 @@ fawave.face = {
     	$('#face_box .face_tab span[face_type="' + current_blogtype + '"]').click();
         $("#face_box_target_id").val(target_id);
         var offset = $(ele).offset();
-        f.css({top: offset.top+20, left: offset.left}).show();
+        f.css({top: offset.top+20, left: offset.left-40}).show();
     },
     hide: function() {
         $("#face_box").hide();

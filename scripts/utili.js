@@ -666,21 +666,23 @@ function setAutoInsertMode(mode){
 };
 //<<--
 
+var _bg_view = null;
 //====>>>>>>>>>>>>>>>>>>
-function getBackgroundView(){
-    var b = chrome.extension.getBackgroundPage();
-    if(b){
-        return b;
-    }else{
-        var views = chrome.extension.getViews();
-        for (var i = 0; i < views.length; i++) {
-            var view = views[i];
-            if (view.theViewName && view.theViewName == 'background') {
-                return view;
+function getBackgroundView() {
+    if(!_bg_view) {
+        _bg_view = chrome.extension.getBackgroundPage();
+        if(!_bg_view){
+            var views = chrome.extension.getViews();
+            for (var i = 0; i < views.length; i++) {
+                var view = views[i];
+                if (view.theViewName && view.theViewName == 'background') {
+                    _bg_view = view;
+                    break;
+                }
             }
         }
     }
-    return null;
+    return _bg_view;
 };
 
 function getPopupView(){
@@ -1347,15 +1349,13 @@ var ShortenUrl = {
 		}
 		$(selector).each(function() {
 			var url = $(this).attr('href');
-			if(url.indexOf('javascript:') == 0) {
+			if(url.indexOf('javascript:') >= 0) {
 				return;
 			}
-			if(url.length > 30) {
-                UrlUtil.showFaviconBefore(this, url);
-                if(!VideoService.attempt(url, this)) {
-                	ImageService.attempt(url, this);
-                }
-				return;
+			if(VideoService.attempt(url, this) || ImageService.attempt(url, this) || url.length > 30) {
+			    // 无需还原
+			    UrlUtil.showFaviconBefore(this, url);
+			    return;
 			}
 			var cache_data = cache[url];
 			if(cache_data && cache_data.url) {
@@ -1448,17 +1448,27 @@ var Instagram = {
 	 */
 	host: 'instagr.am',
 	url_re: /http:\/\/instagr\.am\/p\//i,
+	cache: {},
 	get: function(url, callback) {
+	    var bg = getBackgroundView();
+	    if(bg.IMAGE_URLS[url]) {
+	        return callback(bg.IMAGE_URLS[url], true);
+	    }
 		$.ajax({
 			url: url,
 			success: function(html, status, xhr) {
 				var src = $(html).find('.photo').attr('src');
-				var pics = {
-					thumbnail_pic: src.replace('_7.', '_5.'),
-					bmiddle_pic: src.replace('_7.', '_6.'),
-					original_pic: src
-				};
-				callback(pics);
+				if(src) {
+				    var pics = {
+	                    thumbnail_pic: src.replace('_7.', '_5.'),
+	                    bmiddle_pic: src.replace('_7.', '_6.'),
+	                    original_pic: src
+	                };
+				    bg.IMAGE_URLS[url] = pics;
+	                callback(pics);
+				} else {
+				    callback(null);
+				}
 			},
 			error: function() {
 				callback(null);
@@ -1467,30 +1477,33 @@ var Instagram = {
 	}
 };
 
+/**
+ * 直接得到图片，无需爬页面，同步版本
+ */
 var Instagram2 = {
-		/* 
-		 * big: <img src="http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_7.jpg" class="photo" /> 
-		 * middle: http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_6.jpg
-		 * small: http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_5.jpg
-		 * 
-		 * http://images.instagram.com/media/2011/05/20/c67a2c94bed9459ca2d398375b799219_5.jpg
-		 * http://images.instagram.com/media/2011/05/20/c67a2c94bed9459ca2d398375b799219_6.jpg
-		 * http://images.instagram.com/media/2011/05/20/c67a2c94bed9459ca2d398375b799219_7.jpg
-		 * 
-		 */
-		host: 'instagram.com',
-		url_re: /http:\/\/images\.instagram\.com\/media\/[^\_]+(\_\d\.)\w+/i,
-		sync: true,
-		get: function(url, callback) {
-			var m = this.url_re.exec(url);
-			var pics = {
-				thumbnail_pic: url.replace(m[1], '_5.'),
-				bmiddle_pic: url.replace(m[1], '_6.'),
-				original_pic: url.replace(m[1], '_7.')
-			};
-			callback(pics);
-		}
-	};
+	/* 
+	 * big: <img src="http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_7.jpg" class="photo" /> 
+	 * middle: http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_6.jpg
+	 * small: http://distillery.s3.amazonaws.com/media/2010/10/03/ca65a1ad211140c8ac97e2d2439a1376_5.jpg
+	 * 
+	 * http://images.instagram.com/media/2011/05/20/c67a2c94bed9459ca2d398375b799219_5.jpg
+	 * http://images.instagram.com/media/2011/05/20/c67a2c94bed9459ca2d398375b799219_6.jpg
+	 * http://images.instagram.com/media/2011/05/20/c67a2c94bed9459ca2d398375b799219_7.jpg
+	 * 
+	 */
+	host: 'instagram.com',
+	url_re: /http:\/\/images\.instagram\.com\/media\/[^\_]+(\_\d\.)\w+/i,
+	sync: true,
+	get: function(url, callback) {
+		var m = this.url_re.exec(url);
+		var pics = {
+			thumbnail_pic: url.replace(m[1], '_5.'),
+			bmiddle_pic: url.replace(m[1], '_6.'),
+			original_pic: url.replace(m[1], '_7.')
+		};
+		callback(pics);
+	}
+};
 
 var Flickr = {
 	host: 'www.flickr.com',
@@ -1683,112 +1696,7 @@ var Imgur = {
 		callback(pics);
 	},
 	key: 'cba6198873ac20498a5686839b189fc0',
-	api: 'http://imgur.com/api/upload.json',
-	upload: function(pic, before_request, onprogress, callback) {
-    	pic.keyname = 'image';
-	    var boundary = '----multipartformboundary' + (new Date).getTime();
-	    var dashdash = '--';
-	    var crlf = '\r\n';
-	
-	    /* Build RFC2388 string. */
-	    var builder = '';
-	
-	    builder += dashdash;
-	    builder += boundary;
-	    builder += crlf;
-		
-	    /* Generate headers. [PIC] */            
-	    builder += 'Content-Disposition: form-data; name="' + pic.keyname + '"';
-	    if(pic.file.fileName) {
-	      builder += '; filename="' + this.url_encode(pic.file.fileName) + '"';
-	    }
-	    builder += crlf;
-	
-	    builder += 'Content-Type: '+ pic.file.type;
-	    builder += crlf;
-	    builder += crlf; 
-	
-	    var bb = new BlobBuilder(); //NOTE
-	    bb.append(builder);
-	    bb.append(pic.file);
-	    builder = crlf;
-	    
-	    /* Mark end of the request.*/ 
-	    builder += dashdash;
-	    builder += boundary;
-	    builder += dashdash;
-	    builder += crlf;
-	
-	    bb.append(builder);
-	    
-	    if(before_request) {
-	    	before_request();
-	    }
-	    $.ajax({
-	        url: this.api,
-	        cache: false,
-	        timeout: 5*60*1000, //5分钟超时
-	        type : 'post',
-	        data: bb.getBlob(),
-	        dataType: 'text',
-	        contentType: 'multipart/form-data; boundary=' + boundary,
-	        processData: false,
-	        beforeSend: function(req) {
-	            if(onprogress) {
-	            	if(req.upload){
-		                req.upload.onprogress = function(ev){
-		                    onprogress(ev);
-		                };
-		            }
-	            }
-	        },
-	        success: function(data, textStatus) {
-	            try{
-	                data = JSON.parse(data);
-	            }
-	            catch(err){
-	                //data = null;
-	                log(data);
-	                data = {error:'服务器返回结果错误，本地解析错误。', error_code:500};
-	                textStatus = 'error';
-	            }
-	            var error_code = null;
-	            if(data){
-                    var error = data.errors || data.error;
-	                if(error || data.error_code){
-	                	data.error = error;
-	                    _showMsg('error: ' + data.error + ', error_code: ' + data.error_code, false);
-	                    error_code = data.error_code || error_code;
-	                }
-	            }else{error_code = 400;}
-	            callback(data, textStatus, error_code);
-	        },
-	        error: function (xhr, textStatus, errorThrown) {
-	            var r = null, status = 'unknow';
-	            if(xhr){
-	                if(xhr.status){
-	                    status = xhr.status;
-	                }
-	                if(xhr.responseText){
-	                    var r = xhr.responseText;
-	                    try{
-	                        r = JSON.parse(r);
-	                    }
-	                    catch(err){
-	                        r = null;
-	                    }
-	                    if(r){_showMsg('error_code:' + r.error_code + ', error:' + r.error, false);}
-	                }
-	            }
-	            if(!r){
-	                textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';
-	                errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
-	                _showMsg('error: ' + textStatus + errorThrown + 'statuCode: ' + status, false);
-	            }
-	            callback({}, 'error', status); //不管什么状态，都返回 error
-	        }
-	    });
-    }
+	api: 'http://imgur.com/api/upload.json'
 };
 
 var SinaImage = {
@@ -1863,7 +1771,7 @@ var ImageService = {
 	},
 	
 	show: function(ele, service, url) {
-		this.services[service].get(url, function(pics) {
+		this.services[service].get(url, function(pics, sync) {
 			if(!pics) {
 				return;
 			}

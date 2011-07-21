@@ -20,7 +20,7 @@ items = {}
 print 'var TSINA_API_EMOTIONS = {'
 for i in data:
     key = i['phrase'][1:-1]
-    items[key] = i['url'].replace("http://img.t.sinajs.cn/t3/style/images/common/face/ext/normal/", "")
+    items[key] = i['url'].replace("http://img.t.sinajs.cn/t35/style/images/common/face/ext/normal/", "")
     print '"' + key + '"' + ': ' + '"' + items[key] + '",',
 print '};'
 

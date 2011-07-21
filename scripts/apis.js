@@ -568,27 +568,25 @@ var sinaApi = {
 	},
 
 	// id, user_id, screen_name, cursor, count
-    followers: function(data, callbackFn, context){
-		if(!callbackFn) return;
+    followers: function(data, callback, context){
         var params = {
             url: this.config.followers,
             type: 'get',
             play_load: 'user',
             data: data
         };
-        this._sendRequest(params, callbackFn, context);
+        this._sendRequest(params, callback, context);
 	},
 
 	// id, user_id, screen_name, cursor, count
-    friends: function(data, callbackFn, context){
-		if(!callbackFn) return;
+    friends: function(data, callback, context){
         var params = {
             url: this.config.friends,
             type: 'get',
             play_load: 'user',
             data: data
         };
-        this._sendRequest(params, callbackFn, context);
+        this._sendRequest(params, callback, context);
 	},
 
 	// page
@@ -1375,6 +1373,7 @@ TQQAPI._user_timeline = TQQAPI.user_timeline;
 TQQAPI._processMsg = TQQAPI.processMsg;
 TQQAPI._followers = TQQAPI.followers;
 TQQAPI._friends = TQQAPI.friends;
+TQQAPI._user_search = TQQAPI.user_search;
 
 $.extend(TQQAPI, {
 	config: $.extend({}, sinaApi.config, {
@@ -1621,6 +1620,13 @@ $.extend(TQQAPI, {
         }
     },
     
+    user_search: function(data, callback, context) {
+        var user = data.user;
+        this._user_search(data, function() {
+            this._get_friendships(user, arguments, callback, context);
+        }, this);
+    },
+    
     followers: function(data, callback, context) {
         var user = data.user;
         this._followers(data, function() {
@@ -1833,7 +1839,7 @@ $.extend(TQQAPI, {
 		return data;
 	},
 
-	format_result_item: function(data, play_load, args, users) {
+	format_result_item: function(data, play_load, args, users, need_user) {
 		if(play_load == 'user' && data && data.name) {
 			var user = {};
 			user.t_url = 'http://t.qq.com/' + data.name;
@@ -1862,6 +1868,10 @@ $.extend(TQQAPI, {
 			user.following = !!data.Ismyfans;
 			user.followed_by = !!data.Ismyidol;
 			user.blacked_by = !!data.Ismyblack;
+			if(data.tweet && data.tweet.length > 0) {
+			    data.tweet[0].origtext = data.tweet[0].origtext || data.tweet[0].text;
+			    user.tweet = this.format_result_item(data.tweet[0], 'status', args, users, false);
+			}
 			data = user;
 		} else if(play_load == 'status' || play_load == 'comment' || play_load == 'message') {
 			// type:微博类型 1-原创发表、2-转载、3-私信 4-回复 5-空回 6-提及 7: 点评
@@ -1903,7 +1913,9 @@ $.extend(TQQAPI, {
 			status.repost_count = data.count || 0;
 			status.comments_count = data.mcount || 0; // 评论数
 			status.source = data.from;
-			status.user = this.format_result_item(data, 'user', args, users);
+			if(need_user !== false) {
+			    status.user = this.format_result_item(data, 'user', args, users);
+			}
 			// 收件人
 //			tohead: ""
 //			toisvip: 0
