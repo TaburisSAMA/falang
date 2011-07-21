@@ -1503,15 +1503,16 @@ $.extend(TQQAPI, {
 	    return message || error_msg;
 	},
 	
-	processMsg: function(str_or_status, notEncode) {
-		var status = this._processMsg(str_or_status, notEncode);
-		if(str_or_status.video && str_or_status.video.picurl) {
-			status += '<br/><img class="video_image" title="' + str_or_status.video.title + '" src="' + str_or_status.video.picurl + '" />';
+	processMsg: function(status, notEncode) {
+		var s = this._processMsg(status, notEncode);
+		if(status.video && status.video.picurl) {
+		    s += ' <a href="' + status.video.realurl + '" title="' + status.video.title + '" target="_blank" class="link">' + status.video.shorturl + '</a>';
+			s += '<br/><img class="video_image" title="' + status.video.title + '" src="' + status.video.picurl + '" />';
 		}
 //		if(str_or_status.music && str_or_status.music.url) {
 //			status += '<br/><audio controls="controls" title="' + str_or_status.music.title + '" src="' + str_or_status.music.url + '"></audio>';
 //		}
-		return status;
+		return s;
 	},
 	
 	//page.js里面调用的时候没有加载表情字典,所以需要判断
