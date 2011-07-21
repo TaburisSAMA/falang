@@ -483,6 +483,22 @@ var TQQ_EMOTIONS = {
 	"c摇头": "cFace/c16.gif",
 	"c再见": "cFace/c17.gif",
 	"c折磨": "cFace/c18.gif",
+	
+	"j吃饭": "cFace/j1.gif",
+	"j飞吻": "cFace/j2.gif",
+	"j浮云": "cFace/j3.gif",
+	"j鼓掌": "cFace/j4.gif",
+	"j害羞": "cFace/j5.gif",
+	"j囧": "cFace/j6.gif",
+	"j纠结": "cFace/j7.gif",
+	"j开心": "cFace/j8.gif",
+	"j哭泣": "cFace/j9.gif",
+	"j晚安": "cFace/j10.gif",
+	"j汗": "cFace/j11.gif",
+	"j无奈": "cFace/j12.gif",
+	"j招手": "cFace/j13.gif",
+	"j震惊": "cFace/j14.gif",
+	"j咒骂": "cFace/j15.gif"
 
 };
 
