@@ -101,6 +101,10 @@
         "message": "關注",
         "description": "关注"
     },
+    "comm_favourite": {
+        "message": "收藏",
+        "description": "收藏"
+    },
     "comm_female": {
         "message": "女",
         "description": "女"
