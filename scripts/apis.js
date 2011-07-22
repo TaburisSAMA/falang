@@ -30,6 +30,23 @@ Combo.prototype = {
     }
 };
 
+//destination, source1[, source2, ...]
+Object.inherits = function(destination) {
+    for(var i = 1, len = arguments.length; i < len; i++) {
+        var source = arguments[i];
+        if(!source) {
+            continue;
+        }
+        for(var property in source) {
+            destination[property] = source[property];
+        }
+        if(destination.super_ === undefined) {
+            destination.super_ = source;
+        }
+    }
+    return destination;
+};
+
 var OAUTH_CALLBACK_URL = chrome.extension.getURL('oauth_cb.html');
 var FAWAVE_OAUTH_CALLBACK_URL = 'http://fawave.net4team.net/';
 var RE_JSON_BAD_WORD = /[\u000B\u000C]/ig; //具体见：http://www.cnblogs.com/rubylouvre/archive/2011/02/12/1951760.html
@@ -42,7 +59,9 @@ var TSINA_APPKEYS = {
 };
 
 var sinaApi = {
-	
+	combo: function(callback) {
+	    return new Combo(callback);
+	},
 	config: {
 		host: 'http://api.t.sina.com.cn',
         user_home_url: 'http://weibo.com/n/',
@@ -91,6 +110,7 @@ var sinaApi = {
 		
 		need_processMsg: true, //是否需要处理消息的内容
 		comment_need_user_id: false, // 评论是否需要使用到用户id，默认为false，兼容所有旧接口
+		user_timeline_need_user: false, // user_timeline 是否需要调用show_user获取详细用户信息
         
 		// api
         public_timeline:      '/statuses/public_timeline',
@@ -258,8 +278,7 @@ var sinaApi = {
         return str;
     },
     processEmotional: function(str){
-        str = str.replace(/\[([\u4e00-\u9fff,\uff1f,\w]{1,4})\]/g, this._replaceEmotional);
-        return str;
+        return str.replace(/\[([\u4e00-\u9fff,\uff1f,\w]{1,4})\]/g, this._replaceEmotional);
     },
     _replaceUrl: function(m, g1, g2){
         var _url = g1;
@@ -349,7 +368,6 @@ var sinaApi = {
     get_authorization_url: function(user, callback, context) {
     	if(user.authType == 'oauth') {
     		var login_url = null;
-//    		var me = this;
     		this.get_request_token(user, function(token, text_status, error_code) {
     			if(token) {
     				user.oauth_token_key = token.oauth_token;
@@ -447,8 +465,8 @@ var sinaApi = {
             成功和错误都会调用的方法。
             如果失败则errorCode为服务器返回的错误代码(例如: 400)。
     */
-    verify_credentials: function(user, callbackFn, data){
-        if(!user || !callbackFn) return;
+    verify_credentials: function(user, callback, data, context){
+        if(!user) return callback && callback();
         var params = {
             url: this.config.verify_credentials,
             type: 'get',
@@ -456,30 +474,29 @@ var sinaApi = {
             play_load: 'user',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callback, context);
 	},
         
-    rate_limit_status: function(data, callbackFn, context){
-        if(!callbackFn) return;
+    rate_limit_status: function(data, callback, context){
+        if(!callback) return;
         var params = {
             url: this.config.rate_limit_status,
             type: 'get',
             play_load: 'rate',
             data: data
         };
-        this._sendRequest(params, callbackFn, context);
+        this._sendRequest(params, callback, context);
 	},
 	
 	// since_id, max_id, count, page 
-	friends_timeline: function(data, callbackFn, context){
-		if(!callbackFn) return;
+	friends_timeline: function(data, callback, context) {
         var params = {
             url: this.config.friends_timeline,
             type: 'get',
             play_load: 'status',
             data: data
         };
-        this._sendRequest(params, callbackFn, context);
+        this._sendRequest(params, callback, context);
 	},
 	
 	// id, user_id, screen_name, since_id, max_id, count, page 
@@ -494,41 +511,58 @@ var sinaApi = {
         };
         
         // Make a Combo object.
-        var both = new Combo(function(statuses_result, friendship_result) {
+        var both = this.combo(function(statuses_args, friendship_args, show_user_args) {
             var friendship = null;
-            if(friendship_result && friendship_result[0]) {
-                friendship = friendship_result[0].target || friendship_result[0];
+            if(friendship_args && friendship_args[0]) {
+                friendship = friendship_args[0].target || friendship_args[0];
             }
-            if(!friendship) {
-                return callback.apply(context, statuses_result);
-            }
-            var user = null;
-            if(statuses_result[0]) {
-                var statuses = statuses_result[0].items || statuses_result[0];
-                user = statuses_result[0].user;
-                if(!user && statuses.length > 0) {
-                    user = statuses[0].user || statuses[0].sender;
+            var statuses_result = statuses_args[0];
+            // statuses_result 分为 [] 和 {items:[], user:xx}  两种类型
+            var user_info = show_user_args[0];
+            if(statuses_result && !user_info) {
+                var statuses = statuses_result.items || statuses_result || [];
+                if(statuses.length > 0) {
+                    // 取数组的第一个的user
+                    user_info = statuses[0].user || statuses[0].sender;
                 }
             }
-            if(user) {
-                user.following = friendship.following;
-                user.followed_by = friendship.followed_by;
+            if(user_info && friendship) {
+                user_info.following = friendship.following;
+                user_info.followed_by = friendship.followed_by;
             }
-            
-            return callback.apply(context, statuses_result);
+            if(statuses_result.items) {
+                statuses_result.user = user_info;
+            }
+            return callback.apply(context, statuses_args);
         });
+        var oauth_user = data.user
+          , user_id = data.id || data.name
+          , screen_name = data.screen_name || data.name;
         this._sendRequest(params, both.add());
         // 获取friendships_show
+        var friendship_callback = both.add();
+        var user_timeline_callback = both.add();
         if(need_friendship) {
-            var args = {};
-            args.target_id = data.id || data.name;
+            var args = {user: oauth_user};
+            args.target_id = user_id;
             if(!args.target_id) {
                 delete args.target_id;
             }
-            if(data.screen_name) {
-                args.target_screen_name = data.screen_name;
+            if(screen_name) {
+                args.target_screen_name = screen_name;
             }
-            this.friendships_show(args, both.add());
+            this.friendships_show(args, friendship_callback);
+        } else {
+            friendship_callback();
+        }
+        // 需要调用show user获取详细的用户信息
+        if(this.config.user_timeline_need_user) {
+            var args = {user: oauth_user};
+            args.id = user_id;
+            args.screen_name = screen_name;
+            this.user_show(args, user_timeline_callback);
+        } else {
+            user_timeline_callback();
         }
 	},
 	
@@ -638,15 +672,14 @@ var sinaApi = {
     },
 
     // id
-    user_show: function(data, callbackFn, context){
-        if(!callbackFn) return;
+    user_show: function(data, callback, context){
         var params = {
             url: this.config.user_show,
             type: 'get',
             play_load: 'user',
             data: data
         };
-        this._sendRequest(params, callbackFn, context);
+        this._sendRequest(params, callback, context);
     },
 
     // since_id, max_id, count
@@ -1032,47 +1065,46 @@ var sinaApi = {
     },
     
     // tags
-    create_tag: function(data, callback) {
+    create_tag: function(data, callback, context) {
     	var params = {
             url: this.config.create_tag,
             type: 'post',
             play_load: 'tag',
             data: data
         };
-        this._sendRequest(params, callback);
+        this._sendRequest(params, callback, context);
     },
     
     // tag_id
-    destroy_tag: function(data, callback) {
+    destroy_tag: function(data, callback, context) {
     	var params = {
             url: this.config.destroy_tag,
             type: 'post',
             play_load: 'tag',
             data: data
         };
-        this._sendRequest(params, callback);
+        this._sendRequest(params, callback, context);
     },
 
     // id
-    destroy: function(data, callbackFn){
-        if(!data || !data.id || !callbackFn){return;}
+    destroy: function(data, callback, context){
         var params = {
             url: this.config.destroy,
             type: 'POST',
             play_load: 'status',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callback, context);
     },
     
     // q, max_id, count
-    search: function(data, callback) {
+    search: function(data, callback, context) {
     	var params = {
             url: this.config.search,
             play_load: 'status',
             data: data
         };
-        this._sendRequest(params, callback);
+        this._sendRequest(params, callback, context);
     },
     
     // q, page, count
@@ -1368,15 +1400,8 @@ function make_base_auth_url(domain, user, password) {
 };
 
 // 腾讯微博api
-var TQQAPI = $.extend({}, sinaApi);
-TQQAPI._user_timeline = TQQAPI.user_timeline;
-TQQAPI._processMsg = TQQAPI.processMsg;
-TQQAPI._followers = TQQAPI.followers;
-TQQAPI._friends = TQQAPI.friends;
-TQQAPI._user_search = TQQAPI.user_search;
-
-$.extend(TQQAPI, {
-	config: $.extend({}, sinaApi.config, {
+var TQQAPI = Object.inherits({}, sinaApi, {
+	config: Object.inherits({}, sinaApi.config, {
 		host: 'http://open.t.qq.com/api',
 		user_home_url: 'http://t.qq.com/',
         search_url: 'http://t.qq.com/k/',
@@ -1404,6 +1429,7 @@ $.extend(TQQAPI, {
         friends_timeline: '/statuses/home_timeline',
         repost_timeline: 	  '/t/re_list_repost',
         user_timeline_need_friendship: false, // show_user信息中已经包含
+        user_timeline_need_user: true, 
         
         mentions:             '/statuses/mentions_timeline',
         followers:            '/friends/user_fanslist',
@@ -1504,7 +1530,7 @@ $.extend(TQQAPI, {
 	},
 	
 	processMsg: function(status, notEncode) {
-		var s = this._processMsg(status, notEncode);
+		var s = this.super_.processMsg.call(this, status, notEncode);
 		if(status.video && status.video.picurl) {
 		    s += ' <a href="' + status.video.realurl + '" title="' + status.video.title + '" target="_blank" class="link">' + status.video.shorturl + '</a>';
 			s += '<br/><img class="video_image" title="' + status.video.title + '" src="' + status.video.picurl + '" />';
@@ -1537,7 +1563,7 @@ $.extend(TQQAPI, {
     	var tpl = '{{m1}}<a target="_blank" href="javascript:getUserTimeline(\'{{m2}}\');" rhref="'
     		+ this.config.user_home_url +'{{m2}}" title="' 
     		+ _u.i18n("btn_show_user_title") + '">{{username}}</a>';
-    	str = str.replace(this.AT_USER_RE, function(match, $1, $2) {
+    	return str.replace(this.AT_USER_RE, function(match, $1, $2) {
         	var users = status.users || {};
         	var username = users[$2];
         	if(username) {
@@ -1552,7 +1578,6 @@ $.extend(TQQAPI, {
         	};
         	return tpl.format(data);
         });
-        return str;
     },
 
 	// urlencode，子类覆盖是否需要urlencode处理
@@ -1560,13 +1585,13 @@ $.extend(TQQAPI, {
 		return text;
 	},
 	
-	rate_limit_status: function(data, callback){
-        callback({error: _u.i18n("comm_no_api")});
+	rate_limit_status: function(data, callback, context) {
+        callback.call(context, {error: _u.i18n("comm_no_api")});
     },
 
     //TODO: 腾讯是有提供重置未读数的接口的，后面加
-    reset_count: function(data, callback) {
-		callback();
+    reset_count: function(data, callback, context) {
+		callback.call(context);
 	},
 	
 	format_upload_params: function(user, data, pic) {
@@ -1576,20 +1601,18 @@ $.extend(TQQAPI, {
         }
     },
     
-    // 先获取用户信息 user_show
-    user_timeline: function(data, callback, context) {
-    	var both = new Combo(function(user_info_args, user_timeline_args) {
-    	    var results = user_timeline_args[0];
-            if(results) {
-                results.user = user_info_args[0];
+    upload: function(user, data, pic, before_request, onprogress, callback, context) {
+        this.super_.upload.call(this, user, data, pic, before_request, onprogress, function(result, text_status, error_code) {
+            if(result && result.data) {
+                result = result.data;
             }
-            callback.apply(context, user_timeline_args);
-        });
-    	// 并发执行
-    	var user = data.user;
-    	var params = {user: user, name: data.id || data.screen_name};
-    	this.user_show(params, both.add());
-    	this._user_timeline(data, both.add());
+            if(text_status != 'error' && result && !result.error && result.id) {
+                // 获取微博的内容，以便拿到图片url
+                this.status_show({user: user, id: result.id}, callback, context);
+            } else {
+                callback.apply(context, arguments);
+            }
+        }, this);
     },
     
     _get_friendships: function(user, followers_args, callback, context) {
@@ -1623,21 +1646,21 @@ $.extend(TQQAPI, {
     
     user_search: function(data, callback, context) {
         var user = data.user;
-        this._user_search(data, function() {
+        this.super_.user_search.call(this, data, function() {
             this._get_friendships(user, arguments, callback, context);
         }, this);
     },
     
     followers: function(data, callback, context) {
         var user = data.user;
-        this._followers(data, function() {
+        this.super_.followers.call(this, data, function() {
             this._get_friendships(user, arguments, callback, context);
         }, this);
     },
 
-    friends: function(data, callback, context){
+    friends: function(data, callback, context) {
         var user = data.user;
-        this._friends(data, function() {
+        this.super_.friends.call(this, data, function() {
             this._get_friendships(user, arguments, callback, context);
         }, this);
     },
@@ -1714,7 +1737,8 @@ $.extend(TQQAPI, {
                 break;
             case this.config.friendships_destroy:
             case this.config.friendships_create:
-            	args.data.name = args.data.id;
+            case this.config.user_show:
+            	args.data.name = args.data.id || args.data.screen_name;
             	delete args.data.id;
             	break;
            	case this.config.followers:
@@ -1955,11 +1979,9 @@ $.extend(TQQAPI, {
 });
 
 // 搜狐微博api
-var TSohuAPI = $.extend({}, sinaApi);
-
-$.extend(TSohuAPI, {
+var TSohuAPI = Object.inherits({}, sinaApi, {
 	// 覆盖不同的参数
-	config: $.extend({}, sinaApi.config, {
+	config: Object.inherits({}, sinaApi.config, {
 		host: 'http://api.t.sohu.com',
         user_home_url: 'http://t.sohu.com/n/',
         search_url: 'http://t.sohu.com/k/',
@@ -1998,8 +2020,7 @@ $.extend(TSohuAPI, {
 	}),
 	
 	processEmotional: function(str){
-	    str = str.replace(/\[([\u4e00-\u9fff,\uff1f,\w]{1,10})\]/g, this._replaceEmotional);
-	    return str;
+	    return str.replace(/\[([\u4e00-\u9fff,\uff1f,\w]{1,10})\]/g, this.replaceEmotional);
 	},
 	_replaceEmotional: function(m, g1){
 	    var tpl = '<img title="{{title}}" src="{{src}}" />';
@@ -2012,8 +2033,8 @@ $.extend(TSohuAPI, {
 	    return m;
 	},
 	
-	reset_count: function(data, callback) {
-		callback();
+	reset_count: function(data, callback, context) {
+		callback.call(context);
 	},
 	
 	before_sendRequest: function(args) {
@@ -2114,12 +2135,10 @@ $.extend(TSohuAPI, {
 });
 
 //嘀咕api
-var DiguAPI = $.extend({}, sinaApi);
-
-$.extend(DiguAPI, {
+var DiguAPI = Object.inherits({}, sinaApi, {
 	
 	// 覆盖不同的参数
-	config: $.extend({}, sinaApi.config, {
+	config: Object.inherits({}, sinaApi.config, {
 		host: 'http://api.minicloud.com.cn',
         user_home_url: 'http://digu.com/',
         search_url: 'http://digu.com/search/',
@@ -2221,8 +2240,7 @@ $.extend(DiguAPI, {
     	return '#' + str.trim();
     },
     processEmotional: function(str){
-        str = str.replace(/\[:(\d{2})\]|\{([\u4e00-\u9fa5,\uff1f]{2,})\}/g, this._replaceEmotional);
-        return str;
+        return str.replace(/\[:(\d{2})\]|\{([\u4e00-\u9fa5,\uff1f]{2,})\}/g, this._replaceEmotional);
     },
     _replaceEmotional: function(m, g, g2){
         if(g2 && window.DIGU_EMOTIONS && DIGU_EMOTIONS[g2]){
@@ -2234,20 +2252,20 @@ $.extend(DiguAPI, {
         }
     },
 
-    rate_limit_status: function(data, callback){
-        callback({error: _u.i18n("comm_no_api")});
+    rate_limit_status: function(data, callback, context) {
+        callback.call(context, {error: _u.i18n("comm_no_api")});
     },
     
-    reset_count: function(data, callback) {
-		callback();
+    reset_count: function(data, callback, context) {
+		callback.call(context);
 	},
 	
-	counts: function(data, callback) {
-		callback();
+	counts: function(data, callback, context) {
+		callback.call(context);
 	},
 	
-	comments_timeline: function(data, callback) {
-		callback();
+	comments_timeline: function(data, callback, context) {
+		callback.call(context);
 	},
 	
 	/* content[可选]：更新的Digu消息内容， 请确定必要时需要进行UrlEncode编码，另外，不超过140个中文或者英文字。
@@ -2436,12 +2454,10 @@ $.extend(DiguAPI, {
 });
 
 // 做啥api
-var ZuosaAPI = $.extend({}, sinaApi);
-
-$.extend(ZuosaAPI, {
+var ZuosaAPI = Object.inherits({}, sinaApi, {
 	
 	// 覆盖不同的参数
-	config: $.extend({}, sinaApi.config, {
+	config: Object.inherits({}, sinaApi.config, {
 		host: 'http://api.zuosa.com',
         user_home_url: 'http://zuosa.com/',
 		source: 'fawave', 
@@ -2467,21 +2483,20 @@ $.extend(ZuosaAPI, {
 		return text;
 	},
 	
-	comments_timeline: function(data, callback) {
-		callback();
+	comments_timeline: function(data, callback, context) {
+		callback.call(context);
 	},
 	
-	reset_count: function(data, callback) {
-		callback();
+	reset_count: function(data, callback, context) {
+		callback.call(context);
 	},
 	
-	counts: function(data, callback) {
-		callback();
+	counts: function(data, callback, context) {
+		callback.call(context);
 	},
 	
 	// {"authorized":True}，需要再调用 users/show获取用户信息
-	verify_credentials: function(user, callbackFn, data){
-		if(!user || !callbackFn) return;
+	verify_credentials: function(user, callback, data, context){
         var params = {
             url: this.config.verify_credentials,
             type: 'get',
@@ -2489,14 +2504,13 @@ $.extend(ZuosaAPI, {
             play_load: 'user',
             data: data
         };
-        var $this = this;
         this._sendRequest(params, function(data, textStatus, error_code) {
-	    	if(!error_code && data.authorized) { // 继续获取用户信息
-	    		$this.user_show({user: user, id: user.userName}, callbackFn);
+	    	if(!error_code && data && data.authorized) { // 继续获取用户信息
+	    		this.user_show({user: user, id: user.userName}, callback, context);
 	    	} else {
-	    		callbackFn(null, 'error', 401);
+	    	    callback.call(context, 'error', 401);
 	    	}
-	    });
+	    }, this);
 	},
 	
 	before_sendRequest: function(args) {
@@ -2607,12 +2621,10 @@ $.extend(ZuosaAPI, {
 });
 
 // 雷猴api
-var LeiHouAPI = $.extend({}, sinaApi);
-
-$.extend(LeiHouAPI, {
+var LeiHouAPI = Object.inherits({}, sinaApi, {
 	
 	// 覆盖不同的参数
-	config: $.extend({}, sinaApi.config, {
+	config: Object.inherits({}, sinaApi.config, {
 		host: 'http://leihou.com',
         user_home_url: 'http://leihou.com/',
 		source: 'fawave', //貌似fawave被雷猴封了？加入source=fawave就好返回404
@@ -2641,20 +2653,20 @@ $.extend(LeiHouAPI, {
 		return text;
 	},
 
-    rate_limit_status: function(data, callback){
-        callback({error: _u.i18n("comm_no_api")});
+    rate_limit_status: function(data, callback, context) {
+        callback.call(context, {error: _u.i18n("comm_no_api")});
     },
 	
-	comments_timeline: function(data, callback) {
-		callback();
+	comments_timeline: function(data, callback, context) {
+		callback.call(context);
 	},
 	
-	reset_count: function(data, callback) {
-		callback();
+	reset_count: function(data, callback, context) {
+		callback.call(context);
 	},
 	
-	counts: function(data, callback) {
-		callback();
+	counts: function(data, callback, context) {
+		callback.call(context);
 	},
 	
 	before_sendRequest: function(args) {
@@ -2752,12 +2764,10 @@ $.extend(LeiHouAPI, {
 });
 
 // follow5 api: http://www.follow5.com/f5/jsp/other/api/api.jsp
-var Follow5API = $.extend({}, sinaApi);
-
-$.extend(Follow5API, {
+var Follow5API = Object.inherits({}, sinaApi, {
 	
 	// 覆盖不同的参数
-	config: $.extend({}, sinaApi.config, {
+	config: Object.inherits({}, sinaApi.config, {
 		host: 'http://api.follow5.com/api',
         user_home_url: 'http://follow5.com',
 		source: '34140E56A31887F770053C2AF6D7B2AC', // 需要申请
@@ -2794,20 +2804,16 @@ $.extend(Follow5API, {
 		return text;
 	},
 
-    rate_limit_status: function(data, callback){
-        callback({error: _u.i18n("comm_no_api")});
+    rate_limit_status: function(data, callback, context) {
+        callback.call(context, {error: _u.i18n("comm_no_api")});
     },
 	
-//	comments_timeline: function(data, callback) {
-//		callback();
-//	},
-	
-	reset_count: function(data, callback) {
-		callback();
+	reset_count: function(data, callback, context) {
+		callback.call(context);
 	},
 	
-	counts: function(data, callback) {
-		callback();
+	counts: function(data, callback, context) {
+		callback.call(context);
 	},
 	
 	before_sendRequest: function(args) {
@@ -2905,12 +2911,10 @@ $.extend(Follow5API, {
 });
 
 //twitter api
-var TwitterAPI = $.extend({}, sinaApi);
-
-$.extend(TwitterAPI, {
+var TwitterAPI = Object.inherits({}, sinaApi, {
 	
 	// 覆盖不同的参数
-	config: $.extend({}, sinaApi.config, {
+	config: Object.inherits({}, sinaApi.config, {
 		host: 'https://api.twitter.com',
         user_home_url: 'https://twitter.com/',
         search_url: 'https://twitter.com/search?q=',
@@ -2972,27 +2976,26 @@ $.extend(TwitterAPI, {
 		return text;
 	},
 	
-	comments_timeline: function(data, callback) {
-		callback();
+	comments_timeline: function(data, callback, context) {
+		callback.call(context);
 	},
 	
-	reset_count: function(data, callback) {
-		callback();
+	reset_count: function(data, callback, context) {
+		callback.call(context);
 	},
 	
-	counts: function(data, callback) {
-		callback();
+	counts: function(data, callback, context) {
+		callback.call(context);
 	},
 
-    retweet: function(data, callbackFn){
-		if(!callbackFn) return;
+    retweet: function(data, callback, context) {
         var params = {
             url: this.config.retweet,
             type: 'post',
             play_load: 'status',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callback, context);
 	},
     
 	/**
@@ -3062,12 +3065,10 @@ $.extend(TwitterAPI, {
 });
 
 //identi.ca
-var StatusNetAPI = $.extend({}, TwitterAPI);
-
-$.extend(StatusNetAPI, {
+var StatusNetAPI = Object.inherits({}, TwitterAPI, {
 	
 	// 覆盖不同的参数
-	config: $.extend({}, sinaApi.config, {
+	config: Object.inherits({}, sinaApi.config, {
 		host: 'http://identi.ca/api',
         user_home_url: 'http://identi.ca/',
         search_url: 'http://identi.ca/tag/',
@@ -3110,17 +3111,15 @@ $.extend(StatusNetAPI, {
 			}
 		}
 
-		return TwitterAPI.format_result_item.apply(this, [data, play_load, args]);
+		return this.super_.format_result_item.apply(this, [data, play_load, args]);
 	}
 });
 
 
-var FanfouAPI = $.extend({}, sinaApi);
-
-$.extend(FanfouAPI, {
+var FanfouAPI = Object.inherits({}, sinaApi, {
 	
 	// 覆盖不同的参数
-	config: $.extend({}, sinaApi.config, {
+	config: Object.inherits({}, sinaApi.config, {
 		host: 'http://api2.fanfou.com',
         user_home_url: 'http://fanfou.com/',
         search_url: 'http://fanfou.com/q/',
@@ -3154,12 +3153,12 @@ $.extend(FanfouAPI, {
         return str;
     },
 	
-	reset_count: function(data, callback) {
-		callback();
+	reset_count: function(data, callback, context) {
+		callback.call(context);
 	},
 	
-	counts: function(data, callback) {
-		callback();
+	counts: function(data, callback, context) {
+		callback.call(context);
 	},
 	
 	format_geo_arguments: function(data, geo) {
@@ -3249,14 +3248,10 @@ $.extend(FanfouAPI, {
 	}
 });
 
-var T163API = $.extend({}, sinaApi);
-T163API._upload = T163API.upload;
-T163API._user_timeline = T163API.user_timeline;
-
-$.extend(T163API, {
+var T163API = Object.inherits({}, sinaApi, {
 	
 	// 覆盖不同的参数
-	config: $.extend({}, sinaApi.config, {
+	config: Object.inherits({}, sinaApi.config, {
 		host: 'http://api.t.163.com',
 		user_home_url: 'http://t.163.com/n/',
 		search_url: 'http://t.163.com/tag/',
@@ -3274,6 +3269,7 @@ $.extend(T163API, {
         support_search_max_id: false,
         support_favorites_max_id: true,
         user_timeline_need_friendship: false,
+        user_timeline_need_user: true,
         max_text_length: 163,
         repost_pre: 'RT', // 转发前缀
         repost_delimiter: '||',
@@ -3305,41 +3301,16 @@ $.extend(T163API, {
 		return text;
 	},
     
-    reset_count: function(data, callback) {
-		callback();
+    reset_count: function(data, callback, context) {
+		callback.call(context);
 	},
 	
-	counts: function(data, callback) {
-		callback();
+	counts: function(data, callback, context) {
+		callback.call(context);
 	},
 
-    rate_limit_status: function(data, callback){
-        callback({error: _u.i18n("comm_no_api")});
-    },
-    
-    // 先获取用户信息 user_show
-    user_timeline: function(data, callback) {
-    	var $this = this;
-    	var params = {};
-    	if(data.id) {
-    		params.id = data.id;
-    	} else {
-    		params.name = data.screen_name;
-    	}
-    	this.user_show(params, function(user_info) {
-    		if(!data.id) {
-    			data.id = user_info.id;
-    		}
-    		$this._user_timeline(data, function(results, error) {
-    			$.each(results, function(index, item) {
-    				// 需要设置准确的用户
-	    			if(item.is_retweet_by_user) {
-	    				item.retweet_user = user_info;
-	    			}
-    			});
-    			callback({items: results, user: user_info}, error);
-    		});
-    	});
+    rate_limit_status: function(data, callback, context) {
+        callback.call(context, {error: _u.i18n("comm_no_api")});
     },
 	
 	format_upload_params: function(user, data, pic) {
@@ -3350,7 +3321,7 @@ $.extend(T163API, {
     },
 	
 	upload: function(user, params, pic, before_request, onprogress, callback, context) {
-		this._upload(user, {}, pic, before_request, onprogress, function(data) {
+		this.super_.upload.call(this, user, {}, pic, before_request, onprogress, function(data) {
 			if(data && data.upload_image_url) {
 				params.user = user;
 				params.status += ' ' + data.upload_image_url;
@@ -3369,7 +3340,7 @@ $.extend(T163API, {
 		if(!onprogress) {
 			onprogress = function() {};
 		}
-		this._upload(user, {}, pic, before_request, onprogress, function(data, text_status, code) {
+		this.super_.upload.call(this, user, {}, pic, before_request, onprogress, function(data, text_status, code) {
 			if(data && data.upload_image_url) {
 				data = data.upload_image_url;
 			}
@@ -3428,10 +3399,8 @@ $.extend(T163API, {
 		}
     },
     
-    _format_result: sinaApi.format_result,
-    
     format_result: function(data, play_load, args) {
-    	data = this._format_result(data, play_load, args);
+    	data = this.super_.format_result.call(this, data, play_load, args);
     	if(String(data.next_cursor) == '-1') {
     		data.next_cursor = '0';
     	}
@@ -3617,12 +3586,10 @@ $.extend(T163API, {
 });
 
 // 人间
-var RenjianAPI = $.extend({}, sinaApi);
-
-$.extend(RenjianAPI, {
+var RenjianAPI = Object.inherits({}, sinaApi, {
 	
 	// 覆盖不同的参数
-	config: $.extend({}, sinaApi.config, {
+	config: Object.inherits({}, sinaApi.config, {
 		host: 'http://api.renjian.com/v2',
 		source: 'FaWave', 
 		support_comment: false,
@@ -3654,36 +3621,36 @@ $.extend(RenjianAPI, {
 	},
 
     processEmotional: function(str){
-        str = str.replace(/\[\/\/(\w+)\]/g, this._replaceEmotional);
-        return str;
+        return str.replace(/\[\/\/(\w+)\]/g, this._replaceEmotional);
     },
     _replaceEmotional: function(m, g){
         if(g && window.RENJIAN_EMOTIONS && RENJIAN_EMOTIONS[g]){
-            return '<span class="renjian_emot" style="background-position: ' + RENJIAN_EMOTIONS[g][1] + ';" title="' + RENJIAN_EMOTIONS[g][0] + '"></span>';
+            return '<span class="renjian_emot" style="background-position: ' 
+                + RENJIAN_EMOTIONS[g][1] + ';" title="' + RENJIAN_EMOTIONS[g][0] 
+                + '"></span>';
         }else{
             return m;
         }
     },
 	
-	comments_timeline: function(data, callback) {
-		callback();
+	comments_timeline: function(data, callback, context) {
+		callback.call(context);
 	},
 	
-	rate_limit_status: function(data, callback){
-        callback({error: _u.i18n("comm_no_api")});
+	rate_limit_status: function(data, callback, context) {
+        callback.call(context, {error: _u.i18n("comm_no_api")});
     },
 	
-	reset_count: function(data, callback) {
-		callback();
+	reset_count: function(data, callback, context) {
+	    callback.call(context);
 	},
 	
-	counts: function(data, callback) {
-		callback();
+	counts: function(data, callback, context) {
+	    callback.call(context);
 	},
 	
-	verify_credentials: function(user, callbackFn, data){
+	verify_credentials: function(user, callback, data, context){
         //this.user_show({id: user.userName}, callbackFn);
-        if(!user || !callbackFn) return;
         var params = {
             url: this.config.verify_credentials,
             type: 'post',
@@ -3691,7 +3658,7 @@ $.extend(RenjianAPI, {
             play_load: 'user',
             data: data
         };
-        this._sendRequest(params, callbackFn);
+        this._sendRequest(params, callback, context);
 	},
 	
 	/* status_type	类型，PICTURE/LINK/MUSIC
@@ -3799,9 +3766,8 @@ $.extend(RenjianAPI, {
 	}
 });
 
-var BuzzAPI = $.extend({}, sinaApi);
-$.extend(BuzzAPI, {
-	config: $.extend({}, sinaApi.config, {
+var BuzzAPI = Object.inherits({}, sinaApi, {
+	config: Object.inherits({}, sinaApi.config, {
 		host: 'https://www.googleapis.com/buzz/v1',
 		source: 'AIzaSyAu4vq6sYO3WuKxP2G64fYg6T1LdIDu3pk', // https://code.google.com/apis/console/#project:828316891836:apis_keys
 		oauth_key: 'net4team.net',
@@ -3857,16 +3823,16 @@ $.extend(BuzzAPI, {
 		return text;
 	},
 	
-	reset_count: function(data, callback) {
-		callback();
+	reset_count: function(data, callback, context) {
+		callback.call(context);
 	},
 
-    rate_limit_status: function(data, callback){
-        callback({error: _u.i18n("comm_no_api")});
+    rate_limit_status: function(data, callback, context){
+        callback.call(context, {error: _u.i18n("comm_no_api")});
     },
 	
-	counts: function(data, callback) {
-		callback();
+	counts: function(data, callback, context) {
+		callback.call(context);
 	},
 	
 	format_authorization_url: function(params) {
@@ -4054,23 +4020,22 @@ $.extend(BuzzAPI, {
 });
 
 // 豆瓣
-var DoubanAPI = $.extend({}, sinaApi);
 /*
  * 豆瓣 API 通过HTTP Status Code来说明 API 请求是否成功 下面的表格中展示了可能的HTTP Status Code以及其含义
 
-状态码	含义
-200 OK	请求成功
-201 CREATED	创建成功
-202 ACCEPTED	更新成功
-400 BAD REQUEST	请求的地址不存在或者包含不支持的参数
-401 UNAUTHORIZED	未授权
-403 FORBIDDEN	被禁止访问
-404 NOT FOUND	请求的资源不存在
-500 INTERNAL SERVER ERROR	内部错误
+状态码 含义
+200 OK  请求成功
+201 CREATED 创建成功
+202 ACCEPTED    更新成功
+400 BAD REQUEST 请求的地址不存在或者包含不支持的参数
+401 UNAUTHORIZED    未授权
+403 FORBIDDEN   被禁止访问
+404 NOT FOUND   请求的资源不存在
+500 INTERNAL SERVER ERROR   内部错误
 
  */
-$.extend(DoubanAPI, {
-	config: $.extend({}, sinaApi.config, {
+var DoubanAPI = Object.inherits({}, sinaApi, {
+	config: Object.inherits({}, sinaApi.config, {
 		host: 'http://api.douban.com',
 		source: '05e787211a7ff69311b695634f7fe3b9', 
 		oauth_key: '05e787211a7ff69311b695634f7fe3b9',
@@ -4091,6 +4056,7 @@ $.extend(DoubanAPI, {
 		support_search: false,
 		support_auto_shorten_url: false,
 		user_timeline_need_friendship: false,
+		user_timeline_need_user: true,
 		// support_sent_direct_messages: false,
 //		oauth_callback: null,
 		oauth_host: 'http://www.douban.com',
@@ -4113,15 +4079,16 @@ $.extend(DoubanAPI, {
         reply: '/miniblog/{{id}}/comments_post',
         comments: '/miniblog/{{id}}/comments',
         user_search: '/people',
+        user_show: '/people/{{id}}',
 		verify_credentials: '/people/%40me'
 	}),
 	
-	counts: function(data, callback) {
-		callback();
+	counts: function(data, callback, context) {
+		callback.call(context);
 	},
 
-    rate_limit_status: function(data, callback){
-        callback({error: _u.i18n("comm_no_api")});
+    rate_limit_status: function(data, callback, context){
+        callback.call(context, {error: _u.i18n("comm_no_api")});
     },
 	
 	/*
@@ -4255,13 +4222,34 @@ $.extend(DoubanAPI, {
 				}
 			}
 			data.text = data.content['$t'];
-			// saying 才支持评论
-			if(data.category && data.category['@term'].endswith('#miniblog.saying')) {
-				if(data['db:attribute']) {
+			// saying 和 推荐 才支持评论
+			if(data.category) {
+				var term = data.category['@term'], can_comment = false, add_comment_to_text = false;
+				if(term.endswith('#miniblog.recommendation')) {
+				    add_comment_to_text = true;
+				    // 推荐<a href="#">《一生所爱》 - 卢冠廷</a>
+				    // => http://music.douban.com/subject_search?search_text=《一生所爱》 - 卢冠廷
+				    var $a = $(data.text);
+				    if($a.length === 1) {
+				        var href = $a.attr('href');
+				        if(!href ||href.length < 10) {
+				            var word = $a.html();
+				            data.text = '推荐<a href="http://music.douban.com/subject_search?search_text=' + word + '">' + word + '</a>';
+				        }
+				    }
+				} else if(term.endswith('#miniblog.saying')) {
+				    can_comment = true;
+				}
+			    if((can_comment || add_comment_to_text) && data['db:attribute']) {
 					// comments_count
 					$.each(data['db:attribute'], function(index, item){
-						if(item['@name'] == 'comments_count') {
+						if(can_comment && item['@name'] === 'comments_count') {
 							data[item['@name']] = item['$t'];
+						} else if(add_comment_to_text && item['@name'] === 'comment') {
+						    add_comment_to_text = false;
+						    if(item['$t']) {
+						        data.text += ' : ' + item['$t'];
+						    }
 						}
 					});
 					delete data['db:attribute'];
@@ -4301,10 +4289,8 @@ $.extend(DoubanAPI, {
 	}
 });
 
-var TianyaAPI = $.extend({}, sinaApi);
-TianyaAPI._apply_auth = TianyaAPI.apply_auth;
-$.extend(TianyaAPI, {
-	config: $.extend({}, sinaApi.config, {
+var TianyaAPI = Object.inherits({}, sinaApi, {
+	config: Object.inherits({}, sinaApi.config, {
 		host: 'http://open.tianya.cn/api',
 		source: '12d4d19aee679b8713297c2583fe21b204dd9ca0a', 
 		oauth_key: '12d4d19aee679b8713297c2583fe21b204dd9ca0a',
@@ -4341,15 +4327,15 @@ $.extend(TianyaAPI, {
 			args.data.oauth_token = user.oauth_token_key;
 			args.data.oauth_token_secret = user.oauth_token_secret;
 		} else {
-			this._apply_auth(url, args, user);
+			this.super_.apply_auth.call(this, url, args, user);
 		}
 	},
-	counts: function(data, callback) {
-		callback();
+	counts: function(data, callback, context) {
+		callback.call(context);
 	},
 
-    rate_limit_status: function(data, callback){
-        callback({error: _u.i18n("comm_no_api")});
+    rate_limit_status: function(data, callback, context) {
+        callback.call(context, {error: _u.i18n("comm_no_api")});
     },
 	
 	before_sendRequest: function(args, user) {
@@ -4378,9 +4364,8 @@ $.extend(TianyaAPI, {
 });
 
 // facebook: http://developers.facebook.com/docs/api
-var FacebookAPI = $.extend({}, sinaApi);
-$.extend(FacebookAPI, {
-	config: $.extend({}, sinaApi.config, {
+var FacebookAPI = Object.inherits({}, sinaApi, {
+	config: Object.inherits({}, sinaApi.config, {
 		host: 'https://graph.facebook.com',
         user_home_url: 'http://www.facebook.com/',
 		source: '121425774590172', 
@@ -4454,7 +4439,7 @@ $.extend(FacebookAPI, {
 		
 	},
 	
-	get_access_token: function(user, callbackFn) {
+	get_access_token: function(user, callback, context) {
     	var params = {
             url: this.config.oauth_access_token,
             type: 'get',
@@ -4482,19 +4467,19 @@ $.extend(FacebookAPI, {
 					user.oauth_token_key = token.access_token;
 				}
 			}
-			callbackFn(token ? user : null, text_status, error_code);
+			callback.call(context, token ? user : null, text_status, error_code);
 		});
     },
     
 	// 获取认证url
-    get_authorization_url: function(user, callback) {
+    get_authorization_url: function(user, callback, context) {
     	var params = {
     		client_id: this.config.oauth_key, 
     		redirect_uri: this.config.oauth_callback,
     		scope: this.config.oauth_scope
     	};
     	var login_url = this.format_authorization_url(params);
-    	callback(login_url, 'success', 200);
+    	callback.call(context, login_url, 'success', 200);
     },
     
     format_upload_params: function(user, data, pic) {
@@ -4645,13 +4630,8 @@ $.extend(FacebookAPI, {
 });
 
 // http://wiki.dev.renren.com/wiki/API
-var RenrenAPI = $.extend({}, sinaApi);
-RenrenAPI._format_result = RenrenAPI.format_result;
-RenrenAPI._user_timeline = RenrenAPI.user_timeline;
-RenrenAPI._friends_timeline = RenrenAPI.friends_timeline;
-RenrenAPI._verify_credentials = RenrenAPI.verify_credentials;
-$.extend(RenrenAPI, {
-	config: $.extend({}, sinaApi.config, {
+var RenrenAPI = Object.inherits({}, sinaApi, {
+	config: Object.inherits({}, sinaApi.config, {
 		host: 'http://api.renren.com/restserver.do',
 		oauth_host: 'https://graph.renren.com',
         user_home_url: 'http://www.renren.com/',
@@ -4719,7 +4699,7 @@ $.extend(RenrenAPI, {
 		
 	},
 	
-	get_access_token: function(user, callbackFn) {
+	get_access_token: function(user, callback, context) {
     	var params = {
             url: this.config.oauth_access_token,
             type: 'get',
@@ -4749,12 +4729,12 @@ $.extend(RenrenAPI, {
 					user.oauth_scope = token.scope;
 				}
 			}
-			callbackFn(token ? user : null, text_status, error_code);
+			callback.call(context, token ? user : null, text_status, error_code);
 		});
     },
     
 	// 获取认证url
-    get_authorization_url: function(user, callback) {
+    get_authorization_url: function(user, callback, context) {
     	var params = {
     		client_id: this.config.oauth_key, 
     		redirect_uri: this.config.oauth_callback,
@@ -4762,7 +4742,7 @@ $.extend(RenrenAPI, {
     		response_type: 'code'
     	};
     	var login_url = this.format_authorization_url(params);
-    	callback(login_url, 'success', 200);
+    	callback.call(context, login_url, 'success', 200);
     },
     
     // http://wiki.dev.renren.com/wiki/Calculate_signature
@@ -4840,11 +4820,7 @@ $.extend(RenrenAPI, {
 		}
 		pic.keyname = 'upload';
     },
-	
-	format_result: function(data, play_load, args) {
-		return this._format_result(data, play_load, args);
-	},
-	
+    
 	format_result_item: function(data, play_load, args) {
 		if(play_load == 'user' && data && data.uid) {
 			// http://www.renren.com/profile.do?id=263668818
@@ -4919,16 +4895,16 @@ $.extend(RenrenAPI, {
 		return data;
 	},
 	
-	verify_credentials: function(user, callback) {
-		var that = this;
-		this._verify_credentials(user, function(result, code_text, code) {
+	// user, callback, data, context
+	verify_credentials: function(user, callback, data, context) {
+		this.super_.verify_credentials.call(this, user, function(result, code_text, code) {
 			var params = {
-				url: that.config.user_profile,
+				url: this.config.user_profile,
 				play_load: 'user',
-				data: {user: user, uid: result.id, fields: that.config.user_profile_fields}
+				data: {user: user, uid: result.id, fields: this.config.user_profile_fields}
 			};
-			that._sendRequest(params, callback);
-		});
+			this._sendRequest(params, callback, context);
+		}, data, this);
 	},
 	
 	_fill_pics: function(user, items, code_text, code, callback, context) {
@@ -5007,24 +4983,22 @@ $.extend(RenrenAPI, {
 	
 	user_timeline: function(data, callback, context) {
 		var user = data.user;
-		this._user_timeline(data, function(items, code_text, code) {
+		this.super_.user_timeline.call(this, data, function(items, code_text, code) {
 			this._fill_users(user, items, code_text, code, callback, context);
 		}, this);
 	},
 	
 	friends_timeline: function(data, callback, context) {
 		var user = data.user;
-		this._friends_timeline(data, function(items, code_text, code) {
+		this.super_.friends_timeline.call(this, data, function(items, code_text, code) {
 			this._fill_users(user, items, code_text, code, callback, context);
 		}, this);
 	}
 });
 
 // plurk: http://www.plurk.com/API/issueKey
-var PlurkAPI = $.extend({}, sinaApi);
-PlurkAPI._upload = PlurkAPI.upload;
-$.extend(PlurkAPI, {
-	config: $.extend({}, sinaApi.config, {
+var PlurkAPI = Object.inherits({}, sinaApi, {
+	config: Object.inherits({}, sinaApi.config, {
 		host: 'http://www.plurk.com/API',
 		source: '4e4QGBY94z6v3zvb2rvDqH8yzSccvk2D', 
         result_format: '',
@@ -5072,14 +5046,14 @@ $.extend(PlurkAPI, {
     	pic.keyname = 'image';
     },
 	
-	upload: function(user, params, pic, before_request, onprogress, callback) {
-		this._upload(user, {}, pic, before_request, onprogress, function(data) {
+	upload: function(user, params, pic, before_request, onprogress, callback, context) {
+		this.super_.upload.call(this, user, {}, pic, before_request, onprogress, function(data) {
 			if(data && data.full) {
 				params.user = user;
 				params.status += ' ' + data.full;
-				this.update(params, callback);
+				this.update(params, callback, context);
 			} else {
-				callback(null, 'error');
+				callback.call(context, 'error');
 			}
 		}, this);
 	},
@@ -5278,9 +5252,8 @@ $.extend(PlurkAPI, {
 	}
 });
 
-var TumblrAPI = $.extend({}, sinaApi);
-$.extend(TumblrAPI, {
-	config: $.extend({}, sinaApi.config, {
+var TumblrAPI = Object.inherits({}, sinaApi, {
+	config: Object.inherits({}, sinaApi.config, {
 		host: 'http://www.tumblr.com/api',
 		source: '',
 		result_format: '',
@@ -5366,7 +5339,7 @@ var tapi = {
 		return this.api_dispatch(user).get_access_token(user, callback, context);
 	},
 	
-	verify_credentials: function(user, callback, data, context){
+	verify_credentials: function(user, callback, data, context) {
 	    return this.api_dispatch(user).verify_credentials(user, callback, data, context);
 	},
         
@@ -5584,7 +5557,7 @@ var VDiskAPI = {
 	 * app_type: 登录类型, 如: app_type=sinat (注意: 目前支持微博帐号)
 	 */
 	
-	get_token: function(user, callback) {
+	get_token: function(user, callback, context) {
 		//user = {username: 'fengmk2@gmail.com', password: '112358', app_type: 'sinat'};
 		var params = {
 			account: user.username,
@@ -5601,30 +5574,29 @@ var VDiskAPI = {
             type: 'post',
             dataType: 'json',
             data: params,
-            success : function(data){
+            success : function(data) {
                 var error = null, result = null;
                 if(data.err_code === 0) {
                     result = data.data;
                 } else {
                     error = new Error(data.err_msg);
                 }
-                callback(error, result);
+                callback.call(context, error, result);
             },
             error: function(xhr, text_status, err) {
-                callback(err);
+                callback.call(context, err);
             }
         });
     },
-    upload: function(user, fileobj, callback, onprogress) {
-        var that = this;
-        that.get_token(user, function(err, result){
+    upload: function(user, fileobj, callback, onprogress, context) {
+        this.get_token(user, function(err, result){
             if(err) {
-                return callback(err);
+                return callback.call(context, err);
             }
-            that._upload({token: result.token}, fileobj, callback, onprogress);
-        });
+            this._upload({token: result.token}, fileobj, callback, onprogress, context);
+        }, this);
     },
-    _upload: function(data, fileobj, callback, onprogress) {
+    _upload: function(data, fileobj, callback, onprogress, context) {
         data.dir_id = '0';
         data.cover = 'yes';
         var blobbuilder = build_upload_params(data, fileobj);
@@ -5652,10 +5624,10 @@ var VDiskAPI = {
                 } else {
                     error = new Error(data.err_msg);
                 }
-                callback(error, result);
+                callback.call(context, error, result);
             },
             error: function(xhr, status, err) {
-                callback(err);
+                callback.call(context, err);
             }
         });
     }

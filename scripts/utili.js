@@ -1341,7 +1341,8 @@ var ShortenUrl = {
 	expandAll: function() {
 		var b_view = getBackgroundView();
 		var cache = b_view.SHORT_URLS;
-		var conditions = '[title*="'+ _u.i18n("comm_mbright_to_open") +'"],[videotype]';
+		// 这里需要判断
+		var conditions = '[title*="'+ _u.i18n("comm_mbright_to_open") +'"],[videotype], .short_done';
 		var selector = 'a.link:not(' + conditions + ')';
 		var config = tapi.get_config(getUser());
 		if(!config.need_processMsg) {
@@ -1349,19 +1350,26 @@ var ShortenUrl = {
 		}
 		$(selector).each(function() {
 			var url = $(this).attr('href');
-			if(url.indexOf('javascript:') >= 0) {
+			if(url.length < 10 || url.indexOf('javascript:') >= 0) {
+			    if(url === '#') {
+			        // 豆瓣电台的推荐链接无法点击
+			        // http://api.douban.com/recommendation/89139831
+			        // => search http://music.douban.com/subject_search?search_text=%E3%80%8A%E4%B8%80%E7%94%9F%E6%89%80%E7%88%B1%E3%80%8B+-+%E5%8D%A2%E5%86%A0%E5%BB%B7
+			        $(this).attr('href', 'javascript:;');
+			    }
 				return;
 			}
 			if(VideoService.attempt(url, this) || ImageService.attempt(url, this) || url.length > 30) {
 			    // 无需还原
 			    UrlUtil.showFaviconBefore(this, url);
+			    $(this).addClass('short_done');
 			    return;
 			}
 			var cache_data = cache[url];
 			if(cache_data && cache_data.url) {
 				var longurl = cache_data.url;
 				$(this).attr('title', _u.i18n("comm_mbright_to_open") 
-					+ ' ' + longurl).attr('rhref', longurl);
+					+ ' ' + longurl).attr('rhref', longurl).addClass('short_done');
                 UrlUtil.showFaviconBefore(this, longurl);
 				if(!VideoService.attempt(cache_data, this)) {
                 	ImageService.attempt(longurl, this);
@@ -1371,7 +1379,7 @@ var ShortenUrl = {
 					var longurl = data ? data.url: data;
 					if(longurl) {
 						$(this).attr('title', _u.i18n("comm_mbright_to_open") 
-							+ ' ' + longurl).attr('rhref', longurl).addClass('longurl');
+							+ ' ' + longurl).attr('rhref', longurl).addClass('longurl').addClass('short_done');
 						cache[$(this).attr('href')] = data;
                         UrlUtil.showFaviconBefore(this, longurl);
 						if(!VideoService.attempt(data, this)) {
@@ -1433,6 +1441,73 @@ var ShortenUrl = {
 	_create_googl_auth_token: function(f){function k(){for(var c=0,b=0;b<arguments.length;b++)c=c+arguments[b]&4294967295;return c}function m(c){c=c=String(c>0?c:c+4294967296);var b;b=c;for(var d=0,i=false,j=b.length-1;j>=0;--j){var g=Number(b.charAt(j));if(i){g*=2;d+=Math.floor(g/10)+g%10}else d+=g;i=!i}b=b=d%10;d=0;if(b!=0){d=10-b;if(c.length%2==1){if(d%2==1)d+=9;d/=2;}}b=String(d);b+=c;return b;}function n(c){for(var b=5381,d=0;d<c.length;d++)b=k(b<<5,b,c.charCodeAt(d));return b;}function o(c){for(var b=0,d=0;d<c.length;d++)b=k(c.charCodeAt(d),b<<6,b<<16,-b);return b;}f={byteArray_:f,charCodeAt:function(c){return this.byteArray_[c];}};f.length=f.byteArray_.length;var e=n(f.byteArray_);e=e>>2&1073741823;e=e>>4&67108800|e&63;e=e>>4&4193280|e&1023;e=e>>4&245760|e&16383;var l="7";f=o(f.byteArray_);var h=(e>>2&15)<<4|f&15;h|=(e>>6&15)<<12|(f>>8&15)<<8;h|=(e>>10&15)<<20|(f>>16&15)<<16;h|=(e>>14&15)<<28|(f>>24&15)<<24;l+=m(h);return l;}
 };
 
+// 查看豆瓣预览图
+var DoubanImage = {
+    /**
+     * http://movie.douban.com/subject/4286017/ 
+=>
+<div id="mainpic"> 
+        <a class="nbg" href="http://movie.douban.com/subject/4286017/photos?type=R" title="点击看更多海报"> 
+        <img src="http://img3.douban.com/mpic/s4672723.jpg" title="点击看更多海报" alt="Fast Five" rel="v:image" /> 
+        </a><br /> 
+ 
+    </div> 
+=>
+http://img3.douban.com/mpic/s4672723.jpg
+http://img3.douban.com/lpic/s4672723.jpg
+=> 
+http://img3.douban.com/spic/s4672723.jpg
+http://img3.douban.com/opic/s4672723.jpg
+
+http://code.google.com/p/falang/issues/detail?id=235
+     * 
+     */
+    host: 'douban.com',
+    url_re: /http:\/\/(?:(?:book|music|movie)\.douban\.com\/subject\/.+|www\.douban.com\/.+?\/photo\/)/i,
+    image_url_re: /com\/([mlso]pic)\//i,
+    photos_re: /\/photo\/(\d+)\//i,
+    show_link: true,
+    sync: true,
+    get: function(url, callback) {
+        var photo_matchs = this.photos_re.exec(url);
+        if(photo_matchs) {
+            var id = photo_matchs[1];
+            return callback({
+                thumbnail_pic: 'http://img3.douban.com/view/photo/thumb/public/p' + id + '.jpg',
+                bmiddle_pic: 'http://img3.douban.com/view/photo/photo/public/p' + id + '.jpg',
+                original_pic: 'http://img3.douban.com/view/photo/raw/public/p' + id + '.jpg'
+            });
+        }
+        var bg = getBackgroundView();
+        if(bg.IMAGE_URLS[url]) {
+            return callback(bg.IMAGE_URLS[url], true);
+        }
+        $.ajax({
+            url: url,
+            success: function(html, status, xhr) {
+                var src = $(html).find('#mainpic img').attr('src');
+                var pics = null;
+                if(src) {
+                    var matchs = DoubanImage.image_url_re.exec(src);
+                    if(matchs) {
+                        var size = matchs[1];
+                        pics = {
+                            thumbnail_pic: src.replace(size, 'mpic'),
+                            bmiddle_pic: src.replace(size, 'lpic'),
+                            original_pic: src.replace(size, 'opic')
+                        };
+                        bg.IMAGE_URLS[url] = pics;
+                    }
+                }
+                callback(pics);
+            },
+            error: function() {
+                callback(null);
+            }
+        });
+    }
+};
+
 // 图片服务
 var Instagram = {
 	/* 
@@ -1448,7 +1523,6 @@ var Instagram = {
 	 */
 	host: 'instagr.am',
 	url_re: /http:\/\/instagr\.am\/p\//i,
-	cache: {},
 	get: function(url, callback) {
 	    var bg = getBackgroundView();
 	    if(bg.IMAGE_URLS[url]) {
@@ -1746,7 +1820,8 @@ var ImageService = {
 		Twitgoo: Twitgoo,
 		MobyPicture: MobyPicture,
 		Twipple: Twipple,
-		Flickr: Flickr
+		Flickr: Flickr,
+		DoubanImage: DoubanImage
 	},
 	
 	attempt: function(url, ele) {
@@ -1754,15 +1829,21 @@ var ImageService = {
 			var item = this.services[name];
 			if(item.url_re.test(url)) {
 				var old_title = $(ele).attr('title');
-				var title = _u.i18n("comm_mbleft_to_preview");
+				var title = _u.i18n("comm_mbleft_to_preview") + ', ' + _u.i18n('comm_mbright_to_open');
 				if(old_title) {
 					title += ', ' + old_title;
 				}
-				$(ele).attr('rhref', url).attr('title', title).attr('href', 'javascript:void(0);').attr('service', name).click(function() {
-					ImageService.show(this, $(this).attr('service'), $(this).attr('rhref'));
+				var $ele = $(ele);
+				if(item.show_link) {
+				    $ele.attr('show_link', '1');
+				}
+				$ele.attr('rhref', url).attr('old_title', old_title).attr('title', title).attr('href', 'javascript:void(0);').attr('service', name).one('click', function() {
+				    var $this = $(this);
+					ImageService.show(this, $this.attr('service'), $this.attr('rhref'), $this.attr('show_link') === '1');
+					return false;
 				});
 				if(item.sync) {
-					$(ele).click();
+					$ele.click();
 				}
 				return true;
 			}
@@ -1770,13 +1851,20 @@ var ImageService = {
 		return false;
 	},
 	
-	show: function(ele, service, url) {
+	show: function(ele, service, url, show_link) {
 		this.services[service].get(url, function(pics, sync) {
 			if(!pics) {
 				return;
 			}
 			var tpl = '<div><a target="_blank" class="image_preview" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="{{bmiddle_pic}}" original="{{original_pic}}" onmousedown="rOpenPic(event, this)" title="'+ _u.i18n("comm_mbright_to_open_pic") +'"><img class="imgicon pic" src="{{thumbnail_pic}}"></a></div>';
-			$(ele).hide().parent().after(tpl.format(pics));
+			var $ele = $(ele);
+			if(show_link !== true) {
+			    $ele.hide();
+			} else {
+			    var old_title = $ele.attr('old_title') || '';
+			    $ele.attr('title', old_title).attr('href', $ele.attr('rhref'));
+			}
+			$ele.parent().after(tpl.format(pics));
 		}, ele);
 	},
 	
