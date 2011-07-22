@@ -1933,11 +1933,14 @@ function sendMsg(msg){
         txt.removeAttr('disabled');
         return;
     }
-    var stat = {};
+    var stat = {image_urls: []};
     stat.userCount = users.length;
     stat.sendedCount = 0;
     stat.successCount = 0;
+    stat.uploadCount = 0;
+    stat.unsupport_uploads = []; // 不支持发送图片的，则等待支持发送图片的获取到图片后，再发送
     var use_source_url = source_url && short_url;
+    var pic = window.imgForUpload;
     var matchs = tapi.findSearchText(current_user, msg);
     for(var i = 0, len = users.length; i < len; i++) {
     	var status = msg, user = users[i];
@@ -1955,26 +1958,54 @@ function sendMsg(msg){
     			status = status.replace(match[0], tapi.formatSearchText(user, match[1]));
     		}
     	}
-        _sendMsgWraper(status, user, stat, selLi);
+    	var config = tapi.get_config(user);
+    	if(pic && !config.support_upload) {
+    	    stat.unsupport_uploads.push([status, user, stat, selLi]);
+    	} else {
+    	    stat.uploadCount++;
+    	    _sendMsgWraper(status, user, stat, selLi, pic);
+    	}
     }
 };
 
-function _sendMsgWraper(msg, user, stat, selLi){
-    //var data = {};
-    //data['status'] = msg; //放到这里重置一下，否则会被编码两次
-    //data['user'] = user;
-    //tapi.update(data, function(sinaMsg, textStatus){
-    var config = tapi.get_config(user), pic = window.imgForUpload;
-    if(!config.support_upload) {
-        pic = null;
+function _start_updates(unsupport_uploads, image_url) {
+    if(unsupport_uploads && unsupport_uploads.length > 0) {
+        for(var i = 0, len = unsupport_uploads.length; i < len; i++) {
+            if(image_url) {
+                unsupport_uploads[i][0] += ' ' + image_url;
+            }
+            _sendMsgWraper.apply(null, unsupport_uploads[i]);
+        }
     }
-    function callback(sinaMsg, textStatus){
+};
+
+function _sendMsgWraper(msg, user, stat, selLi, pic) {
+    function callback(sinaMsg, textStatus) {
+        stat.uploadCount--;
         stat.sendedCount++;
-        if(sinaMsg === true || (sinaMsg && sinaMsg.id) || (sinaMsg && sinaMsg.data && sinaMsg.data.id) || sinaMsg.id || textStatus == 'success'){
+        if(sinaMsg === true || (sinaMsg && sinaMsg.id) || (sinaMsg && sinaMsg.data && sinaMsg.data.id) || sinaMsg.id || textStatus === 'success'){
             stat.successCount++;
             $("#accountsForSend li[uniquekey=" + user.uniqueKey +"]").removeClass('sel');
-        }else if(sinaMsg.error){
-//            showMsg('error: ' + sinaMsg.error);
+            if(sinaMsg.original_pic) {
+                stat.image_urls.push(sinaMsg.original_pic);
+            }
+        }
+        if(stat.uploadCount === 0 && stat.unsupport_uploads) {
+            // 都没有url，则只能发普通微博了
+            var image_url = null;
+            for(var i = 0, len = stat.image_urls.length; i < len; i++) {
+                // 优先获取sinaimg
+                if(stat.image_urls[i].indexOf('sinaimg') > 0) {
+                    image_url = stat.image_urls[i];
+                    break;
+                }
+            }
+            if(!image_url) {
+                image_url = stat.image_urls[0];
+            }
+            var unsupport_uploads = stat.unsupport_uploads;
+            delete stat.unsupport_uploads;
+            _start_updates(unsupport_uploads, image_url);
         }
         if(stat.successCount >= stat.userCount){//全部发送成功
             hideMsgInput();
@@ -2011,7 +2042,6 @@ function _sendMsgWraper(msg, user, stat, selLi){
         var data = {status: msg, user:user};
         tapi.update(data, callback);
     }
-    //});
 };
 
 // 发生私信
