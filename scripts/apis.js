@@ -1530,15 +1530,19 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 	},
 	
 	processMsg: function(status, notEncode) {
-		var s = this.super_.processMsg.call(this, status, notEncode);
-		if(status.video && status.video.picurl) {
-		    s += ' <a href="' + status.video.realurl + '" title="' + status.video.title + '" target="_blank" class="link">' + status.video.shorturl + '</a>';
-			s += '<br/><img class="video_image" title="' + status.video.title + '" src="' + status.video.picurl + '" />';
+		if(status.video && status.video.picurl && status.text) {
+		    status.text = status.text.replace(status.video.shorturl, '!!!{{status.video.shorturl}}!!!');
+		    var s = this.super_.processMsg.call(this, status, notEncode);
+		    var video_html = '<a href="' + status.video.realurl + '" title="' + status.video.title + '" target="_blank" class="link">' + status.video.shorturl + '</a>';
+			s = s.replace('!!!{{status.video.shorturl}}!!!', video_html);
+		    s += '<br/><img class="video_image" title="' + status.video.title + '" src="' + status.video.picurl + '" />';
+		    return s;
+		} else {
+		    return this.super_.processMsg.call(this, status, notEncode);
 		}
 //		if(str_or_status.music && str_or_status.music.url) {
 //			status += '<br/><audio controls="controls" title="' + str_or_status.music.title + '" src="' + str_or_status.music.url + '"></audio>';
 //		}
-		return s;
 	},
 	
 	//page.js里面调用的时候没有加载表情字典,所以需要判断

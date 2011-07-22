@@ -1915,6 +1915,13 @@ var VideoService = {
 			},
 			tpl: '<embed src="http://you.video.sina.com.cn/api/sinawebApi/outplayrefer.php/vid={{id}}/s.swf" type="application/x-shockwave-flash" allowNetworking="all" allowScriptAccess="always" width="460" height="400"></embed>'
 		},
+		// http://url.cn/2Arc4n
+		// http://v.qq.com/video/play.html?vid=8snYX6VEFXq
+		// http://v.qq.com/cover/x/xp5cyy8s332vn56.html?vid=8RpUd2iCw0c
+		qq: {
+		    url_re: /v\.qq\.com\/.+?vid=(\w+)/i,
+		    tpl: '<embed flashvars="version=20110401&amp;vid={{id}}&amp;autoplay=1&amp;list=2&amp;duration=&amp;adplay=1&amp;showcfg=1&amp;tpid=23" src="http://static.video.qq.com/TencentPlayer.swf" quality="high" name="_playerswf" id="_playerswf" bgcolor="#000000" width="460" height="400" align="middle" allowscriptaccess="always" allowfullscreen="true" type="application/x-shockwave-flash">'
+		},
 		// http://www.youtube.com/v/A6vXOZbzBYY?fs=1
 		// http://youtu.be/A6vXOZbzBYY
 		// http://www.youtube.com/watch?v=x9S37QbWYJc&feature=player_embedded
@@ -2216,7 +2223,7 @@ function at_user_search(query, callback, context) {
 	    // 根据当前选择的用户来获取at数据
 	    // 如果只选择了一个用户，则使用选择的用户
 	    // 如果没有选择或者选择大于1人，则使用当前用户
-	    var $selected = $('#accountsForSend li.sel');
+	    var $selected = $('#accountsForSend li.sel:last');
 	    if($selected.length > 0) {
 	        current_user = getUserByUniqueKey($selected.attr('uniquekey'), 'all');
 	    } 
