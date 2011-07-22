@@ -186,7 +186,7 @@ function sendMsg() {
         var user = users[i];
         var config = tapi.get_config(user);
         // 判断文件是否过大
-        if(file.size > config.max_image_size) {
+        if(file && file.size > config.max_image_size) {
             // rpe.loaded / rpe.total
             upInfo.append(TP_USER_UPLOAD_INFO.format(user));
             onprogress({loaded: 0, total: file.size}, user, stat);
@@ -209,14 +209,20 @@ function sendMsg() {
         	stat.uploadCount++;
         	_uploadWrap(user, status, pic, stat, selLi);
         } else { // only support update
-            if(!image_url) {
+            if(image_url || !pic.file) {
+                _updateWrap(user, status, stat, selLi, image_url);
+            } else {
                 // 没有图片连接，则等待其他上传完得到图片后再发送
                 onprogress({loaded: 0, total: 100}, user, stat);
                 stat.unsupport_uploads.push([user, status, stat, selLi]);
-            } else {
-                _updateWrap(user, status, stat, selLi, image_url);
             }
         }
+    }
+    if(stat.uploadCount === 0 && stat.unsupport_uploads && stat.unsupport_uploads.length > 0) {
+        // 未选中图片服务，直接发送内容
+        var unsupport_uploads = stat.unsupport_uploads;
+        delete stat.unsupport_uploads;
+        _start_updates(unsupport_uploads);
     }
 };
 
@@ -264,6 +270,9 @@ function _finish_callback(user, stat, selLi, data, textStatus, error_code) {
         }
         var unsupport_uploads = stat.unsupport_uploads;
         delete stat.unsupport_uploads;
+        if(image_url) {
+            stat.select_image_url = image_url;
+        }
         _start_updates(unsupport_uploads, image_url);
     }
     if(stat.successCount >= stat.userCount) {
@@ -296,6 +305,10 @@ function _finish_callback(user, stat, selLi, data, textStatus, error_code) {
             var failCount = stat.userCount - stat.successCount;
             if(stat.userCount > 1 && failCount > 0) { // 多个用户的
                 _showMsg(_u.i18n("msg_send_complete").format({successCount:stat.successCount, errorCount:failCount}));
+            }
+            if(failCount > 0 && stat.select_image_url) {
+                // 有未成功的，则将图片保留下来，以便下次发送
+                $("#txtContent").val($("#txtContent").val() + ' ' + stat.select_image_url);
             }
         }
     }

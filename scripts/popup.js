@@ -1966,6 +1966,12 @@ function sendMsg(msg){
     	    _sendMsgWraper(status, user, stat, selLi, pic);
     	}
     }
+    if(stat.uploadCount === 0 && stat.unsupport_uploads && stat.unsupport_uploads.length > 0) {
+        // 未选中图片服务，直接发送内容
+        var unsupport_uploads = stat.unsupport_uploads;
+        delete stat.unsupport_uploads;
+        _start_updates(unsupport_uploads);
+    }
 };
 
 function _start_updates(unsupport_uploads, image_url) {
@@ -2005,6 +2011,9 @@ function _sendMsgWraper(msg, user, stat, selLi, pic) {
             }
             var unsupport_uploads = stat.unsupport_uploads;
             delete stat.unsupport_uploads;
+            if(image_url) {
+                stat.select_image_url = image_url;
+            }
             _start_updates(unsupport_uploads, image_url);
         }
         if(stat.successCount >= stat.userCount){//全部发送成功
@@ -2028,6 +2037,11 @@ function _sendMsgWraper(msg, user, stat, selLi, pic) {
                 if(failCount <= 0) { //全部成功则清除上传的图片
                     window.imgForUpload = null;
                     $('#upImgPreview').hide();
+                } else {
+                    // 有未成功的，则将图片保留下来，以便下次发送
+                    if(stat.select_image_url) {
+                        $("#txtContent").val($("#txtContent").val() + ' ' + stat.select_image_url);
+                    }
                 }
             }
         }
