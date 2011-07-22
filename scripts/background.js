@@ -212,7 +212,7 @@ var friendships = {
     	tapi.friends(params, function(data){
     		var friends = null;
     		if(data) {
-    		    data.users || data.items || data;
+    		    friends = data.users || data.items || data;
     		}
     		// 重新获取一次cache，防止期间cache被更新了，之前的引用就失效了
     		var cache = get_data_cache(friend_data_type, user.uniqueKey) || [];

@@ -2217,14 +2217,13 @@ function at_user_search(query, callback, context) {
 	    // 如果只选择了一个用户，则使用选择的用户
 	    // 如果没有选择或者选择大于1人，则使用当前用户
 	    var $selected = $('#accountsForSend li.sel');
-	    if($selected.length === 1) {
+	    if($selected.length > 0) {
 	        current_user = getUserByUniqueKey($selected.attr('uniquekey'), 'all');
 	    } 
 	}
 	if(!current_user) {
 	    current_user = getUser();
 	}
-//	console.log(current_user.screen_name)
 	var b_view = getBackgroundView();
 	var hits = {}, hit_count = 0;
 	var config = tapi.get_config(current_user);
