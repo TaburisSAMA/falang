@@ -1966,16 +1966,28 @@ function sendMsg(msg){
     	    _sendMsgWraper(status, user, stat, selLi, pic);
     	}
     }
-    if(stat.uploadCount === 0 && stat.unsupport_uploads && stat.unsupport_uploads.length > 0) {
-        // 未选中图片服务，直接发送内容
-        var unsupport_uploads = stat.unsupport_uploads;
-        delete stat.unsupport_uploads;
-        _start_updates(unsupport_uploads);
-    }
+    _start_updates(stat);
 };
 
-function _start_updates(unsupport_uploads, image_url) {
-    if(unsupport_uploads && unsupport_uploads.length > 0) {
+function _start_updates(stat, image_url) {
+    if(stat.uploadCount === 0 && stat.unsupport_uploads && stat.unsupport_uploads.length > 0) {
+        var unsupport_uploads = stat.unsupport_uploads;
+        delete stat.unsupport_uploads;
+        // 都没有url，则只能发普通微博了
+        var image_url = null;
+        for(var i = 0, len = stat.image_urls.length; i < len; i++) {
+            // 优先获取sinaimg
+            if(stat.image_urls[i].indexOf('sinaimg') > 0) {
+                image_url = stat.image_urls[i];
+                break;
+            }
+        }
+        if(!image_url) {
+            image_url = stat.image_urls[0];
+        }
+        if(image_url) {
+            stat.select_image_url = image_url;
+        }
         for(var i = 0, len = unsupport_uploads.length; i < len; i++) {
             if(image_url) {
                 unsupport_uploads[i][0] += ' ' + image_url;
@@ -1986,36 +1998,23 @@ function _start_updates(unsupport_uploads, image_url) {
 };
 
 function _sendMsgWraper(msg, user, stat, selLi, pic) {
-    function callback(sinaMsg, textStatus) {
+    function callback(result, textStatus) {
         stat.uploadCount--;
         stat.sendedCount++;
-        if(sinaMsg === true || (sinaMsg && sinaMsg.id) || (sinaMsg && sinaMsg.data && sinaMsg.data.id) || sinaMsg.id || textStatus === 'success'){
+        if(result === true || (result && (result.id || (result.data && result.data.id))) || textStatus === 'success') {
             stat.successCount++;
             $("#accountsForSend li[uniquekey=" + user.uniqueKey +"]").removeClass('sel');
-            if(sinaMsg.original_pic) {
-                stat.image_urls.push(sinaMsg.original_pic);
-            }
-        }
-        if(stat.uploadCount === 0 && stat.unsupport_uploads) {
-            // 都没有url，则只能发普通微博了
-            var image_url = null;
-            for(var i = 0, len = stat.image_urls.length; i < len; i++) {
-                // 优先获取sinaimg
-                if(stat.image_urls[i].indexOf('sinaimg') > 0) {
-                    image_url = stat.image_urls[i];
-                    break;
+            if(result) {
+                var image_url = result.original_pic;
+                if(!image_url && result.data) {
+                    image_url = result.data.original_pic;
+                }
+                if(image_url) {
+                    stat.image_urls.push(image_url);
                 }
             }
-            if(!image_url) {
-                image_url = stat.image_urls[0];
-            }
-            var unsupport_uploads = stat.unsupport_uploads;
-            delete stat.unsupport_uploads;
-            if(image_url) {
-                stat.select_image_url = image_url;
-            }
-            _start_updates(unsupport_uploads, image_url);
         }
+        _start_updates(stat);
         if(stat.successCount >= stat.userCount){//全部发送成功
             hideMsgInput();
             selLi.addClass('sel');

@@ -134,8 +134,9 @@ function sendMsg() {
         check = false;
     }
     var file = $("#imageFile").length > 0 ? $("#imageFile")[0].files[0] : null;
+    var image_url = null; // 是否通过图片url发送
     if(!file) {
-    	var image_url = $('#imageUrl').val();
+    	image_url = $('#imageUrl').val();
     	if(image_url) {
     		file = getImageBlob(image_url);
     	} else {
@@ -207,55 +208,25 @@ function sendMsg() {
     	upInfo.append(TP_USER_UPLOAD_INFO.format(user));
         if(config.support_upload && pic.file) {
         	stat.uploadCount++;
-        	_uploadWrap(user, status, pic, stat, selLi);
+        	_uploadWrap(status, user, pic, stat, selLi);
         } else { // only support update
-            if(image_url || !pic.file) {
-                _updateWrap(user, status, stat, selLi, image_url);
+            if(image_url) {
+                status += ' ' + image_url;
+                _updateWrap(status, user, stat, selLi);
             } else {
                 // 没有图片连接，则等待其他上传完得到图片后再发送
                 onprogress({loaded: 0, total: 100}, user, stat);
-                stat.unsupport_uploads.push([user, status, stat, selLi]);
+                stat.unsupport_uploads.push([status, user, stat, selLi]);
             }
         }
     }
+    _start_updates(stat);
+};
+
+function _start_updates(stat) {
     if(stat.uploadCount === 0 && stat.unsupport_uploads && stat.unsupport_uploads.length > 0) {
-        // 未选中图片服务，直接发送内容
         var unsupport_uploads = stat.unsupport_uploads;
         delete stat.unsupport_uploads;
-        _start_updates(unsupport_uploads);
-    }
-};
-
-function _start_updates(unsupport_uploads, image_url) {
-    if(unsupport_uploads && unsupport_uploads.length > 0) {
-        for(var i = 0, len = unsupport_uploads.length; i < len; i++) {
-            if(image_url) {
-                unsupport_uploads[i].push(image_url);
-            }
-            _updateWrap.apply(null, unsupport_uploads[i]);
-        }
-    }
-};
-
-function _finish_callback(user, stat, selLi, data, textStatus, error_code) {
-    stat.sendedCount++;
-    stat.uploadCount--;
-    if(textStatus != 'error' && data && !data.error) {
-        stat.successCount++;
-        $("#accountsForSend li[uniquekey=" + user.uniqueKey +"]").removeClass('sel');
-        $("#u_uploadinfo_" + user.uniqueKey).find('.progressInfo').append(' (<span>'+ _u.i18n("comm_success") +'</span>)');
-        if(data.original_pic) {
-            stat.image_urls.push(data.original_pic);
-        }
-    } else {
-        var message = ' (<span style="color:red">'+ _u.i18n("comm_fail");
-        if(data && data.error) {
-            message += ': ' + data.error;
-        }
-        message += '</span>)';
-        $("#u_uploadinfo_" + user.uniqueKey).addClass('error').find('.progressInfo').append(message);
-    }
-    if(stat.uploadCount === 0 && stat.unsupport_uploads) {
         // 都没有url，则只能发普通微博了
         var image_url = null;
         for(var i = 0, len = stat.image_urls.length; i < len; i++) {
@@ -268,13 +239,43 @@ function _finish_callback(user, stat, selLi, data, textStatus, error_code) {
         if(!image_url) {
             image_url = stat.image_urls[0];
         }
-        var unsupport_uploads = stat.unsupport_uploads;
-        delete stat.unsupport_uploads;
         if(image_url) {
             stat.select_image_url = image_url;
         }
-        _start_updates(unsupport_uploads, image_url);
+        for(var i = 0, len = unsupport_uploads.length; i < len; i++) {
+            if(image_url) {
+                unsupport_uploads[i][0] += ' ' + image_url;
+            }
+            _updateWrap.apply(null, unsupport_uploads[i]);
+        }
     }
+};
+
+function _finish_callback(user, stat, selLi, result, textStatus, error_code) {
+    stat.sendedCount++;
+    stat.uploadCount--;
+    if(result === true || (result && (result.id || (result.data && result.data.id))) || textStatus === 'success') {
+        stat.successCount++;
+        $("#accountsForSend li[uniquekey=" + user.uniqueKey +"]").removeClass('sel');
+        $("#u_uploadinfo_" + user.uniqueKey).find('.progressInfo').append(' (<span>'+ _u.i18n("comm_success") +'</span>)');
+        if(result) {
+            var image_url = result.original_pic;
+            if(!image_url && result.data) {
+                image_url = result.data.original_pic;
+            }
+            if(image_url) {
+                stat.image_urls.push(image_url);
+            }
+        }
+    } else {
+        var message = ' (<span style="color:red">'+ _u.i18n("comm_fail");
+        if(result && result.error) {
+            message += ': ' + result.error;
+        }
+        message += '</span>)';
+        $("#u_uploadinfo_" + user.uniqueKey).addClass('error').find('.progressInfo').append(message);
+    }
+    _start_updates(stat);
     if(stat.successCount >= stat.userCount) {
         // 全部发送成功
         _showMsg(_u.i18n("msg_send_success"));
@@ -314,12 +315,7 @@ function _finish_callback(user, stat, selLi, data, textStatus, error_code) {
     }
 };
 
-function _updateWrap(user, status, stat, selLi, image_url){
-	if(image_url) {
-//		var config = tapi.get_config(user);
-//		status += config.image_shorturl_pre + image_url;
-		status += ' ' + image_url;
-	}
+function _updateWrap(status, user, stat, selLi) {
 	onprogress({loaded: 50, total: 100}, user, stat);
 	tapi.update({user: user, status: status}, function(result_data, status_code, error_code) {
 	    onprogress({loaded: 100, total: 100}, user, stat);
@@ -327,7 +323,7 @@ function _updateWrap(user, status, stat, selLi, image_url){
 	});
 };
 
-function _uploadWrap(user, status, pic, stat, selLi) {
+function _uploadWrap(status, user, pic, stat, selLi) {
     tapi.upload(user, {status: status}, pic, 
         function() {
             _showLoading();

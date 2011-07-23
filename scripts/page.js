@@ -473,16 +473,17 @@ function sendFawaveMsg(){
         showFawaveSendMsg(_u.i18n("msg_need_select_account"));
         return;
     }
-    var stat = {};
+    var stat = {unsupport_uploads: [], image_urls: []};
     stat.userCount = users.length;
     stat.sendedCount = 0;
     stat.successCount = 0;
+    stat.uploadCount = 0;
     $("#fawaveSendMsgWrap input, #fawaveSendMsgWrap button, #fawaveSendMsgWrap textarea").attr('disabled', true);
     var matchs = tapi.findSearchText(CURRENT_USER, msg);
-    for(var i in users){
+    for(var i = 0, len = users.length; i < len; i++) {
     	var status = msg, user = users[i];
+    	var config = tapi.get_config(user);
     	if(use_source_url) {
-    		var config = tapi.get_config(user);
     		if(config.support_auto_shorten_url) {
     			status = status.replace(short_url, source_url);
     		}
@@ -494,40 +495,89 @@ function sendFawaveMsg(){
     			status = status.replace(match[0], tapi.formatSearchText(user, match[1]));
     		}
     	}
-        _sendFawaveMsgWrap(status, image_url, user, stat, selLi);
+    	if(!config.support_upload && image_url) {
+    	    // 如果不支持上传并且有图片，才需要延迟发送
+    	    stat.unsupport_uploads.push([status, user, stat, selLi]);
+    	} else {
+    	    stat.uploadCount++;
+    	    _sendFawaveMsgWrap(status, user, stat, selLi, image_url);
+    	}
+    }
+    _start_updates(stat);
+};
+
+function _start_updates(stat) {
+    if(stat.uploadCount === 0 && stat.unsupport_uploads && stat.unsupport_uploads.length > 0) {
+        var unsupport_uploads = stat.unsupport_uploads;
+        delete stat.unsupport_uploads;
+        // 都没有url，则只能发普通微博了
+        var image_url = null;
+        for(var i = 0, len = stat.image_urls.length; i < len; i++) {
+            // 优先获取sinaimg
+            if(stat.image_urls[i].indexOf('sinaimg') > 0) {
+                image_url = stat.image_urls[i];
+                break;
+            }
+        }
+        if(!image_url) {
+            image_url = stat.image_urls[0];
+        }
+        if(image_url) {
+            stat.select_image_url = image_url;
+        }
+        for(var i = 0, len = unsupport_uploads.length; i < len; i++) {
+            if(image_url) {
+                unsupport_uploads[i][0] += ' ' + image_url;
+            }
+            _sendFawaveMsgWrap.apply(null, unsupport_uploads[i]);
+        }
     }
 };
 
-function _sendFawaveMsgWrap(msg, imageUrl, user, stat, selLi){
-    chrome.extension.sendRequest({method:'publicQuickSendMsg', user:user, sendMsg:msg, imageUrl: imageUrl}, function(response){
+function _sendFawaveMsgWrap(msg, user, stat, selLi, imageUrl) {
+    chrome.extension.sendRequest(
+            {method:'publicQuickSendMsg', user:user, sendMsg:msg, imageUrl: imageUrl}, function(response) {
         stat.sendedCount++;
-        var msg = response.msg;
-        if( msg === true || (msg && msg.id) || (msg && msg.data && msg.data.id) || response.textStatus == 'success'){
+        stat.uploadCount--;
+        var result = response.msg;
+        if(result === true || (result && (result.id || (result.data && result.data.id))) || response.textStatus === 'success') {
             stat.successCount++;
             $("#fawave_accountsForSend li[uniquekey=" + user.uniqueKey +"]").removeClass('sel');
-        }else if(msg && msg.error){
-            showFawaveSendMsg('error: ' + msg.error);
-        }
-        else{
+            if(result) {
+                var image_url = result.original_pic;
+                if(!image_url && result.data) {
+                    image_url = result.data.original_pic;
+                }
+                if(image_url) {
+                    stat.image_urls.push(image_url);
+                }
+            }
+        } else if (result && result.error) {
+            showFawaveSendMsg('error: ' + result.error);
+        } else {
             showFawaveSendMsg(_u.i18n("msg_send_error").format({username:user.screen_name}));
         }
-        if(stat.successCount >= stat.userCount){//全部发送成功
+        _start_updates(stat);
+        if(stat.successCount >= stat.userCount){ // 全部发送成功
             selLi.addClass('sel');
             // 清空图片
             $('#imgPreview').html('');
             $("#fawaveSendMsgWrap .btn-negative").click();
         }
-        if(stat.sendedCount >= stat.userCount){//全部发送完成
+        if(stat.sendedCount >= stat.userCount) { //全部发送完成
             selLi = null;
             $("#fawaveSendMsgWrap input, #fawaveSendMsgWrap button, #fawaveSendMsgWrap textarea").removeAttr('disabled');
-            if(stat.successCount > 0){ //有发送成功的
+            if(stat.successCount > 0){ // 有发送成功的
                 chrome.extension.sendRequest({method:'notifyCheckNewMsg'}, function(response){});
-                
                 if(stat.userCount > 1){ //多个用户的
                     showFawaveSendMsg(_u.i18n("msg_send_complete").format({successCount:stat.successCount, errorCount:(stat.userCount - stat.successCount)}));
                 }
             }
-            
+            var failCount = stat.userCount - stat.successCount;
+            if(failCount > 0 && stat.select_image_url) {
+                // 有未成功的，则将图片保留下来，以便下次发送
+                $("#fawaveTxtContentInp").val($("#fawaveTxtContentInp").val() + ' ' + stat.select_image_url);
+            }
         }
         user = null;
         stat = null;
