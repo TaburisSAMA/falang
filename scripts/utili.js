@@ -1523,6 +1523,8 @@ var Instagram = {
 	 */
 	host: 'instagr.am',
 	url_re: /http:\/\/instagr\.am\/p\//i,
+	show_link: true,
+    sync: true,
 	get: function(url, callback) {
 	    var bg = getBackgroundView();
 	    if(bg.IMAGE_URLS[url]) {
@@ -1616,6 +1618,7 @@ var Twitpic = {
 	 */
 	host: 'twitpic.com',
 	url_re: /http:\/\/(twitpic\.com)\/\w+/i,
+	show_link: true,
 	sync: true,
 	get: function(url, callback) {
 		var tpl = 'http://twitpic.com/show/{{size}}/{{id}}';
@@ -1685,6 +1688,7 @@ var Yfrog = {
 	 */
 	host: 'yfrog.com',
 	url_re: /http:\/\/yfrog\.com\/\w+/i,
+	show_link: true,
 	sync: true,
 	get: function(url, callback) {
 		var pics = {
@@ -1700,6 +1704,7 @@ var Yfrog = {
 var Twitgoo = {
 	host: 'twitgoo.com',
 	url_re: /http:\/\/twitgoo\.com\/\w+/i,
+	show_link: true,
 	sync: true,
 	get: function(url, callback) {
 		var pics = {
@@ -1752,6 +1757,7 @@ var MobyPicture = {
 var Imgur = {
 	host: 'imgur.com',
 	url_re: /http:\/\/(i\.)?imgur\.com\/\w+\.\w+/i,
+	show_link: true,
 	sync: true,
 	get: function(url, callback) {
 		var re = /imgur.com\/(\w+)\.(\w+)/i;
