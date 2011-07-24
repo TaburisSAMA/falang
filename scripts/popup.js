@@ -217,6 +217,7 @@ function _load_new_data(data_type, is_current_tab) {
         $("#" + data_type + "_timeline ul.list").html('');
         getSinaTimeline(data_type);
     }
+    return load_new;
 };
 
 function initOnUnload(){
@@ -1724,12 +1725,13 @@ function readMore(t){
     var _b_view = getBackgroundView();
     var c_user = getUser();
     var data_type = t;
-    if(data_type == 'direct_messages') {
+    if(data_type === 'direct_messages') {
     	data_type = 'messages';
     }
     var cache = _b_view.get_data_cache(data_type, c_user.uniqueKey);
     var view_status = _b_view.get_view_status(t, c_user.uniqueKey);
     var timeline_offset = getTimelineOffset(t) + (view_status.index || 0);
+    //console.log(t, timeline_offset, view_status.index, cache.length)
 //    //tab上如果有未读数，则需要加上
 //    var unread_count = $("#tl_tabs li.tab-" + t + " .unreadCount").html();
 //    unread_count = Number(unread_count);
