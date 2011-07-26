@@ -54,8 +54,8 @@ var URL_RE = new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&
 
 // 伪装成微博AIR
 var TSINA_APPKEYS = {
-    'weibo_air': ['微博AIR', '3434422667', '523f2d0d134bfd5aa138f9e5af828bf9'],
-    'fawave': ['FaWave', '3538199806', '18cf587d60e11e3c160114fd92dd1f2b']
+    'fawave': ['FaWave', '3538199806', '18cf587d60e11e3c160114fd92dd1f2b'],
+    'weibo_air': ['微博AIR', '3434422667', '523f2d0d134bfd5aa138f9e5af828bf9']
 };
 
 var sinaApi = {
