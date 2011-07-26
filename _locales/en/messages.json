@@ -860,7 +860,7 @@
         "description": "用户管理"
     },
     "sett_tip_add_account": {
-        "message": "",
+        "message": "<li>* Please logout Sina weibo first: <b><a href=\"http://t.sina.com.cn/logout.php?backurl=/\" target=\"_blank\">Logout sina weibo</a></b></li>",
         "description": "添加账号的时候提示用户的一些信息"
     },
     "sett_jTip_update_accounts": {
