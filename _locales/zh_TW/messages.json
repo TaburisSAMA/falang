@@ -867,6 +867,14 @@
         "message": "為了快速啟動，用戶信息會緩存在本地，如果你修改了用戶頭像或者其他用戶信息，需要手動更新一下。",
         "description": "更新用户信息的说明"
     },
+    "sett_des_account_appkey": {
+        "message": "應用 Key：",
+        "description": "添加用户的时候选择新浪微博的appkey"
+    },
+    "sett_jTip_account_appkey": {
+        "message": "我們曾經很傻很天真地以為新浪微博開放平台是真的開放的。由於新浪將FaWave的應用Key屏蔽了，目前只能無奈地讓用戶選擇使用其他應用Key來繼續讓FaWave兼容新浪微博。望諒解。",
+        "description": "添加用户的时候选择新浪微博的appkey时的提示说明"
+    },
     "sett_des_account_blog_type": {
         "message": "微　　博：",
         "description": "添加用户的时候选择微博类型"
