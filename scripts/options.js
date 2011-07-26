@@ -406,7 +406,7 @@ function showDndAccountList(bindDnd){
     // 显示新浪微博appkey 选项
     var appkey_options = '';
     for(var k in TSINA_APPKEYS) {
-        if(k === 'weibo_air') {
+        if(k !== 'fawave') {
             continue;
         }
     	appkey_options += '<option value="{{value}}">{{name}}</option>'.format({name: TSINA_APPKEYS[k][0], value: k});
