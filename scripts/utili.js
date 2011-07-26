@@ -98,7 +98,7 @@ var T_NAMES = {
 	't163': '网易微博',
 	'douban': '豆瓣',
 	'fanfou': '饭否',
-	'renren': '人人网',
+//	'renren': '人人网',
 	'digu': '嘀咕',
 //	'tianya': '天涯微博',
 	'zuosa': '做啥',
