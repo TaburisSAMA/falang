@@ -883,6 +883,14 @@
         "message": "我们曾经很傻很天真地以为新浪微博开放平台是真的开放的。由于新浪将FaWave的应用Key屏蔽了，目前只能无奈地让用户选择使用其他应用的Key来继续让FaWave兼容新浪微博。望谅解。",
         "description": "添加用户的时候选择新浪微博的appkey时的提示说明"
     },
+    "sett_des_account_appkey_diy": {
+        "message": "使用我自己的Key：",
+        "description": "使用我自己的Key："
+    },
+    "sett_des_account_appkey_secret": {
+        "message": "密钥：",
+        "description": "密钥："
+    },
     "sett_des_account_blog_type": {
         "message": "微　　博：",
         "description": "添加用户的时候选择微博类型"

@@ -875,6 +875,14 @@
         "message": "Our FaWave app key had been blocked by Sina, we are so sorry, please use other app key to continue let FaWave work on Sina Weibo.",
         "description": "添加用户的时候选择新浪微博的appkey时的提示说明"
     },
+    "sett_des_account_appkey_diy": {
+        "message": "Use My Key：",
+        "description": "使用我自己的Key："
+    },
+    "sett_des_account_appkey_secret": {
+        "message": "Secret：",
+        "description": "密钥："
+    },
     "sett_des_account_blog_type": {
         "message": "Microblogging：",
         "description": "添加用户的时候选择微博类型"
@@ -1100,11 +1108,11 @@
         "description": "刷新间隔已更新"
     },
     "msg_word_count": {
-        "message": "(You can also enter the {{len}} words)",
+        "message": "({{len}} words left)",
         "description": "(你还可以输入{{len}}字)"
     },
     "msg_word_overstep": {
-        "message": "Beyond the {{len}} words",
+        "message": "Beyond {{len}} words",
         "description": "已超出{{len}}字"
     },
     "msg_file_too_large": {

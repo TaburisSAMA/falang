@@ -304,9 +304,9 @@ var sinaApi = {
 	// 设置认证头
 	apply_auth: function(url, args, user) {
     	var appkey = null;
-    	if(user.blogType == 'tsina' && user.appkey) {
+    	if(user.blogType === 'tsina' && user.appkey) {
 			// 设在其他key
-			appkey = TSINA_APPKEYS[user.appkey];
+			appkey = TSINA_APPKEYS[user.appkey] || [user.appkey, user.appkey];
 			if(appkey && args.data.source) {
 				args.data.source = appkey[1];
 			}
@@ -319,7 +319,7 @@ var sinaApi = {
 			var oauth_key = this.config.oauth_key;
 			if(appkey) {
 				oauth_key = appkey[1];
-				oauth_secret = appkey[2];
+				oauth_secret = user.appkey_secret || appkey[2];
 			}
 			var accessor = {
 				consumerSecret: oauth_secret

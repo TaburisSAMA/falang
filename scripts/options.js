@@ -406,6 +406,9 @@ function showDndAccountList(bindDnd){
     // 显示新浪微博appkey 选项
     var appkey_options = '';
     for(var k in TSINA_APPKEYS) {
+        if(k === 'weibo_air') {
+            continue;
+        }
     	appkey_options += '<option value="{{value}}">{{name}}</option>'.format({name: TSINA_APPKEYS[k][0], value: k});
     }
     $('#account-appkey').html(appkey_options);
@@ -839,7 +842,18 @@ function saveAccount(){
     var pwd = $.trim($("#account-pwd").val());
     var blogType = $.trim($("#account-blogType").val()) || 'tsina'; //微博类型，兼容，默认tsina
     var authType = $.trim($("#account-authType").val()); //登录验证类型
-    var appkey = $.trim($('#account-appkey').val()) || 'fawave';
+    var appkey = 'fawave', appkey_secret = null;
+    if(!$('.account-appkey').is(':hidden')) {
+        appkey = $.trim($('#account-appkey').val()) || 'fawave';
+        if($('#account-appkey-diy').attr('checked')) {
+            var diy_key = $('#account-appkey-diy-key').val();
+            var diy_secret = $('#account-appkey-diy-secret').val();
+            if(diy_key && diy_secret) {
+                appkey = diy_key;
+                appkey_secret = diy_secret;
+            }
+        }
+    }
     // appkey = 'fawave';
     var pin = $.trim($('#account-pin').val()); // oauth pin码
     var apiProxy = $.trim($('#account-proxy-api').val());
@@ -851,8 +865,11 @@ function saveAccount(){
     	user.apiProxy = apiProxy;
     }
     // 目前只是新浪需要设在key
-    if(blogType == 'tsina' && appkey) {
+    if(blogType === 'tsina' && appkey) {
     	user.appkey = appkey;
+    	if(appkey_secret) {
+    	    user.appkey_secret = appkey_secret;
+    	}
     }
     if((authType == 'baseauth' || authType == 'xauth') && userName && pwd){ // TODO: xauth还未支持
         //userName = userName.toLowerCase(); //小写
