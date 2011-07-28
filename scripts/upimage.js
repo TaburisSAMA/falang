@@ -179,6 +179,9 @@ function sendMsg() {
     stat.sendedCount = 0;
     stat.successCount = 0;
     stat.uploadCount = 0;
+    if(file) {
+        stat.pic = file;
+    }
     var matchs = tapi.findSearchText(c_user, msg);
     stat.unsupport_uploads = []; // 不支持发送图片的，则等待支持发送图片的获取到图片后，再发送
     // 增加图片链接
@@ -196,8 +199,8 @@ function sendMsg() {
                 {error: _u.i18n("msg_pic_too_large").format({max_size: max_size})}, 'error', 500);
             continue;
         }
-        var pic = {file: file};
         var status = msg;
+        var pic = {file: file};
         // 处理主题转化
     	if(matchs.length > 0 && c_user.blogType !== user.blogType) {
     		for(var j = 0, jlen = matchs.length; j < jlen; j++) {
@@ -227,27 +230,22 @@ function _start_updates(stat) {
     if(stat.uploadCount === 0 && stat.unsupport_uploads && stat.unsupport_uploads.length > 0) {
         var unsupport_uploads = stat.unsupport_uploads;
         delete stat.unsupport_uploads;
-        // 都没有url，则只能发普通微博了
-        var image_url = null;
-        for(var i = 0, len = stat.image_urls.length; i < len; i++) {
-            // 优先获取sinaimg
-            if(stat.image_urls[i].indexOf('sinaimg') > 0) {
-                image_url = stat.image_urls[i];
-                break;
-            }
-        }
-        if(!image_url) {
-            image_url = stat.image_urls[0];
-        }
-        if(image_url) {
-            stat.select_image_url = image_url;
-        }
-        for(var i = 0, len = unsupport_uploads.length; i < len; i++) {
+        _get_image_url(stat, function(image_url) {
             if(image_url) {
-                unsupport_uploads[i][0] += ' ' + image_url;
+                stat.select_image_url = image_url;
             }
-            _updateWrap.apply(null, unsupport_uploads[i]);
-        }
+            for(var i = 0, len = unsupport_uploads.length; i < len; i++) {
+                if(image_url) {
+                    unsupport_uploads[i][0] += ' ' + image_url;
+                }
+                _updateWrap.apply(null, unsupport_uploads[i]);
+            }
+        }, function(ev) {
+            for(var i = 0, len = unsupport_uploads.length; i < len; i++) {
+                var args = unsupport_uploads[i];
+                onprogress(ev, args[1], args[2]);
+            }
+        });
     }
 };
 

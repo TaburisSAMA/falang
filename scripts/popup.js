@@ -600,7 +600,7 @@ var Search = {
 //	            $tab.attr('q', q);
 	            $tab.attr('page', page + 1);
 	        }
-	        if(statuses.length >= PAGE_SIZE) {
+	        if(statuses.length >= PAGE_SIZE / 2) {
             	max_id = data.max_id || String(statuses[statuses.length - 1].id);
             	$tab.attr('max_id', max_id);
             	showReadMore(timeline_type);
@@ -1943,6 +1943,7 @@ function sendMsg(msg){
     stat.unsupport_uploads = []; // 不支持发送图片的，则等待支持发送图片的获取到图片后，再发送
     var use_source_url = source_url && short_url;
     var pic = window.imgForUpload;
+    stat.pic = pic;
     var matchs = tapi.findSearchText(current_user, msg);
     for(var i = 0, len = users.length; i < len; i++) {
     	var status = msg, user = users[i];
@@ -1971,31 +1972,46 @@ function sendMsg(msg){
     _start_updates(stat);
 };
 
-function _start_updates(stat, image_url) {
+function _get_image_url(stat, callback, onprogress, context) {
+    // 都没有url，则只能发普通微博了
+    var image_url = null;
+    for(var i = 0, len = stat.image_urls.length; i < len; i++) {
+        // 优先获取sinaimg
+        if(stat.image_urls[i].indexOf('sinaimg') > 0) {
+            image_url = stat.image_urls[i];
+            break;
+        }
+    }
+    if(!image_url) {
+        image_url = stat.image_urls[0];
+    }
+    if(!image_url && stat.pic) {
+        Immio.upload({}, stat.pic, function(error, info) {
+            if(info && info.link) {
+                image_url = info.link;
+            }
+            callback.call(context, image_url);
+        }, onprogress, context);
+    } else {
+        callback.call(context, image_url);
+    }
+}
+
+function _start_updates(stat) {
     if(stat.uploadCount === 0 && stat.unsupport_uploads && stat.unsupport_uploads.length > 0) {
         var unsupport_uploads = stat.unsupport_uploads;
         delete stat.unsupport_uploads;
-        // 都没有url，则只能发普通微博了
-        var image_url = null;
-        for(var i = 0, len = stat.image_urls.length; i < len; i++) {
-            // 优先获取sinaimg
-            if(stat.image_urls[i].indexOf('sinaimg') > 0) {
-                image_url = stat.image_urls[i];
-                break;
-            }
-        }
-        if(!image_url) {
-            image_url = stat.image_urls[0];
-        }
-        if(image_url) {
-            stat.select_image_url = image_url;
-        }
-        for(var i = 0, len = unsupport_uploads.length; i < len; i++) {
+        _get_image_url(stat, function(image_url) {
             if(image_url) {
-                unsupport_uploads[i][0] += ' ' + image_url;
+                stat.select_image_url = image_url;
             }
-            _sendMsgWraper.apply(null, unsupport_uploads[i]);
-        }
+            for(var i = 0, len = unsupport_uploads.length; i < len; i++) {
+                if(image_url) {
+                    unsupport_uploads[i][0] += ' ' + image_url;
+                }
+                _sendMsgWraper.apply(null, unsupport_uploads[i]);
+            }
+        });
     }
 };
 

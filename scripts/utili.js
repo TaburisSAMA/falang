@@ -1508,6 +1508,75 @@ http://code.google.com/p/falang/issues/detail?id=235
     }
 };
 
+// http://imm.io/api/
+// http://imm.io/7BhM
+var Immio = {
+    host: 'imm.io',
+    url_re: /http:\/\/imm\.io\/\w+$/i,
+    show_link: true,
+    sync: true,
+    get: function(url, callback) {
+        var bg = getBackgroundView();
+        if(bg.IMAGE_URLS[url]) {
+            return callback(bg.IMAGE_URLS[url], true);
+        }
+        $.ajax({
+            url: url,
+            success: function(html, status, xhr) {
+                var src = $(html).find('.view img').attr('src');
+                if(src) {
+                    var pics = {
+                        thumbnail_pic: src,
+                        bmiddle_pic: src,
+                        original_pic: src
+                    };
+                    bg.IMAGE_URLS[url] = pics;
+                    callback(pics);
+                } else {
+                    callback(null);
+                }
+            },
+            error: function() {
+                callback(null);
+            }
+        });
+    },
+    upload: function(data, pic, callback, onprogress, context) {
+        var url = 'http://imm.io/store/';
+        pic.keyname = 'image';
+        var blobbuilder = build_upload_params(data, pic);
+        $.ajax({
+            url: url,
+            data: blobbuilder.getBlob(),
+            type: 'post',
+            dataType: 'json',
+            contentType: blobbuilder.contentType,
+            processData: false,
+            beforeSend: function(req) {
+                if(onprogress) {
+                    if(req.upload){
+                        req.upload.onprogress = function(ev){
+                            onprogress(ev);
+                        };
+                    }
+                }
+            },
+            success: function(result) {
+                var error = null, info = null;
+                if(result.success) {
+                    info = result.payload;
+                } else {
+                    error = new Error(JSON.stringify(result));
+                }
+                callback.call(context, error, info);
+            },
+            error: function(xhr, status, err) {
+                callback.call(context, err);
+            }
+        });
+    }
+};
+
 // 图片服务
 var Instagram = {
 	/* 
@@ -1827,7 +1896,8 @@ var ImageService = {
 		MobyPicture: MobyPicture,
 		Twipple: Twipple,
 		Flickr: Flickr,
-		DoubanImage: DoubanImage
+		DoubanImage: DoubanImage,
+		Immio: Immio
 	},
 	
 	attempt: function(url, ele) {
