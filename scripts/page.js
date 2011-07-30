@@ -478,6 +478,9 @@ function sendFawaveMsg(){
     stat.sendedCount = 0;
     stat.successCount = 0;
     stat.uploadCount = 0;
+    if(image_url) {
+        stat.pic = image_url;
+    }
     $("#fawaveSendMsgWrap input, #fawaveSendMsgWrap button, #fawaveSendMsgWrap textarea").attr('disabled', true);
     var matchs = tapi.findSearchText(CURRENT_USER, msg);
     for(var i = 0, len = users.length; i < len; i++) {
@@ -506,31 +509,44 @@ function sendFawaveMsg(){
     _start_updates(stat);
 };
 
+function _get_image_url(stat, callback, onprogress, context) {
+    // 都没有url，则只能发普通微博了
+    var image_url = null;
+    for(var i = 0, len = stat.image_urls.length; i < len; i++) {
+        // 优先获取sinaimg
+        if(stat.image_urls[i].indexOf('sinaimg') > 0) {
+            image_url = stat.image_urls[i];
+            break;
+        }
+    }
+    if(!image_url) {
+        image_url = stat.image_urls[0];
+    }
+    if(!image_url && stat.pic) {
+        chrome.extension.sendRequest({method:'uploadImage', imageUrl: stat.pic}, function(response) {
+            image_url = response.url;
+            callback.call(context, image_url);
+        });
+    } else {
+        callback.call(context, image_url);
+    }
+}
+
 function _start_updates(stat) {
     if(stat.uploadCount === 0 && stat.unsupport_uploads && stat.unsupport_uploads.length > 0) {
         var unsupport_uploads = stat.unsupport_uploads;
         delete stat.unsupport_uploads;
-        // 都没有url，则只能发普通微博了
-        var image_url = null;
-        for(var i = 0, len = stat.image_urls.length; i < len; i++) {
-            // 优先获取sinaimg
-            if(stat.image_urls[i].indexOf('sinaimg') > 0) {
-                image_url = stat.image_urls[i];
-                break;
-            }
-        }
-        if(!image_url) {
-            image_url = stat.image_urls[0];
-        }
-        if(image_url) {
-            stat.select_image_url = image_url;
-        }
-        for(var i = 0, len = unsupport_uploads.length; i < len; i++) {
+        _get_image_url(stat, function(image_url) {
             if(image_url) {
-                unsupport_uploads[i][0] += ' ' + image_url;
+                stat.select_image_url = image_url;
             }
-            _sendFawaveMsgWrap.apply(null, unsupport_uploads[i]);
-        }
+            for(var i = 0, len = unsupport_uploads.length; i < len; i++) {
+                if(image_url) {
+                    unsupport_uploads[i][0] += ' ' + image_url;
+                }
+                _sendFawaveMsgWrap.apply(null, unsupport_uploads[i]);
+            }
+        });
     }
 };
 

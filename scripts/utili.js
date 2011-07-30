@@ -1441,6 +1441,72 @@ var ShortenUrl = {
 	_create_googl_auth_token: function(f){function k(){for(var c=0,b=0;b<arguments.length;b++)c=c+arguments[b]&4294967295;return c}function m(c){c=c=String(c>0?c:c+4294967296);var b;b=c;for(var d=0,i=false,j=b.length-1;j>=0;--j){var g=Number(b.charAt(j));if(i){g*=2;d+=Math.floor(g/10)+g%10}else d+=g;i=!i}b=b=d%10;d=0;if(b!=0){d=10-b;if(c.length%2==1){if(d%2==1)d+=9;d/=2;}}b=String(d);b+=c;return b;}function n(c){for(var b=5381,d=0;d<c.length;d++)b=k(b<<5,b,c.charCodeAt(d));return b;}function o(c){for(var b=0,d=0;d<c.length;d++)b=k(c.charCodeAt(d),b<<6,b<<16,-b);return b;}f={byteArray_:f,charCodeAt:function(c){return this.byteArray_[c];}};f.length=f.byteArray_.length;var e=n(f.byteArray_);e=e>>2&1073741823;e=e>>4&67108800|e&63;e=e>>4&4193280|e&1023;e=e>>4&245760|e&16383;var l="7";f=o(f.byteArray_);var h=(e>>2&15)<<4|f&15;h|=(e>>6&15)<<12|(f>>8&15)<<8;h|=(e>>10&15)<<20|(f>>16&15)<<16;h|=(e>>14&15)<<28|(f>>24&15)<<24;l+=m(h);return l;}
 };
 
+var FanfouImage = {
+    host: 'fanfou.com',
+    url_re: /fanfou\.com\/photo\/\w+/i,
+    get: function(url, callback) {
+        var bg = getBackgroundView();
+        if(bg.IMAGE_URLS[url]) {
+            return callback(bg.IMAGE_URLS[url], true);
+        }
+        $.ajax({
+            url: url,
+            success: function(html, status, xhr) {
+                var src = $(html).find('#photo img').attr('src');
+                if(src) {
+                    var pics = {
+                        thumbnail_pic: src.replace('/n0/', '/s0/'),
+                        bmiddle_pic: src,
+                        original_pic: src
+                    };
+                    bg.IMAGE_URLS[url] = pics;
+                    callback(pics);
+                } else {
+                    callback(null);
+                }
+            },
+            error: function() {
+                callback(null);
+            }
+        });
+    }
+};
+
+// http://www.yupoo.com/photos/techparty/81756954/zoom/small/
+// http://www.yupoo.com/photos/techparty/81756954/
+// http://photo.yupoo.com/techparty/BckmKZdN/medish.jpg
+var Yupoo = {
+    host: 'yupoo.com',
+    url_re: /yupoo\.com\/photos\//i,
+    show_link: true,
+    get: function(url, callback) {
+        var bg = getBackgroundView();
+        if(bg.IMAGE_URLS[url]) {
+            return callback(bg.IMAGE_URLS[url], true);
+        }
+        $.ajax({
+            url: url,
+            success: function(html, status, xhr) {
+                var src = $(html).find('#photo_img').attr('src');
+                if(src) {
+                    var pics = {
+                        thumbnail_pic: src.replace('medish.', 'small.'),
+                        bmiddle_pic: src.replace('medish.', 'medium.'),
+                        original_pic: src
+                    };
+                    bg.IMAGE_URLS[url] = pics;
+                    callback(pics);
+                } else {
+                    callback(null);
+                }
+            },
+            error: function() {
+                callback(null);
+            }
+        });
+    }
+};
+
 // 查看豆瓣预览图
 var DoubanImage = {
     /**
@@ -1897,7 +1963,9 @@ var ImageService = {
 		Twipple: Twipple,
 		Flickr: Flickr,
 		DoubanImage: DoubanImage,
-		Immio: Immio
+		Immio: Immio,
+		Yupoo: Yupoo,
+		FanfouImage: FanfouImage
 	},
 	
 	attempt: function(url, ele) {

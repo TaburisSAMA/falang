@@ -985,6 +985,21 @@ var r_method_manager = {
         	tapi.update(data, callback);
         }
     },
+    uploadImage: function(req, sender, sendResponse) {
+        var imageUrl = req.imageUrl;
+        var pic = imageUrl ? getImageBlob(imageUrl) : null;
+        if(pic) {
+            Immio.upload({}, pic, function(error, info) {
+                var url = null;
+                if(info && info.link) {
+                    url = info.link;
+                }
+                sendResponse({url: url});
+            });
+        } else {
+            sendResponse({});
+        }
+    },
     notifyCheckNewMsg: function(request, sender, sendResponse){
         setTimeout(checkNewMsg, 1000, 'friends_timeline');
     },
