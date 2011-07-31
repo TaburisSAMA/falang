@@ -4647,16 +4647,18 @@ var RenrenAPI = Object.inherits({}, sinaApi, {
         result_format: '',
         //userinfo_has_counts: false,
         support_counts: false,
-        support_cursor_only: true,  // 只支持游标方式翻页
+        support_cursor_only: false,  // 只支持游标方式翻页
         support_friends_only: true, // 只支持friends
-        support_repost: false,
+        support_repost: true,
         support_repost_timeline: false,
+        support_direct_messages: false,
         support_sent_direct_messages: false,
         support_comment: false,
         support_do_comment: true,
         support_mentions: false,
         support_favorites: false,
         support_auto_shorten_url: false,
+        support_max_id: false, // page 翻页
         user_timeline_need_friendship: false,
         use_method_param: true, // only one api path
         
@@ -4669,14 +4671,19 @@ var RenrenAPI = Object.inherits({}, sinaApi, {
         // http://wiki.dev.renren.com/wiki/Type%E5%88%97%E8%A1%A8
         friends_timeline_type: '10,20,21,30,32,50,51,52',
         destroy: '/{{id}}_delete',
-        user_timeline: 'status.gets',
+        user_timeline: 'feed.get',//'status.gets',
+        comments: 'status.getComment',
+        comments_need_status: true, // 评论列表需要结合status才能获取
         update: 'status.set',
         upload: 'photos.upload',
-        friends: '/{{user_id}}/friends',
-        followers: '/{{user_id}}/friends',
+        friends: 'friends.getFriends',
+        followers: 'friends.getFriends',
         users: 'users.getInfo',
         photos: 'photos.get',
-        comment: '/{{id}}/comments',
+        comment: 'status.addComment',
+        reply: 'status.addComment',
+        repost: 'status.set_repost', // 
+        repost_need_status: true,
         favorites_create: '/{{id}}/likes',
         favorites_destroy: '/{{id}}/likes',
         new_message: '/{{id}}/notes',
@@ -4688,7 +4695,8 @@ var RenrenAPI = Object.inherits({}, sinaApi, {
         	'read_user_feed', 
         	'read_user_message',
         	'read_user_photo', 'read_user_status', 'read_user_comment',
-        	'publish_feed', 
+        	'read_user_share',
+        	'publish_feed', 'publish_share',
         	'send_request',
         	'send_message', 'photo_upload',
         	'status_update', 'publish_comment',
@@ -4755,7 +4763,7 @@ var RenrenAPI = Object.inherits({}, sinaApi, {
     	params.access_token = user.oauth_token_key;
     	params.api_key = this.config.oauth_key;
     	params.v = '1.0';
-    	params.call_id = ++this.config.call_id;
+//    	params.call_id = ++this.config.call_id;
     	var kvs = [];
     	for(var k in params) {
     		kvs.push([k, params[k]]);
@@ -4783,28 +4791,112 @@ var RenrenAPI = Object.inherits({}, sinaApi, {
 		if(args.play_load == 'string') {
 			return;
 		}
+		args.data.method = args.url;
+		var status_type = 'status';
+		if(args.data.status && args.data.status.id) {
+		    status_type = args.data.status.status_type;
+		    if(status_type === 'status') {
+                args.data.status_id = args.data.id;
+                args.data.owner_id = args.data.status.user.id;
+            } else if(status_type === 'photo') { // photo
+                args.data.pid = args.data.id;
+                args.data.uid = args.data.status.user.id;
+            } else if(status_type === 'share') {
+                args.data.share_id = args.data.id;
+                args.data.user_id = args.data.status.user.id;
+            }
+		    delete args.data.id;
+		    delete args.data.status;
+		}
 		if(args.url === this.config.user_timeline) {
 			args.data.uid = args.data.id;
 			delete args.data.id;
 			delete args.data.screen_name;
-		}
-		if(args.url === this.config.friends_timeline) {
 			args.data.type = this.config.friends_timeline_type;
+		} else if(args.url === this.config.friends_timeline) {
+			args.data.type = this.config.friends_timeline_type;
+		} else if(args.url === this.config.comments) {
+		    if(status_type === 'photo') {
+                args.data.method = 'photos.getComments'; 
+		    } else if(status_type === 'share') {
+		        args.data.method = 'share.getComments'; 
+		    }
+            args.data.order = 1; // 获取留言的排序规则，0表示升序(最旧到新)，1表示降序(最新到旧)，默认为0
+		} else if(args.url === this.config.comment) {
+		    if(args.data.reply_user_id) {
+		        args.data.rid = args.data.reply_user_id;
+		        delete args.data.reply_user_id;
+		        delete args.data.cid;
+		    }
+		    args.data.content = args.data.comment;
+		    if(status_type === 'photo') {
+                args.data.method = 'photos.addComment'; 
+            }  else if(status_type === 'share') {
+                args.data.method = 'share.addComment'; 
+                if(args.data.rid) {
+                    args.data.to_user_id = args.data.rid;
+                    delete args.data.rid;
+                }
+            }
+		    if(status_type !== 'share') {
+		        delete args.data.user_id;
+		    }
+		    delete args.data.comment;
+		} else if(args.url === this.config.friends) {
+		    delete args.data.user_id;
+		    delete args.data.screen_name;
+		    var cursor = parseInt(args.data.cursor);
+		    delete args.data.cursor;
+		    if(cursor > 0) {
+		        args.data.page = cursor;
+		    }
+		} else if(args.url === this.config.repost) {
+		    if(args.data.retweeted_status.status_type === 'status') {
+		        args.data.forward_id = args.data.id;
+		        delete args.data.id;
+		        args.data.forward_owner = args.data.retweeted_status.uid;
+		        args.data.method = args.data.method.replace('_repost', '');
+		    } else { 
+		        // 分享图片 http://wiki.dev.renren.com/wiki/Share.publish
+		        args.data.method = 'share.publish';
+		        args.data.type = 2;
+		        args.data.uid = args.data.retweeted_status.user.id;
+		        args.data.comment = args.data.status;
+		        delete args.data.status;
+		    }
+		    delete args.data.retweeted_status;
 		}
 		args.type = 'post';
 		args.data.format = 'json';
-		args.data.method = args.url;
 		args.url = '';
 		var old_status = args.data.status;
 		if(args.data.status) {
 			// 必须先将字符串变成utf8编码进行签名计算, sb人人
 			args.data.status = Base64._utf8_encode(args.data.status);
 		}
+		var old_content = args.data.content;
+        if(args.data.content) {
+            // 必须先将字符串变成utf8编码进行签名计算, sb人人
+            args.data.content = Base64._utf8_encode(args.data.content);
+        }
+        var old_comment = args.data.comment;
+        if(args.data.comment) {
+            // 必须先将字符串变成utf8编码进行签名计算, sb人人
+            args.data.comment = Base64._utf8_encode(args.data.comment);
+        }
 		this.signature(args.data, user);
 		if(old_status) {
 			// 将之前编码的字符串还原回来, fxxx
 			args.data.status = old_status;
 		}
+		if(old_content) {
+            // 将之前编码的字符串还原回来, fxxx
+            args.data.content = old_content;
+        }
+		if(old_comment) {
+            // 将之前编码的字符串还原回来, fxxx
+            args.data.comment = old_comment;
+        }
 	},
 	
 	format_upload_params: function(user, data, pic) {
@@ -4825,11 +4917,21 @@ var RenrenAPI = Object.inherits({}, sinaApi, {
 		}
 		pic.keyname = 'upload';
     },
+
+    format_result: function(data, play_load, args) {
+        if(data && data.result === 1) {
+            return true;
+        }
+        if(args.data.method === 'share.getComments' && data && data.comments) {
+            data = data.comments;
+        }
+        return this.super_.format_result.call(this, data, play_load, args);
+    },
     
 	format_result_item: function(data, play_load, args) {
-		if(play_load == 'user' && data && data.uid) {
+		if(play_load == 'user' && data && (data.uid || data.id)) {
 			// http://www.renren.com/profile.do?id=263668818
-			data.id = data.uid;
+			data.id = data.uid || data.id;
 			delete data.uid;
 			data.t_url = 'http://www.renren.com/profile.do?id=' + data.id;
 			data.profile_image_url = data.tinyurl || data.headurl;
@@ -4857,10 +4959,11 @@ var RenrenAPI = Object.inherits({}, sinaApi, {
 			data.followers_count = data.visitors_count;
 			data.friends_count = data.friends_count;
 			data.statuses_count = data.status_count;
-		} else if(play_load == 'status' || play_load == 'message') {
+		} else if(play_load === 'status' || play_load === 'message') {
 			// http://wiki.dev.renren.com/wiki/Feed.get
-			data.id = data.post_id;
+			data.id = data.status_id || data.source_id; // source_id 表示新鲜事内容主体的id，例如日志id、相册id和分享id等等
 			delete data.post_id;
+			delete data.status_id;
 			if(data.message) {
 				data.text = data.message;
 			} else {
@@ -4871,31 +4974,60 @@ var RenrenAPI = Object.inherits({}, sinaApi, {
 				data.text = title + (data.description || '');
 			}
 			delete data.message;
-			//data.t_url = data.link;
+			data.uid = data.actor_id || data.uid;
+			data.t_url = data.href;
+			data.status_type = 'status';
+			if(data.feed_type === 30) {
+			    data.status_type = 'photo';
+			} else if(data.feed_type === 32) {
+			    data.status_type = 'share';
+			}
+			if(data.comments) {
+			    data.comments_count = data.comments.count || 0;
+			}
 			if(data.attachment && data.attachment.length > 0 && data.attachment[0].media_type === 'photo') {
-				data.thumbnail_pic = data.attachment[0].src;
-				data.bmiddle_pic = data.thumbnail_pic;
-				data.original_pic = data.thumbnail_pic;
-				data.pic_id = data.attachment[0].media_id;
-				data.pic_owner_id = data.attachment[0].owner_id;
-				//delete data.attachment;
+			    var attachment = data.attachment[0];
+			    var pic_owner_id = attachment.owner_id;
+			    if(data.uid === pic_owner_id && data.prefix !== '分享了照片') {
+			        data.bmiddle_pic = data.bmiddle_pic = data.thumbnail_pic = attachment.src;
+	                data.pic_id = attachment.media_id;
+	                data.pic_owner_id = pic_owner_id;
+	                data.t_url = attachment.href;
+			    } else {
+			        data.retweeted_status = {
+		                id: attachment.media_id,
+		                pic_id: attachment.media_id,
+		                pic_owner_id: pic_owner_id,
+		                thumbnail_pic: attachment.src,
+		                uid: pic_owner_id,
+		                t_url: attachment.href
+			        };
+			        data.text = data.prefix;
+			    }
+				delete data.attachment;
 			}
 			if(data.source_name) {
-				data.source = '<a href="{{source_url}}" target="_blank">{{source_name}}</a>'.format(data);
+			    if(data.source_url) {
+			        data.source = '<a href="{{source_url}}" target="_blank">{{source_name}}</a>'.format(data);
+			    } else {
+			        data.source = data.source_name;
+			    }
 				delete data.source_name;
 				delete data.source_url;
 			}
-//			if(data.headurl) {
-//				data.user = {
-//					headurl: data.headurl,
-//					name: data.name,
-//					uid: data.actor_id
-//				};
-//				data.user = this.format_result_item(data.user, 'user', args);
-//			}
-			data.uid = data.actor_id;
-			data.created_at = data.update_time;
+			
+			data.created_at = data.update_time || data.time;
 			delete data.update_time;
+			delete data.time;
+		} else if(play_load === 'comment') {
+		    data.id = data.comment_id;
+		    data.created_at = data.update_time || data.time;
+		    if(!data.text) {
+		        data.text = data.content;
+		    }
+            delete data.update_time;
+            delete data.time;
+		    data.user = this.format_result_item(data, 'user', args);
 		}
 		return data;
 	},
@@ -4912,53 +5044,90 @@ var RenrenAPI = Object.inherits({}, sinaApi, {
 		}, data, this);
 	},
 	
-	_fill_pics: function(user, items, code_text, code, callback, context) {
-		var items_map = {};
+	_fill_pics: function(user, items, callback, context) {
+		var items_map = {}, user_id_pic_map = {};
 		items = items || [];
 		for(var i = 0, len = items.length; i < len; i++) {
-			var pid = items[i].pic_id;
+		    var item = items[i];
+			var pid = item.pic_id;
 			if(pid) {
 				var list = items_map[pid] || [];
-				list.push(items[i]);
+				list.push(item);
 				items_map[pid] = list;
+				var pids = user_id_pic_map[item.pic_owner_id] || [];
+				pids.push(pid);
+				user_id_pic_map[item.pic_owner_id] = pids;
+			}
+			if(item.retweeted_status && item.retweeted_status.pic_id) {
+			    item = item.retweeted_status;
+			    pid = item.pic_id;
+			    var list = items_map[pid] || [];
+                list.push(item);
+                items_map[pid] = list;
+                var pids = user_id_pic_map[item.pic_owner_id] || [];
+                pids.push(pid);
+                user_id_pic_map[item.pic_owner_id] = pids;
 			}
 		}
 		if(Object.keys(items_map).length === 0) {
-			return callback.call(context, items, code_text, code);
+			return callback.call(context, items);
 		}
-		var params = {
-			url: this.config.photos,
-			play_load: 'photo',
-			data: {
-				user: user, 
-				uid: user.id,
-				pids: Object.keys(items_map).join(',')
-			}
-		};
-		this._sendRequest(params, function(photos) {
-			if(photos) {
-				for(var i = 0, len = photos.length; i < len; i++) {
-					var photo = photos[i];
-					var list = items_map[photo.id];
-					for(var j = 0, jlen = list.length; j < jlen; j++) {
-						list[j].bmiddle_pic = photo.url_large;
-						list[j].original_pic = photo.url_large;
-					}
-				}
-			}
-			callback.call(context, items, code_text, code);
-		}, this);
+		var count = Object.keys(user_id_pic_map).length;
+		for(var user_id in user_id_pic_map) {
+		    var pids = user_id_pic_map[user_id];
+		    var params = {
+	            url: this.config.photos,
+	            play_load: 'photo',
+	            data: {
+	                user: user, 
+	                uid: user_id,
+	                pids: pids.join(',')
+	            }
+	        };
+	        this._sendRequest(params, function(photos) {
+	            if(photos) {
+	                for(var i = 0, len = photos.length; i < len; i++) {
+	                    var photo = photos[i];
+	                    var list = items_map[photo.pid];
+	                    for(var j = 0, jlen = list.length; j < jlen; j++) {
+	                        var status = list[j];
+	                        status.id = photo.pid;
+	                        status.bmiddle_pic = photo.url_large;
+	                        status.original_pic = photo.url_large;
+	                        if(photo.caption) {
+	                            status.text = photo.caption;
+	                        }
+	                        status.created_at = photo.update_time || photo.time;
+	                        // http://photo.renren.com/photo/385478335/photo-4746901797
+	                        status.t_url = 'http://photo.renren.com/photo/' + photo.uid + '/photo-' + photo.pid;
+	                    }
+	                }
+	            }
+	            count--;
+	            if(count === 0) {
+	                callback.call(context, items);
+	            }
+	        }, this);
+		}
 	},
 	
-	_fill_users: function(user, items, code_text, code, callback, context) {
+	_fill_users: function(user, items, callback, context) {
 		// 批量获取用户信息
 		if(items && items.length > 0 && items[0].uid) {
 			var items_map = {};
 			for(var i = 0, len = items.length; i < len; i++) {
-				var uid = items[i].uid;
+			    var item = items[i];
+				var uid = item.uid;
 				var list = items_map[uid] || [];
-				list.push(items[i]);
+				list.push(item);
 				items_map[uid] = list;
+				if(item.retweeted_status) {
+				    item = item.retweeted_status;
+	                uid = item.uid;
+	                list = items_map[uid] || [];
+	                list.push(item);
+	                items_map[uid] = list;
+				}
 			}
 			var params = {
 				url: this.config.users,
@@ -4979,24 +5148,34 @@ var RenrenAPI = Object.inherits({}, sinaApi, {
 						}
 					}
 				}
-				callback.call(context, items, code_text, code);
+				callback.call(context, items);
 			}, this);
 		} else {
-			callback.call(context, items, code_text, code);
+			callback.call(context, items);
 		}
+	},
+	
+	_fill_datas: function(user, items, code_text, code, callback, context) {
+	    var both = this.combo(function(users_args, pics_args) {
+            callback.call(context, items, code_text, code);
+        });
+        var users_callback = both.add(), pics_callback = both.add();
+        this._fill_users(user, items, users_callback);
+        this._fill_pics(user, items, pics_callback);
 	},
 	
 	user_timeline: function(data, callback, context) {
 		var user = data.user;
+		delete data.uid;
 		this.super_.user_timeline.call(this, data, function(items, code_text, code) {
-			this._fill_users(user, items, code_text, code, callback, context);
+		    this._fill_datas(user, items, code_text, code, callback, context);
 		}, this);
 	},
 	
 	friends_timeline: function(data, callback, context) {
 		var user = data.user;
 		this.super_.friends_timeline.call(this, data, function(items, code_text, code) {
-			this._fill_users(user, items, code_text, code, callback, context);
+		    this._fill_datas(user, items, code_text, code, callback, context);
 		}, this);
 	}
 });

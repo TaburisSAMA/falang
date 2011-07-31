@@ -1512,6 +1512,14 @@ function showComments(ele, tweetId, page, notHide, page_params){
     } else {
     	page = 1;
     }
+    var config = tapi.get_config(user);
+    if(config.comments_need_status) {
+        var $li = $ele.closest('li');
+        var status = $li.find('.msgObjJson').text();
+        status = unescape(status);
+        status = JSON.parse(status);
+        params.status = status;
+    }
     var method = timeline_type == 'comment' ? 'comments' : 'repost_timeline';
     tapi[method](params, function(data, textStatus){
     	data = data || {};
@@ -2111,6 +2119,13 @@ function sendRepost(msg, repostTweetId, notSendMord){
     data.user = user;
     $btn.attr('disabled','true');
     $txt.attr('disabled','true');
+    if(config.repost_need_status) {
+        var $li = $('#tweet' + repostTweetId);
+        var status = $li.find('.msgObjJson').text();
+        status = unescape(status);
+        status = JSON.parse(status);
+        data.retweeted_status = status;
+    }
     // 处理是否评论
     if(!notSendMord) {
         var $chk_sendOneMore = $('#chk_sendOneMore');
@@ -2131,7 +2146,7 @@ function sendRepost(msg, repostTweetId, notSendMord){
         }
     }
     tapi.repost(data, function(status, textStatus){
-        if(status && (status.id || (status.retweeted_status && status.retweeted_status.id))) {
+        if(status && (status === true || status.id || (status.retweeted_status && status.retweeted_status.id))) {
             hideReplyInput();
             $txt.val('');
             setTimeout(callCheckNewMsg, 1000, 'friends_timeline');
@@ -2150,10 +2165,17 @@ function sendComment(msg, comment_id, notSendMord){
     user_id = $('#commentUserId').val();
     comment_id = comment_id || $('#commentTweetId').val();
     data = {comment: msg, id: comment_id};
-    var user = getUser();
-    // 判断评论是否需要用到原微博的id
-    if(tapi.get_config(user).comment_need_user_id) {
+    var user = getUser(), config = tapi.get_config(user);
+    // 判断评论是否需要用到原微博的user_id
+    if(config.comment_need_user_id) {
     	data.user_id = user_id;
+    }
+    if(config.comments_need_status) {
+        var $li = $('#tweet' + comment_id);
+        var status = $li.find('.msgObjJson').text();
+        status = unescape(status);
+        status = JSON.parse(status);
+        data.status = status;
     }
     data['user'] = user;
     btn.attr('disabled','true');
