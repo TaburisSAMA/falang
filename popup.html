@@ -530,7 +530,7 @@
 				<?js if(user.tags){ ?>
                 <div class="tags">#{_u.i18n("comm_tags")}: 
 	                <?js for(var i=0;i<user.tags.length;i++){ var tag = user.tags[i]; ?>
-	                <a target="_blank" href="http://t.qq.com/search/tag.php?k=#{tag.name}">#{tag.name}</a>
+	                <a target="_blank" href="#{tag.url}">#{tag.name}</a>
 	                <?js } ?>
                 </div>
                 <?js } ?>

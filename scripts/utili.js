@@ -1372,7 +1372,7 @@ var ShortenUrl = {
 					+ ' ' + longurl).attr('rhref', longurl).addClass('short_done');
                 UrlUtil.showFaviconBefore(this, longurl);
 				if(!VideoService.attempt(cache_data, this)) {
-                	ImageService.attempt(longurl, this);
+                	ImageService.attempt({url: longurl, sourcelink: url}, this);
                 }
 			} else {
 				ShortenUrl.expand(url, function(data) {
@@ -1383,7 +1383,7 @@ var ShortenUrl = {
 						cache[$(this).attr('href')] = data;
                         UrlUtil.showFaviconBefore(this, longurl);
 						if(!VideoService.attempt(data, this)) {
-		                	ImageService.attempt(longurl, this);
+		                	ImageService.attempt({url: longurl, sourcelink: url}, this);
 		                }
 					}
 				}, this);
@@ -1532,7 +1532,8 @@ http://code.google.com/p/falang/issues/detail?id=235
     url_re: /http:\/\/(?:(?:book|music|movie)\.douban\.com\/subject\/.+|www\.douban.com\/.+?\/photo\/)/i,
     image_url_re: /com\/([mlso]pic)\//i,
     photos_re: /\/photo\/(\d+)\//i,
-    show_link: true,
+    show_link: true, 
+    need_sourcelink: true, // RT的时候，需要原始链接
     sync: true,
     get: function(url, callback) {
         var photo_matchs = this.photos_re.exec(url);
@@ -1541,7 +1542,7 @@ http://code.google.com/p/falang/issues/detail?id=235
             return callback({
                 thumbnail_pic: 'http://img3.douban.com/view/photo/thumb/public/p' + id + '.jpg',
                 bmiddle_pic: 'http://img3.douban.com/view/photo/photo/public/p' + id + '.jpg',
-                original_pic: 'http://img3.douban.com/view/photo/raw/public/p' + id + '.jpg'
+                original_pic: 'http://img3.douban.com/view/photo/photo/public/p' + id + '.jpg'
             });
         }
         var bg = getBackgroundView();
@@ -1574,6 +1575,46 @@ http://code.google.com/p/falang/issues/detail?id=235
     }
 };
 
+// http://campl.us/dcEN
+// http://code.google.com/p/falang/issues/detail?id=190
+var Camplus = {
+    host: 'campl.us',
+    url_re: /http:\/\/campl\.us\/\w+$/i,
+    show_link: true,
+    sync: true,
+    get: function(url, callback) {
+        var bg = getBackgroundView();
+        if(bg.IMAGE_URLS[url]) {
+            return callback(bg.IMAGE_URLS[url], true);
+        }
+        $.ajax({
+            url: url,
+            success: function(html, status, xhr) {
+                var $doc = $(html);
+                var caption = $doc.find('.tweetContents').text();
+                var src = $doc.find('img.photo').attr('src');
+                if(src) {
+                    var pics = {
+                        thumbnail_pic: src.replace('/f/', '/t/'),
+                        bmiddle_pic: src.replace('/f/', '/iphone/'),
+                        original_pic: src
+                    };
+                    if(caption) {
+                        pics.caption = caption.trim();
+                    }
+                    bg.IMAGE_URLS[url] = pics;
+                    callback(pics);
+                } else {
+                    callback(null);
+                }
+            },
+            error: function() {
+                callback(null);
+            }
+        });
+    }
+};
+
 // http://imm.io/api/
 // http://imm.io/7BhM
 var Immio = {
@@ -1589,13 +1630,18 @@ var Immio = {
         $.ajax({
             url: url,
             success: function(html, status, xhr) {
-                var src = $(html).find('.view img').attr('src');
+                var $doc = $(html);
+                var caption = $doc.find('#name_in').text();
+                var src = $doc.find('.view img').attr('src');
                 if(src) {
                     var pics = {
                         thumbnail_pic: src,
                         bmiddle_pic: src,
                         original_pic: src
                     };
+                    if(caption) {
+                        pics.caption = caption.trim();
+                    }
                     bg.IMAGE_URLS[url] = pics;
                     callback(pics);
                 } else {
@@ -1655,9 +1701,13 @@ var Instagram = {
 	 * http://images.instagram.com/media/2011/05/20/c67a2c94bed9459ca2d398375b799219_6.jpg
 	 * http://images.instagram.com/media/2011/05/20/c67a2c94bed9459ca2d398375b799219_7.jpg
 	 * 
+	 * http://instagram.com/p/JEYHD/ 
+	 * =>
+	 * http://instagr.am/p/JEYHD/ 
+	 * 
 	 */
 	host: 'instagr.am',
-	url_re: /http:\/\/instagr\.am\/p\//i,
+	url_re: /http:\/\/(instagr\.am|instagram\.com)\/p\//i,
 	show_link: true,
     sync: true,
 	get: function(url, callback) {
@@ -1668,13 +1718,18 @@ var Instagram = {
 		$.ajax({
 			url: url,
 			success: function(html, status, xhr) {
-				var src = $(html).find('.photo').attr('src');
+			    var $doc = $(html);
+			    var caption = $doc.find('.caption').text();
+				var src = $doc.find('.photo').attr('src');
 				if(src) {
 				    var pics = {
 	                    thumbnail_pic: src.replace('_7.', '_5.'),
 	                    bmiddle_pic: src.replace('_7.', '_6.'),
 	                    original_pic: src
 	                };
+				    if(caption) {
+	                    pics.caption = caption.trim();
+	                }
 				    bg.IMAGE_URLS[url] = pics;
 	                callback(pics);
 				} else {
@@ -1813,6 +1868,23 @@ var Plixi = {
 		};
 		callback(pics);
 	}
+};
+
+// http://code.google.com/p/falang/issues/detail?id=190#makechanges
+// http://img.ph.126.net/V2mX6JSNRZu_NkqIvk_kDA==/2357634404929042613.jpg#3
+var Photo163 = {
+    host: 'ph.126.net',
+    url_re: /\.ph\.126\.net\/[\w\-\=]+\/\w+/i,
+    sync: true,
+    get: function(url, callback) {
+        url = url.replace('#3', '');
+        var pics = {
+            thumbnail_pic: 'http://oimagec6.ydstatic.com/image?w=120&h=120&url=' + url,
+            bmiddle_pic: url,
+            original_pic: url
+        };
+        callback(pics);
+    }
 };
 
 // http://code.google.com/p/imageshackapi/wiki/YFROGoptimizedimages
@@ -1965,10 +2037,17 @@ var ImageService = {
 		DoubanImage: DoubanImage,
 		Immio: Immio,
 		Yupoo: Yupoo,
-		FanfouImage: FanfouImage
+		FanfouImage: FanfouImage,
+		Camplus: Camplus,
+		Photo163: Photo163
 	},
 	
 	attempt: function(url, ele) {
+	    var sourcelink = null;
+	    if(typeof url === 'object') {
+	        sourcelink = url.sourcelink;
+	        url = url.url;
+	    }
 		for(var name in this.services) {
 			var item = this.services[name];
 			if(item.url_re.test(url)) {
@@ -1981,9 +2060,14 @@ var ImageService = {
 				if(item.show_link) {
 				    $ele.attr('show_link', '1');
 				}
-				$ele.attr('rhref', url).attr('old_title', old_title).attr('title', title).attr('href', 'javascript:void(0);').attr('service', name).one('click', function() {
+				if(sourcelink && sourcelink !== url) {
+				    $ele.attr('sourcelink', sourcelink);
+				}
+				$ele.attr('rhref', url).attr('old_title', old_title).attr('title', title).
+				        attr('href', 'javascript:void(0);').attr('service', name).one('click', function() {
 				    var $this = $(this);
-					ImageService.show(this, $this.attr('service'), $this.attr('rhref'), $this.attr('show_link') === '1');
+					ImageService.show(this, $this.attr('service'), 
+				        $this.attr('rhref'), $this.attr('sourcelink'), $this.attr('show_link') === '1');
 					return false;
 				});
 				if(item.sync) {
@@ -1995,17 +2079,31 @@ var ImageService = {
 		return false;
 	},
 	
-	show: function(ele, service, url, show_link) {
-		this.services[service].get(url, function(pics, sync) {
+	show: function(ele, service, url, sourcelink, show_link) {
+	    service = this.services[service];
+	    service.get(url, function(pics, sync) {
 			if(!pics) {
 				return;
 			}
-			var tpl = '<div><a target="_blank" class="image_preview" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="{{bmiddle_pic}}" original="{{original_pic}}" onmousedown="rOpenPic(event, this)" title="'+ _u.i18n("comm_mbright_to_open_pic") +'"><img class="imgicon pic" src="{{thumbnail_pic}}"></a></div>';
+			sourcelink = sourcelink || url;
+			var title = _u.i18n("comm_mbright_to_open_pic");
+			if(pics.caption) {
+			    title = pics.caption + ', ' + title;
+			}
+			// 是否需要原生链接，如果转发带图片的时候
+			var need_sourcelink = service.need_sourcelink ? '1' : '0';
+			var tpl = '<div><a target="_blank" class="image_preview" onclick="showFacebox(this);return false;" ' 
+			    + ' sourcelink="' + sourcelink + '" need_sourcelink="' + need_sourcelink + '" '
+			    + ' href="javascript:void(0);" bmiddle="{{bmiddle_pic}}" original="{{original_pic}}" onmousedown="rOpenPic(event, this)" title="' 
+			    + title +'"><img class="imgicon pic" src="{{thumbnail_pic}}" /></a></div>';
 			var $ele = $(ele);
 			if(show_link !== true) {
 			    $ele.hide();
 			} else {
 			    var old_title = $ele.attr('old_title') || '';
+			    if(pics.caption) {
+			        old_title = pics.caption + (old_title? (', ' + old_title) : '');
+			    }
 			    $ele.attr('title', old_title).attr('href', $ele.attr('rhref'));
 			}
 			$ele.parent().after(tpl.format(pics));

@@ -96,13 +96,22 @@ function init() {
         countInputText();
         var source_url = params.image_url;
         $("#imgPreview").html('<img class="pic" src="' + source_url + '" />');
+        if(params.image_source_link) {
+            // 图片是通过缩短url还原得到的
+            $("#imgPreview img").attr('sourcelink', params.image_source_link);
+        }
+        if(params.image_need_source_link) {
+            // 上传的时候，是否需要原始链接
+            $("#imgPreview img").attr('need_source_link', params.image_need_source_link);
+        }
         $('#imageUrl').val(source_url);
         if(source_url.indexOf('126.fm') >= 0) {
         	// 163的图片需要先还原
         	ShortenUrl.expand(source_url, function(data) {
         		var longurl = data.url || data;
         		if(longurl) {
-        			$('#imageUrl').val(longurl);
+        			$('#imageUrl').val(longurl.replace('#3', ''));
+        			$("#imgPreview img").attr('sourcelink', source_url);
         		}
         	});
         } else {
@@ -186,6 +195,9 @@ function sendMsg() {
     stat.unsupport_uploads = []; // 不支持发送图片的，则等待支持发送图片的获取到图片后，再发送
     // 增加图片链接
     var image_url = $('#imgPreview img').attr('short_url') || $('#imageUrl').val(); // $('#imgPreview img').attr('src');
+    // 判断图片是否从url得到的
+    var source_link = $("#imgPreview img").attr('sourcelink');
+    var need_source_link = $("#imgPreview img").attr('need_source_link') === '1';
     for(var i = 0, len = users.length; i < len; i++) {
         var user = users[i];
         var config = tapi.get_config(user);
@@ -211,10 +223,27 @@ function sendMsg() {
     	upInfo.append(TP_USER_UPLOAD_INFO.format(user));
         if(config.support_upload && pic.file) {
         	stat.uploadCount++;
+        	if(source_link) {
+        	    // 清空原来的图片连接
+        	    if(!need_source_link) {
+        	        status = status.replace(source_link, '');
+                    if(!status) {
+                        status = source_link;
+                    }
+        	    }
+        	}
         	_uploadWrap(status, user, pic, stat, selLi);
         } else { // only support update
             if(image_url) {
-                status += ' ' + image_url;
+                if(source_link) {
+                    if(status.indexOf(source_link) < 0) {
+                        // 没有link，则添加
+                        status += ' ' + source_link;
+                    }
+                } else {
+                    // 内容已经包含url了，就无需再传了
+                    status += ' ' + image_url;
+                }
                 _updateWrap(status, user, stat, selLi);
             } else {
                 // 没有图片连接，则等待其他上传完得到图片后再发送

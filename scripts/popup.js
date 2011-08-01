@@ -2433,7 +2433,7 @@ function doNewMessage(ele, userName, toUserId){//悄悄话
     countReplyText();
 };
 
-function doRT(ele, is_rt, is_rt_rt){//RT
+function doRT(ele, is_rt, is_rt_rt) {
 	var $li = $(ele).closest('li');
     var data = $li.find('.msgObjJson').text();
     data = unescape(data);
@@ -2454,8 +2454,20 @@ function doRT(ele, is_rt, is_rt_rt){//RT
     var config = tapi.get_config(getUser());
     var repost_pre = config.repost_pre;
     var need_processMsg = config.need_processMsg;
-    var val = need_processMsg ? data.text : htmlToText(data.text);
-    var original_pic = data.original_pic;
+    var val = data.text;
+    if(!need_processMsg && val) {
+        // 将链接提取出来
+        var $links = $('<div>' + val + '</div>').find('a');
+        val = htmlToText(val);
+        $links.each(function() {
+            var $a = $(this);
+            var url = $a.attr('href'), a_text = $a.text();
+            if(url && a_text) {
+                val = val.replace(a_text, a_text + ' ' + url + ' ');
+            }
+        });
+    }
+    var original_pic = data.original_pic, sourcelink = null, need_sourcelink = null;
     if(config.rt_need_source && data.retweeted_status) {
     	if(data.retweeted_status.original_pic) {
     		original_pic = data.retweeted_status.original_pic;
@@ -2479,7 +2491,10 @@ function doRT(ele, is_rt, is_rt_rt){//RT
     }
     if(!original_pic) {
     	// 尝试从链接中获取图片
-		original_pic = $li.find('a.image_preview').attr('original');
+        var $preview = $li.find('a.image_preview');
+		original_pic = $preview.attr('original');
+		sourcelink = $preview.attr('sourcelink');
+		need_sourcelink = $preview.attr('need_sourcelink');
     }
     
     if(!original_pic) {
@@ -2495,7 +2510,7 @@ function doRT(ele, is_rt, is_rt_rt){//RT
     t.blur().val(val).focus(); //光标在头部
     if(original_pic) {
     	// 有图片，则打开图片上传
-    	openUploadImage(null, original_pic);
+    	openUploadImage(null, original_pic, sourcelink, need_sourcelink);
     }
 };
 
@@ -2728,13 +2743,20 @@ function _getWindowId(callback) {
 }
 
 //打开上传图片窗口
-function openUploadImage(tabId, image_url){
+function openUploadImage(tabId, image_url, image_source_link, image_need_source_link){
     initOnUnload();
     var args_str = _get_open_window_args();
     tabId = tabId || '';
     var url = 'upimage.html?tabId=' + tabId;
     if(image_url) {
     	url += '&image_url=' + image_url;
+    }
+    if(image_source_link) {
+        // 图片原始缩短url，如果有，则替换文本数据
+        url += '&image_source_link=' + image_source_link;
+    }
+    if(image_need_source_link) {
+        url += '&image_need_source_link=' + image_need_source_link;
     }
     window.open(url, '_blank', args_str);
 };

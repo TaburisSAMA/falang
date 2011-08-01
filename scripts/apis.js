@@ -1891,6 +1891,10 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 			user.description = data.introduction;
 			if(data.tag) {
 				user.tags = data.tag;
+				for(var i = 0, len = user.tags.length; i < len; i++) {
+				    var tag = user.tags[i];
+				    tag.url = 'http://t.qq.com/search/tag.php?k=#' + tag.name;
+				}
 			}
 			// Ismyidol: 是否为accesstoken用户的收听的人
 			// Ismyfans: 是否为accesstoken 用户的听众
@@ -3193,13 +3197,7 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
 			delete args.data.cursor;
 			delete args.data.user_id;
 			delete args.data.screen_name;
-		} 
-//		else if(args.url == this.config.user_timeline) {
-//			if(args.data.screen_name) {
-//				args.data.id = args.data.screen_name;
-//				delete args.data.screen_name;
-//			}
-//		}
+		}
     },
 	
 	/* photo（必须）- 照片文件。和<input type="file" name="photo" />效果一样
@@ -3227,7 +3225,7 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
 		}
 		return data;
 	},
-	
+	_FANFOU_IMAGEURL_RE: /http:\/\/fanfou\.com\/photo\/[\w\-]+$/i,
 	format_result_item: function(data, play_load, args) {
 		if(play_load == 'status' && data.id) {
 			var tpl = 'http://fanfou.com/statuses/{{id}}';
@@ -3241,6 +3239,8 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
 				data.bmiddle_pic = data.photo.largeurl;
 				data.original_pic = data.photo.largeurl;
 				delete data.photo;
+				// 删除图片 http://fanfou.com/photo/b0QRkVL6-2Y
+				data.text = data.text.replace(this._FANFOU_IMAGEURL_RE, '');
    			}
    			if(data.in_reply_to_status_id){
    				data.related_dialogue_url = 'http://fanfou.com/statuses/' + data.in_reply_to_status_id + '?fr=viewreply';
@@ -3420,6 +3420,22 @@ var T163API = Object.inherits({}, sinaApi, {
             data.screen_name = data.name || data.screen_name;
             data.name = temp_name;
             data.gender = this.config.gender_map[data.gender];
+            if(data.sysTag) {
+                data.tags = [];
+                for(var i = 0, len = data.sysTag.length; i < len; i++) {
+                    var tag = data.sysTag[i];
+                    data.tags.push({name: tag, url: 'http://t.163.com/search/itag/' + tag, itag: true});
+                }
+                delete data.sysTag;
+            }
+            if(data.userTag) {
+                data.tags = data.tags || [];
+                for(var i = 0, len = data.userTag.length; i < len; i++) {
+                    var tag = data.userTag[i];
+                    data.tags.push({name: tag, url: 'http://t.163.com/search/tag/' + tag});
+                }
+                delete data.userTag;
+            }
 		} else if(play_load == 'status') {
 			// search
 			if(!data.user) {
