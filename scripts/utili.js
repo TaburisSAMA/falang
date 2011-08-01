@@ -1689,6 +1689,50 @@ var Immio = {
     }
 };
 
+// http://code.google.com/p/falang/issues/detail?id=244
+// http://picplz.com/user/martinisantos/pic/hg5wl/
+// http://picplz.com/tlzl
+var Picplz = {
+    host: 'picplz.com',
+    url_re: /http:\/\/picplz\.com\/([\w\-\=]+$|user\/\w+\/\w+)/i,
+    show_link: true,
+    sync: true,
+    get: function(url, callback) {
+        var bg = getBackgroundView();
+        if(bg.IMAGE_URLS[url]) {
+            return callback(bg.IMAGE_URLS[url], true);
+        }
+        $.ajax({
+            url: url,
+            success: function(html, status, xhr) {
+                var $doc = $(html);
+                var $img = $doc.find('#mainImage');
+                var src = $img.attr('src'), caption = $img.attr('alt');
+                if(src) {
+                    // http://s2.i1.picplzthumbs.com/upload/img/13/3d/bc/133dbcf42367a8caa25bd95758967a7c2e3f3968_wmeg_00001.jpg
+                    // => 
+                    // http://s2.i1.picplzthumbs.com/upload/img/13/3d/bc/133dbcf42367a8caa25bd95758967a7c2e3f3968_t100s_00001.jpg
+                    var pics = {
+                        thumbnail_pic: src.replace('_wmeg', '_t100s'),
+                        bmiddle_pic: src,
+                        original_pic: src
+                    };
+                    if(caption) {
+                        pics.caption = caption.trim();
+                    }
+                    bg.IMAGE_URLS[url] = pics;
+                    callback(pics);
+                } else {
+                    callback(null);
+                }
+            },
+            error: function() {
+                callback(null);
+            }
+        });
+    }
+};
+
 // 图片服务
 var Instagram = {
 	/* 
@@ -2039,7 +2083,8 @@ var ImageService = {
 		Yupoo: Yupoo,
 		FanfouImage: FanfouImage,
 		Camplus: Camplus,
-		Photo163: Photo163
+		Photo163: Photo163,
+		Picplz: Picplz
 	},
 	
 	attempt: function(url, ele) {
