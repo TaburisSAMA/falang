@@ -2845,10 +2845,11 @@ fawave.face = {
         }
     	// 初始化表情
     	if($('#face_box .faceItemPicbg .face_icons').length === 0) {
-    	    var $accounts = $("#accountsForSend li"), blogTypes = {"yanwenzi": 1};
-    	    $accounts.each(function() {
-    	        blogTypes[$(this).attr('blogType')] = 1;
-    	    });
+    	    var userList = getUserList('send');
+    	    var blogTypes = {"yanwenzi": 1};
+    	    for(var i = 0, len = userList.length; i < len; i++) {
+    	        blogTypes[userList[i].blogType] = 1;
+    	    }
     		// FACE_TYPES   [typename, faces, url_pre, tpl, type_title]
     		for(var i = 0, len = FACE_TYPES.length; i < len; i++) {
     			var face_type = FACE_TYPES[i];
