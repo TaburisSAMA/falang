@@ -309,6 +309,9 @@ var sinaApi = {
 //				args.data.source = appkey[1];
 //			}
 //		}
+	    if(user.blogType === 'tsina') {
+	        delete args.data.source;
+	    }
         user.authType = user.authType || 'baseauth'; //兼容旧版本
 		if(user.authType == 'baseauth') {
 			args.headers['Authorization'] = make_base_auth_header(user.userName, user.password);
