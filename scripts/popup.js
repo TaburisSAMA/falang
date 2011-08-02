@@ -771,7 +771,7 @@ function initSelectSendAccounts(is_upload){
     }
     var userList = getUserList('send');
     if(userList.length < 2){ return; } //多个用户才显示
-    var li_tpl = '<li class="{{sel}}" uniqueKey="{{uniqueKey}}" onclick="toggleSelectSendAccount(this)">' +
+    var li_tpl = '<li class="{{sel}}" uniqueKey="{{uniqueKey}}" blogType="{{blogType}}" onclick="toggleSelectSendAccount(this)">' +
         '<img src="{{profile_image_url}}" />' +
         '{{screen_name}}' +
         '<img src="/images/blogs/{{blogType}}_16.png" class="blogType" /></li>';
@@ -818,7 +818,8 @@ function initSelectSendAccounts(is_upload){
 //        tpl += li_tpl_end;
         li.push(li_tpl.format(user));
     }
-    afs.html('TO(<a class="all" href="javascript:" onclick="toggleSelectAllSendAccount()">'+ _u.i18n("abb_all") +'</a>): ' + li.join(''));
+    afs.html('TO(<a class="all" href="javascript:" onclick="toggleSelectAllSendAccount()">' 
+        + _u.i18n("abb_all") +'</a>): ' + li.join(''));
     afs.data('inited', 'true');
     shineSelectedSendAccounts();
 };
@@ -834,19 +835,42 @@ function shineSelectedSendAccounts(sels){
 };
 function toggleSelectSendAccount(ele){
     var _t = $(ele);
+    var is_tsina = (_t.attr('blogType') || 'tsina') === 'tsina';
     if(_t.hasClass('sel')){
         _t.removeClass('sel');
     }else{
+        if(is_tsina) {
+           _t.siblings().each(function() {
+               var $this = $(this);
+               if($this.attr('blogType') !== 'tsina') {
+                   $this.removeClass('sel');
+               }
+           });
+        } else {
+            _t.siblings().each(function() {
+                var $this = $(this);
+                if($this.attr('blogType') === 'tsina') {
+                    $this.removeClass('sel');
+                }
+            });
+        }
         _t.addClass('sel');
     }
 };
-function toggleSelectAllSendAccount(){
-    if($("#accountsForSend .sel").length == $("#accountsForSend li").length){ //已全选
+function toggleSelectAllSendAccount() {
+    var $selected = $("#accountsForSend .sel");
+    if($selected.length === 0 || $selected.length === 1) {
+        // select all
+        var is_tsina = $selected.attr('blogType') === 'tsina';
+        if(is_tsina) {
+            $('#accountsForSend li[blogType="tsina"]').addClass('sel');
+        } else {
+            $('#accountsForSend li[blogType!="tsina"]').addClass('sel');
+        }
+    } else {
         $("#accountsForSend li").removeClass('sel');
         var c_user = getUser();
         $("#accountsForSend li[uniqueKey=" + c_user.uniqueKey +"]").addClass('sel');
-    }else{
-        $("#accountsForSend li").addClass('sel');
     }
 };
 // <<-- 多用户 END
