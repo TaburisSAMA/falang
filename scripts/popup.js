@@ -2845,9 +2845,17 @@ fawave.face = {
         }
     	// 初始化表情
     	if($('#face_box .faceItemPicbg .face_icons').length === 0) {
+    	    var $accounts = $("#accountsForSend li"), blogTypes = {"yanwenzi": 1};
+    	    $accounts.each(function() {
+    	        blogTypes[$(this).attr('blogType')] = 1;
+    	    });
     		// FACE_TYPES   [typename, faces, url_pre, tpl, type_title]
     		for(var i = 0, len = FACE_TYPES.length; i < len; i++) {
     			var face_type = FACE_TYPES[i];
+    			if(!blogTypes[face_type[0]]) {
+    			    // 未绑定的微博类型，无需显示表情
+    			    continue;
+    			}
     			var $face_tab = $('<span face_type="' + face_type[0] + '">' + face_type[4] + '</span>');
     			$face_tab.click(function() {
     			    var $this = $(this);
@@ -2866,19 +2874,34 @@ fawave.face = {
         			exists[$(this).attr('title')] = true;
         		});
         		var face_tpl = face_type[3];
-        		var tpl = '<li><a href="javascript:void(0)" onclick="fawave.face.insert(this)"' 
-        			+ ' value="' + face_tpl + '" title="{{name}}"><img src="{{url}}" alt="{{name}}"></a></li>';
-        		var faces = face_type[1], url_pre = face_type[2];
-        		for(var name in faces) {
-        			if(exists[name]) continue;
-        			$face_icons.append(tpl.format({'name': name, 'url': url_pre + faces[name]}));
-        			exists[name] = true;
+        		var faces = face_type[1];
+        		if(face_tpl) {
+        		    var tpl = '<li><a href="javascript:void(0)" onclick="fawave.face.insert(this)"' 
+                        + ' value="' + face_tpl + '" title="{{name}}"><img src="{{url}}" alt="{{name}}"></a></li>';
+                    var url_pre = face_type[2];
+                    for(var name in faces) {
+                        if(exists[name]) continue;
+                        $face_icons.append(tpl.format({'name': name, 'url': url_pre + faces[name]}));
+                        exists[name] = true;
+                    }
+        		} else {
+        		    var tpl = '<li class="yanwenzi"><a href="javascript:void(0)" onclick="fawave.face.insert(this)"' 
+                        + ' value="{{name}}" title="{{title}}">{{name}}</a></li>';
+        		    for(var name in faces) {
+        		        $face_icons.append(tpl.format({'name': name, 'title': faces[name]}));
+        		    }
         		}
     		}
+    		var current_blogtype = getUser().blogType;
+    		var $selected = $("#accountsForSend li.sel");
+    		if($selected.length > 1) {
+    		    current_blogtype = 'yanwenzi';
+    		} else if($selected.length === 1) {
+    		    current_blogtype = $selected.attr('blogType');
+    		}
+            $('#face_box .face_tab span[face_type="' + current_blogtype + '"]').click();
     	}
-    	var current_blogtype = getUser().blogType;
-    	$('#face_box .face_tab span[face_type="' + current_blogtype + '"]').click();
-        $("#face_box_target_id").val(target_id);
+    	$("#face_box_target_id").val(target_id);
         var offset = $(ele).offset();
         f.css({top: offset.top+20, left: offset.left-40}).show();
     },
