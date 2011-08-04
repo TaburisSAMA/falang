@@ -19,15 +19,15 @@
 		.icon{width:20px; height:20px;}
 		.error{color:red;}
 	</style>
-	<script type="text/javascript" src="/scripts/lib/jquery-1.4.js" ></script>
-	<script type="text/javascript" src="/scripts/lib/facebox.js" ></script>
-	<script type="text/javascript" src="/scripts/lib/Base64.js" ></script>
-	<script type="text/javascript" src="scripts/emotional.js" ></script>
-	<script type="text/javascript" src="/scripts/utili.js" ></script>
-	<script type="text/javascript" src="scripts/lib/sha1.js" ></script>
-    <script type="text/javascript" src="scripts/lib/oauth.js" ></script>
-	<script type="text/javascript" src="/scripts/apis.js" ></script>
-	<script type="text/javascript" >
+	<script src="/scripts/lib/jquery-1.6.2.min.js" ></script>
+	<script src="/scripts/lib/facebox.js" ></script>
+	<script src="/scripts/lib/Base64.js" ></script>
+	<script src="/scripts/emotional.js" ></script>
+	<script src="/scripts/utili.js" ></script>
+	<script src="/scripts/lib/sha1.js" ></script>
+    <script src="/scripts/lib/oauth.js" ></script>
+	<script src="/scripts/apis.js" ></script>
+	<script >
 		this.document.title = _u.i18n('comm_show_rate_limit_stat') + ' -- ' + _u.i18n('defaultTitle');
 		
 		var tr_tp = '<tr id="user_{{uniqueKey}}"><td><img class="icon" src="{{profile_image_url}}" />{{screen_name}}</td>\
@@ -89,7 +89,7 @@
 		</table>
 	</div>
 </div>
-	<script type="text/javascript">
+	<script>
 	chrome.extension.sendRequest({method:'activelog', active: 'api_rate_limit'});
 		var _gaq = _gaq || [];
 		 _gaq.push(['_setAccount', 'UA-19689660-1']);

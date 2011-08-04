@@ -3,21 +3,21 @@
  <head>
 	<meta charset="utf-8" />
 	<title>发送图片 - FaWave(发微) - 多微博插件 </title>
-	<script type="text/javascript" > window.theViewName = 'upimage'; </script>
+	<script> window.theViewName = 'upimage'; </script>
 	<link rel="stylesheet" media="screen" type="text/css" href="/css/popup.css" />
 	<link rel="stylesheet" media="screen" type="text/css" href="/css/upimage.css" />
-	<script type="text/javascript" src="scripts/lib/jquery-1.4.js" ></script>
-	<script type="text/javascript" src="scripts/lib/Base64.js" ></script>
-	<script type="text/javascript" src="scripts/emotional.js" ></script>
-	<script type="text/javascript" src="scripts/utili.js" ></script>
-	<script type="text/javascript" src="scripts/lib/md5.js" ></script>
-	<script type="text/javascript" src="scripts/lib/jssha256.js" ></script>
-	<script type="text/javascript" src="scripts/lib/sha1.js" ></script>
-    <script type="text/javascript" src="scripts/lib/oauth.js" ></script>
-	<script type="text/javascript" src="scripts/apis.js" ></script>
-	<script type="text/javascript" src="scripts/ui.js" ></script>
-	<script type="text/javascript" src="scripts/popup.js" ></script>
-	<script type="text/javascript" src="scripts/upimage.js" ></script>
+	<script src="/scripts/lib/jquery-1.6.2.min.js"></script>
+	<script src="scripts/lib/Base64.js" ></script>
+	<script src="scripts/emotional.js" ></script>
+	<script src="scripts/utili.js" ></script>
+	<script src="scripts/lib/md5.js" ></script>
+	<script src="scripts/lib/jssha256.js" ></script>
+	<script src="scripts/lib/sha1.js" ></script>
+    <script src="scripts/lib/oauth.js" ></script>
+	<script src="scripts/apis.js" ></script>
+	<script src="scripts/ui.js" ></script>
+	<script src="scripts/popup.js" ></script>
+	<script src="scripts/upimage.js" ></script>
 	<style id="styleCustom"></style>
 	<script>
 		this.document.title = _u.i18n('comm_pic') + ' - ' + _u.i18n('defaultTitle');
@@ -92,7 +92,7 @@
 		对不起，发微暂时未支持您的Chrome浏览器，您需要升级您的Chrome浏览器到 <b>6.0.472.0 Dev</b> 版本或者以上版本。
 		如果您要升级，可以<a target="_blank" onclick="window.close();" href="http://lulu.sinaapp.com/?p=36">到这里下载</a>。
 	</div>
-	<script type="text/javascript">
+	<script>
 	chrome.extension.sendRequest({method:'activelog', active: 'upimage'});
 		var _gaq = _gaq || [];
 		 _gaq.push(['_setAccount', 'UA-19689660-1']);

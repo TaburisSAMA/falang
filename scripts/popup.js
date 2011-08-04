@@ -2900,7 +2900,11 @@ fawave.face = {
     		} else if($selected.length === 1) {
     		    current_blogtype = $selected.attr('blogType');
     		}
-            $('#face_box .face_tab span[face_type="' + current_blogtype + '"]').click();
+    		var $face_type_tab = $('#face_box .face_tab span[face_type="' + current_blogtype + '"]');
+    		if($face_type_tab.length === 0) {
+    		    $face_type_tab = $('#face_box .face_tab span[face_type="yanwenzi"]');
+    		}
+    		$face_type_tab.click();
     	}
     	$("#face_box_target_id").val(target_id);
         var offset = $(ele).offset();

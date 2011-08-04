@@ -4,11 +4,11 @@
 	<meta http-equiv="Authorization" content="Base 1232" />
 	<meta http-equiv="expires" content="31 Dec 2008">
 	<title>播放器 - FaWave(发微) - 多微博插件 </title>
-	<script type="text/javascript"> window.theViewName = 'popshow'; </script>
+	<script> window.theViewName = 'popshow'; </script>
 	<link rel="stylesheet" media="screen" type="text/css" href="/css/popup.css" />
-	<script type="text/javascript" src="scripts/lib/jquery-1.4.js" ></script>
-	<script type="text/javascript" src="scripts/utili.js" ></script>
-	<script type="text/javascript">
+	<script src="/scripts/lib/jquery-1.6.2.min.js" ></script>
+	<script src="/scripts/utili.js"></script>
+	<script>
 		document.title = _u.i18n('comm_player') 
 		    + ' - ' + _u.i18n('defaultTitle');
 		$(document).ready(function() {
@@ -31,7 +31,7 @@
  	<br />
 	<div id="content">
 	</div>
-	<script type="text/javascript">
+	<script>
 	   chrome.extension.sendRequest({method:'activelog', active: 'popshow'});
 		var _gaq = _gaq || [];
 		 _gaq.push(['_setAccount', 'UA-19689660-1']);
