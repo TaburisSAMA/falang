@@ -310,6 +310,7 @@ function _finish_callback(user, stat, selLi, result, textStatus, error_code) {
         var ifw = $("#imageFileWrap");
         ifw.html(ifw.html());
         $("#txtContent").val('');
+        localStorage.setObject(UNSEND_TWEET_KEY, '');
         $("#btnSend").attr('disabled', true);
         $("#imgPreview").html('');
         $("#imageUrl").val('');
@@ -384,7 +385,6 @@ function checkImage(file){
             check = false;
         }
     }else{
-        //_showMsg(_u.i18n("msg_need_pic"));
         check = false;
     }
     return check;

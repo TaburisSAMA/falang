@@ -863,6 +863,13 @@ var sinaApi = {
 	    	before_request();
 	    }
 		var that = this;
+		var xhr_provider = function() {
+		    var xhr = jQuery.ajaxSettings.xhr();
+	        if(onprogress && xhr.upload) {
+	            xhr.upload.addEventListener('progress', onprogress, false);
+	        }
+		    return xhr;
+		};
 	    $.ajax({
 	        url: url,
 	        cache: false,
@@ -872,17 +879,11 @@ var sinaApi = {
 	        dataType: 'text',
 	        contentType: 'multipart/form-data; boundary=' + boundary,
 	        processData: false,
+	        xhr: xhr_provider,
 	        beforeSend: function(req) {
 		    	for(var k in auth_args.headers) {
 		    		req.setRequestHeader(k, auth_args.headers[k]);
 	    		}
-	            if(onprogress) {
-	            	if(req.upload){
-		                req.upload.onprogress = function(ev){
-		                    onprogress(ev);
-		                };
-		            }
-	            }
 	        },
 	        success: function(data, textStatus, xhr) {
 	         // 如果没有网络，则会返回['', 'success', xhr.status === 0, xhr.statusText === '']

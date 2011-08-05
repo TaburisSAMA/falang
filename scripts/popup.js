@@ -467,14 +467,13 @@ function initIamDoing(){
 	            		var title = tab.title || '';
 		                var $txt = $("#txtContent");
 		                var settings = Settings.get();
-		                $txt.val(formatText(settings.lookingTemplate, {title: title, url: loc_url}));
-		                $txt.data('source_url', '').data('short_url', '');
+		                $txt.val(formatText(settings.lookingTemplate, {title: title, url: loc_url}))
+		                    .data({source_url: '', short_url: ''});
 		                showMsgInput();
 		                _shortenUrl(loc_url, settings, function(shorturl){
 				            if(shorturl) {
-				                $txt.val($txt.val().replace(loc_url, shorturl));
-				                // 记录下原始url
-				                $txt.data('source_url', loc_url).data('short_url', shorturl);
+				                $txt.val($txt.val().replace(loc_url, shorturl))
+				                    .data({source_url: loc_url, short_url: shorturl}); // 记录下原始url
 				            }
 				        });
 	            	}
@@ -1538,11 +1537,8 @@ function showComments(ele, tweetId, page, notHide, page_params){
     }
     var config = tapi.get_config(user);
     if(config.comments_need_status) {
-        var $li = $ele.closest('li');
-        var status = $li.find('.msgObjJson').text();
-        status = unescape(status);
-        status = JSON.parse(status);
-        params.status = status;
+        var sid = $ele.closest('li').attr('did');
+        params.status = TWEETS[sid];
     }
     var method = timeline_type == 'comment' ? 'comments' : 'repost_timeline';
     tapi[method](params, function(data, textStatus){
@@ -2068,10 +2064,9 @@ function _sendMsgWraper(msg, user, stat, selLi, pic) {
         if(stat.successCount >= stat.userCount){//全部发送成功
             hideMsgInput();
             selLi.addClass('sel');
-            $("#txtContent").val('');
             showMsg(_u.i18n("msg_send_success"));
             // 清除url数据
-            $("#txtContent").data('source_url', '').data('short_url', '');
+            $("#txtContent").val('').data({source_url: '', short_url: ''});
         }
         if(stat.sendedCount >= stat.userCount){//全部发送完成
             selLi = null;
@@ -2144,11 +2139,7 @@ function sendRepost(msg, repostTweetId, notSendMord){
     $btn.attr('disabled','true');
     $txt.attr('disabled','true');
     if(config.repost_need_status) {
-        var $li = $('#tweet' + repostTweetId);
-        var status = $li.find('.msgObjJson').text();
-        status = unescape(status);
-        status = JSON.parse(status);
-        data.retweeted_status = status;
+        data.retweeted_status = TWEETS[repostTweetId];
     }
     // 处理是否评论
     if(!notSendMord) {
@@ -2195,11 +2186,7 @@ function sendComment(msg, comment_id, notSendMord){
     	data.user_id = user_id;
     }
     if(config.comments_need_status) {
-        var $li = $('#tweet' + comment_id);
-        var status = $li.find('.msgObjJson').text();
-        status = unescape(status);
-        status = JSON.parse(status);
-        data.status = status;
+        data.status = TWEETS[comment_id];
     }
     data['user'] = user;
     btn.attr('disabled','true');
@@ -2362,39 +2349,30 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){ // 转发
     }
 
     $('#ye_dialog_window').show();
-    var d = {};
-    if(ele) {
-    	d = $(ele).closest('li').find('.msgObjJson').text();
-        try{
-            d = unescape(d);
-            d = JSON.parse(d);
-        }
-        catch(err){
-            d = null;
-        }
-    }
     var $t = $('#replyTextarea');
     var value = $t.val() || '';
     $t.focus().blur();
     if(!value) {
-    	if(reTweetId && d && d.retweeted_status){
-            if(user.blogType=='tqq' && ele){
-                var data = $(ele).closest('li').find('.msgObjJson').text();
-                data = unescape(data);
-                try{
-                    data = JSON.parse(data);
-                    userName = data.user.name || userName;
-                }catch(err){
-                }
+    	if(reTweetId && TWEETS[tweetId]) {
+    	    var rt = TWEETS[tweetId];
+            if(user.blogType=='tqq'){
+//                var data = $(ele).closest('li').find('.msgObjJson').text();
+//                data = unescape(data);
+//                try{
+//                    data = JSON.parse(data);
+//                    userName = data.user.name || userName;
+//                }catch(err){
+//                }
+                userName = rt.user.name || userName;
             }
-            value = config.repost_delimiter + '@' + userName + ':' + d.text;
+            value = config.repost_delimiter + '@' + userName + ':' + rt.text;
         } else {
         	value = _u.i18n("comm_repost_default");
         }
     }
 	// 光标在前
 	$t.val(value).focus();
-    if(value == _u.i18n("comm_repost_default")){$t.select();}
+    if(value === _u.i18n("comm_repost_default")){$t.select();}
     _initText($t, config);
     countReplyText();
 };
@@ -2459,9 +2437,8 @@ function doNewMessage(ele, userName, toUserId){//悄悄话
 
 function doRT(ele, is_rt, is_rt_rt) {
 	var $li = $(ele).closest('li');
-    var data = $li.find('.msgObjJson').text();
-    data = unescape(data);
-    data = JSON.parse(data);
+    var did = $li.attr('did');
+    data = TWEETS[did];
     var t = $("#txtContent");
     t.val('').blur();
     // 如果有链接还原，则记录下来

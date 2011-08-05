@@ -2101,15 +2101,21 @@ var ImageService = {
 				if(old_title) {
 					title += ', ' + old_title;
 				}
-				var $ele = $(ele);
+				var $ele = $(ele)
+				  , attrs = {
+                        rhref: url,
+                        old_title: old_title,
+                        title: title, 
+                        href: 'javascript:;',
+                        service: name
+                    };
 				if(item.show_link) {
-				    $ele.attr('show_link', '1');
+				    attrs.show_link = '1';
 				}
 				if(sourcelink && sourcelink !== url) {
-				    $ele.attr('sourcelink', sourcelink);
+				    attrs.sourcelink = sourcelink;
 				}
-				$ele.attr('rhref', url).attr('old_title', old_title).attr('title', title).
-				        attr('href', 'javascript:void(0);').attr('service', name).one('click', function() {
+				$ele.attr(attrs).one('click', function() {
 				    var $this = $(this);
 					ImageService.show(this, $this.attr('service'), 
 				        $this.attr('rhref'), $this.attr('sourcelink'), $this.attr('show_link') === '1');
@@ -2149,7 +2155,11 @@ var ImageService = {
 			    if(pics.caption) {
 			        old_title = pics.caption + (old_title? (', ' + old_title) : '');
 			    }
-			    $ele.attr('title', old_title).attr('href', $ele.attr('rhref'));
+			    var attrs = {
+		            title: old_title,
+		            href: $ele.attr('rhref')
+			    };
+			    $ele.attr(attrs);
 			}
 			$ele.parent().after(tpl.format(pics));
 		}, ele);
@@ -2273,48 +2283,56 @@ var VideoService = {
 	
 	attempt: function(urldata, ele) {
 		var url = urldata.url || urldata;
-		var flash = urldata.flash;
+		var flash = urldata.flash || '';
 		var flash_title = urldata.title || '';
 		var screen_pic = urldata.screen;
 		for(var name in this.services) {
 			var service = this.services[name];
 			if(service.url_re.test(url)) {
+			    var $ele = $(ele);
 				if(service.append) {
 					// 直接添加到后面
 					var flash_code = flash ? this.format_flash(flash) : this.format_tpl(service, url, ele);
-					if($(ele).parent().find('.embed_insert').length == 0) {
-						$(ele).parent().append('<div class="embed_insert">' + flash_code + '</div>');
+					var $parent = $ele.parent();
+					if($parent.find('.embed_insert').length == 0) {
+					    $parent.append('<div class="embed_insert">' + flash_code + '</div>');
 					}
 				} else {
-					var old_title = $(ele).attr('title');
-					var title = _u.i18n("comm_mbleft_to_preview");
+					var old_title = $ele.attr('title')
+					  , title = _u.i18n("comm_mbleft_to_preview");
 					if(flash_title) {
 						title += '[' + flash_title + ']';
 					}
 					if(old_title) {
 						title += ', ' + old_title;
 					}
-					$(ele).attr('rhref', url).attr('title', title)
-							.attr('href', 'javascript:void(0);')
-							.attr('flash', flash || '')
-							.attr('flash_title', flash_title)
-							.click(function() {
-						VideoService.show($(this).attr('videoType'), 
-							$(this).attr('rhref'), 
-							$(this).attr('flash'), 
-							$(this).attr('flash_title'),
-							this);
+					var attrs = {
+				        title: title,
+				        rhref: url,
+				        href: 'javascript:;',
+				        flash: flash,
+				        flash_title: flash_title
+					};
+					$ele.attr(attrs).click(function() {
+					    var $this = $(this);
+						VideoService.show(
+					        $this.attr('videoType'), 
+					        $this.attr('rhref'), 
+					        $this.attr('flash'), 
+					        $this.attr('flash_title'),
+					        this);
 					});
 					if(screen_pic) {
-						var img_html = '<br/><img class="video_image" title="' + flash_title + '" src="' + screen_pic + '" /><br/>';
-//						if(flash_title) {
-//							img_html = '<br/>' + flash_title + img_html;
-//						}
-						$(ele).parent().append(img_html);
+						var img_html = '<br/><img class="video_image" title="' 
+						    + flash_title + '" src="' + screen_pic + '" /><br/>';
+						$ele.parent().append(img_html);
 					}
 				}
-				$(ele).attr('videoType', name).after(' [<a onclick="VideoService.popshow(this);" href="javascript:void(0);" title="' 
-						+ _u.i18n("comm_popup_play") +'" class="external_link">'+ _u.i18n("abb_play") +'</a>]');
+				$ele.attr('videoType', name)
+				    .after(' [<a onclick="VideoService.popshow(this);return false;" href="javascript:;" title="' 
+			            + _u.i18n("comm_popup_play") 
+			            + '" class="external_link">' 
+			            + _u.i18n("abb_play") +'</a>]');
 				return true;
 			}
 		}
@@ -2349,10 +2367,10 @@ var VideoService = {
 			url += '&url=' + ($this.attr('rhref') || $this.attr('href'));
 		}
 		var l = (window.screen.availWidth-510)/2;
-		var width_height = vtype == 'xiami' 
-			? 'width=300,height=50': 'width=460,height=430';
-    	window.open(url, '_blank', 'left=' + l + ',top=30,' 
-    		+ width_height + ',menubar=no,location=no,resizable=no,scrollbars=yes,status=yes');
+		var width_height = vtype == 'xiami' ? 'width=300,height=50': 'width=460,height=430';
+		var params = 'left=' + l + ',top=30,' + width_height 
+		    + ',menubar=no,location=no,resizable=no,scrollbars=yes,status=yes';
+    	window.open(url, '_blank', params);
 	}
 };
 
@@ -2366,7 +2384,8 @@ function _bind_tip_items($tip_div) {
 // match_all_text 是否匹配全部内容
 function at_user_autocomplete(ele_id, match_all_text, select_callback) {
 	// support @ autocomplete
-	var $tip_div = $('<div ele_id="' + ele_id + '" style="z-index: 2000; position: absolute;display:none; " class="at_user"><ul></ul></div>');
+	var $tip_div = $('<div ele_id="' + ele_id 
+        + '" style="z-index: 2000; position: absolute;display:none; " class="at_user"><ul></ul></div>');
 	$(document.body).append($tip_div);
 	var ele = $(ele_id).get(0);
 	ele.select_callback = select_callback;
@@ -2506,7 +2525,7 @@ function at_user_search(query, callback, context) {
 	var query_regex = new RegExp(query, 'i');
 	var current_user = null;
 	// 当前不是对话框回复的话，则代表是发微博
-	if($("#ye_dialog_window").css('display') === 'none') {
+	if($("#ye_dialog_window").is(':hidden')) {
 	    // 根据当前选择的用户来获取at数据
 	    // 如果只选择了一个用户，则使用选择的用户
 	    // 如果没有选择或者选择大于1人，则使用当前用户
@@ -2524,14 +2543,14 @@ function at_user_search(query, callback, context) {
 	var data_types = [b_view.friendships.friend_data_type].concat(T_LIST.all);
 	for(var index=0, index_len = data_types.length; index < index_len; index++) {
 		var tweets = b_view.get_data_cache(data_types[index], current_user.uniqueKey) || [];
-	    for(var  i= 0, len = tweets.length; i < len; i++){
+	    for(var i = 0, len = tweets.length; i < len; i++){
 	    	var tweet = tweets[i];
 	    	var items = [tweet.user || tweet];
-	    	var retweeted_status = tweet.retweeted_status || tweet.status;
-	    	if(retweeted_status) {
-	    		items.push(retweeted_status.user);
-	    		if(retweeted_status.retweeted_status) {
-	    			items.push(retweeted_status.retweeted_status.user);
+	    	var rt = tweet.retweeted_status || tweet.status;
+	    	if(rt) {
+	    		items.push(rt.user);
+	    		if(rt.retweeted_status) {
+	    			items.push(rt.retweeted_status.user);
 	    		}
 	    	}
 	    	for(var j = 0, jlen = items.length; j < jlen; j++) {
@@ -2548,15 +2567,14 @@ function at_user_search(query, callback, context) {
 	            }
 	    	}
 	        if(hit_count >= 10) {
-	        	callback.call(context, hits);
-	        	return;
+	        	return callback.call(context, hits);
 	    	}
 	    }
 	}
 	if(hit_count < 2) {
 		// 命中太少，则尝试获取最新的
 		b_view.friendships.fetch_friends(current_user.uniqueKey, function(friends){
-			for(var i=0; i<friends.length; i++){
+			for(var i = 0, len = friends.length; i < len; i++){
 				user = friends[i];
 				if(_check_name(user, query_regex)){
 	            	if(!hits[user.id]) {
@@ -2572,12 +2590,10 @@ function at_user_search(query, callback, context) {
 	            	}
 	            }
 			}
-			callback.call(context, hits);
-	    	return;
+			return callback.call(context, hits);
 		});
 	} else {
-		callback.call(context, hits);
-		return;
+		return callback.call(context, hits);
 	}
 };
 
