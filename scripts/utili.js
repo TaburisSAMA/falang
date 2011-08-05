@@ -1259,7 +1259,8 @@ var UrlUtil = {
 var ShortenUrl = {
 	services: {
 		// http://api.t.sina.com.cn/short_url/shorten.json?source=3538199806&url_long=http://www.tudou.com/programs/view/cl_8vhHMCfs/
-		't.cn': {api: 'http://api.t.sina.com.cn/short_url/shorten.json?source=3434422667',
+		't.cn': {
+		    api: 'http://api.t.sina.com.cn/short_url/shorten.json?source=3434422667',
 			format: 'json', method: 'get',
 			param_name: 'url_long',
 			result_callback: function(data) {
@@ -1284,11 +1285,26 @@ var ShortenUrl = {
 //		'7.ly': {api: 'http://7.ly/api/short', format: 'json', method: 'get', param_name: 'longurl', result_name: 'url'},
 //		'aa.cx': 'http://aa.cx/api.php?url={{url}}',
 //		'2br.in': {api: 'http://api.2br.in/shorten.json', format: 'json', method: 'get', param_name: 'url', result_name: 'shorten_url'},
-		'lnk.by': {api: 'http://lnk.by/Shorten', 
+		'lnk.by': {
+		    api: 'http://lnk.by/Shorten', 
 			format_name: 'format', 
 			format: 'json', 
 			method: 'get', 
-			param_name: 'url', result_name: 'shortUrl'}
+			param_name: 'url', 
+			result_name: 'shortUrl'
+	    },
+		'bit.ly': {
+            api: 'http://api.bitly.com/v3/shorten?login=fengmk2&apiKey=R_da317e9fbaebee684da33d1237adf853&format=json',
+            format: 'json', 
+            method: 'get',
+            param_name: 'longUrl',
+            result_callback: function(data) {
+                if(data && data.data) {
+                    data = data.data;
+                }
+                return data ? data.url : null;
+            }
+        },
 	},
 	// 还原
 	// http://urlexpand0-55.appspot.com/api?u=http://is.gd/imWyT
@@ -1664,15 +1680,7 @@ var Immio = {
             dataType: 'json',
             contentType: blobbuilder.contentType,
             processData: false,
-            beforeSend: function(req) {
-                if(onprogress) {
-                    if(req.upload){
-                        req.upload.onprogress = function(ev){
-                            onprogress(ev);
-                        };
-                    }
-                }
-            },
+            xhr: xhr_provider(onprogress),
             success: function(result) {
                 var error = null, info = null;
                 if(result.success) {
@@ -2924,3 +2932,22 @@ function build_upload_params(data, pic) {
     bb.contentType = 'multipart/form-data; boundary=' + boundary;
     return bb;
 }
+
+function display_size(bytes){   // simple function to show a friendly size
+    var i = 0;
+    while(1023 < bytes){
+        bytes /= 1024;
+        ++i;
+    };
+    return  i ? bytes.toFixed(2) + ["", " Kb", " Mb", " Gb", " Tb"][i] : bytes + " bytes";
+};
+
+var xhr_provider = function(onprogress) {
+    return function() {
+        var xhr = jQuery.ajaxSettings.xhr();
+        if(onprogress && xhr.upload) {
+            xhr.upload.addEventListener('progress', onprogress, false);
+        }
+        return xhr;
+    };
+};

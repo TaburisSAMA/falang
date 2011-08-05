@@ -251,11 +251,18 @@
     <!-- 表情选择 End -->
 
 	<!-- 上传图片预览 -->
-	<div id="upImgPreview">
+	<div id="upImgPreview" class="upload_image_preview">
 		<img class="arrow" src="images/layerArrow.gif" />
 		<a class="close" href="javascript:window.imgForUpload = null; $('#upImgPreview').hide(); $('#txtContent').focus();" title="Close"></a>
 		<div class="img"></div>
+		<div class="loading_bar"><div><span></span></div></div>
 	</div>
+	<div id="upImgPreview_reply" class="upload_image_preview">
+        <img class="arrow" src="images/layerArrow.gif" />
+        <a class="close" href="javascript:window.imgForUpload_reply = null; $('#upImgPreview_reply').hide(); countReplyText();" title="Close"></a>
+        <div class="img"></div>
+        <div class="loading_bar"><div><span></span></div></div>
+    </div>
 
 	<!-- 模板选择 -->
 	<div style="display:none;">

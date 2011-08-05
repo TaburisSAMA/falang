@@ -443,25 +443,15 @@ function onprogress(rpe, user, stat){
     //$("#progressBar")[0].style.width = ((rpe.loaded * 200 / rpe.total) >> 0) + "px";
     var precent = parseInt((rpe.loaded / rpe.total) * 100);
     $("#u_uploadinfo_" + user.uniqueKey).find(".bar").css('width', precent + "%")
-        .end().find(".progressInfo").html("Sent: " + size(rpe.loaded) + " of " + size(rpe.total));
+        .end().find(".progressInfo").html(display_size(rpe.loaded) + " / " + display_size(rpe.total));
     var allLoaded = 0;
     for(key in stat.uploaded){
         allLoaded += stat.uploaded[key];
     }
-    var allPrecent = parseInt((allLoaded / (rpe.total*stat.userCount) ) * 100);
+    var allPrecent = parseInt((allLoaded / (rpe.total*stat.userCount)) * 100);
     $("#progressBar")[0].style.width = allPrecent + "%";
     $("#progressBar span").html(allPrecent + "%");
 };
-
-function size(bytes){   // simple function to show a friendly size
-    var i = 0;
-    while(1023 < bytes){
-        bytes /= 1024;
-        ++i;
-    };
-    return  i ? bytes.toFixed(2) + ["", " Kb", " Mb", " Gb", " Tb"][i] : bytes + " bytes";
-};
-
 
 function selectFile(fileEle, file_only){
 	$("#uploadForm .dragFile").removeClass('drag_on');

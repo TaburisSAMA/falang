@@ -676,7 +676,7 @@ div.mainContent{word-wrap: break-word; line-height:1.5em;}
 }
 
 /*上传图片预览*/
-#upImgPreview{
+.upload_image_preview{
 	display:none;
 	background: white;
 	position: absolute;
@@ -685,13 +685,13 @@ div.mainContent{word-wrap: break-word; line-height:1.5em;}
 	-webkit-box-shadow: 0px 1px 5px rgba(0, 0, 0, .5);
 	-webkit-border-radius: 5px;
 }
-#upImgPreview .img img{
+.upload_image_preview .img img{
 	max-width:180px;
 	min-width:80px;
 	-webkit-border-radius: 5px;
 	-webkit-box-shadow: #AAA 0px 0px 15px;
 }
-#upImgPreview .close{
+.upload_image_preview .close{
 	position: absolute;
 	background: #fff url(../images/cross.png) no-repeat scroll 0 0;
 	float: right;
@@ -702,11 +702,20 @@ div.mainContent{word-wrap: break-word; line-height:1.5em;}
 	width: 12px;
 	padding: 2px;
 }
-#upImgPreview .arrow{
+.upload_image_preview .arrow{
 	position: absolute;
 	left:30px;
 	top:-8px;
 }
+
+div.loading_bar {display:none;position:relative;width:100%;overflow:hidden;}
+div.loading_bar div {
+	height:18px;
+	border-left:1px solid green;
+	background-color:#EEEEEE;
+	border-left-width: 0px;
+}
+div.loading_bar span {position:absolute;top:0;left:20px;height:18px;}
 
 #pb_map_canvas{width:400px; height:380px; position: relative;}
 #pb_map_canvas .map_user_icon{width:48px;height:48px;border:solid 1px #ccc; float:left;margin-right:5px;}

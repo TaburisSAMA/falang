@@ -243,43 +243,53 @@ function initOnUnload(){
     }
 };
 
+function _get_clipboard_file(e, callback) {
+    var f = null, items = e.clipboardData && e.clipboardData.items;
+    items = items || [];
+    for(var i = 0; i < items.length; i++){
+        if(items[i].kind === 'file'){
+            f = items[i].getAsFile();
+            break;
+        }
+    }
+    if(f){
+        var reader = new FileReader();
+        reader.onload = function(event){
+            callback(f, event.target.result);
+        };
+        reader.readAsDataURL(f);
+    } else {
+        callback();
+    }
+};
+
 function initTxtContentEven(){
     //>>>发送微博事件初始化 开始<<<
     var unsendTweet = localStorage.getObject(UNSEND_TWEET_KEY);
-    var txtContent = $("#txtContent");
+    var $txtContent = $("#txtContent"), $replyText = $("#replyTextarea");
     if(unsendTweet){
-        txtContent.val(unsendTweet);
+        $txtContent.val(unsendTweet);
     }
 
-    txtContent[0].oninput = txtContent[0].onfocus = countInputText;
+    $txtContent[0].oninput = $txtContent[0].onfocus = countInputText;
     
     //黏贴图片
-    txtContent[0].onpaste = function(e){
-        var f = null,
-            items = e.clipboardData &&
-				e.clipboardData.items;
-        items = items || [];
-		for(var i=0; i<items.length; i++){
-            if(items[i].kind == 'file'){
-                f = items[i].getAsFile();
-                break;
+    $txtContent[0].onpaste = function(e) {
+        _get_clipboard_file(e, function(file, image_src) {
+            if(file){
+                window.imgForUpload = file;
+                window.imgForUpload.fileName = 'fawave.png';
+                $("#upImgPreview .img").html('<img class="pic" src="' + image_src + '" />');
+                var eleid = '#btnUploadPic', left_padding = -30, top_padding = 20;
+                var offset = $(eleid).offset();
+                $("#upImgPreview").css({left:offset.left + left_padding, 
+                    top:offset.top + top_padding}).show()
+                    .find('.loading_bar').hide();
             }
-        }
-        if(f){
-            window.imgForUpload = f;
-            window.imgForUpload.fileName = 'fawave.png';
-            var reader = new FileReader();
-            reader.onload = function(e){
-                $("#upImgPreview .img").html('<img class="pic" src="' + e.target.result + '" />');
-                
-                var offset = $("#btnUploadPic").offset();
-                $("#upImgPreview").css({left:offset.left-30, top:offset.top+20}).show();
-            };
-            reader.readAsDataURL(f);
-        }
+        });
     };
 
-    txtContent.keydown(function(event){
+    $txtContent.keydown(function(event){
         var c = $.trim($(this).val());
         if(event.ctrlKey && event.keyCode==13){
             if(c){
@@ -292,8 +302,7 @@ function initTxtContentEven(){
     });
 
     $("#btnSend").click(function(){
-        var txt = $("#txtContent");
-        var c = $.trim(txt.val());
+        var c = $.trim($("#txtContent").val());
         if(c){
             sendMsg(c);
         }else{
@@ -303,49 +312,89 @@ function initTxtContentEven(){
     //>>>发送微博事件初始化 结束<<<
 
     //>>>回复事件初始化开始<<<
-    var unsendReply = localStorage.getObject(UNSEND_REPLY_KEY)
-      , $replyText = $("#replyTextarea");
-    if(unsendReply) {
-    	$replyText.val(unsendReply);
-    }
-    $replyText.keyup(function(){
-        countReplyText();
-    }).keydown(function(event){
-        var c = $.trim($(this).val());
-        if(event.ctrlKey && event.keyCode==13){
-            sendMsgByActionType(c);
-            return false;
+    if($replyText.length > 0) {
+        var unsendReply = localStorage.getObject(UNSEND_REPLY_KEY);
+        if(unsendReply) {
+            $replyText.val(unsendReply);
         }
-    });
+        $replyText.keyup(function(){
+            countReplyText();
+        }).keydown(function(event){
+            var c = $.trim($(this).val());
+            if(event.ctrlKey && event.keyCode==13){
+                sendMsgByActionType(c);
+                return false;
+            }
+        });
+        
+        $replyText[0].onpaste = function(e){
+            _get_clipboard_file(e, function(file, image_src) {
+                if(file){
+                    window.imgForUpload_reply = file;
+                    window.imgForUpload_reply.fileName = 'fawave_reply.png';
+                    $("#upImgPreview_reply .img").html('<img class="pic" src="' + image_src + '" />');
+                    var eleid = '#btnAddReplyEmotional', left_padding = -30, top_padding = 60;
+                    var offset = $(eleid).offset();
+                    $("#upImgPreview_reply").css({left:offset.left + left_padding, 
+                        top:offset.top + top_padding, 'z-index': 1000}).show()
+                        .find('.loading_bar').hide();
+                    countReplyText();
+                }
+            });
+        };
 
-    $("#replySubmit").click(function(){
-        sendMsgByActionType($.trim($("#replyTextarea").val()));
-    });
-    
+        $("#replySubmit").click(function(){
+            sendMsgByActionType($.trim($("#replyTextarea").val()));
+        });
+    }
     //>>>回复结束<<<
 };
 
-function sendMsgByActionType(c){//c:要发送的内容
-    if(c){
-        var actionType = $('#actionType').val();
-        switch(actionType){
-            case 'newmsg': // 私信
-                sendWhisper(c);
-                break;
-            case 'repost': // 转
-                sendRepost(c);
-                break;
-            case 'comment': // 评
-                sendComment(c);
-                break;
-            case 'reply': // @
-                sendReplyMsg(c);
-                break;
-            default:
-                showMsg('Wrong Send Type');
-        }
+function sendMsgByActionType(c) { // c:要发送的内容
+    if(!c) {
+        return showMsg(_u.i18n("msg_need_content"));
+    }
+    $("#replySubmit, #replyTextarea").attr('disabled', true);
+    if(window.imgForUpload_reply) {
+        // 增加图片链接
+        var $progress = $('#upImgPreview_reply .loading_bar');
+        $progress.show();
+        Immio.upload({}, window.imgForUpload_reply, function(error, info) {
+            if(info && info.link) {
+                c += ' ' + info.link;
+            }
+            __sendMsgByActionType(c);
+            $progress.hide();
+        }, function(rpe) {
+            // progress
+            var html = display_size(rpe.loaded) + "/" + display_size(rpe.total);
+            var width = parseInt((rpe.loaded / rpe.total) * $progress.width());
+            $progress.find('div').css({'border-left-width': width + 'px'}).find('span').html(html);
+        });
     } else {
-        showMsg(_u.i18n("msg_need_content"));
+        __sendMsgByActionType(c);
+    }
+};
+
+function __sendMsgByActionType(c){ // c:要发送的内容
+    var actionType = $('#actionType').val();
+    switch(actionType) {
+        case 'newmsg': // 私信
+            sendWhisper(c);
+            break;
+        case 'repost': // 转
+            sendRepost(c);
+            break;
+        case 'comment': // 评
+            sendComment(c);
+            break;
+        case 'reply': // @
+            sendReplyMsg(c);
+            break;
+        default:
+            showMsg('Wrong Send Type');
+            $("#replySubmit, #replyTextarea").attr('disabled', false);
+            break;
     }
 };
 
@@ -378,6 +427,10 @@ function countInputText() {
 
 function countReplyText(){
 	var values = _countText('replyTextarea'), len = values[1], html = null;
+	if(window.imgForUpload_reply) {
+	    // 有图片，则自动增加20字符
+	    len -= 20;
+	}
 	if(len > 0){
         html = _u.i18n("msg_word_count").format({len: len});
     }else{
@@ -1759,7 +1812,6 @@ function readMore(t){
     var cache = _b_view.get_data_cache(data_type, c_user.uniqueKey);
     var view_status = _b_view.get_view_status(t, c_user.uniqueKey);
     var timeline_offset = getTimelineOffset(t) + (view_status.index || 0);
-    //console.log(t, timeline_offset, view_status.index, cache.length)
 //    //tab上如果有未读数，则需要加上
 //    var unread_count = $("#tl_tabs li.tab-" + t + " .unreadCount").html();
 //    unread_count = Number(unread_count);
@@ -1942,7 +1994,6 @@ function sendMsg(msg){
         source_url = txt.data('source_url'),
         short_url = txt.data('short_url');
         
-    
     btn.attr('disabled','true');
     txt.attr('disabled','true');
     
@@ -2014,6 +2065,18 @@ function _get_image_url(stat, callback, onprogress, context) {
         image_url = stat.image_urls[0];
     }
     if(!image_url && stat.pic) {
+        if(!onprogress) {
+            var $loading_bar = $('#upImgPreview .loading_bar');
+            if($loading_bar.length > 0) {
+                $loading_bar.show();
+                onprogress = function(rpe) {
+                    // progress
+                    var html = display_size(rpe.loaded) + "/" + display_size(rpe.total);
+                    var width = parseInt((rpe.loaded / rpe.total) * $loading_bar.width());
+                    $loading_bar.find('div').css({'border-left-width': width + 'px'}).find('span').html(html);
+                };
+            }
+        }
         Immio.upload({}, stat.pic, function(error, info) {
             if(info && info.link) {
                 image_url = info.link;
@@ -2095,7 +2158,17 @@ function _sendMsgWraper(msg, user, stat, selLi, pic) {
     if(pic) {
         var data = {status: msg};
         pic = {file: pic};
-        tapi.upload(user, data, pic, function(){}, function(){}, callback);
+        var $loading_bar = $('#upImgPreview .loading_bar'), onprogress = null;
+        if($loading_bar.is(':hidden')) {
+            $loading_bar.show();
+            onprogress = function(rpe) {
+                // progress
+                var html = display_size(rpe.loaded) + "/" + display_size(rpe.total);
+                var width = parseInt((rpe.loaded / rpe.total) * $loading_bar.width());
+                $loading_bar.find('div').css({'border-left-width': width + 'px'}).find('span').html(html);
+            };
+        }
+        tapi.upload(user, data, pic, null, onprogress, callback);
     } else {
         var data = {status: msg, user:user};
         tapi.update(data, callback);
@@ -2273,6 +2346,8 @@ function hideReplyInput(){
     $('#replyTextarea').val('');
     // 清除 ActionCache
     cleanActionCache();
+    window.imgForUpload_reply = null;
+    $('#upImgPreview_reply').hide().find('.loading_bar').hide();
 };
 
 function resizeFawave(w, h){

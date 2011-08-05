@@ -863,13 +863,6 @@ var sinaApi = {
 	    	before_request();
 	    }
 		var that = this;
-		var xhr_provider = function() {
-		    var xhr = jQuery.ajaxSettings.xhr();
-	        if(onprogress && xhr.upload) {
-	            xhr.upload.addEventListener('progress', onprogress, false);
-	        }
-		    return xhr;
-		};
 	    $.ajax({
 	        url: url,
 	        cache: false,
@@ -879,7 +872,7 @@ var sinaApi = {
 	        dataType: 'text',
 	        contentType: 'multipart/form-data; boundary=' + boundary,
 	        processData: false,
-	        xhr: xhr_provider,
+	        xhr: xhr_provider(onprogress),
 	        beforeSend: function(req) {
 		    	for(var k in auth_args.headers) {
 		    		req.setRequestHeader(k, auth_args.headers[k]);
