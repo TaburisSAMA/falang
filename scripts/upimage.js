@@ -19,10 +19,6 @@ function initOnLoad(){
 function init() {
 	// 判断是否截图
     var params = decodeForm(window.location.search);
-    var is_upload = true;
-    if(params.image_url) {
-    	is_upload = false;
-    }
 	initSelectSendAccounts();
 	initTxtContentEven();
 	var $txtContent = $("#txtContent");
@@ -306,21 +302,27 @@ function _finish_callback(user, stat, selLi, result, textStatus, error_code) {
     if(stat.successCount >= stat.userCount) {
         // 全部发送成功
         _showMsg(_u.i18n("msg_send_success"));
-        selLi.addClass('sel');
-        var ifw = $("#imageFileWrap");
-        ifw.html(ifw.html());
-        $("#txtContent").val('');
-        localStorage.setObject(UNSEND_TWEET_KEY, '');
-        $("#btnSend").attr('disabled', true);
-        $("#imgPreview").html('');
-        $("#imageUrl").val('');
-        $("#progressBar span").html("");
-        $('#longtext').val('');
-        if($('#cb_success_close').attr('checked')) {
-            // 1.5秒后关闭
-            setTimeout(function() {
-                window.close();
-            }, 1500);
+        var $remember_send_data = $('#remember_send_data');
+        if(!$remember_send_data.prop('checked')) {
+            selLi.addClass('sel');
+            var ifw = $("#imageFileWrap");
+            ifw.html(ifw.html());
+            $("#txtContent").val('');
+            localStorage.setObject(UNSEND_TWEET_KEY, '');
+            $("#btnSend").attr('disabled', true);
+            $("#imgPreview").html('');
+            $("#imageUrl").val('');
+            $("#progressBar span").html("");
+            $('#longtext').val('');
+            if($('#cb_success_close').attr('checked')) {
+                // 1.5秒后关闭
+                setTimeout(function() {
+                    window.close();
+                }, 1500);
+            }
+        } else {
+            // 不选中
+            $remember_send_data.prop('checked', false);
         }
     }
     if(stat.sendedCount >= stat.userCount) { 
@@ -337,7 +339,8 @@ function _finish_callback(user, stat, selLi, result, textStatus, error_code) {
             }
             if(failCount > 0 && stat.select_image_url) {
                 // 有未成功的，则将图片保留下来，以便下次发送
-                $("#txtContent").val($("#txtContent").val() + ' ' + stat.select_image_url);
+                var $txtContent = $("#txtContent");
+                $txtContent.val($txtContent.val() + ' ' + stat.select_image_url);
             }
         }
     }

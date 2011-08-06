@@ -178,35 +178,6 @@ function HTMLEnCode(str){
     return str;
 };
 
-/*
-<li class="tweetItem showCounts_${status.id}" id="tweet${status.id}" did="${status.id}">
-	<div class="usericon">
-		<a target="_blank" href="" title="">
-			<img src="${status.user.profile_image_url.replace('24x24', '48x48')}" />
-		</a>
-	</div>
-	<div class="mainContent">
-		<div class="userName">
-			<a target="_blank" href="" title="">${status.user.screen_name}</a>
-		</div>
-		<div class="msg">
-			<div class="tweet">${status.text}
-				<?py if(status.thumbnail_pic): ?>
-				<div>
-					<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{status.bmiddle_pic}" >
-						<img class="imgicon pic" src="#{status.thumbnail_pic}" />
-					</a>
-				</div>
-				<?py #endif ?>
-			</div>
-		</div>
-		<div class="retweet"></div>
-		<div class="msgInfo">${status.created_at} 通过 #{status.source}</div>
-	</div>
-</li>
-*/
-
-
 /**
  * 格式化字符串 from tbra
  * eg:

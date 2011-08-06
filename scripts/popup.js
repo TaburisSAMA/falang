@@ -7,7 +7,8 @@ function getTimelineOffset(t){
 };
 
 function initOnLoad(){
-    setTimeout(init, 100); //为了打开的时候不会感觉太卡
+    init();
+    //setTimeout(init, 10); //为了打开的时候不会感觉太卡
 };
 
 var POPUP_CACHE = {};
@@ -40,6 +41,7 @@ function init(){
         chrome.tabs.create({url: 'options.html#no_uniqueKey'});
         return;
     }
+    
     //$('a').attr('target', '_blank');
     $('a').live('click', function(e){
         var url = $.trim($(this).attr('href'));
@@ -69,7 +71,7 @@ function init(){
     $('#ye_dialog_close').click(function(){ hideReplyInput(); });
 
     initTabs();
-
+    
     initTxtContentEven();
 
     initChangeUserList();
@@ -80,7 +82,7 @@ function init(){
     _change_tab(last_data_type);
 
     initMsgHover();
-
+    
     addUnreadCountToTabs();
     initIamDoing();
 
@@ -129,11 +131,6 @@ function init(){
     adShow();
     
     restoreActionCache();
-    
-    // 处理未读微博的样式
-//    $('li.unread-item').live('mouseleave', function() {
-//        $(this).die('mouseleave').removeClass('unread-item');
-//    });
 };
 
 function initializeMap(){};//给载入地图api调用
@@ -221,10 +218,14 @@ function _load_new_data(data_type, is_current_tab) {
 };
 
 function initOnUnload(){
-    var c = $("#txtContent").val();
+    var c = $("#txtContent").val(), $reply_text = $("#replyTextarea");
+    if(!c || !$reply_text.is(':hidden')) {
+        // 没有输入或者是对话框模式，则隐藏文本输入
+        ActionCache.set('showMsgInput', null);
+    }
     localStorage.setObject(UNSEND_TWEET_KEY, c || '');
     localStorage.setObject(UNSEND_REPLY_KEY, $("#replyTextarea").val() || '');
-    if(Settings.get().sendAccountsDefaultSelected == 'remember') {
+    if(Settings.get().sendAccountsDefaultSelected === 'remember') {
         if($("#accountsForSend").data('inited')){
             var keys = '';
             $("#accountsForSend li.sel").each(function(){
@@ -417,11 +418,6 @@ function countInputText() {
     }
     var text = values[0], wlength = text.len(); //, length = text.length;
     $('#wordCount_double').html(140 - wlength);
-//    $('#accountsForSend li .wordcount').each(function() {
-//    	var $this = $(this), len = $this.attr('support_double_char') ? wlength : length;
-//    	var left_length = +($this.attr('max_text_length') || 140) - len;
-//    	$this.html(left_length);
-//    });
     $('#wordCount').html(values[1]);
 };
 
@@ -809,11 +805,12 @@ function changeUser(uniqueKey){
     }
 };
 
-// 初始化用户选择视图, is_upload === true 代表是上传
-function initSelectSendAccounts(is_upload){
+// 初始化用户选择视图
+function initSelectSendAccounts(){
+    var settings = Settings.get();
     var afs = $("#accountsForSend");
     if(afs.data('inited')){
-        if(Settings.get().sendAccountsDefaultSelected == 'current' && afs.find('li.sel').length < 2){
+        if(settings.sendAccountsDefaultSelected === 'current' && afs.find('li.sel').length < 2){
             afs.find('li').removeClass('sel');
             var c_user = getUser();
             $("#accountsForSend li[uniqueKey=" + c_user.uniqueKey +"]").addClass('sel');
@@ -827,25 +824,19 @@ function initSelectSendAccounts(is_upload){
         '<img src="{{profile_image_url}}" />' +
         '{{screen_name}}' +
         '<img src="/images/blogs/{{blogType}}_16.png" class="blogType" /></li>';
-//    var li_tpl = '<li class="{{sel}}" uniqueKey="{{uniqueKey}}" onclick="toggleSelectSendAccount(this)">' +
-//                   '<img src="{{profile_image_url}}" />' +
-//                   '{{screen_name}}' +
-//                   '<img src="/images/blogs/{{blogType}}_16.png" class="blogType" />';
-//    var li_tpl_end = '</li>';
-//    var counter_tpl = ' [<span class="wordcount" support_double_char="{{support_double_char}}" ' 
-//        + ' max_text_length="{{max_text_length}}">{{max_text_length}}</span>]';
     var li = [];
-    var c_user = getUser();
-    for(var i in userList){
-        var user = userList[i]
-          , config = tapi.get_config(user);
-        if(is_upload === true && config.support_upload === false) {
-        	continue;
-        }
+    var c_user = getUser(), has_sina = false, has_other = false;
+    for(var i = 0, len = userList.length; i < len; i++) {
+        var user = userList[i];
         user.sel = '';
-//        user.support_double_char = config.support_double_char ? 'true' : '';
-//        user.max_text_length = config.max_text_length;
-        switch(Settings.get().sendAccountsDefaultSelected){
+        var is_sina = user.blogType === 'tsina';
+        if(!has_sina && is_sina) {
+            has_sina = true;
+        }
+        if(!has_other && !is_sina) {
+            has_other = true;
+        }
+        switch(settings.sendAccountsDefaultSelected){
             case 'all':
                 user.sel = 'sel';
                 break;
@@ -863,12 +854,12 @@ function initSelectSendAccounts(is_upload){
             default:
                 break;
         }
-//        var tpl = li_tpl;
-//        if(!user.support_double_char) {
-//            tpl += counter_tpl;
-//        }
-//        tpl += li_tpl_end;
         li.push(li_tpl.format(user));
+    }
+    if(has_sina && has_other) {
+        // 只有同时有新浪微博和其他类型，才显示保留数据的选项
+        li.push('<div id="remember_send_data_ctr"><input checked="checked" type="checkbox" id="remember_send_data" /><label for="remember_send_data">' 
+            + _u.i18n("abb_keep_send_data") + '</label></div>');
     }
     afs.html('TO(<a class="all" href="javascript:" onclick="toggleSelectAllSendAccount()">' 
         + _u.i18n("abb_all") +'</a>): ' + li.join(''));
@@ -911,19 +902,26 @@ function toggleSelectSendAccount(ele){
 };
 function toggleSelectAllSendAccount() {
     var $selected = $("#accountsForSend .sel");
-    if($selected.length === 0 || $selected.length === 1) {
-        // select all
-        var is_tsina = $selected.attr('blogType') === 'tsina';
-        if(is_tsina) {
-            $('#accountsForSend li[blogType="tsina"]').addClass('sel');
-        } else {
-            $('#accountsForSend li[blogType!="tsina"]').addClass('sel');
-        }
-    } else {
-        $("#accountsForSend li").removeClass('sel');
-        var c_user = getUser();
-        $("#accountsForSend li[uniqueKey=" + c_user.uniqueKey +"]").addClass('sel');
+    if($selected.length === 0) {
+        $selected = $("#accountsForSend li[uniqueKey=" + getUser().uniqueKey +"]");
     }
+    var $sinas = $('#accountsForSend li[blogType="tsina"]');
+    var $others = $('#accountsForSend li[blogType!="tsina"]');
+    var is_tsina = $selected.attr('blogType') === 'tsina';
+    if(is_tsina) {
+        if($selected.length < $sinas.length) {
+            return $sinas.addClass('sel') && $others.removeClass('sel');
+        }
+        if($others.length > 0) {
+            return $sinas.removeClass('sel') && $others.addClass('sel');
+        }
+    }
+    if($selected.length < $others.length) {
+        return $sinas.removeClass('sel') && $others.addClass('sel');
+    }
+    $("#accountsForSend li").removeClass('sel');
+    var c_user = getUser();
+    $("#accountsForSend li[uniqueKey=" + c_user.uniqueKey +"]").addClass('sel');
 };
 // <<-- 多用户 END
 
@@ -2124,31 +2122,35 @@ function _sendMsgWraper(msg, user, stat, selLi, pic) {
             }
         }
         _start_updates(stat);
-        if(stat.successCount >= stat.userCount){//全部发送成功
-            hideMsgInput();
-            selLi.addClass('sel');
+        
+        if(stat.successCount >= stat.userCount) { // 全部发送成功
             showMsg(_u.i18n("msg_send_success"));
-            // 清除url数据
-            $("#txtContent").val('').data({source_url: '', short_url: ''});
+            var $remember_send_data = $('#remember_send_data');
+            if(!$remember_send_data.prop('checked')) {
+                // 清除url数据
+                $("#txtContent").val('').data({source_url: '', short_url: ''});
+                window.imgForUpload = null;
+                $('#upImgPreview').hide();
+                hideMsgInput();
+                selLi.addClass('sel');
+            } else {
+                // 不选中
+                $remember_send_data.prop('checked', false);
+            }
         }
-        if(stat.sendedCount >= stat.userCount){//全部发送完成
+        if(stat.sendedCount >= stat.userCount) {// 全部发送完成
             selLi = null;
-            $("#btnSend").removeAttr('disabled');
-            $("#txtContent").removeAttr('disabled');
-            if(stat.successCount > 0){ //有发送成功的
+            $("#btnSend, #txtContent").removeAttr('disabled');
+            if(stat.successCount > 0) { // 有发送成功的
                 setTimeout(callCheckNewMsg, 1000, 'friends_timeline');
                 var failCount = stat.userCount - stat.successCount;
-                if(stat.userCount > 1 && failCount > 0){ //多个用户，并且有发送失败才显示
+                if(stat.userCount > 1 && failCount > 0){ // 多个用户，并且有发送失败才显示
                     showMsg(_u.i18n("msg_send_complete").format({successCount:stat.successCount, errorCount:failCount}));
                 }
-                if(failCount <= 0) { //全部成功则清除上传的图片
-                    window.imgForUpload = null;
-                    $('#upImgPreview').hide();
-                } else {
+                if(stat.select_image_url && failCount > 0) { 
                     // 有未成功的，则将图片保留下来，以便下次发送
-                    if(stat.select_image_url) {
-                        $("#txtContent").val($("#txtContent").val() + ' ' + stat.select_image_url);
-                    }
+                    var $txtContent = $("#txtContent");
+                    $txtContent.val($txtContent.val() + ' ' + stat.select_image_url);
                 }
             }
         }
@@ -2301,18 +2303,20 @@ function callCheckNewMsg(t, uniqueKey){
 }
 
 function showMsgInput(){
-    initSelectSendAccounts();
-    var h_submitWrap = $("#submitWarp .w").height();
-    var h = window.innerHeight - 70 - h_submitWrap;
-    $(".list_warp").css('height', h);
-    $("#submitWarp").data('status', 'show').css('height', h_submitWrap);
+    var $submitWarp = $("#submitWarp");
+    if($submitWarp.data('status') !== 'show') {
+        initSelectSendAccounts();
+        var h_submitWrap = $submitWarp.find(".w").height();
+        var h = window.innerHeight - 70 - h_submitWrap;
+        $(".list_warp").css('height', h);
+        $submitWarp.data('status', 'show').css('height', h_submitWrap);
+        $("#header .write").addClass('active').find('b').addClass('up');
+        $("#doing").appendTo('#doingWarp');
+        ActionCache.set('showMsgInput', []);
+    }
     var $text = $("#txtContent"), value = $text.val();
     $text.focus().val('').val(value); //光标在最后面
-    //_initText($text);
     countInputText();
-    $("#header .write").addClass('active').find('b').addClass('up');
-    $("#doing").appendTo('#doingWarp');
-    ActionCache.set('showMsgInput', []);
 };
 
 function hideMsgInput(){
@@ -2326,10 +2330,12 @@ function hideMsgInput(){
 };
 
 function toogleMsgInput(ele){
-    if($("#submitWarp").data('status') != 'show'){
+    if($("#submitWarp").data('status') !== 'show'){
         showMsgInput();
-        if(window.imgForUpload){
-            $("#upImgPreview").show();
+        if(window.imgForUpload) {
+            setTimeout(function() {
+                $("#upImgPreview").show();
+            }, 500);
         }
     }else{
         $("#upImgPreview").hide();
@@ -3151,13 +3157,19 @@ function adShow(){
 var __action_names = ['doComment', 'doRepost', 'doNewMessage', 'doReply', 'showMsgInput'];
 
 function restoreActionCache() {
-    for(var i = 0, len = __action_names.length; i < len; i++) {
-    	var action = __action_names[i];
+    __action_names.forEach(function(action){
     	var action_args = ActionCache.get(action);
         if(action_args) {
-        	window[action].apply(this, action_args);
+            if(action === 'showMsgInput') {
+             // 延时一小段时间触发
+                setTimeout(function() {
+                    window[action].apply(this, action_args);
+                }, 400);
+            } else {
+                window[action].apply(this, action_args);
+            }
         }
-	}
+	});
 };
 
 function cleanActionCache() {

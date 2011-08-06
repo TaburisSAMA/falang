@@ -264,7 +264,9 @@ li .pic{max-width:160px; max-height:160px;}
 /*.favicons_ico{height:14px; vertical-align:middle;}*/
 .favicons_ico{padding-left:15px;background-repeat:no-repeat;background-size:14px 14px; background-position-y: 50%;}
 
-li .thumbnail_pic{position:relative;display:inline-block;}
+li .thumbnail_pic{
+	position:relative;display:inline-block;
+}
 li .thumbnail_pic .img_loading{position:absolute;left:42%;top:43%;}
 
 .readmore_loading{display:none; text-align:center; height:20px;}
@@ -628,8 +630,11 @@ div.mainContent{word-wrap: break-word; line-height:1.5em;}
 	opacity:0.7;
     -webkit-transition: all .2s;
     -webkit-transform-origin: bottom;
+    border-radius: 3px;
 }
-#accountListDock li.current a img{opacity:1; width:40px;height:40px; background: #9C3; border-color: green;}
+#accountListDock li.current a img{
+	opacity:1; width:40px;height:40px; background: #9C3; border-color: green;
+}
 #accountListDock li:hover a img, a:focus img {
 	-webkit-transition: width height background opacity border-color 1s ease;
 	width:50px;
@@ -682,14 +687,15 @@ div.mainContent{word-wrap: break-word; line-height:1.5em;}
 	position: absolute;
 	top: 22px;
 	z-index: 10;
-	-webkit-box-shadow: 0px 1px 5px rgba(0, 0, 0, .5);
-	-webkit-border-radius: 5px;
+	box-shadow: 0px 1px 5px rgba(0, 0, 0, .5);
+	border-radius: 5px;
 }
 .upload_image_preview .img img{
 	max-width:180px;
-	min-width:80px;
-	-webkit-border-radius: 5px;
-	-webkit-box-shadow: #AAA 0px 0px 15px;
+	min-width:100px;
+	max-height:180px;
+	border-radius: 5px;
+	box-shadow: #AAA 0px 0px 15px;
 }
 .upload_image_preview .close{
 	position: absolute;
@@ -708,14 +714,19 @@ div.mainContent{word-wrap: break-word; line-height:1.5em;}
 	top:-8px;
 }
 
-div.loading_bar {display:none;position:relative;width:100%;overflow:hidden;}
+div.loading_bar {
+	display:none;position:relative;width:100%;overflow:hidden;
+}
 div.loading_bar div {
 	height:18px;
 	border-left:1px solid green;
 	background-color:#EEEEEE;
 	border-left-width: 0px;
+	border-radius: 0 0 5px 5px;
 }
-div.loading_bar span {position:absolute;top:0;left:20px;height:18px;}
+div.loading_bar span {
+	position:absolute;top:0;left:5px;height:18px;
+}
 
 #pb_map_canvas{width:400px; height:380px; position: relative;}
 #pb_map_canvas .map_user_icon{width:48px;height:48px;border:solid 1px #ccc; float:left;margin-right:5px;}
@@ -787,4 +798,11 @@ div.loading_bar span {position:absolute;top:0;left:20px;height:18px;}
 }
 .at_user li.cur{
 	background:#eeeff6;
+}
+
+#remember_send_data_ctr {
+	margin: 3px 0 5px 5px;
+}
+#remember_send_data_ctr * {
+    cursor:pointer;
 }

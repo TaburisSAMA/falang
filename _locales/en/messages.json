@@ -452,6 +452,10 @@
         "message": "All",
         "description": "全部（全选）的缩写"
     },
+    "abb_keep_send_data": {
+        "message": "Keep sent data",
+        "description": "发送微博后，保留发送数据"
+    },
     "abb_comments_timeline": {
         "message": "Cm",
         "description": "评论Timeline的简称"

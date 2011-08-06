@@ -6,12 +6,12 @@
 	<link rel="stylesheet" href="css/popup.css" />
 	<link rel="stylesheet" href="" id="cssTheme" />
 	<script src="/scripts/lib/jquery-1.6.2.min.js"></script>
-	<script src="scripts/lib/Base64.js" ></script>
-	<script src="scripts/lib/jquery.rotate.1-1.js" ></script>
-	<script src="scripts/lib/shotenjin.js" ></script>
-	<script src="scripts/provinces.js" ></script>
-	<script src="scripts/emotional.js" ></script>
-	<script src="scripts/utili.js" ></script>
+	<script src="/scripts/lib/Base64.js" ></script>
+	<script src="/scripts/lib/jquery.rotate.1-1.js" ></script>
+	<script src="/scripts/lib/shotenjin.js" ></script>
+	<script src="/scripts/provinces.js" ></script>
+	<script src="/scripts/emotional.js" ></script>
+	<script src="/scripts/utili.js" ></script>
 	<script >
 		var _view = getNewWinPopupView();
 		if(_view){
@@ -25,15 +25,15 @@
 		
 		this.document.title = _u.i18n('defaultTitle');
 	</script>
-	<script src="scripts/lib/sha1.js" ></script>
-	<script src="scripts/lib/md5.js" ></script>
-	<script src="scripts/lib/oauth.js" ></script>
-	<script src="scripts/lib/jssha256.js" ></script>
-	<script src="scripts/apis.js" ></script>
-	<script src="scripts/ui.js" ></script>
-	<script src="scripts/popup.js" ></script>
-	<style id="styleCustom" ></style>
-	<style id="styleCustomResize" ></style>
+	<script src="/scripts/lib/sha1.js" ></script>
+	<script src="/scripts/lib/md5.js" ></script>
+	<script src="/scripts/lib/oauth.js" ></script>
+	<script src="/scripts/lib/jssha256.js" ></script>
+	<script src="/scripts/apis.js" ></script>
+	<script src="/scripts/ui.js" ></script>
+	<script src="/scripts/popup.js" ></script>
+	<style id="styleCustom"></style>
+	<style id="styleCustomResize"></style>
 	<script>
 		var THEME = Settings.get().theme;
 		$("#cssTheme").attr('href', '/themes/' + THEME + '/css/theme.css');
@@ -70,11 +70,11 @@
 				<script>_u.wia('#btnUploadPic','title','btn_pic_title');</script>&nbsp;
 				<button onclick="cleanTxtContent();" class="btn"><script>_u.wi('comm_clear')</script></button>
 				<span id="doingWarp"></span>
-				<a id="urlShortenBtn" href="javascript:" title="缩短网址" onclick="addShortenUrl()"><img src="images/link_add.png" /></a>
+				<a id="urlShortenBtn" href="javascript:" onclick="addShortenUrl()"><img src="images/link_add.png" /></a>
 				<script>_u.wia('#urlShortenBtn','title','comm_url_shorten');</script>
 				<input type="text" id="urlShortenInp" onclick="showAddShortenUrl()" onkeyup="enterAddShortenUrl(event)" />
 				
-				<input id="btnSend" type="button" value="发微!" title="ctrl + enter 发送" class="btn send" disabled="disabled" />
+				<input id="btnSend" type="button" class="btn send" disabled="disabled" />
 				<script>_u.wia('#btnSend','value','comm_send'); _u.wia('#btnSend','title','comm_send_tip');</script>
 			</div>
 		  </div>
@@ -470,7 +470,7 @@
 					</div>
 				</div>
 				<?js if(user.description){ ?>
-				<div class="des">#{_u.i18n("comm_description")}：#{user.description}</div>
+				<div class="des">#{_u.i18n("comm_description")}：${user.description}</div>
 				<?js } ?>
 			</div>
 		</textarea>
@@ -525,12 +525,12 @@
 					<?js } ?>
 				</div>
 				<?js if(user.description){ ?>
-				<div class="des">#{_u.i18n("comm_description")}: #{user.description}</div>
+				<div class="des">#{_u.i18n("comm_description")}: ${user.description}</div>
 				<?js } ?>
 				<?js if(user.tags){ ?>
                 <div class="tags">#{_u.i18n("comm_tags")}: 
 	                <?js for(var i=0;i<user.tags.length;i++){ var tag = user.tags[i]; ?>
-	                <a target="_blank" href="#{tag.url}">#{tag.name}</a>
+	                <a target="_blank" href="#{tag.url}">${tag.name}</a>
 	                <?js } ?>
                 </div>
                 <?js } ?>

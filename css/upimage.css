@@ -71,7 +71,8 @@ html, body{ height:100%; }
     position: relative;
     border: 1px solid #B1D632; 
     padding: 2px; 
-    margin-bottom: .5em;                    
+    margin-bottom: .5em;        
+    border-radius: 5px;          
 }
 .graph .bar{
 	height: 50px; 
@@ -120,4 +121,8 @@ html, body{ height:100%; }
 
 .drag_on{
 	border:dotted 3px #900;
+}
+
+#success_close * {
+	cursor: pointer;
 }

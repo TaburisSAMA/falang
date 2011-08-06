@@ -1043,8 +1043,7 @@ function saveAll(){
     }
 
 
-    var asu = ($("#autoShortUrl").attr("checked")== true);
-    settings.isSharedUrlAutoShort = asu;
+    settings.isSharedUrlAutoShort = !!$("#autoShortUrl").attr("checked");
     var asuwc = $("#autoShortUrlCount").val(); //自动缩短网址
     asuwc = Number(asuwc);
     if(!isNaN(asuwc) && asuwc>0){
