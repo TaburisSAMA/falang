@@ -190,9 +190,9 @@ function initTabs() {
 };
 
 // 判断是否需要加载新数据
-function _load_new_data(data_type, is_current_tab) {
+function _load_new_data(t, is_current_tab) {
     var b_view = getBackgroundView();
-    var view_status = b_view.get_view_status(data_type);
+    var view_status = b_view.get_view_status(t);
     view_status.index = view_status.index || 0;
     var load_new = view_status.index !== 0; // 判断是否有新数据
     var settings = Settings.get();
@@ -210,9 +210,14 @@ function _load_new_data(data_type, is_current_tab) {
         view_status.index = 0;
         view_status.size = 0;
         view_status.scrollTop = 0;
-        b_view.set_view_status(data_type, view_status);
-        $("#" + data_type + "_timeline ul.list").html('');
-        getSinaTimeline(data_type);
+        if(view_status.clean_cache) {
+            // 清空分页数据
+            b_view.clean_timeline_cache_data(t);
+        }
+        view_status.clear_cache = false;
+        b_view.set_view_status(t, view_status);
+        $("#" + t + "_timeline ul.list").html('');
+        getSinaTimeline(t);
     }
     return load_new;
 };
@@ -1430,7 +1435,7 @@ function getSinaTimeline(t, notCheckNew){
     var c_user = getUser();
     var b_view = getBackgroundView();
     var data_type = t;
-    if('direct_messages' == data_type) {
+    if('direct_messages' === data_type) {
     	data_type = 'messages';
     }
     var cache = b_view.get_data_cache(data_type, c_user.uniqueKey)
@@ -1448,21 +1453,20 @@ function getSinaTimeline(t, notCheckNew){
             removeUnreadTimelineCount(t);
             updateDockUserUnreadCount(getUser().uniqueKey);
         }
-        var msgs = cache.slice(view_status.index, view_status.index + view_status.size), htmls = [], ids = [];
-        htmls = buildStatusHtml(msgs, t);
-        //var need_reset_scroll = _ul.children().length > 0;
+        var msgs = cache.slice(view_status.index, view_status.index + view_status.size), ids = [];
+        var htmls = buildStatusHtml(msgs, t);
         _ul.append(htmls.join(''));
         // 处理缩址
         ShortenUrl.expandAll();
         for(var i = 0, len = msgs.length; i < len; i++) {
             var msg = msgs[i];
             ids.push(msg.id);
-            if(msg.retweeted_status){
+            if(msg.retweeted_status) {
                 ids.push(msg.retweeted_status.id);
                 if(msg.retweeted_status.retweeted_status) {
                 	ids.push(msg.retweeted_status.retweeted_status.id);
                 }
-            }else if(msg.status) {
+            } else if(msg.status) {
                 ids.push(msg.status.id);
                 if(msg.status.retweeted_status) {
                 	ids.push(msg.status.retweeted_status.id);
@@ -1478,7 +1482,7 @@ function getSinaTimeline(t, notCheckNew){
             showCounts(t, ids);
         }
         resetScrollTop(t);
-        if(cache.length >= (PAGE_SIZE/2)) {
+        if(cache.length >= (PAGE_SIZE / 2)) {
             showReadMore(t);
         }
     } else if(!notCheckNew) {
@@ -1849,9 +1853,6 @@ function addTimelineMsgs(msgs, t, user_uniqueKey, is_first_time){
         if(_msg_user && String(_msg_user.id) !== c_user_id) {
         	unread += 1;
         }
-//        if(_msg_user) {
-//            unread += 1;
-//        }
     }
     if(!li.hasClass('active')) {
         //清空，让下次点tab的时候重新取
@@ -2965,8 +2966,13 @@ fawave.face = {
     		$face_type_tab.click();
     	}
     	$("#face_box_target_id").val(target_id);
-        var offset = $(ele).offset();
-        f.css({top: offset.top+20, left: offset.left-40}).show();
+        var offset = $(ele).offset(), left = offset.left - 40, arrow_left = 40;
+        if(!$('#replyTextarea').is(':hidden')) {
+            left -= 80;
+            arrow_left = 120;
+        }
+        f.css({top: offset.top+20, left: left}).show();
+        f.find('.layerArrow').css({left: arrow_left});
     },
     hide: function() {
         $("#face_box").hide();

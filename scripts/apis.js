@@ -1993,7 +1993,7 @@ var TSohuAPI = Object.inherits({}, sinaApi, {
 		
 	    oauth_key: '5vi74qXPB5J97GNzsevN',
         oauth_secret: 'fxZbb-07bCvv-BCA1Qci2lO^7wnl0%pRE$mvG1K#',
-        support_max_id: false,
+        support_max_id: true,
         support_search_max_id: false,
         support_comment: true,
         support_repost_comment: false,
@@ -2026,7 +2026,7 @@ var TSohuAPI = Object.inherits({}, sinaApi, {
 	processEmotional: function(str){
 	    return str.replace(/\[([\u4e00-\u9fff,\uff1f,\w]{1,10})\]/g, this.replaceEmotional);
 	},
-	_replaceEmotional: function(m, g1){
+	replaceEmotional: function(m, g1){
 	    var tpl = '<img title="{{title}}" src="{{src}}" />';
 	    if(g1) {
 	        var face = TSOHU_EMOTIONS[g1];
@@ -2147,7 +2147,6 @@ var DiguAPI = Object.inherits({}, sinaApi, {
         user_home_url: 'http://digu.com/',
         search_url: 'http://digu.com/search/',
 		source: 'fawave', 
-	    source2: 'fawave',
 	    support_comment: false,
 	    support_do_comment: false,
 	    support_double_char: false,
@@ -2217,16 +2216,16 @@ var DiguAPI = Object.inherits({}, sinaApi, {
         }
 	}),
 
-    processAt: function (str) { //@***
+    processAt: function(str) { //@***
         str = str.replace(/^@([\w\-\u4e00-\u9fa5|\_]+)/g, '<a target="_blank" href="http://digu.com/search/friend/' +'$1" title="点击打开用户主页">@$1</a>');
         str = str.replace(/([^\w#])@([\w\-\u4e00-\u9fa5|\_]+)/g, '$1<a target="_blank" href="http://digu.com/search/friend/' +'$2" title="点击打开用户主页">@$2</a>');
         
         return str;
     },
     searchMatchReg: /(^|[^a-zA-Z0-9\/])(#)([\w\u4e00-\u9fa5|\_]+)/g,
-    processSearch: function (str) {
-        str = str.replace(this.searchMatchReg, '$1<a title="Search $2$3" href="' + this.config.search_url + '%23$3" target="_blank">$2$3</a>');
-        return str;
+    processSearch: function(str) {
+        return str.replace(this.searchMatchReg, '$1<a title="Search $2$3" href="' 
+            + this.config.search_url + '%23$3" target="_blank">$2$3</a>');
     },
     // return [[hash1, hash_value], ..., [#xxx#, xxx]]
     findSearchText: function(str) {
@@ -2243,7 +2242,7 @@ var DiguAPI = Object.inherits({}, sinaApi, {
     formatSearchText: function(str) { // 格式化主题
     	return '#' + str.trim();
     },
-    processEmotional: function(str){
+    processEmotional: function(str) {
         return str.replace(/\[:(\d{2})\]|\{([\u4e00-\u9fa5,\uff1f]{2,})\}/g, this._replaceEmotional);
     },
     _replaceEmotional: function(m, g, g2){
