@@ -258,14 +258,14 @@ function __displayMessage(msg, show_now) {
 
 function showLoading(){
     var popupView = getPopupView();
-    if(popupView){
+    if(popupView && popupView._showLoading){
         popupView._showLoading();
     }
 };
 
 function hideLoading(){
     var popupView = getPopupView();
-    if(popupView){
+    if(popupView && popupView._hideLoading){
         popupView._hideLoading();
     }
 };
@@ -1785,11 +1785,11 @@ var Instagram = {
 				    bg.IMAGE_URLS[url] = pics;
 	                callback(pics);
 				} else {
-				    callback(null);
+				    callback();
 				}
 			},
 			error: function() {
-				callback(null);
+				callback();
 			}
 		});
 	}
@@ -1825,26 +1825,57 @@ var Instagram2 = {
 
 var Flickr = {
 	host: 'www.flickr.com',
-	url_re: /http:\/\/www\.flickr\.com\/photos\/\w+/i,
+	// http://flic.kr/p/8q4MxW
+	url_re: /http:\/\/(www\.flickr\.com\/photos\/\w+\/\d+|flic\.kr\/p\/[\w\-]+)/i,
 	src_re: /<link\srel\=\"image\_src\"\shref\=\"([^\"]+)\"/i,
+	show_link: true,
+    sync: true,
 	get: function(url, callback) {
+	    var bg = getBackgroundView();
+        if(bg.IMAGE_URLS[url]) {
+            return callback(bg.IMAGE_URLS[url], true);
+        }
 		$.ajax({
 			url: url,
 			success: function(html, status, xhr) {
-				// <link rel="image_src" href="http://farm6.static.flickr.com/5044/5345477530_171cfe59db_m.jpg">
-				var m = Flickr.src_re.exec(html);
-				if(m) {
-					var src = m[1];
-					var pics = {
-						thumbnail_pic: src.replace('_m.', '_s.'),
-						bmiddle_pic: src,
-						original_pic: src.replace('_m.', '.')
-					};
+			    // <div class="photo-div"><img src="http://farm7.static.flickr.com/6133/6014360607_366de2fabe_z.jpg" alt="photo" width="640" height="424"></div>
+				// _z. => _m => _b
+			    //
+			    // view-source:http://www.flickr.com/photos/nihaoblog/69881634/in/photostream/
+			    // => <div class="photo-div"> <img src="http://farm1.static.flickr.com/35/69881634_7f5361cf6d.jpg" alt="photo" width="500" height="375">
+			    // => empty => _m => _z
+				var $doc = $(html);
+                var caption = $doc.find('#meta h1').text();
+                var src = $doc.find('.photo-div img').attr('src');
+				if(src) {
+				    var has_big = src.indexOf('_z.') > 0;
+					var pics = null;
+					if(has_big) {
+					    pics = {
+	                        thumbnail_pic: src.replace('_z.', '_m.'),
+	                        bmiddle_pic: src,
+	                        original_pic: src.replace('_z.', '_b.')
+	                    };
+					} else {
+					    var index = src.lastIndexOf('.');
+					    var u = src.substring(0, index) + '_m' + src.substring(index);
+					    pics = {
+                            thumbnail_pic: u,
+                            bmiddle_pic: u.replace('_m.', '_z.'),
+                            original_pic: src
+                        };
+					}
+					if(caption) {
+                        pics.caption = caption.trim();
+                    }
+                    bg.IMAGE_URLS[url] = pics;
 					callback(pics);
+				} else {
+				    callback();
 				}
 			},
 			error: function() {
-				callback(null);
+				callback();
 			}
 		});
 	}
@@ -2951,3 +2982,74 @@ var xhr_provider = function(onprogress) {
         return xhr;
     };
 };
+
+// http://james.padolsey.com/javascript/special-scroll-events-for-jquery/
+(function(){
+    
+    var special = jQuery.event.special,
+        uid1 = 'D' + (+new Date()),
+        uid2 = 'D' + (+new Date() + 1);
+        
+    special.scrollstart = {
+        setup: function() {
+            
+            var timer,
+                handler =  function(evt) {
+                    
+                    var _self = this,
+                        _args = arguments;
+                    
+                    if (timer) {
+                        clearTimeout(timer);
+                    } else {
+                        evt.type = 'scrollstart';
+                        jQuery.event.handle.apply(_self, _args);
+                    }
+                    
+                    timer = setTimeout( function(){
+                        timer = null;
+                    }, special.scrollstop.latency);
+                    
+                };
+            
+            jQuery(this).bind('scroll', handler).data(uid1, handler);
+            
+        },
+        teardown: function(){
+            jQuery(this).unbind( 'scroll', jQuery(this).data(uid1) );
+        }
+    };
+    
+    special.scrollstop = {
+        latency: 300,
+        setup: function() {
+            
+            var timer,
+                    handler = function(evt) {
+                    
+                    var _self = this,
+                        _args = arguments;
+                    
+                    if (timer) {
+                        clearTimeout(timer);
+                    }
+                    
+                    timer = setTimeout( function(){
+                        
+                        timer = null;
+                        evt.type = 'scrollstop';
+                        jQuery.event.handle.apply(_self, _args);
+                        
+                    }, special.scrollstop.latency);
+                    
+                };
+            
+            jQuery(this).bind('scroll', handler).data(uid2, handler);
+            
+        },
+        teardown: function() {
+            jQuery(this).unbind( 'scroll', jQuery(this).data(uid2) );
+        }
+    };
+    
+})();

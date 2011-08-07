@@ -793,6 +793,8 @@ function changeUser(uniqueKey){
             $("#" + _t + '_timeline .list').html('');
             hideReadMore(_t);
         });
+        // 清空ui缓存数据
+        TWEETS = {};
         checkSupportedTabs(to_user);
         
         // TODO: 获取上次正在查看的tab
@@ -1771,15 +1773,21 @@ function scrollPaging(){
     }
 };
 
-function initScrollPaging(){
-    $(".list_warp").scroll(function(e){
-    	if($(this).attr('scrolling')) {
-    		return;
-    	}
-    	$(this).attr('scrolling', true);
+function _scroll_callback(e) {
+    
+};
+
+function initScrollPaging() {
+    $(".list_warp").bind('scrollstop', function(e){
+//        var $this = $(this);
+//    	if($this.data('scrolling')) {
+//    		return;
+//    	}
+//    	console.log('scrolling')
+//    	$this.data('scrolling', true);
         scrollPaging();
         checkShowGototop();
-        $(this).removeAttr('scrolling');
+//        $this.data('scrolling', false);
     });
 };
 
