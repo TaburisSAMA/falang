@@ -214,7 +214,7 @@ function _load_new_data(t, is_current_tab) {
             // 清空分页数据
             b_view.clean_timeline_cache_data(t);
         }
-        view_status.clear_cache = false;
+        view_status.clean_cache = false;
         b_view.set_view_status(t, view_status);
         $("#" + t + "_timeline ul.list").html('');
         getSinaTimeline(t);
@@ -1814,10 +1814,6 @@ function readMore(t){
     var cache = _b_view.get_data_cache(data_type, c_user.uniqueKey);
     var view_status = _b_view.get_view_status(t, c_user.uniqueKey);
     var timeline_offset = getTimelineOffset(t) + (view_status.index || 0);
-//    //tab上如果有未读数，则需要加上
-//    var unread_count = $("#tl_tabs li.tab-" + t + " .unreadCount").html();
-//    unread_count = Number(unread_count);
-//    unread_count = isNaN(unread_count) ? 0 : unread_count;
     if(!cache || timeline_offset >= cache.length) {
         _b_view.getTimelinePage(c_user.uniqueKey, t);
     } else {
@@ -1934,14 +1930,6 @@ function addPageMsgs(msgs, t, append, data_type){
         var h_new = _ul.height();
         list_warp.scrollTop(h_new - h_old + st_old);
     }
-//    if(append) {
-//        // 设置缓存的页数
-//        var b_view = getBackgroundView();
-//        var view_status = b_view.get_view_status(t);
-//        view_status.size = view_status.size || 0;
-//        view_status.size += msgs.length;
-//        b_view.set_view_status(t, view_status);
-//    }
     return msgs;
 };
 

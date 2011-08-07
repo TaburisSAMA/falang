@@ -263,9 +263,8 @@ function merge_direct_messages(user_uniquekey, new_messages){
 	set_data_cache(messages, 'messages', user_uniquekey);
 };
 
-//获取最新的(未看的)微博
+// 获取最新的(未看的)微博
 // @t : 获取timeline的类型
-// @p : 要附加的请求参数,类型为{}
 function checkTimeline(t, user_uniqueKey) {
     var c_user = null;
     if(!user_uniqueKey) {
@@ -280,7 +279,8 @@ function checkTimeline(t, user_uniqueKey) {
     if(isDoChecking(user_uniqueKey, t, 'checking')){ 
     	return; 
     }
-    if(t === 'direct_messages' && tapi.get_config(c_user).support_sent_direct_messages) {
+    var config = tapi.get_config(c_user);
+    if(t === 'direct_messages' && config.support_sent_direct_messages) {
     	// 私信，则同时获取自己发送的
     	checkTimeline('sent_direct_messages', user_uniqueKey);
     }
@@ -316,15 +316,10 @@ function checkTimeline(t, user_uniqueKey) {
         if(!tweets[_key]){
             tweets[_key] = [];
         }
-        if(!$.isArray(sinaMsgs)) {
+        if(!sinaMsgs || !sinaMsgs.length) {
     		sinaMsgs = [];
     	}
-        if(data.next_cursor !== undefined) {
-            // 保存最新的cursor，用于分页
-            if(sinaMsgs.length > 0) {
-                sinaMsgs[sinaMsgs.length - 1].__pagging_cursor = data.next_cursor;
-            }
-        }
+        var msg_len = sinaMsgs.length;
         // 避免插件启动的时候，无法获取出现的问题
     	var isFirstTime = false;
 		if(tweets[_key].length === 0) {
@@ -346,7 +341,7 @@ function checkTimeline(t, user_uniqueKey) {
                 	// 将私信合并显示
                 	merge_direct_messages(user_uniqueKey, result.olds);
                 }
-        		if(popupView){
+        		if(popupView) {
         			popupView.addTimelineMsgs(result.olds, t, user_uniqueKey, isFirstTime);
         		}
         	}
@@ -410,12 +405,49 @@ function checkTimeline(t, user_uniqueKey) {
             if(!isFirstTime && sinaMsgs.length >= PAGE_SIZE) {
                 // 清除缓存
                 var view_status = get_view_status(t, user_uniqueKey);
-                view_status.clean_cache = true;
-                // 清空旧数据标致位
-                tweets[_key][sinaMsgs.length - 1].__clean_cache_status = true;
-                set_view_status(t, view_status, user_uniqueKey);
+                var now_pos = view_status.index + view_status.size;
+                if(now_pos <= sinaMsgs.length) {
+                    // 查看数据小于数据长度，则直接删除
+                    tweets[_key] = sinaMsgs;
+                } else {
+                    // 清空旧数据标致位
+                    tweets[_key][sinaMsgs.length - 1].__clean_cache_status = true;
+                    view_status.clean_cache = true;
+                    set_view_status(t, view_status, user_uniqueKey);
+                }
+                msg_len = sinaMsgs.length;
             }
     	}
+        if(data.next_cursor !== undefined && msg_len > 0) {
+            // 保存最新的cursor，用于分页
+            tweets[_key][msg_len - 1].__pagging_cursor = data.next_cursor;
+        }
+        // 判断是否需要清除多余的缓存数据，释放内存
+        var max_len = PAGE_SIZE * 5;
+        if(tweets[_key].length > max_len) {
+            var i = max_len - 1;
+            if(config.support_cursor_only) {
+                // 找到最后带有分页cursor的位置
+                var items = tweets[_key];
+                for(; i > 0; i--) {
+                    if(items[i].__pagging_cursor !== undefined) {
+                        break;
+                    }
+                }
+            }
+            // 默认只缓存5页数据
+            var view_status = get_view_status(t, user_uniqueKey);
+            var now_pos = view_status.index + view_status.size - 1;
+            if(now_pos <= i) {
+                // 查看数据小于数据长度，则直接删除
+                tweets[_key] = tweets[_key].slice(0, i + 1);
+            } else {
+                // 清空旧数据标致位
+                tweets[_key][i].__clean_cache_status = true;
+                view_status.clean_cache = true;
+                set_view_status(t, view_status, user_uniqueKey);
+            }
+        }
     	setDoChecking(user_uniqueKey, t, 'checking', false);
     	if(popupView) {
     	    popupView.showReadMore(t);
@@ -430,23 +462,21 @@ function clean_timeline_cache_data(t, user_uniqueKey) {
         user_uniqueKey = getUser().uniqueKey;
     }
     var _key = user_uniqueKey + t + '_tweets';
-    var items = tweets[_key], index = 0;
+    var items = tweets[_key], i = 0;
     if(!items) {
         return;
     }
-    for(var i = 0, len = items.length; i < len; i++) {
-        index = i;
+    for(var len = items.length; i < len; i++) {
         if(items[i].__clean_cache_status) {
             break;
         }
     }
 //    console.log('clean_timeline_cache_data', t, user_uniqueKey, index);
-    tweets[_key] = tweets[_key].slice(0, index + 1);
+    tweets[_key] = tweets[_key].slice(0, i + 1);
 };
 
 //分页获取以前的微博
 // @t : 获取timeline的类型
-// @p : 要附加的请求参数,类型为{}
 function getTimelinePage(user_uniqueKey, t) {
     var c_user = null;
     if(!user_uniqueKey) {
@@ -470,31 +500,30 @@ function getTimelinePage(user_uniqueKey, t) {
         tweets[t_key] = [];
     }
     var params = {user: c_user, count: PAGE_SIZE};
-    var page = null, cursor = null;
-    if(config.support_cursor_only) { // 只支持cursor分页
+    if(config.support_cursor_only) { 
+        // 只支持cursor分页
     	// 先去tweets[t_key]获取最后一个数据是否带cursor，带则使用他，不带则使用last_cursor
     	// 这是最巧妙的地方。。。
     	var length = tweets[t_key].length || 0;
     	if(length > 0 && tweets[t_key][length - 1].__pagging_cursor) {
+    	    var cursor = null;
     		cursor = String(tweets[t_key][length - 1].__pagging_cursor);
     		if(cursor === '0') { // 再无数据
                 return;
             }
     		params.cursor = cursor;
     	} 
+    } else if(config.support_max_id) {
+        // 判断是否支持max_id形式获取数据
+        // 获取最旧的数据id
+        var max_id = getMaxMsgId(t, user_uniqueKey);
+        if(max_id){
+            params['max_id'] = max_id;
+        }
     } else {
-    	// 判断是否支持max_id形式获取数据
-	    if(config.support_max_id) {
-	        // 获取最旧的数据id
-		    var max_id = getMaxMsgId(t, user_uniqueKey);
-		    if(max_id){
-		        params['max_id'] = max_id;
-		    }
-	    } else {
-	    	// count, page 形式
-	        page = Math.round(tweets[t_key].length / PAGE_SIZE);
-	    	params['page'] = page + 1;
-	    }
+        // count, page 形式
+        var page = Math.round(tweets[t_key].length / PAGE_SIZE);
+        params['page'] = page + 1;
     }
 
     setDoChecking(user_uniqueKey, t, 'paging', true);
