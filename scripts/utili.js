@@ -1358,12 +1358,14 @@ var ShortenUrl = {
 		var b_view = getBackgroundView();
 		var cache = b_view.SHORT_URLS;
 		// 这里需要判断
-		var conditions = '[title*="'+ _u.i18n("comm_mbright_to_open") +'"],[videotype], .short_done';
+//		var conditions = '[title*="'+ _u.i18n("comm_mbright_to_open") +'"],[videotype], .short_done';
+		var conditions = '.short_done';
 		var selector = 'a.link:not(' + conditions + ')';
 		var config = tapi.get_config(getUser());
 		if(!config.need_processMsg) {
 		    selector += ', .tweet_text a:not(' + conditions + ')';
 		}
+		var that = this;
 		$(selector).each(function() {
 			var url = $(this).attr('href');
 			if(url.length < 10 || url.indexOf('javascript:') >= 0) {
@@ -1371,7 +1373,7 @@ var ShortenUrl = {
 			        // 豆瓣电台的推荐链接无法点击
 			        // http://api.douban.com/recommendation/89139831
 			        // => search http://music.douban.com/subject_search?search_text=%E3%80%8A%E4%B8%80%E7%94%9F%E6%89%80%E7%88%B1%E3%80%8B+-+%E5%8D%A2%E5%86%A0%E5%BB%B7
-			        $(this).attr('href', 'javascript:;');
+			        $(this).attr('href', 'javascript:;').addClass('short_done');;
 			    }
 				return;
 			}
@@ -1381,31 +1383,30 @@ var ShortenUrl = {
 			    $(this).addClass('short_done');
 			    return;
 			}
-			var cache_data = cache[url];
-			if(cache_data && cache_data.url) {
-				var longurl = cache_data.url;
-				$(this).attr('title', _u.i18n("comm_mbright_to_open") 
-					+ ' ' + longurl).attr('rhref', longurl).addClass('short_done');
-                UrlUtil.showFaviconBefore(this, longurl);
-				if(!VideoService.attempt(cache_data, this)) {
-                	ImageService.attempt({url: longurl, sourcelink: url}, this);
-                }
+			var data = cache[url];
+			if(data && data.url) {
+				that._format_link(this, url, data.url, data);
 			} else {
 				ShortenUrl.expand(url, function(data) {
 					var longurl = data ? data.url: data;
 					if(longurl) {
-						$(this).attr('title', _u.i18n("comm_mbright_to_open") 
-							+ ' ' + longurl).attr('rhref', longurl).addClass('longurl').addClass('short_done');
-						cache[$(this).attr('href')] = data;
-                        UrlUtil.showFaviconBefore(this, longurl);
-						if(!VideoService.attempt(data, this)) {
-		                	ImageService.attempt({url: longurl, sourcelink: url}, this);
-		                }
+					    cache[url] = data;
+					    that._format_link(this, url, longurl, data);
 					}
 				}, this);
 			}
-			
 		});
+	},
+	_format_link: function(ele, url, longurl, data) {
+	    var attrs = {
+            title: _u.i18n("comm_mbright_to_open") + ' ' + longurl,
+            rhref: longurl
+        };
+        $(ele).attr(attrs).addClass('longurl short_done');
+        UrlUtil.showFaviconBefore(ele, longurl);
+        if(!VideoService.attempt(data, ele)) {
+            ImageService.attempt({url: longurl, sourcelink: url}, ele);
+        }
 	},
 	
 	short: function(longurl, callback, name, context) {
