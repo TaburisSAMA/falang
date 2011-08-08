@@ -1246,6 +1246,7 @@ var UrlUtil = {
 
 // shorturl
 var ShortenUrl = {
+    SHORT_SERVICE_RE: /(goo\.gl|t\.co|bit\.ly|lnk\.by|fa\.by|v\.gd|is\.gd|s8\.hk|seso\.me|tinyurl\.com|to\.ly|zi\.mu|2\.ly|aa\.cx|2br\.in)/i,
 	services: {
 		// http://api.t.sina.com.cn/short_url/shorten.json?source=3538199806&url_long=http://www.tudou.com/programs/view/cl_8vhHMCfs/
 		't.cn': {
@@ -1302,20 +1303,30 @@ var ShortenUrl = {
 	expand: function(shorturl, callback, context) {
 		var m = this.SINAURL_RE.exec(shorturl);
 		if(m) {
-			this.expand_sinaurl(shorturl, callback, context);
+			this.expand_sinaurl(shorturl, function(data) {
+			    if(data && data.url && this.SHORT_SERVICE_RE.test(data.url)) {
+			        this._expand(data.url, callback, context);
+			    } else {
+			        callback.call(context, data);
+			    }
+			}, this);
 		} else {
-			var url = 'http://api.yongwo.de/api/e?f=json&u=' + shorturl;
-    		$.ajax({
-    			url: url,
-    			dataType: 'json',
-    			success: function(data, status, xhr) {
-    				callback.call(context, data);
-    			}, 
-    			error: function(xhr, status) {
-    				callback.call(context, null);
-    			}
-    		});
+		    this._expand(shorturl, callback, context);
 		}
+	},
+	
+	_expand: function(shorturl, callback, context) {
+	    var url = 'http://api.yongwo.de/api/e?f=json&u=' + shorturl;
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            success: function(data, status, xhr) {
+                callback.call(context, data);
+            }, 
+            error: function(xhr, status) {
+                callback.call(context, null);
+            }
+        });
 	},
 	
 	SINAURL_RE: /http:\/\/(?:t|sinaurl)\.cn\/(\w+)/i,
@@ -1377,7 +1388,7 @@ var ShortenUrl = {
 				that._format_link(this, url, data.url, data);
 			} else {
 				ShortenUrl.expand(url, function(data) {
-					var longurl = data ? data.url: data;
+					var longurl = data ? (data.url || data) : null;
 					if(longurl) {
 					    cache[url] = data;
 					    that._format_link(this, url, longurl, data);
