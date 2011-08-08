@@ -26,12 +26,7 @@ var _u = {
     },
     //获取本地化语言
     i18n: function(s, e){
-        var re = chrome.i18n.getMessage(s, e);
-        if(re){
-            return re;
-        }else{
-            return s;
-        }
+        return chrome.i18n.getMessage(s, e) || s;
     }
 };
 
@@ -216,18 +211,19 @@ function showMsg(msg, show_now){
     }
 };
 // 缓冲错误信息，不要一次过显示一堆
-var __msg_buffers = [];
+var __msg_next = null;
 // show_now: 是否马上显示，用于非错误提示
 function _showMsg(msg, show_now) {
-	if(show_now) {
-		__displayMessage(msg, show_now);
-	} else {
-	    // 已存在的信息，不显示
-        __msg_buffers.push(msg);
-        if(__msg_buffers.length === 1) {
-        	__displayMessage(msg);
-        }
-	}
+//    show_now = msg.indexOf('error:') < 0;
+    if(show_now) {
+        return __displayMessage(msg, show_now);
+    }
+    if(__msg_next) {
+        __msg_next = msg;
+    } else {
+        __displayMessage(msg);
+        __msg_next = msg;
+    }
 };
 
 function __displayMessage(msg, show_now) {
@@ -238,20 +234,13 @@ function __displayMessage(msg, show_now) {
         .fadeOut('slow', function() {
         	$(this).remove();
         	if(!show_now) {
-        	    var next_msg = null;
-        	    while(true) {
-        	        // 过滤重复的
-        	        next_msg = __msg_buffers.shift();
-        	        if(!next_msg || next_msg !== msg || __msg_buffers.length === 0) {
-        	            if(next_msg === msg) {
-        	                next_msg = null;
-        	            }
-        	            break;
-        	        }
-        	    }
-            	if(next_msg) {
-            		__displayMessage(next_msg);
-            	}
+        	    if(__msg_next) {
+                    if(__msg_next !== msg) {
+                        __displayMessage(__msg_next);
+                    } else {
+                        __msg_next = null;
+                    }
+                }
         	}
         });
 }
@@ -675,7 +664,7 @@ function getBackgroundView() {
             var views = chrome.extension.getViews();
             for (var i = 0; i < views.length; i++) {
                 var view = views[i];
-                if (view.theViewName && view.theViewName == 'background') {
+                if (view.theViewName && view.theViewName === 'background') {
                     _bg_view = view;
                     break;
                 }
@@ -689,7 +678,7 @@ function getPopupView(){
     var views = chrome.extension.getViews();
     for (var i = 0; i < views.length; i++) {
         var view = views[i];
-        if (view.theViewName && view.theViewName == 'popup') {
+        if (view.theViewName && view.theViewName === 'popup') {
             return view;
         }
     }

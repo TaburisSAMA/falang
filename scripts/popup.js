@@ -1728,7 +1728,7 @@ function showReadMoreLoading(t){
 };
 //隐藏获取分页loading
 function hideReadMoreLoading(t){
-	if(t == 'friends') {
+	if(t === 'friends') {
 		t = 'followers';
 	}
     $("#" + t + "_rm_loading").hide();
@@ -1754,8 +1754,9 @@ function scrollPaging(){
     var list_warp = $(c_t + ' .list_warp');
     h = h - list_warp.height();
     var scroll_top = list_warp.scrollTop();
+//    console.log('scroll ' + tl, scroll_top, h);
     if(scroll_top >= h){
-//    	log('scroll ' + tl);
+//    	console.log('scroll ' + tl);
         if(c_t == '#followers_timeline'){ //粉丝列表特殊处理
             readMoreFans();
         } else if(tl == 'favorites') {
@@ -1773,17 +1774,12 @@ function scrollPaging(){
     }
 };
 
-function _scroll_callback(e) {
-    
-};
-
 function initScrollPaging() {
     $(".list_warp").bind('scrollstop', function(e){
 //        var $this = $(this);
 //    	if($this.data('scrolling')) {
 //    		return;
 //    	}
-//    	console.log('scrolling')
 //    	$this.data('scrolling', true);
         scrollPaging();
         checkShowGototop();

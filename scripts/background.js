@@ -531,8 +531,9 @@ function getTimelinePage(user_uniqueKey, t) {
 //    console.log('bg_pagging', t, params.user.screen_name, 'cursor:', params.cursor, 'max_id:', params.max_id, 'page:', params.page);
     tapi[t](params, function(data, textStatus) {
     	hideLoading();
+    	var sinaMsgs = null;
     	if(data && !data.error && textStatus != 'error') {
-    		var sinaMsgs = data.items || data;
+    		sinaMsgs = data.items || data;
         	if($.isArray(sinaMsgs)) {
         		if(sinaMsgs.length > 0){
                     var max_id = null;
@@ -557,10 +558,10 @@ function getTimelinePage(user_uniqueKey, t) {
             	// 保存paging cursor信息
         		tweets[t_key][tweets[t_key].length - 1].__pagging_cursor = String(data.next_cursor);
         	}
-            // 设置翻页和填充新数据到ui列表的后面显示
-            _showReadMore(t, user_uniqueKey, sinaMsgs);
     	}
         setDoChecking(user_uniqueKey, t, 'paging', false);
+        // 设置翻页和填充新数据到ui列表的后面显示
+        _showReadMore(t, user_uniqueKey, sinaMsgs);
     });
 };
 
@@ -569,7 +570,7 @@ function getTimelinePage(user_uniqueKey, t) {
 function _showReadMore(t, user_uniqueKey, datas) {
 	var current_user = getUser();
     //防止获取分页内容后已经切换了用户
-    if(current_user.uniqueKey == user_uniqueKey) { 
+    if(current_user.uniqueKey === user_uniqueKey) { 
     	// TODO:更详细逻辑有待改进
         var popupView = getPopupView();
         if(popupView) {
@@ -581,7 +582,11 @@ function _showReadMore(t, user_uniqueKey, datas) {
                     popupView.hideReadMore(t, true);
                 }
         	} else { // 获取数据异常
-        		popupView.showReadMore(t);
+        	    popupView.hideReadMoreLoading(t);
+        	    setTimeout(function() {
+        	        popupView = getPopupView();
+        	        return popupView && popupView.showReadMore(t);
+        	    }, 10000);
         	}
         }
     }
