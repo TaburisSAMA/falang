@@ -1060,6 +1060,12 @@ function saveScrollTop(t) {
         }
         total_height += height;
     });
+    var $comments = $('div.comments:visible');
+    if($comments.length > 0) {
+        $comments.each(function() {
+            view_status.scrollTop -= $(this).height();
+        });
+    }
     view_status.size = item_index + 5;
     b_view.set_view_status(t, view_status);
 };
