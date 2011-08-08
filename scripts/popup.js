@@ -131,6 +131,20 @@ function init(){
     adShow();
     
     restoreActionCache();
+    
+    // 绑定缩短网址事件
+    var $urlshorten_span = $("#urlShortenInp").parent();
+    if($urlshorten_span.length > 0) {
+        $urlshorten_span.mouseenter(function() {
+            $("#urlShortenInp").addClass('long').select();
+        }).mouseleave(function() {
+            $("#urlShortenInp").removeClass('long');
+        }).keypress(function(event) {
+            if(event.which === 13) {
+                addShortenUrl();
+            }
+        });
+    }
 };
 
 function initializeMap(){};//给载入地图api调用
@@ -370,7 +384,7 @@ function sendMsgByActionType(c) { // c:要发送的内容
                 c += ' ' + info.link;
             }
             __sendMsgByActionType(c);
-            $progress.hide();
+            $progress.hide().find('div').css({'border-left-width': '0px'}).find('span').html('');
         }, function(rpe) {
             // progress
             var html = display_size(rpe.loaded) + "/" + display_size(rpe.total);
@@ -459,48 +473,34 @@ function _shortenUrl(longurl, settings, callback) {
 
 // 添加缩短url
 function addShortenUrl(){
-    var btn = $("#urlShortenBtn");
-    var status = btn.data('status');
+    var $btn = $("#urlShortenBtn");
+    var status = $btn.data('status');
     switch(status){
         case 'shorting':
             showMsg(_u.i18n("msg_shorting_and_wait"));
             break;
-        case 'opened':
-            var long_url = $("#urlShortenInp").val();
-            if(!long_url){
+        default:
+            var $text = $("#urlShortenInp");
+            var long_url = $text.addClass('long').val();
+            if(!long_url) {
+                $text.focus();
                 return;
             }
-            btn.data('status', 'shorting');
-            $("#urlShortenInp").val(_u.i18n("msg_shorting")).attr('disabled', true);
+            $btn.data('status', 'shorting');
+            $text.val(_u.i18n("msg_shorting")).attr('disabled', true);
             ShortenUrl.short(long_url, function(shorturl){
                 if(shorturl){
-                    $("#txtContent").val($("#txtContent").val() + ' ' + shorturl + ' ');
-                    $("#urlShortenInp").removeClass('long').val('');
-                    btn.data('status', ''); 
+                    var $content = $("#txtContent");
+                    $content.val($content.val() + ' ' + shorturl + ' ');
+                    $text.val('');
                 }else{
                     showMsg(_u.i18n("msg_shorten_fail"));
-                    $("#urlShortenInp").val(long_url);
-                    btn.data('status', 'opened'); //失败，仍然标记为打开的
+                    $text.val(long_url);
                 }
-                $("#urlShortenInp").removeAttr('disabled');
+                $btn.data('status', null);
+                $text.removeAttr('disabled');
             });
             break;
-        default:
-            btn.data('status', 'opened');
-            $("#urlShortenInp").addClass('long').focus();
-            break;
-    }
-};
-function showAddShortenUrl(){
-    var btn = $("#urlShortenBtn");
-    if(!btn.data('status')){
-        btn.data('status', 'opened');
-        $("#urlShortenInp").addClass('long').focus();
-    }
-};
-function enterAddShortenUrl(e){
-    if(e.keyCode == '13') {
-        addShortenUrl();
     }
 };
 
@@ -865,8 +865,9 @@ function initSelectSendAccounts(){
     }
     if(has_sina && has_other) {
         // 只有同时有新浪微博和其他类型，才显示保留数据的选项
-        li.push('<div id="remember_send_data_ctr"><input checked="checked" type="checkbox" id="remember_send_data" /><label for="remember_send_data">' 
-            + _u.i18n("abb_keep_send_data") + '</label></div>');
+        var keep_data_btn = '<span id="remember_send_data_ctr"><input checked="checked" type="checkbox" id="remember_send_data" /><label for="remember_send_data">' 
+            + _u.i18n("abb_keep_send_data") + '</label></span>';
+        $('#btnSend').before(keep_data_btn);
     }
     afs.html('TO(<a class="all" href="javascript:" onclick="toggleSelectAllSendAccount()">' 
         + _u.i18n("abb_all") +'</a>): ' + li.join(''));
@@ -2078,6 +2079,7 @@ function _get_image_url(stat, callback, onprogress, context) {
             if(info && info.link) {
                 image_url = info.link;
             }
+            $('#upImgPreview .loading_bar').hide().find('div').css({'border-left-width': '0px'}).find('span').html('');
             callback.call(context, image_url);
         }, onprogress, context);
     } else {
@@ -2140,6 +2142,7 @@ function _sendMsgWraper(msg, user, stat, selLi, pic) {
         if(stat.sendedCount >= stat.userCount) {// 全部发送完成
             selLi = null;
             $("#btnSend, #txtContent").removeAttr('disabled');
+            $('#upImgPreview .loading_bar').hide().find('div').css({'border-left-width': '0px'}).find('span').html('');
             if(stat.successCount > 0) { // 有发送成功的
                 setTimeout(callCheckNewMsg, 1000, 'friends_timeline');
                 var failCount = stat.userCount - stat.successCount;
@@ -2965,7 +2968,7 @@ fawave.face = {
     	}
     	$("#face_box_target_id").val(target_id);
         var offset = $(ele).offset(), left = offset.left - 40, arrow_left = 40;
-        if(!$('#replyTextarea').is(':hidden')) {
+        if($('#replyTextarea').length > 0 && !$('#replyTextarea').is(':hidden')) {
             left -= 80;
             arrow_left = 120;
         }

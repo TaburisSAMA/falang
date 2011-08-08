@@ -801,7 +801,7 @@ div.loading_bar span {
 }
 
 #remember_send_data_ctr {
-	margin: 3px 0 5px 5px;
+	margin-left: 30px;
 }
 #remember_send_data_ctr * {
     cursor:pointer;

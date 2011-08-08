@@ -70,10 +70,11 @@
 				<script>_u.wia('#btnUploadPic','title','btn_pic_title');</script>&nbsp;
 				<button onclick="cleanTxtContent();" class="btn"><script>_u.wi('comm_clear')</script></button>
 				<span id="doingWarp"></span>
+				<span>
 				<a id="urlShortenBtn" href="javascript:" onclick="addShortenUrl()"><img src="images/link_add.png" /></a>
 				<script>_u.wia('#urlShortenBtn','title','comm_url_shorten');</script>
-				<input type="text" id="urlShortenInp" onclick="showAddShortenUrl()" onkeyup="enterAddShortenUrl(event)" />
-				
+				<input type="text" id="urlShortenInp" />
+				</span>
 				<input id="btnSend" type="button" class="btn send" disabled="disabled" />
 				<script>_u.wia('#btnSend','value','comm_send'); _u.wia('#btnSend','title','comm_send_tip');</script>
 			</div>
