@@ -283,11 +283,24 @@ function _get_clipboard_file(e, callback) {
     }
 };
 
+function _init_image_preview(image_src, size, preview_id, btn_id, top_padding, left_padding) {
+    $("#" + preview_id + " .img").html('<img class="pic" src="' + image_src + '" />');
+    left_padding = left_padding || -30;
+    top_padding = top_padding || 20;
+    var offset = $('#' + btn_id).offset();
+    $("#" + preview_id).data('uploading', false).css({
+        left:offset.left + left_padding, 
+        top:offset.top + top_padding
+    }).show()
+    .find('.loading_bar div').css({'border-left-width': '0px'})
+    .find('span').html(display_size(size));
+};
+
 function initTxtContentEven(){
     //>>>发送微博事件初始化 开始<<<
     var unsendTweet = localStorage.getObject(UNSEND_TWEET_KEY);
     var $txtContent = $("#txtContent"), $replyText = $("#replyTextarea");
-    if(unsendTweet){
+    if(unsendTweet) {
         $txtContent.val(unsendTweet);
     }
 
@@ -299,12 +312,7 @@ function initTxtContentEven(){
             if(file){
                 window.imgForUpload = file;
                 window.imgForUpload.fileName = 'fawave.png';
-                $("#upImgPreview .img").html('<img class="pic" src="' + image_src + '" />');
-                var eleid = '#btnUploadPic', left_padding = -30, top_padding = 20;
-                var offset = $(eleid).offset();
-                $("#upImgPreview").css({left:offset.left + left_padding, 
-                    top:offset.top + top_padding}).show()
-                    .find('.loading_bar').hide();
+                _init_image_preview(image_src, file.size, 'upImgPreview', 'btnUploadPic');
             }
         });
     };
@@ -352,12 +360,7 @@ function initTxtContentEven(){
                 if(file){
                     window.imgForUpload_reply = file;
                     window.imgForUpload_reply.fileName = 'fawave_reply.png';
-                    $("#upImgPreview_reply .img").html('<img class="pic" src="' + image_src + '" />');
-                    var eleid = '#btnAddReplyEmotional', left_padding = -30, top_padding = 60;
-                    var offset = $(eleid).offset();
-                    $("#upImgPreview_reply").css({left:offset.left + left_padding, 
-                        top:offset.top + top_padding, 'z-index': 1000}).show()
-                        .find('.loading_bar').hide();
+                    _init_image_preview(image_src, file.size, 'upImgPreview_reply', 'btnAddReplyEmotional', 60);
                     countReplyText();
                 }
             });
@@ -377,19 +380,17 @@ function sendMsgByActionType(c) { // c:要发送的内容
     $("#replySubmit, #replyTextarea").attr('disabled', true);
     if(window.imgForUpload_reply) {
         // 增加图片链接
-        var $progress = $('#upImgPreview_reply .loading_bar');
-        $progress.show();
         Immio.upload({}, window.imgForUpload_reply, function(error, info) {
             if(info && info.link) {
                 c += ' ' + info.link;
             }
             __sendMsgByActionType(c);
-            $progress.hide().find('div').css({'border-left-width': '0px'}).find('span').html('');
         }, function(rpe) {
             // progress
+            var $loading_bar = $('#upImgPreview_reply .loading_bar');
             var html = display_size(rpe.loaded) + "/" + display_size(rpe.total);
-            var width = parseInt((rpe.loaded / rpe.total) * $progress.width());
-            $progress.find('div').css({'border-left-width': width + 'px'}).find('span').html(html);
+            var width = parseInt((rpe.loaded / rpe.total) * $loading_bar.width());
+            $loading_bar.find('div').css({'border-left-width': width + 'px'}).find('span').html(html);
         });
     } else {
         __sendMsgByActionType(c);
@@ -865,9 +866,10 @@ function initSelectSendAccounts(){
     }
     if(has_sina && has_other) {
         // 只有同时有新浪微博和其他类型，才显示保留数据的选项
-        var keep_data_btn = '<span id="remember_send_data_ctr"><input checked="checked" type="checkbox" id="remember_send_data" /><label for="remember_send_data">' 
-            + _u.i18n("abb_keep_send_data") + '</label></span>';
-        $('#btnSend').before(keep_data_btn);
+        var $keep_data_btn = $('<span id="remember_send_data_ctr"><input checked="checked" type="checkbox" id="remember_send_data" /><label for="remember_send_data">' 
+            + _u.i18n("abb_keep_send_data") + '</label></span>');
+        var $sendBtn = $('#btnSend');
+        $sendBtn.before($keep_data_btn.css({right: ($sendBtn.width() + 50) + 'px'}));
     }
     afs.html('TO(<a class="all" href="javascript:" onclick="toggleSelectAllSendAccount()">' 
         + _u.i18n("abb_all") +'</a>): ' + li.join(''));
@@ -2066,7 +2068,6 @@ function _get_image_url(stat, callback, onprogress, context) {
         if(!onprogress) {
             var $loading_bar = $('#upImgPreview .loading_bar');
             if($loading_bar.length > 0) {
-                $loading_bar.show();
                 onprogress = function(rpe) {
                     // progress
                     var html = display_size(rpe.loaded) + "/" + display_size(rpe.total);
@@ -2079,7 +2080,6 @@ function _get_image_url(stat, callback, onprogress, context) {
             if(info && info.link) {
                 image_url = info.link;
             }
-            $('#upImgPreview .loading_bar').hide().find('div').css({'border-left-width': '0px'}).find('span').html('');
             callback.call(context, image_url);
         }, onprogress, context);
     } else {
@@ -2131,7 +2131,7 @@ function _sendMsgWraper(msg, user, stat, selLi, pic) {
                 // 清除url数据
                 $("#txtContent").val('').data({source_url: '', short_url: ''});
                 window.imgForUpload = null;
-                $('#upImgPreview').hide();
+                $('#upImgPreview').hide().find('.img').html('');
                 hideMsgInput();
                 selLi.addClass('sel');
             } else {
@@ -2142,7 +2142,6 @@ function _sendMsgWraper(msg, user, stat, selLi, pic) {
         if(stat.sendedCount >= stat.userCount) {// 全部发送完成
             selLi = null;
             $("#btnSend, #txtContent").removeAttr('disabled');
-            $('#upImgPreview .loading_bar').hide().find('div').css({'border-left-width': '0px'}).find('span').html('');
             if(stat.successCount > 0) { // 有发送成功的
                 setTimeout(callCheckNewMsg, 1000, 'friends_timeline');
                 var failCount = stat.userCount - stat.successCount;
@@ -2163,8 +2162,8 @@ function _sendMsgWraper(msg, user, stat, selLi, pic) {
         var data = {status: msg};
         pic = {file: pic};
         var $loading_bar = $('#upImgPreview .loading_bar'), onprogress = null;
-        if($loading_bar.is(':hidden')) {
-            $loading_bar.show();
+        if(!$loading_bar.data('uploading')) {
+            $loading_bar.data('uploading', true);
             onprogress = function(rpe) {
                 // progress
                 var html = display_size(rpe.loaded) + "/" + display_size(rpe.total);
@@ -2355,7 +2354,7 @@ function hideReplyInput(){
     // 清除 ActionCache
     cleanActionCache();
     window.imgForUpload_reply = null;
-    $('#upImgPreview_reply').hide().find('.loading_bar').hide();
+    $('#upImgPreview_reply').hide().find('.img').html('');
 };
 
 function resizeFawave(w, h){
@@ -2583,6 +2582,7 @@ function doRT(ele, is_rt, is_rt_rt) {
     
     if(!original_pic) {
     	// 没图片，则打开文本框
+        window.imgForUpload = null;
     	showMsgInput();
     }
     var name = config.rt_at_name ? (_msg_user.name || _msg_user.id) : _msg_user.screen_name;

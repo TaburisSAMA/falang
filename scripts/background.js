@@ -423,7 +423,7 @@ function checkTimeline(t, user_uniqueKey) {
             tweets[_key][msg_len - 1].__pagging_cursor = data.next_cursor;
         }
         // 判断是否需要清除多余的缓存数据，释放内存
-        var max_len = PAGE_SIZE * 3;
+        var max_len = PAGE_SIZE * 4;
         if(tweets[_key].length > max_len) {
             var i = max_len - 1;
             if(config.support_cursor_only) {

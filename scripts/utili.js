@@ -2966,12 +2966,15 @@ function build_upload_params(data, pic) {
 }
 
 function display_size(bytes){   // simple function to show a friendly size
-    var i = 0;
+    var i = 0, fixed = 0;
     while(1023 < bytes){
         bytes /= 1024;
         ++i;
     };
-    return  i ? bytes.toFixed(2) + ["", " Kb", " Mb", " Gb", " Tb"][i] : bytes + " bytes";
+    if(i > 1) {
+        fixed = 1;
+    }
+    return bytes.toFixed(fixed) + [" B", " KB", " MB", " GB", " TB"][i];
 };
 
 var xhr_provider = function(onprogress) {

@@ -56,7 +56,7 @@ function init() {
 				e.clipboardData.items;
         items = items || [];
 		for(var i=0; i<items.length; i++){
-            if(items[i].kind == 'file'){
+            if(items[i].kind === 'file'){
                 f = items[i].getAsFile();
                 break;
             }
@@ -472,7 +472,7 @@ function selectFile(fileEle, file_only){
         if(check){
             var reader = new FileReader();
             reader.onload = function(e){
-                $("#imgPreview").html('<img class="pic" src="' + e.target.result + '" />');
+                $("#imgPreview").html('<span>file size: ' + display_size(file.size) + '</span><br/><img class="pic" src="' + e.target.result + '" />');
             };
             reader.readAsDataURL(file);
         }
