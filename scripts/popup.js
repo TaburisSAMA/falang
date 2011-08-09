@@ -7,8 +7,7 @@ function getTimelineOffset(t){
 };
 
 function initOnLoad(){
-    init();
-    //setTimeout(init, 10); //为了打开的时候不会感觉太卡
+    setTimeout(init, 10); //为了打开的时候不会感觉太卡
 };
 
 var POPUP_CACHE = {};
@@ -71,7 +70,6 @@ function init(){
     $('#ye_dialog_close').click(function(){ hideReplyInput(); });
 
     initTabs();
-    
     initTxtContentEven();
 
     initChangeUserList();
@@ -88,14 +86,6 @@ function init(){
 
     initScrollPaging();
 
-    $(window).unload(function(){ initOnUnload(); }); 
-
-    //google map api，为了不卡，最后才载入
-    var script = document.createElement("script"); 
-    script.type = "text/javascript"; 
-    script.src = "http://maps.google.com/maps/api/js?sensor=false&callback=initializeMap"; 
-    document.body.appendChild(script);
-    
     // 注册 查看原始围脖的按钮事件
     $('a.show_source_status_btn').live('click', function() {
     	var $this = $(this);
@@ -145,6 +135,14 @@ function init(){
             }
         });
     }
+    
+    $(window).unload(function(){ initOnUnload(); }); 
+    
+    //google map api，为了不卡，最后才载入
+    var script = document.createElement("script"); 
+    script.type = "text/javascript"; 
+    script.src = "http://maps.google.com/maps/api/js?sensor=false&callback=initializeMap"; 
+    document.body.appendChild(script);
 };
 
 function initializeMap(){};//给载入地图api调用
@@ -382,7 +380,12 @@ function sendMsgByActionType(c) { // c:要发送的内容
         // 增加图片链接
         Immio.upload({}, window.imgForUpload_reply, function(error, info) {
             if(info && info.link) {
-                c += ' ' + info.link;
+                if($('#repostTweetId').val()) {
+                    // repost
+                    c = info.link + ' ' + c; // 图片放前面
+                } else {
+                    c += ' ' + info.link;
+                }
             }
             __sendMsgByActionType(c);
         }, function(rpe) {
