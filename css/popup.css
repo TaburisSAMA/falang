@@ -723,9 +723,8 @@ div.loading_bar {
 div.loading_bar div {
 	height:18px;
 	border-left:1px solid green;
-	background-color:#EEEEEE;
 	border-left-width: 0px;
-	border-radius: 0 0 5px 5px;
+	border-radius: 0 0 5px 0;
 }
 div.loading_bar span {
 	position:absolute;top:0;left:10px;height:18px;
