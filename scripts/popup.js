@@ -869,7 +869,7 @@ function initSelectSendAccounts(){
         var $keep_data_btn = $('<span id="remember_send_data_ctr"><input checked="checked" type="checkbox" id="remember_send_data" /><label for="remember_send_data">' 
             + _u.i18n("abb_keep_send_data") + '</label></span>');
         var $sendBtn = $('#btnSend');
-        $sendBtn.before($keep_data_btn.css({right: ($sendBtn.width() + 50) + 'px'}));
+        $sendBtn.before($keep_data_btn.css({right: ($sendBtn.width() + 30) + 'px'}));
     }
     afs.html('TO(<a class="all" href="javascript:" onclick="toggleSelectAllSendAccount()">' 
         + _u.i18n("abb_all") +'</a>): ' + li.join(''));
