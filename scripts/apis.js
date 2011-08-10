@@ -3014,6 +3014,8 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
     },
 	
 	before_sendRequest: function(args) {
+		args.data.include_entities = 'true';
+		args.data.contributor_details = 'true';
 		if(args.url == this.config.repost) {
 			if(args.data.sina_id) {
 				args.data.in_reply_to_status_id = args.data.sina_id;
@@ -3034,12 +3036,30 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 			args.data.per_page = args.data.count;
 			delete args.data.count;
 		}
+		args.url = '/1' + args.url;
     },
 
     format_result_item: function(data, play_load, args) {
 		if(play_load == 'status' && data.id) {
             data.id = data.id_str || data.id;
             data.in_reply_to_status_id = data.in_reply_to_status_id_str || data.in_reply_to_status_id;
+            // check media
+            if(data.entities && data.entities.media && data.entities.media.length > 0) {
+            	var entities = data.entities;
+            	if(entities.media && entities.media.length > 0) {
+	            	for(var i = 0, len = entities.media.length; i < len; i++) {
+	            		var media = entities.media[i];
+	            		if(media.type === 'photo') {
+	            			data.thumbnail_pic = media.media_url;
+	        				data.bmiddle_pic = data.thumbnail_pic;
+	        				data.original_pic = data.thumbnail_pic;
+	        				data.text = data.text.replace(media.url, ''); // 去除图片链接尾巴
+	            			break;
+	            		}
+	            	}
+            	}
+            	delete data.entities;
+            }
 			var tpl = this.config.user_home_url + '{{user.screen_name}}/status/{{id}}';
 			if(data.retweeted_status) {
                 data.retweeted_status.id = data.retweeted_status.id_str || data.retweeted_status.id;

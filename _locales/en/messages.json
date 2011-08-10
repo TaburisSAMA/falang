@@ -346,7 +346,7 @@
         "description": "查看原信息"
     },
     "comm_show_original_pic": {
-        "message": "View the original picture",
+        "message": "Original photo",
         "description": "查看原图"
     },
     "comm_show_original_vedio": {
