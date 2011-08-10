@@ -2972,7 +2972,7 @@ fawave.face = {
     	$("#face_box_target_id").val(target_id);
         var offset = $(ele).offset(), left = offset.left - 40, arrow_left = 40;
         if($('#replyTextarea').length > 0 && !$('#replyTextarea').is(':hidden')) {
-            left -= 80;
+            left = $('#ye_dialog_window').position().left;
             arrow_left = 120;
         }
         f.css({top: offset.top+20, left: left}).show();
