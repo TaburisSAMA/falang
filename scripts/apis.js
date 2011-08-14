@@ -3036,7 +3036,9 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 			args.data.per_page = args.data.count;
 			delete args.data.count;
 		}
-		args.url = '/1' + args.url;
+		if(args.url.indexOf('/oauth') < 0) {
+		    args.url = '/1' + args.url;
+		}
     },
 
     format_result_item: function(data, play_load, args) {
