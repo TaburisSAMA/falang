@@ -3036,7 +3036,7 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 			args.data.per_page = args.data.count;
 			delete args.data.count;
 		}
-		if(args.url.indexOf('/oauth') < 0) {
+		if(this.config.host === 'https://api.twitter.com' && args.url.indexOf('/oauth') < 0) {
 		    args.url = '/1' + args.url;
 		}
     },
@@ -3123,7 +3123,7 @@ var StatusNetAPI = Object.inherits({}, TwitterAPI, {
     format_result_item: function(data, play_load, args) {
 		if(play_load == 'user' && data && data.id) {
 			//data.t_url = ;
-		} else if(play_load == 'status') {
+		} else if(play_load === 'status') {
 			if(!data.user) { // search data
 				data.user = {
 					screen_name: data.from_user,
@@ -3134,10 +3134,52 @@ var StatusNetAPI = Object.inherits({}, TwitterAPI, {
 				delete data.from_user;
 				delete data.from_user_id;
 			}
+			if(data.attachments) {
+                for(var i = 0, l = data.attachments.length; i < l; i++) {
+                    var attachment = data.attachments[i];
+                    if(attachment.mimetype && attachment.mimetype.indexOf('image') >= 0) {
+                        data.thumbnail_pic = attachment.url;
+                        data.bmiddle_pic = data.thumbnail_pic;
+                        data.original_pic = data.thumbnail_pic;
+                    }
+                }
+            }
 		}
 
 		return this.super_.format_result_item.apply(this, [data, play_load, args]);
 	}
+});
+
+// t.taobao.org
+var TaobaoStatusNetAPI = Object.inherits({}, StatusNetAPI, {
+    
+    // 覆盖不同的参数
+    config: Object.inherits({}, StatusNetAPI.config, {
+        host: 'http://t.taobao.org/api',
+        user_home_url: 'http://t.taobao.org/',
+        search_url: 'http://t.taobao.org/tag/',
+        source: 'FaWave', // Basic Auth 会显示这个，不过显示不了链接
+//        oauth_key: 'c71100649f6c6cfb4eebbacca18de8f6',
+//        oauth_secret: 'f3ef411594e624f7eda7e1c0ae6b9029',
+        repost_pre: 'RT',
+        support_double_char: false,
+        support_comment: true,
+        support_do_comment: true,
+        support_repost: true,
+        support_upload: true,
+        support_repost_timeline: true,
+        support_sent_direct_messages: true,
+        support_auto_shorten_url: true,
+        support_user_search: false, //暂时屏蔽
+        user_timeline_need_friendship: false,
+        search: '/search_statuses',
+        repost: '/statuses/update',
+        retweet: '/statuses/retweet/{{id}}',
+        favorites_create: '/favorites/create/{{id}}',
+        friends_timeline: '/statuses/home_timeline',
+        upload: '/statuses/update',
+        search: '/search.json?q='
+    })
 });
 
 
@@ -5515,6 +5557,7 @@ var T_APIS = {
     'identi_ca': StatusNetAPI,
     'tumblr': TumblrAPI,
     'tianya': TianyaAPI,
+    't_taobao': TaobaoStatusNetAPI,
 	'twitter': TwitterAPI // fxxx gxfxw first.
 };
 

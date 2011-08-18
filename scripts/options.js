@@ -21,6 +21,7 @@ var SUPPORT_AUTH_TYPES = {
 	'plurk': ['baseauth'],
     'identi_ca': ['oauth', 'baseauth'],
     'tianya': ['oauth'],
+    't_taobao': ['baseauth'],
     'tumblr': ['baseauth']
 };
 
