@@ -3096,6 +3096,7 @@ var StatusNetAPI = Object.inherits({}, TwitterAPI, {
 	config: Object.inherits({}, sinaApi.config, {
 		host: 'http://identi.ca/api',
         user_home_url: 'http://identi.ca/',
+        status_prev_url: 'http://identi.ca/notice/',
         search_url: 'http://identi.ca/tag/',
 		source: 'FaWave', //Basic Auth 会显示这个，不过显示不了链接
         oauth_key: 'c71100649f6c6cfb4eebbacca18de8f6',
@@ -3119,11 +3120,17 @@ var StatusNetAPI = Object.inherits({}, TwitterAPI, {
         friends_timeline: '/statuses/home_timeline',
         search: '/search.json?q='
 	}),
-    
+	
     format_result_item: function(data, play_load, args) {
-		if(play_load == 'user' && data && data.id) {
-			//data.t_url = ;
+        data = this.super_.format_result_item.apply(this, [data, play_load, args]);
+		if(play_load === 'user' && data && data.id) {
+		    if(data.statusnet_profile_url) {
+		        data.t_url = data.statusnet_profile_url;
+		    } else {
+		        data.t_url = this.config.user_home_url + data.screen_name;
+		    }
 		} else if(play_load === 'status') {
+		    data.t_url = this.config.status_prev_url + data.id;
 			if(!data.user) { // search data
 				data.user = {
 					screen_name: data.from_user,
@@ -3145,8 +3152,7 @@ var StatusNetAPI = Object.inherits({}, TwitterAPI, {
                 }
             }
 		}
-
-		return this.super_.format_result_item.apply(this, [data, play_load, args]);
+		return data;
 	}
 });
 
@@ -3157,28 +3163,21 @@ var TaobaoStatusNetAPI = Object.inherits({}, StatusNetAPI, {
     config: Object.inherits({}, StatusNetAPI.config, {
         host: 'http://t.taobao.org/api',
         user_home_url: 'http://t.taobao.org/',
+        status_prev_url: 'http://t.taobao.org/notice/',
         search_url: 'http://t.taobao.org/tag/',
         source: 'FaWave', // Basic Auth 会显示这个，不过显示不了链接
-//        oauth_key: 'c71100649f6c6cfb4eebbacca18de8f6',
-//        oauth_secret: 'f3ef411594e624f7eda7e1c0ae6b9029',
         repost_pre: 'RT',
         support_double_char: false,
-        support_comment: true,
-        support_do_comment: true,
-        support_repost: true,
+//        support_comment: true,
+//        support_do_comment: true,
+//        support_repost: true,
         support_upload: true,
         support_repost_timeline: true,
-        support_sent_direct_messages: true,
+//        support_sent_direct_messages: true,
         support_auto_shorten_url: true,
         support_user_search: false, //暂时屏蔽
         user_timeline_need_friendship: false,
-        search: '/search_statuses',
-        repost: '/statuses/update',
-        retweet: '/statuses/retweet/{{id}}',
-        favorites_create: '/favorites/create/{{id}}',
-        friends_timeline: '/statuses/home_timeline',
-        upload: '/statuses/update',
-        search: '/search.json?q='
+        upload: '/statuses/update'
     })
 });
 
