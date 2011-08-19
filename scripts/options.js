@@ -1288,6 +1288,9 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
 			|| tab.url.indexOf(FacebookAPI.config.oauth_callback + '?code=') == 0)) {
 		var d = decodeForm(tab.url);
 		var pin = d.oauth_verifier || d.code || 'impin';
+		if(pin.indexOf('#')) {
+			pin = pin.substring(0, pin.indexOf('#'));
+		}
 		$('#account-pin').val(pin);
 		$('#save-account').click();
 		chrome.windows.remove(tab.windowId);
