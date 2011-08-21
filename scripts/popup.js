@@ -317,7 +317,7 @@ function initTxtContentEven(){
 
     $txtContent.keydown(function(event){
         var c = $.trim($(this).val());
-        if(event.ctrlKey && event.keyCode==13){
+        if(((event.ctrlKey || event.metaKey) && event.keyCode==13) || (event.altKey && event.which === 83)) {
             if(c){
                 sendMsg(c);
             }else{
@@ -347,7 +347,13 @@ function initTxtContentEven(){
             countReplyText();
         }).keydown(function(event){
             var c = $.trim($(this).val());
-            if(event.ctrlKey && event.keyCode==13){
+            var send = false;
+            if((event.ctrlKey || event.metaKey) && event.which === 13){ // ctrl[command] + enter
+                send = true;
+            } else if(event.altKey && event.which === 83) { // alt + s
+                send = true;
+            }
+            if(send) {
                 sendMsgByActionType(c);
                 return false;
             }
