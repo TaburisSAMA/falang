@@ -397,8 +397,11 @@ function showDndAccountList(bindDnd){
     }
     
     // 显示微博选项
-    var blogtype_options = '';
+    var blogtype_options = '', settings = Settings.get();;
     for(var k in T_NAMES) {
+        if(k === 't_taobao' && !settings.t_taobaoEnabled) {
+            continue;
+        }
     	blogtype_options += '<option value="{{value}}">{{name}}</option>'.format({name: T_NAMES[k], value: k});
     }
     $('#account-blogType').html(blogtype_options);
@@ -1300,22 +1303,32 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
 
 //Konami code
 var k_k=[];
-$(document).keydown( function(e){
+$(document).keydown(function(e){
     if(k_k.length>=10){k_k.shift();}
     k_k.push(e.keyCode);
-    if(k_k.toString().indexOf("38,38,40,40,37,39,37,39,66,65")>=0) {
+    var code = k_k.toString(), enable = false;
+    if(code.indexOf("38,38,40,40,37,39,37,39,66,65")>=0) {
         var settings = Settings.get();
         settings.twitterEnabled = true;
         Settings.save();
         T_NAMES['twitter'] = 'Twitter';
         _showMsg('首先，恭喜你，Twitter支持已经激活。<br/>其次，请低调。');
-
+        enable = true;
+    } else if(code.indexOf('84,65,79,66,65,79')>=0) {
+        var settings = Settings.get();
+        settings.t_taobaoEnabled = true;
+        Settings.save();
+        _showMsg('首先，恭喜你，淘宝微博支持已经激活。');
+        enable = true;
+    }
+    if(enable) {
+        k_k = [];
         // 显示微博选项
         var blogtype_options = '';
         for(var k in T_NAMES) {
             blogtype_options += '<option value="{{value}}">{{name}}</option>'.format({name: T_NAMES[k], value: k});
         }
         $('#account-blogType').html(blogtype_options);
-    }}
-);
+    }
+});
 // End Konami code

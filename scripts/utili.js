@@ -264,6 +264,7 @@ function hideLoading(){
 var Settings = {
     defaults: {
         twitterEnabled: true,
+        t_taobaoEnabled: false,
         globalRefreshTime:{ //全局的刷新间隔时间
             friends_timeline: 90,
             mentions: 120,

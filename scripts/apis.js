@@ -516,7 +516,12 @@ var sinaApi = {
         var both = this.combo(function(statuses_args, friendship_args, show_user_args) {
             var friendship = null;
             if(friendship_args && friendship_args[0]) {
-                friendship = friendship_args[0].target || friendship_args[0];
+                var relationship = friendship_args[0];
+                if(relationship.relationship) {
+                    // twitter
+                    relationship = relationship.relationship;
+                }
+                friendship = relationship.target || relationship;
             }
             var statuses_result = statuses_args[0];
             // statuses_result 分为 [] 和 {items:[], user:xx}  两种类型
@@ -1544,6 +1549,9 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 	//page.js里面调用的时候没有加载表情字典,所以需要判断
 	_emotion_rex: window.TQQ_EMOTIONS ? new RegExp('\/(' + Object.keys(window.TQQ_EMOTIONS).join('|') + ')', 'g') : null,
 	processEmotional: function(str) {
+	    if(!this._emotion_rex) {
+	        return str;
+	    }
         return str.replace(this._emotion_rex, function(m, g1){
 	        if(window.TQQ_EMOTIONS && g1) {
 	        	var emotion = window.TQQ_EMOTIONS[g1];
@@ -2935,7 +2943,7 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 	    support_upload: false,
 	    support_double_char: false,
 	    rt_need_source: false,
-	    user_timeline_need_friendship: false,
+	    user_timeline_need_friendship: true,
 	    oauth_callback: 'oob',
 	    upload: '/statuses/update_with_media', // https://upload.twitter.com/1/statuses/update_with_media.json
 	    search: '/search_statuses',
@@ -2943,6 +2951,7 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
         retweet: '/statuses/retweet/{{id}}',
         favorites_create: '/favorites/create/{{id}}',
         friends_timeline: '/statuses/home_timeline',
+        friendships_lookup: '/friendships/lookup',
         search: '/search'
 	}),
     
@@ -3000,6 +3009,80 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
         };
         this._sendRequest(params, callback, context);
 	},
+	
+	friendships_lookup: function(data, callback, context) {
+	    var params = {
+            url: this.config.friendships_lookup,
+            type: 'get',
+            play_load: 'object',
+            data: data
+        };
+        this._sendRequest(params, callback, context);
+	},
+	
+	_get_friendships: function(user, followers_args, callback, context) {
+        var ids = [];
+        var result = followers_args[0];
+        if(result && result.users) {
+            for(var i = 0, len = result.users.length; i < len; i++) {
+                ids.push(String(result.users[i].id));
+            }
+        }
+        if(ids.length > 0) {
+            this.friendships_lookup({user: user, user_id: ids.join(',')}, function() {
+                var infos = arguments[0];
+                if(infos && infos.length > 0) {
+                    var map = {};
+                    for(var i = 0, l = infos.length; i < l; i++) {
+                        var info = infos[i], relation = {following: false, followed_by: false};
+                        if(info.connections) {
+                            for(var j = 0, jl = info.connections.length; j < jl; j++) {
+                                if(info.connections[j] === 'following') {
+                                    relation.followed_by = true;
+                                } else if(info.connections[j] === 'followed_by') {
+                                    relation.following = true;
+                                }
+                            }
+                        }
+                        map[String(info.id)] = relation;
+                    }
+                    for(var i = 0, len = result.users.length; i < len; i++) {
+                        var user = result.users[i];
+                        var info = map[String(user.id)];
+                        if(info) {
+                            for(var k in info) {
+                                user[k] = info[k];
+                            }
+                        }
+                    }
+                }
+                callback.apply(context, followers_args);
+            });
+        } else {
+            callback.apply(context, followers_args);
+        }
+    },
+    
+    user_search: function(data, callback, context) {
+        var user = data.user;
+        this.super_.user_search.call(this, data, function() {
+            this._get_friendships(user, arguments, callback, context);
+        }, this);
+    },
+    
+    followers: function(data, callback, context) {
+        var user = data.user;
+        this.super_.followers.call(this, data, function() {
+            this._get_friendships(user, arguments, callback, context);
+        }, this);
+    },
+
+    friends: function(data, callback, context) {
+        var user = data.user;
+        this.super_.friends.call(this, data, function() {
+            this._get_friendships(user, arguments, callback, context);
+        }, this);
+    },
     
 	/**
 	 * Endpoint: https://upload.twitter.com/1/statuses/update_with_media.json 
@@ -3082,8 +3165,9 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 			}
 			data.t_url = tpl.format(data);
 			this.format_result_item(data.user, 'user', args);
-		} else if(play_load == 'user' && data && data.id) {
+		} else if(play_load === 'user' && data && data.id) {
 			data.t_url = this.config.user_home_url + (data.screen_name || data.id);
+			data.following = false;
 		}
 		return data;
 	}
@@ -3093,7 +3177,7 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 var StatusNetAPI = Object.inherits({}, TwitterAPI, {
 	
 	// 覆盖不同的参数
-	config: Object.inherits({}, sinaApi.config, {
+	config: Object.inherits({}, TwitterAPI.config, {
 		host: 'http://identi.ca/api',
         user_home_url: 'http://identi.ca/',
         status_prev_url: 'http://identi.ca/notice/',
@@ -3111,7 +3195,6 @@ var StatusNetAPI = Object.inherits({}, TwitterAPI, {
 	    support_sent_direct_messages: false,
 	    support_auto_shorten_url: false,
 	    support_user_search: false, //暂时屏蔽
-	    user_timeline_need_friendship: false,
 	    oauth_callback: 'oob',
 	    search: '/search_statuses',
 	    repost: '/statuses/update',
@@ -3124,6 +3207,7 @@ var StatusNetAPI = Object.inherits({}, TwitterAPI, {
     format_result_item: function(data, play_load, args) {
         data = this.super_.format_result_item.apply(this, [data, play_load, args]);
 		if(play_load === 'user' && data && data.id) {
+		    data.following = false;
 		    if(data.statusnet_profile_url) {
 		        data.t_url = data.statusnet_profile_url;
 		    } else {
@@ -3168,17 +3252,30 @@ var TaobaoStatusNetAPI = Object.inherits({}, StatusNetAPI, {
         source: 'FaWave', // Basic Auth 会显示这个，不过显示不了链接
         repost_pre: 'RT',
         support_double_char: false,
-//        support_comment: true,
-//        support_do_comment: true,
-//        support_repost: true,
         support_upload: true,
         support_repost_timeline: true,
-//        support_sent_direct_messages: true,
+        support_direct_messages: false,
         support_auto_shorten_url: true,
         support_user_search: false, //暂时屏蔽
-        user_timeline_need_friendship: false,
         upload: '/statuses/update'
-    })
+    }),
+    
+    _emotion_rex: window.TAOBAO_FACES ? new RegExp('\\[\\^(' + Object.keys(window.TAOBAO_FACES).join('|') + ')\\^\\]', 'g') : null,
+    processEmotional: function(str) {
+        if(!this._emotion_rex) {
+            return str;
+        }
+        return str.replace(this._emotion_rex, function(m, g1){
+            if(window.TAOBAO_FACES && g1) {
+                var emotion = TAOBAO_FACES[g1];
+                if(emotion) {
+                    var tpl = '<img style="height: 24px;" title="{{title}}" src="' + TAOBAO_FACES_URL_PRE + '{{emotion}}" />';
+                    return tpl.format({title: g1, emotion: emotion});
+                }
+            }
+            return m;
+        });
+    },
 });
 
 
