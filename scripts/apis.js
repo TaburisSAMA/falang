@@ -3096,7 +3096,7 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
     	pic.keyname = 'media';
     },
 	
-	before_sendRequest: function(args) {
+	before_sendRequest: function(args, user) {
 		args.data.include_entities = 'true';
 		args.data.contributor_details = 'true';
 		if(args.url == this.config.repost) {
@@ -3104,6 +3104,7 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 				args.data.in_reply_to_status_id = args.data.sina_id;
 				delete args.data.sina_id;
 			} else if(args.data.id) {
+//				args.data.in_reply_to_status_id = args.data.id;
 				delete args.data.id;
 			}
 		} else if(args.url == this.config.new_message) {
@@ -3119,7 +3120,8 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 			args.data.per_page = args.data.count;
 			delete args.data.count;
 		}
-		if(this.config.host === 'https://api.twitter.com' && args.url.indexOf('/oauth') < 0) {
+		var hasAPI = user && user.apiProxy;
+		if(!hasAPI && this.config.host === 'https://api.twitter.com' && args.url.indexOf('/oauth') < 0) {
 		    args.url = '/1' + args.url;
 		}
     },

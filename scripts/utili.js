@@ -105,7 +105,7 @@ var T_NAMES = {
 	'plurk': 'Plurk',
 	'buzz': 'Google Buzz',
     'identi_ca': 'identi.ca',
-    't_taobao': '淘宝微博'
+    't_taobao': '@AiTa'
 //    'tumblr': 'Tumblr'
 };
 
