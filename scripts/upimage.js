@@ -217,7 +217,7 @@ function sendMsg() {
     		}
     	}
     	upInfo.append(TP_USER_UPLOAD_INFO.format(user));
-        if(config.support_upload && pic.file) {
+        if((config.support_upload && !user.apiProxy) && pic.file) {
         	stat.uploadCount++;
         	if(source_link) {
         	    // 清空原来的图片连接

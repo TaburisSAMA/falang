@@ -2050,7 +2050,7 @@ function sendMsg(msg){
     		}
     	}
     	var config = tapi.get_config(user);
-    	if(pic && !config.support_upload) {
+    	if(pic && (!config.support_upload || user.apiProxy)) { // twitter代理不兼容图片上传
     	    stat.unsupport_uploads.push([status, user, stat, selLi]);
     	} else {
     	    stat.uploadCount++;
