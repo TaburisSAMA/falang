@@ -113,7 +113,9 @@ function buildStatusHtml(statuses, t, c_user){
     		.replace(/{{id}}/g, '{{retweeted_status.retweeted_status.id}}');
     }
     var messageReplyToBtn = '';
-    switch(t){
+    var support_instapaper = Settings.get().instapaper_user != null;
+    var support_readitlater = Settings.get().readitlater_user != null;
+    switch(t) {
 	    case 'friends_timeline':
 	    case 'favorites':
 	    case 'mentions':
@@ -138,14 +140,16 @@ function buildStatusHtml(statuses, t, c_user){
 	    		= BUTTON_TPLS.repostCounts = BUTTON_TPLS.commentBtn 
 	    		= BUTTON_TPLS.commentCounts = BUTTON_TPLS.delCommentBtn 
 	    		= BUTTON_TPLS.delTweetBtn = BUTTON_TPLS.addFavoritesMsgBtn 
+	    		= BUTTON_TPLS.retweetBtn = BUTTON_TPLS.replyBtn
 	    		= BUTTON_TPLS.delFavoritesMsgBtn = '';
 	    	BUTTON_TPLS.new_msgBtn = BUTTON_TPLS.new_msgBtn.replace('>'
 	    		+ _u.i18n("abb_send_direct_message") +'<', '>'+ _u.i18n("abb_reply") +'<');
-	    	BUTTON_TPLS.replyBtn = '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'{{user.screen_name}}\',\'\');" title="'
-	    		+ _u.i18n("btn_mention_title") +'">@</a>';
+//	    	BUTTON_TPLS.replyBtn = '<a class="replytweet" href="javascript:void(0);" onclick="javascript:doReply(this,\'{{user.screen_name}}\',\'\');" title="'
+//	    		+ _u.i18n("btn_mention_title") +'">@</a>';
 	    	messageReplyToBtn = '回复给 <a class="newMessage" href="javascript:void(0);" ' 
 	    		+ ' onclick="doNewMessage(this,\'{{recipient.screen_name}}\',\'{{recipient.id}}\');" title="'
 	    		+ _u.i18n("btn_direct_message_title") + '">{{recipient.screen_name}}</a>';
+	    	support_instapaper = support_readitlater = false;
 	        break;
 	    default:
 	        break;
@@ -174,8 +178,6 @@ function buildStatusHtml(statuses, t, c_user){
         default:
             break;
 	}
-	var support_instapaper = Settings.get().instapaper_user != null;
-	var support_readitlater = Settings.get().readitlater_user != null;
 	var comments_count_tpl = '<a href="javascript:void(0);" timeline_type="comment" title="'
         + _u.i18n("btn_show_comments_title") 
         + '" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>';

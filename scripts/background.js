@@ -492,7 +492,7 @@ function getTimelinePage(user_uniqueKey, t) {
     var config = tapi.get_config(c_user);
     if(t === 'direct_messages' && config.support_sent_direct_messages) {
     	// 私信，则同时获取自己发送的
-    	getTimelinePage(user_uniqueKey, 'sent_direct_messages', p);
+    	getTimelinePage(user_uniqueKey, 'sent_direct_messages');
     }
     var t_key = user_uniqueKey + t + '_tweets';
     if(!tweets[t_key]) {
