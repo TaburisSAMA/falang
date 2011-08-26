@@ -270,7 +270,7 @@ var sinaApi = {
     	//【观点·@任志强】今年提出的1000万套的保障房任务可能根本完不成
     	// http://blog.oasisfeng.com/2006/10/19/full-cjk-unicode-range/
     	// CJK标点符号：3000-303F
-        str = str.replace(/@([\w\-\_\u2E80-\u3000\u303F-\u9FFF]+)/g, 
+        str = str.replace(/@([●\w\-\_\u2E80-\u3000\u303F-\u9FFF]+)/g, 
         	'<a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'
         		+ this.config.user_home_url + '$1" title="'
         		+ _u.i18n("btn_show_user_title") +'">@$1</a>');
@@ -3277,6 +3277,16 @@ var TaobaoStatusNetAPI = Object.inherits({}, StatusNetAPI, {
             }
             return m;
         });
+    },
+    searchMatchReg: /#([^#]+)#/g,
+    processSearch: function(str) {
+        var search_url = this.config.search_url;
+        str = str.replace(this.searchMatchReg, function(m, g1) {
+            // 修复#xxx@xxx#嵌套问题
+            var search = g1.remove_html_tag();
+            return '<a target="_blank" href="'+ search_url + '{{search}}" title="Search #{{search}}">#{{search}}#</a>'.format({search: search});
+        });
+        return str;
     },
 });
 

@@ -1359,8 +1359,6 @@ var ShortenUrl = {
 	expandAll: function() {
 		var b_view = getBackgroundView();
 		var cache = b_view.SHORT_URLS;
-		// 这里需要判断
-//		var conditions = '[title*="'+ _u.i18n("comm_mbright_to_open") +'"],[videotype], .short_done';
 		var conditions = '.short_done';
 		var selector = 'a.link:not(' + conditions + ')';
 		var config = tapi.get_config(getUser());
@@ -1369,20 +1367,22 @@ var ShortenUrl = {
 		}
 		var that = this;
 		$(selector).each(function() {
-			var url = $(this).attr('href');
+		    var $this = $(this);
+			var url = $this.attr('href');
 			if(url.length < 10 || url.indexOf('javascript:') >= 0) {
 			    if(url === '#') {
 			        // 豆瓣电台的推荐链接无法点击
 			        // http://api.douban.com/recommendation/89139831
 			        // => search http://music.douban.com/subject_search?search_text=%E3%80%8A%E4%B8%80%E7%94%9F%E6%89%80%E7%88%B1%E3%80%8B+-+%E5%8D%A2%E5%86%A0%E5%BB%B7
-			        $(this).attr('href', 'javascript:;').addClass('short_done');;
+			        $this.attr('href', 'javascript:;').addClass('short_done');;
 			    }
 				return;
 			}
+			
 			if(VideoService.attempt(url, this) || ImageService.attempt(url, this) || url.length > 30) {
 			    // 无需还原
 			    UrlUtil.showFaviconBefore(this, url);
-			    $(this).addClass('short_done');
+			    $this.addClass('short_done');
 			    return;
 			}
 			var data = cache[url];
@@ -2130,6 +2130,11 @@ var ImageService = {
 	},
 	
 	attempt: function(url, ele) {
+	    var $ele = $(ele);
+	    if($ele.closest('.tweetItem').find('.thumbnail_pic').length > 0) {
+            // 有图片，无需解析图片链接了
+	        return false;
+        }
 	    var sourcelink = null;
 	    if(typeof url === 'object') {
 	        sourcelink = url.sourcelink;
@@ -2138,19 +2143,18 @@ var ImageService = {
 		for(var name in this.services) {
 			var item = this.services[name];
 			if(item.url_re.test(url)) {
-				var old_title = $(ele).attr('title');
+				var old_title = $ele.attr('title');
 				var title = _u.i18n("comm_mbleft_to_preview") + ', ' + _u.i18n('comm_mbright_to_open');
 				if(old_title) {
 					title += ', ' + old_title;
 				}
-				var $ele = $(ele)
-				  , attrs = {
-                        rhref: url,
-                        old_title: old_title,
-                        title: title, 
-                        href: 'javascript:;',
-                        service: name
-                    };
+				var attrs = {
+                    rhref: url,
+                    old_title: old_title,
+                    title: title, 
+                    href: 'javascript:;',
+                    service: name
+                };
 				if(item.show_link) {
 				    attrs.show_link = '1';
 				}

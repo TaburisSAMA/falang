@@ -875,7 +875,7 @@ function initSelectSendAccounts(){
     }
     if(has_sina && has_other) {
         // 只有同时有新浪微博和其他类型，才显示保留数据的选项
-        var $keep_data_btn = $('<span id="remember_send_data_ctr"><input checked="checked" type="checkbox" id="remember_send_data" /><label for="remember_send_data">' 
+        var $keep_data_btn = $('<span id="remember_send_data_ctr"><input type="checkbox" id="remember_send_data" /><label for="remember_send_data">' 
             + _u.i18n("abb_keep_send_data") + '</label></span>');
         var $sendBtn = $('#btnSend');
         $sendBtn.before($keep_data_btn.css({right: ($sendBtn.width() + 30) + 'px'}));
