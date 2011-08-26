@@ -174,27 +174,46 @@ var sinaApi = {
     
     // 翻译
     translate: function(text, target, callback, context) {
-    	var api = 'https://www.googleapis.com/language/translate/v2';
+        // http://translate.google.cn/translate_a/t?client=t&text=I%20fucking%20you&hl=en&sl=en&tl=zh-CN&multires=1&otf=2&ssel=3&tsel=6&sc=1
+//        $.get('http://translate.google.cn/translate_a/t?client=t&text=I%20fucking%20you&tl=zh',
+//                function() {
+//            console.log(arguments)
+//        });
+//    	var api = 'https://www.googleapis.com/language/translate/v2';
+    	var api = 'http://translate.google.cn/translate_a/t?client=t&sl=auto';
     	if(!target || target == 'zh-CN' || target == 'zh-TW') {
     		target = 'zh';
     	}
-    	var params = {key: this.config.google_appkey, target: target, q: text};
+//    	var params = {key: this.config.google_appkey, target: target, q: text};
+    	var params = {tl: target, text: text};
     	$.ajax({
 			url: api,
-		  	dataType: 'json',
+//		  	dataType: 'json',
 		  	data: params,
 		  	success: function(data, status) {
-				var tran = data.data.translations[0];
-				var detectedSourceLanguage = tran.detectedSourceLanguage;
-				if(detectedSourceLanguage == 'zh-CN' || detectedSourceLanguage == 'zh-TW') {
-		    		detectedSourceLanguage = 'zh';
-		    	}
-				if(detectedSourceLanguage == target) {
-					showMsg(_u.i18n("comm_not_need_tran"), true);
-					callback.call(context, null);
-				} else {
-					callback.call(context, tran.translatedText);
-				}
+		  	    data = eval(data);
+		  	    if(data && data[0]) {
+		  	        data = data[0];
+		  	        var tran_text = '';
+		  	        for(var i = 0, l = data.length; i < l; i++) {
+		  	            tran_text += data[i][0];
+		  	        }
+		  	        callback.call(context, tran_text);
+		  	    } else {
+		  	        showMsg(_u.i18n("comm_not_need_tran"), true);
+		  	        callback.call(context, null);
+		  	    }
+//				var tran = data.data.translations[0];
+//				var detectedSourceLanguage = tran.detectedSourceLanguage;
+//				if(detectedSourceLanguage == 'zh-CN' || detectedSourceLanguage == 'zh-TW') {
+//		    		detectedSourceLanguage = 'zh';
+//		    	}
+//				if(detectedSourceLanguage == target) {
+//					showMsg(_u.i18n("comm_not_need_tran"), true);
+//					callback.call(context, null);
+//				} else {
+//					callback.call(context, tran.translatedText);
+//				}
 		  	}, 
 		  	error: function(xhr, status) {
 		  		var error = {message: status + ': ' + xhr.statusText};
