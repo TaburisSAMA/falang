@@ -1454,7 +1454,7 @@ var TQQAPI = Object.inherits({}, sinaApi, {
         friendships_create:   '/friends/add',
         friendships_destroy:  '/friends/del',
         friendships_show:     '/friends/check',
-        reset_count:          '/statuses/reset_count',
+        reset_count:          '/info/update',
         user_show:            '/user/other_info',
         
         // 用户标签
@@ -1597,11 +1597,6 @@ var TQQAPI = Object.inherits({}, sinaApi, {
         callback.call(context, {error: _u.i18n("comm_no_api")});
     },
 
-    //TODO: 腾讯是有提供重置未读数的接口的，后面加
-    reset_count: function(data, callback, context) {
-		callback.call(context);
-	},
-	
 	format_upload_params: function(user, data, pic) {
     	if(data.status){
             data.content = data.status;
@@ -1671,6 +1666,29 @@ var TQQAPI = Object.inherits({}, sinaApi, {
         this.super_.friends.call(this, data, function() {
             this._get_friendships(user, arguments, callback, context);
         }, this);
+    },
+    
+    reset_count: function(data, callback, context) {
+        // Type：5 首页未读消息记数，6 @页消息记数 7 私信页消息计数 8 新增听众数 9 首页广播数（原创的）
+        // 1 comments 2 metions 3 messages 4 fans
+        if(data.type === 1) {
+            return callback.call(context, true);
+        }
+        data.op = 1;
+        if(data.type === 2) {
+            data.type = 6;
+        } else if(data.type === 3) {
+            data.type = 7;
+        } else if(data.type === 4) {
+            data.type = 8;
+        }
+        var params = {
+            url: this.config.reset_count,
+            type: 'get',
+            play_load: 'result',
+            data: data
+        };
+        this._sendRequest(params, callback, context);
     },
 	
 	before_sendRequest: function(args, user) {

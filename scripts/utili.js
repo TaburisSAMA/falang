@@ -297,7 +297,8 @@ var Settings = {
             direct_messages: false
         },
         desktopNotificationsTimeout: 5, //桌面提示的延迟关闭时间
-        isSyncReadedToSina: false, //已读消息是否和新浪微博页面同步
+//        isSyncReadedToSina: false, //已读消息是否和新浪微博页面同步
+        isSyncReadedCount: true, // 同步已读数据
         isSharedUrlAutoShort: true, //分享正在看的网址时是否自动缩短
         sharedUrlAutoShortWordCount: 15, //超过多少个字则自动缩短URL
         quickSendHotKey: '113', //快速发送微博的快捷键。默认 F2。保存的格式为： 33,34,35 用逗号分隔的keycode
@@ -521,10 +522,11 @@ function removeUnreadTimelineCount(t, user_uniqueKey){
     if(!user_uniqueKey){
         user_uniqueKey = getUser().uniqueKey;
     }
-    localStorage.setObject(user_uniqueKey + t + UNREAD_TIMELINE_COUNT_KEY, 0);
-    if(Settings.get().isSyncReadedToSina){ //如果同步未读数
+    var unread = getUnreadTimelineCount(t, user_uniqueKey);
+    if(unread && Settings.get().isSyncReadedCount) { // 如果同步未读数
         syncUnreadCountToSinaPage(t, user_uniqueKey);
     }
+    localStorage.setObject(user_uniqueKey + t + UNREAD_TIMELINE_COUNT_KEY, 0);
     if(getAlertMode()=='dnd'){ //免打扰模式
         chrome.browserAction.setBadgeText({text: ''});
         chrome.browserAction.setIcon({path: 'icons/icon48-dnd.png'});

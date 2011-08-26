@@ -579,7 +579,7 @@ function init(){
     $("#autoShortUrlCount").val(settings.sharedUrlAutoShortWordCount);
 
     //初始化是否同步未读提示到新浪微博
-    $("#unread_sync_to_page").attr("checked", settings.isSyncReadedToSina);
+    $("#unread_sync_to_page").attr("checked", settings.isSyncReadedCount);
     
     //初始化是否启用右键菜单
     $("#enable_contextmenu").attr("checked", settings.enableContextmenu);
@@ -1078,7 +1078,7 @@ function saveAll(){
     	settings.geoPosition = null;
     }
 
-    settings.isSyncReadedToSina = $("#unread_sync_to_page").attr("checked") ? true : false;
+    settings.isSyncReadedCount = $("#unread_sync_to_page").attr("checked") ? true : false;
     
     //右键菜单
     settings.enableContextmenu = $("#enable_contextmenu").attr("checked") ? true : false;
