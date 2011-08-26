@@ -824,6 +824,10 @@ var sinaApi = {
 		if(this.config.use_method_param) {
 			// 只使用method 做参数, 走rest api
 			url = api;
+		} else if(data.__upload_url) {
+		    url = data.__upload_url  + this.config.result_format;
+		    delete data.__upload_url;
+		    delete auth_args.data.__upload_url;
 		}
 		// 设置认证头部
         this.apply_auth(url, auth_args, user);
@@ -851,6 +855,7 @@ var sinaApi = {
 	    builder += 'Content-Type: '+ (pic.file.fileType || pic.file.type);
 	    builder += crlf;
 	    builder += crlf; 
+//	    console.log(builder)
 	    var bb = new BlobBuilder(); //NOTE change to WebKitBlogBuilder
 	    bb.append(builder);
 	    bb.append(pic.file);
@@ -2958,7 +2963,7 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 	    support_sent_direct_messages: false,
 	    support_auto_shorten_url: false,
 	    support_search_max_id: false,
-	    support_upload: false,
+	    support_upload: true,
 	    support_double_char: false,
 	    rt_need_source: false,
 	    user_timeline_need_friendship: true,
@@ -3111,12 +3116,30 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 		(lat, lon, etc). 
 	 */
 	format_upload_params: function(user, data, pic) {
-    	pic.keyname = 'media';
+    	pic.keyname = 'media[]';
+    	var hasAPI = user && user.apiProxy;
+        if(!hasAPI && this.config.host === 'https://api.twitter.com') {
+            data.__upload_url = 'https://upload.twitter.com/1' + this.config.upload;
+        }
+    },
+    
+    apply_auth: function(url, auth_args, user) {
+        if(url.indexOf(this.config.upload) > 0 && this.config.host === 'https://api.twitter.com') {
+            // https://dev.twitter.com/discussions/1059
+            var data = auth_args.data;
+            auth_args.data = {};
+            this.super_.apply_auth.call(this, url, auth_args, user);
+            auth_args.data = data;
+        } else {
+            this.super_.apply_auth.call(this, url, auth_args, user);
+        }
     },
 	
 	before_sendRequest: function(args, user) {
-		args.data.include_entities = 'true';
-		args.data.contributor_details = 'true';
+	    if(args.url.indexOf('/oauth') < 0) {
+	        args.data.include_entities = 'true';
+	        args.data.contributor_details = 'true';
+	    }
 		if(args.url == this.config.repost) {
 			if(args.data.sina_id) {
 				args.data.in_reply_to_status_id = args.data.sina_id;
@@ -3223,6 +3246,10 @@ var StatusNetAPI = Object.inherits({}, TwitterAPI, {
         friends_timeline: '/statuses/home_timeline',
         search: '/search.json?q='
 	}),
+	
+	format_upload_params: function(user, data, pic) {
+        pic.keyname = 'media';
+    },
 	
     format_result_item: function(data, play_load, args) {
         data = this.super_.format_result_item.apply(this, [data, play_load, args]);
@@ -3498,10 +3525,6 @@ var T163API = Object.inherits({}, sinaApi, {
 		callback.call(context);
 	},
 
-    rate_limit_status: function(data, callback, context) {
-        callback.call(context, {error: _u.i18n("comm_no_api")});
-    },
-	
 	format_upload_params: function(user, data, pic) {
     	delete data.source;
     	// 不支持地理坐标
