@@ -2133,7 +2133,7 @@ var ImageService = {
 	
 	attempt: function(url, ele) {
 	    var $ele = $(ele);
-	    if($ele.closest('.tweetItem').find('.thumbnail_pic').length > 0) {
+	    if($ele.parent().parent().find('.thumbnail_pic').length > 0) {
             // 有图片，无需解析图片链接了
 	        return false;
         }
