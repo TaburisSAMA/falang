@@ -78,6 +78,7 @@ var sinaApi = {
         userinfo_has_counts: true, // 用户信息中是否包含粉丝数、微博数等信息
         support_double_char: true, // 是否按双字节计算长度
         support_counts: true, // 是否支持批量获取转发和评论数
+        support_counts_max_id_num: 99, // 支持一次同时获取多少个id的数据
         support_comment: true, // 判断是否支持评论列表
         support_do_comment: true, // 判断是否支持发送评论
         support_repost_comment: true, // 判断是否支持转发同时发评论
@@ -1452,7 +1453,8 @@ var TQQAPI = Object.inherits({}, sinaApi, {
         reply_dont_need_at_screen_name: true, // @回复某条微博 无需填充@screen_name 
         rt_at_name: true, // RT的@name而不是@screen_name
         repost_delimiter: ' || ', //转发时的分隔符
-        support_counts: false, // 只有rt_count这个，不过貌似有问题，总是404。暂时隐藏
+        support_counts: true, 
+        support_counts_max_id_num: 29,
         max_image_size: 2 * 1024 * 1024,
         latitude_field: 'wei', // 纬度参数名
         longitude_field: 'jing', // 经度参数名
@@ -1755,6 +1757,9 @@ var TQQAPI = Object.inherits({}, sinaApi, {
         }
         
         switch(args.url){
+            case this.config.counts:
+                args.data.flag = 2;
+                break;
             case this.config.new_message:
             case this.config.user_timeline:
             	if(args.data.id) {
@@ -1923,7 +1928,20 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 		            data = data[keys[0]];
 		        }
 		    }
+		} else if(args.url === this.config.counts) {
+		    if(data) {
+		        var items = [];
+                for(var key in data) {
+                    var item = {}, d = data[key];
+                    item.id = key;
+                    item.rt = d.count;
+                    item.comments = d.mcount;
+                    items.push(item);
+                }
+                data = items;
+            }
 		}
+		
 		return data;
 	},
 

@@ -1467,6 +1467,7 @@ function getSinaTimeline(t, notCheckNew){
     }
     hideReadMoreLoading(t);
     if(cache && cache.length > 0) {
+        var counts_max_id_num = tapi.get_config(c_user).support_counts_max_id_num || 99;
         if(view_status.index === 0) {
             // 清空未读数据
             $('#tl_tabs li.active').find(".unreadCount").html('');
@@ -1492,9 +1493,9 @@ function getSinaTimeline(t, notCheckNew){
                 	ids.push(msg.status.retweeted_status.id);
                 }
             }
-            if(ids.length > 100) {
-                var ids2 = ids.slice(0, 99);
-                ids = ids.slice(99, ids.length);
+            if(ids.length > counts_max_id_num) {
+                var ids2 = ids.slice(0, counts_max_id_num);
+                ids = ids.slice(counts_max_id_num, ids.length);
                 showCounts(t, ids2);
             }
         }
@@ -1536,20 +1537,23 @@ function showCounts(t, ids){
     tapi.counts(data, function(counts, textStatus){
     	hideLoading();
         if(textStatus != 'error' && counts && !counts.error){
-            if(counts.length && counts.length>0){
-                for(var i in counts){
-                    $('#'+ t +'_timeline .showCounts_'+counts[i].id).each(function(){
+            if(counts.length && counts.length > 0) {
+                for(var i = 0, l = counts.length; i < l; i++) {
+                    var item = counts[i];
+                    $('#'+ t +'_timeline .showCounts_'+item.id).each(function(){
                         var _li = $(this);
                         var _edit = _li.find('.edit:eq(0)');
                         if(_edit){
                         	if(config.support_repost_timeline) {
-                        		_edit.find('.repostCounts a').html(counts[i].rt);
+                        		_edit.find('.repostCounts a').html(item.rt);
                         	} else {
-                        		_edit.find('.repostCounts').html('('+ counts[i].rt +')');
+                        		_edit.find('.repostCounts').html('('+ item.rt +')');
                         	}
                             var _comm_txt = '(0)';
-                            if(counts[i].comments > 0){
-                                _comm_txt = '(<a href="javascript:void(0);" title="'+ _u.i18n("comm_show_comments") +'" timeline_type="comment" onclick="showComments(this,' + counts[i].id + ');">' +counts[i].comments + '</a>)';
+                            if(item.comments > 0){
+                                _comm_txt = '(<a href="javascript:void(0);" title="'
+                                    + _u.i18n("comm_show_comments") +'" timeline_type="comment" onclick="showComments(this,' 
+                                    + item.id + ');">' + item.comments + '</a>)';
                             }
                             _edit.find('.commentCounts').html(_comm_txt);
                         }
@@ -1922,8 +1926,10 @@ function addPageMsgs(msgs, t, append, data_type){
     _ul[method](htmls.join(''));
     // 处理缩址
     ShortenUrl.expandAll();
-    var ids = [];
-    if(t != 'direct_messages') {
+    
+    if(t !== 'direct_messages') {
+        var ids = [];
+        var counts_max_id_num = tapi.get_config(getUser()).support_counts_max_id_num || 99;
 	    for(var i = 0, len = msgs.length; i < len; i++){
 	    	var status = msgs[i]
 	    	  , retweeted_status = status.retweeted_status || status.status;
@@ -1935,14 +1941,14 @@ function addPageMsgs(msgs, t, append, data_type){
                 }
             }
 	    }
-    }
-    if(ids.length > 0) {
-        if(ids.length > 100) {
-            var ids2 = ids.slice(0, 99);
-            ids = ids.slice(99, ids.length);
-            showCounts(t, ids2);
-        }
-        showCounts(t, ids);
+	    if(ids.length > 0) {
+	        if(ids.length > counts_max_id_num) {
+	            var ids2 = ids.slice(0, counts_max_id_num);
+	            ids = ids.slice(counts_max_id_num, ids.length);
+	            showCounts(t, ids2);
+	        }
+	        showCounts(t, ids);
+	    }
     }
     var h_old = _ul.height();
     //hold住当前阅读位置
