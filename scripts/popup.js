@@ -2423,14 +2423,15 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){ // 转发
     $('#repostTweetId').val(tweetId);
     $('#replyUserName').val(userName);
     $('#ye_dialog_title').html(_u.i18n("msg_repost_who").format({username:userName}));
-    if(config.support_comment) {
+    var support_comment = config.support_comment && user.blogType !== 'tqq';
+    if(support_comment) {
     	$('#chk_sendOneMore').attr("checked", false).val(tweetId).show();
         $('#txt_sendOneMore').text(_u.i18n("msg_comment_too").format({username:userName})).show();
     } else { // 不支持repost，则屏蔽
     	$('#chk_sendOneMore').attr("checked", false).val('').hide();
         $('#txt_sendOneMore').text('').hide();
     }
-    if(config.support_comment &&
+    if(support_comment &&
     		rtUserName && rtUserName != userName && reTweetId) {
         $('#chk_sendOneMore2').attr("checked", false).val(reTweetId).show();
         $('#txt_sendOneMore2').text(_u.i18n("msg_comment_original_too").format({username:rtUserName})).show();
@@ -2491,7 +2492,7 @@ function doComment(ele, userName, userId, tweetId,
     }
     var user = getUser();
 	var config = tapi.get_config(user);
-	if(config.support_repost) { // 支持repost才显示
+	if(config.support_comment_repost) { // 支持repost才显示
 		$('#chk_sendOneMore').attr("checked", false).val(tweetId).show();
     	$('#txt_sendOneMore').text(_u.i18n("msg_repost_too")).show();
 	} else {

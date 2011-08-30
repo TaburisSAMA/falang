@@ -83,6 +83,7 @@ var sinaApi = {
         support_repost_comment: true, // 判断是否支持转发同时发评论
         support_repost_comment_to_root: false, // 判断是否支持转发同时给原文作者发评论
         support_repost: true, // 是否支持新浪形式转载
+        support_comment_repost: true, // 判断是否支持评论同时转发
         support_repost_timeline: true, // 支持查看转发列表
 		support_upload: true, // 是否支持上传图片
 		repost_pre: '转:', // 转发前缀
@@ -1440,8 +1441,12 @@ var TQQAPI = Object.inherits({}, sinaApi, {
         oauth_access_token:   '/cgi-bin/access_token',
         // 竟然是通过get传递
         oauth_params_by_get: true,
-        support_comment: false, // 不支持评论列表，不支持转发 ＋ 评论
+        support_comment: true, // 不支持评论列表，不支持转发 ＋ 评论
         support_do_comment: true,
+        support_repost: true,
+        support_comment_repost: false, // 判断是否支持评论同时转发
+        support_repost_comment: false, // 判断是否支持转发同时发评论
+        support_repost_comment_to_root: false, // 判断是否支持转发同时给原文作者发评论
         support_repost_timeline: true, // 支持查看转发列表
         support_favorites_max_id: true,
         reply_dont_need_at_screen_name: true, // @回复某条微博 无需填充@screen_name 
@@ -1742,6 +1747,13 @@ var TQQAPI = Object.inherits({}, sinaApi, {
             delete args.data.comment;
         }
         
+        if(args.url === this.config.user_timeline || args.url === this.config.mentions
+                || args.url === this.config.friends_timeline) {
+            // type: 拉取类型, 0x1 原创发表 0x2 转载 0x8 回复 0x10 空回 0x20 提及 0x40 点评
+            // 如需拉取多个类型请|上(0x1|0x2) 得到3，type=3即可,填零表示拉取所有类型
+            args.data.type = 0x1 | 0x2 | 0x8 | 0x10 | 0x20;
+        }
+        
         switch(args.url){
             case this.config.new_message:
             case this.config.user_timeline:
@@ -1777,9 +1789,6 @@ var TQQAPI = Object.inherits({}, sinaApi, {
             case this.config.comment:
                 args.data.reid = args.data.id;
 			    delete args.data.id;
-                break;
-            case this.config.counts:
-//                args.data.flag = 2;
                 break;
             case this.config.repost:
                 args.data.reid = args.data.id;
@@ -1829,6 +1838,10 @@ var TQQAPI = Object.inherits({}, sinaApi, {
                 delete args.data.target_screen_name;
                 delete args.data.target_id;
                 delete args.data.target_ids;
+                break;
+            case this.config.comments_timeline:
+                args.url = this.config.mentions;
+                args.data.type = 0x40;
                 break;
         }
         if(args.url === this.config.update) {
@@ -2201,6 +2214,7 @@ var DiguAPI = Object.inherits({}, sinaApi, {
 	    support_do_comment: false,
 	    support_double_char: false,
 	    support_repost: false,
+	    support_comment_repost: false,
 	    support_repost_timeline: false,
 	    support_max_id: false,
 	    support_sent_direct_messages: false,
@@ -2519,6 +2533,7 @@ var ZuosaAPI = Object.inherits({}, sinaApi, {
 	    support_comment: false,
 	    support_do_comment: false,
 	    support_repost: false,
+	    support_comment_repost: false,
 	    support_repost_timeline: false,
 	    support_sent_direct_messages: false,
 	    support_max_id: false,
@@ -2686,6 +2701,7 @@ var LeiHouAPI = Object.inherits({}, sinaApi, {
 	    support_comment: false,
 	    support_do_comment: false,
 	    support_repost: false,
+	    support_comment_repost: false,
 	    support_repost_timeline: false,
 	    support_sent_direct_messages: false,
 		support_favorites: false,
@@ -2831,6 +2847,7 @@ var Follow5API = Object.inherits({}, sinaApi, {
 	    support_comment: false,
 	    support_do_comment: false,
 	    support_repost: false,
+	    support_comment_repost: false,
 	    support_repost_timeline: false,
 	    support_upload: false,
 	    support_sent_direct_messages: false,
@@ -2978,6 +2995,7 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 	    support_comment: false,
 	    support_do_comment: false,
 	    support_repost: false,
+	    support_comment_repost: false,
 	    support_repost_timeline: false,
 	    support_sent_direct_messages: false,
 	    support_auto_shorten_url: false,
@@ -3252,6 +3270,7 @@ var StatusNetAPI = Object.inherits({}, TwitterAPI, {
 	    support_comment: false,
 	    support_do_comment: false,
 	    support_repost: false,
+	    support_comment_repost: false,
 	    support_upload: false,
 	    support_repost_timeline: false,
 	    support_sent_direct_messages: false,
@@ -3367,6 +3386,7 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
 	    support_comment: false,
 	    support_do_comment: false,
 	    support_repost: false,
+	    support_comment_repost: false,
 	    support_repost_timeline: false,
 	    support_sent_direct_messages: false,
 	    support_auto_shorten_url: false,
@@ -3842,6 +3862,7 @@ var RenjianAPI = Object.inherits({}, sinaApi, {
 		support_comment: false,
 		support_do_comment: false,
 		support_repost: true,
+		support_comment_repost: true,
 		support_repost_timeline: false,
 		support_sent_direct_messages: false,
 	    support_search: false,
@@ -4023,6 +4044,7 @@ var BuzzAPI = Object.inherits({}, sinaApi, {
         userinfo_has_counts: false, //用户信息中是否包含粉丝数、微博数等信息
         support_counts: false,
         support_repost: true,
+        support_comment_repost: true,
         support_repost_timeline: false, // 支持查看转发列表
 		support_upload: false, // 是否支持上传图片
 		support_cursor_only: true,  // 只支持游标方式翻页
@@ -4292,6 +4314,7 @@ var DoubanAPI = Object.inherits({}, sinaApi, {
 		userinfo_has_counts: false, // 用户信息中是否包含粉丝数、微博数等信息
         support_comment: false,
 		support_repost: false,
+		support_comment_repost: false,
 		support_repost_timeline: false,
 		support_max_id: false,
 		support_favorites: false,
@@ -4547,6 +4570,7 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 		userinfo_has_counts: false, // 用户信息中是否包含粉丝数、微博数等信息
         support_comment: false,
 		support_repost: false,
+		support_comment_repost: false,
 		support_repost_timeline: false,
 		support_max_id: false,
 		support_favorites: false,
@@ -4624,6 +4648,7 @@ var FacebookAPI = Object.inherits({}, sinaApi, {
         support_cursor_only: true,  // 只支持游标方式翻页
         support_friends_only: true, // 只支持friends
         support_repost: false,
+        support_comment_repost: false,
         support_repost_timeline: false,
         support_sent_direct_messages: false,
         support_comment: false,
@@ -4892,6 +4917,7 @@ var RenrenAPI = Object.inherits({}, sinaApi, {
         support_cursor_only: false,  // 只支持游标方式翻页
         support_friends_only: true, // 只支持friends
         support_repost: true,
+        support_comment_repost: true,
         support_repost_timeline: false,
         support_direct_messages: false,
         support_sent_direct_messages: false,
@@ -5433,6 +5459,7 @@ var PlurkAPI = Object.inherits({}, sinaApi, {
         support_double_char: false,
         support_direct_messages: false,
         support_repost: false,
+        support_comment_repost: false,
         support_repost_timeline: false,
         support_mentions: false,
 //        support_user_search: false, // 暂时屏蔽
@@ -5686,6 +5713,7 @@ var TumblrAPI = Object.inherits({}, sinaApi, {
         userinfo_has_counts: false, //用户信息中是否包含粉丝数、微博数等信息
         support_counts: false,
         support_repost: true,
+        support_comment_repost: true,
         support_repost_timeline: false, // 支持查看转发列表
 		support_cursor_only: true,  // 只支持游标方式翻页
 		support_mentions: false,

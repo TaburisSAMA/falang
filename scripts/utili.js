@@ -81,8 +81,8 @@ var T_LIST = {
 	'douban': ['friends_timeline', 'direct_messages'],
 	'tianya': []
 };
-T_LIST.t163 = T_LIST.tsina = T_LIST.tsohu = T_LIST.all;
-T_LIST.t_taobao = T_LIST.tqq = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa 
+T_LIST.tqq = T_LIST.t163 = T_LIST.tsina = T_LIST.tsohu = T_LIST.all;
+T_LIST.t_taobao = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa 
 	= T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter 
 	= T_LIST.identi_ca = T_LIST.tumblr = T_LIST.digu;
 

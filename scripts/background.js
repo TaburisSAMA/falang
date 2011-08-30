@@ -292,11 +292,13 @@ function checkTimeline(t, user_uniqueKey) {
         last_id = getLastMsgId(t, user_uniqueKey);
     }
     if(last_id){
-        if(c_user.blogType == 'tqq' && !get_data_cache(t, user_uniqueKey)){ 
-        	//腾讯微博的第一次获取加pageflag=0，获取第一页
-           params['pageflag'] = 0;
-        }
         params['since_id'] = last_id;
+    }
+    if(c_user.blogType === 'tqq' && !last_id) {
+      // 腾讯微博的第一次获取加pageflag=0，获取第一页
+        params['pageflag'] = 0;
+        params['since_id'] = 0;
+        params['lastid'] = 0;
     }
     showLoading();
 //    console.log('bg_checkTimeline', t, params.user.screen_name, 'since_id:', params.since_id, 'pageflag:', params.pageflag);
@@ -352,6 +354,7 @@ function checkTimeline(t, user_uniqueKey) {
         	// 兼容网易的cursor_id
             // 兼容腾讯的pagetime
             var new_last_id = sinaMsgs[0].timestamp || sinaMsgs[0].cursor_id || sinaMsgs[0].id;
+//            console.log(t, last_id, sinaMsgs[0].id, new_last_id, sinaMsgs[0], sinaMsgs);
             setLastMsgId(new_last_id, t, user_uniqueKey);
             if(c_user.blogType === 'tqq') {
                 //qq的last_id保存的是timestamp，但是在过滤重复信息的时候需要用到id，所以再保存一个ID
