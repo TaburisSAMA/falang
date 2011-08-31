@@ -1465,11 +1465,13 @@ var sinaApi = {
                             	}
                             	var error_code = r.error_code || r.code || r.type;
                             	r.error = this.format_error(r.error || r.wrong || r.message || r.error_text, error_code, r);
-		                    	var error_msg = callmethod + ' error: ' + r.error;
-		                    	if(!r.error && error_code){ // 错误为空，才显示错误代码
-		                    		error_msg += ', error_code: ' + error_code;
-		                    	}
-		                    	showMsg(error_msg, false);
+                            	if(!args.dont_show_error) {
+                            	    var error_msg = callmethod + ' error: ' + r.error;
+                                    if(!r.error && error_code){ // 错误为空，才显示错误代码
+                                        error_msg += ', error_code: ' + error_code;
+                                    }
+                                    showMsg(error_msg, false);
+                            	}
                             }
                         }
                     }
@@ -1480,7 +1482,9 @@ var sinaApi = {
                     textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';
                     errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
                     r = {error:callmethod + ' error: ' + textStatus + errorThrown + ' statuCode: ' + status};
-                    showMsg(r.error, false);
+                    if(!args.dont_show_error) {
+                        showMsg(r.error, false);
+                    }
                 }
                 callbackFn.call(context, r||{}, 'error', status); //不管什么状态，都返回 error
                 hideLoading();
@@ -1541,7 +1545,13 @@ var TQQAPI = Object.inherits({}, sinaApi, {
         user_timeline_need_friendship: false, // show_user信息中已经包含
         user_timeline_need_user: true, 
         show_fullname: true,
-        support_blocking: false,
+        support_blocking: true,
+        
+        blocks_blocking:      '/friends/blacklist',
+        blocks_blocking_ids:  '/friends/blacklist/ids',
+        blocks_create:        '/friends/addblacklist',
+        blocks_destroy:       '/friends/delblacklist',
+        blocks_exists:        '/friends/exists',
         
         mentions:             '/statuses/mentions_timeline',
         followers:            '/friends/user_fanslist',
@@ -1850,6 +1860,17 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 			    	delete args.data.screen_name;
             	}
                 break;
+            case this.config.blocks_blocking:
+                if(args.data.page) {
+                    args.data.startindex = (parseInt(args.data.page) - 1) * args.data.reqnum;
+                }
+                break;
+            case this.config.blocks_create:
+            case this.config.blocks_destroy:
+                args.data.name = args.data.user_id || args.data.screen_name;
+                delete args.data.user_id;
+                delete args.data.screen_name;
+                break;
             case this.config.comments:
             	// flag:标识0 转播列表，1点评列表 2 点评与转播列表
             	args.data.flag = 1;
@@ -1951,6 +1972,9 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 		}
 		if(args.url == this.config.friendships_create || args.url == this.config.friendships_destroy) {
 			return true;
+		}
+		if(!data.data && data.msg === 'ok') {
+		    return true;
 		}
 		data = data.data;
         if(!data){ return data; }
@@ -2057,7 +2081,7 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 			// Ismyblack: 是否在 accesstoken 用户的黑名单内
 			user.following = !!data.Ismyfans;
 			user.followed_by = !!data.Ismyidol;
-			user.blacked_by = !!data.Ismyblack;
+			user.blocking = user.blacked_by = !!data.Ismyblack;
 			if(data.tweet && data.tweet.length > 0) {
 			    data.tweet[0].origtext = data.tweet[0].origtext || data.tweet[0].text;
 			    user.tweet = this.format_result_item(data.tweet[0], 'status', args, users, false);
@@ -3108,7 +3132,7 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 	    rt_need_source: false,
 	    user_timeline_need_friendship: true,
 	    show_fullname: true,
-	    support_blocking: false,
+	    support_blocking: true,
 	    oauth_callback: 'oob',
 	    upload: '/statuses/update_with_media', // https://upload.twitter.com/1/statuses/update_with_media.json
 	    search: '/search_statuses',
@@ -3276,6 +3300,16 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
             this.super_.apply_auth.call(this, url, auth_args, user);
         }
     },
+    
+    blocks_exists: function(data, callback, context) {
+        this.super_.blocks_exists.call(this, data, function(r, text, status) {
+            if(status === 404) {
+                callback({result: false}, text, status);
+            } else {
+                callback({result: true, user: r}, text, status);
+            }
+        }, context);
+    },
 	
 	before_sendRequest: function(args, user) {
 	    if(args.url.indexOf('/oauth') < 0) {
@@ -3299,9 +3333,11 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 			args.data.show_user = 'true';
 			delete args.data.source;
 			delete args.data.count;
-		} else if(args.url === this.config.user_search) {
-			args.data.per_page = args.data.count;
-			delete args.data.count;
+		} else if(args.url === this.config.user_search || args.url === this.config.blocks_blocking) {
+		    args.data.per_page = args.data.count;
+		    delete args.data.count;
+		} else if(args.url === this.config.blocks_exists) {
+		    args.dont_show_error = true;
 		}
 		var hasAPI = user && user.apiProxy;
 		if(!hasAPI && this.config.host === 'https://api.twitter.com' && args.url.indexOf('/oauth') < 0) {

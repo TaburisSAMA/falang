@@ -1938,7 +1938,7 @@ function addPageMsgs(msgs, t, append, data_type){
     // 处理缩址
     ShortenUrl.expandAll();
     
-    if(t !== 'direct_messages') {
+    if(t !== 'direct_messages' && data_type === 'status') {
         var ids = [];
         var counts_max_id_num = tapi.get_config(getUser()).support_counts_max_id_num || 99;
 	    for(var i = 0, len = msgs.length; i < len; i++){
@@ -3222,6 +3222,7 @@ function showblocking(read_more) {
         var $ul = $("#" + timeline_type + "_timeline ul.list");
         $ul.find(".tweetItem").remove();
         $ul.find('.fans').remove();
+        $tab.data('page', null);
     }
     var c_user = getUser();
     var page = ($tab.data('page') || 0) + 1;
@@ -3233,6 +3234,7 @@ function showblocking(read_more) {
         if(now_user.uniqueKey != c_user.uniqueKey) {
             return;
         }
+        users = users.items || users;
         if(users.length > 0){
             for(var i = 0, l = users.length; i < l; i++) {
                 users[i].blocking = true;
@@ -3255,7 +3257,7 @@ function create_blocking(ele, user_id) {
     var $ele = $(ele);
     $ele.hide();
     getBackgroundView().BlockingUser.create(user_id, function(data) {
-        if(data && !data.error) {
+        if(data === true || (data && !data.error)) {
             showMsg(_u.i18n("create_blocking_success"));
             $ele.prev('.follow').show();
         } else {
@@ -3270,7 +3272,7 @@ function destroy_blocking(ele, user_id) {
     var $ele = $(ele);
     $ele.hide();
     getBackgroundView().BlockingUser.destroy(user_id, function(data) {
-        if(data && !data.error) {
+        if(data === true || (data && !data.error)) {
             showMsg(_u.i18n("destroy_blocking_success"));
             $ele.next('.follow').show();
         } else {
