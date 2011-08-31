@@ -106,6 +106,32 @@ function getMaxMsgId(data_type, user_uniquekey){
     return null;
 };
 
+var BlockingUser = {
+    list: function(user, page, count, callback) {
+        page = page || 1;
+        var params = {user: user, page: page, count: count};
+        tapi.blocks_blocking(params, function(users, textStatus, statuCode) {
+            callback(users || []);
+        });
+    },
+    _op: function(method, user_id, callback) {
+        var user = getUser();
+        var params = {user: user, user_id: user_id};
+        tapi[method](params, function(result, textStatus, statuCode) {
+            callback(result);
+        });
+    },
+    create: function(user_id, callback) {
+        this._op('blocks_create', user_id, callback);
+    },
+    destroy: function(user_id, callback) {
+        this._op('blocks_destroy', user_id, callback);
+    },
+    exists: function(user_id, callback) {
+        this._op('blocks_exists', user_id, callback);
+    }
+};
+
 // 用户跟随放到background view这里处理
 var friendships = {
 	fetch_cursors: {},

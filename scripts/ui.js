@@ -332,6 +332,7 @@ function buildUsersHtml(users, t, c_user){
     if(!c_user){
         c_user = getUser();
     }
+    var config = tapi.get_config(c_user);
     for(var i = 0, len = users.length; i < len; i++) {
     	var user = users[i];
         var context = {
@@ -342,7 +343,8 @@ function buildUsersHtml(users, t, c_user){
             processMsg: tapi.processMsg,
             user: user,
             account: c_user,
-            support_follow: c_user.blogType != 'douban'
+            support_blocking: config.support_blocking,
+            support_follow: !user.blocking && c_user.blogType !== 'douban'
         };
         try {
             htmls.push(Shotenjin.render(TEMPLATE_FANS, context));
@@ -365,11 +367,15 @@ function buildTipboxUserInfo(user, show_fullname){
 
 // 生成用户信息
 function buildUserInfo(user){
+    var c_user = getUser();
+    var config = tapi.get_config(c_user);
     var context = {
         provinces: provinces,
         getUserCountsInfo: getUserCountsInfo,
         user: user,
-        support_follow: getUser().blogType != 'douban'
+        show_fullname: config.show_fullname,
+        support_blocking: config.support_blocking,
+        support_follow: !user.blocking && c_user.blogType !== 'douban'
     };
     return Shotenjin.render(TEMPLATE_USER_INFO, context);
 };

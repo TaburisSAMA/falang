@@ -621,7 +621,7 @@ var Search = {
 	    var timeline_type = 'user_timeline';
 	    var method = 'search';
 	    var data_type = 'status';
-	    if(Search.current_search == 'search_user') {
+	    if(Search.current_search === 'search_user') {
 	    	method = 'user_search';
 	    	data_type = 'user';
 	    }
@@ -1330,7 +1330,7 @@ function getUserTimeline(screen_name, user_id, read_more) {
         	}
             if(sinaMsgs && sinaMsgs.length > 0){
             	var c_tab = getCurrentTab();
-            	if(c_tab != "#user_timeline_timeline") {
+            	if(c_tab !== "#user_timeline_timeline") {
             		//添加当前激活的状态
                     $tab.siblings().removeClass('active').end().addClass('active');
                     //切换tab前先保护滚动条位置
@@ -1787,9 +1787,12 @@ function scrollPaging(){
         } else if(tl == 'favorites') {
         	getFavorites();
         } else if(tl == 'user_timeline') {
-        	var $tab = $("#tl_tabs .tab-user_timeline");
-        	if($tab.attr('statusType') == 'search') {
+        	var $tab = $("#tl_tabs .tab-user_timeline")
+        	  , statusType = $tab.attr('statusType');
+        	if(statusType === 'search') {
         		Search.search(true);
+        	} else if(statusType === 'blocking') {
+        	    showblocking(true);
         	} else {
         		getUserTimeline(null, null, true);
         	}
@@ -1913,19 +1916,24 @@ function addPageMsgs(msgs, t, append, data_type){
 	if(msgs.length == 0){
 		return msgs;
 	}
-	if(t == 'sent_direct_messages') {
+	if(t === 'sent_direct_messages') {
 		t = 'direct_messages';
 	}
 	data_type = data_type || 'status';
     var _ul = $("#" + t + "_timeline ul.list"), htmls = [];
     var method = append ? 'append' : 'prepend';
     var direct = append ? 'last' : 'first';
-    var $last_item = $("#" + t + "_timeline ul.list li.tweetItem:" + direct);
+    var $last_item;
+    if(data_type === 'status') {
+        $last_item = $("#" + t + "_timeline ul.list li.tweetItem:" + direct);
+    } else {
+        $last_item = $("#" + t + "_timeline ul.list div.user_info:" + direct);
+    }
     var max_id = $last_item.attr('did');
     var result = filterDatasByMaxId(msgs, max_id, append);
     msgs = result.news;
 
-    htmls = data_type == 'status' ? buildStatusHtml(msgs, t) : buildUsersHtml(msgs, t);
+    htmls = data_type === 'status' ? buildStatusHtml(msgs, t) : buildUsersHtml(msgs, t);
     _ul[method](htmls.join(''));
     // 处理缩址
     ShortenUrl.expandAll();
@@ -3202,4 +3210,73 @@ function cleanActionCache() {
 	for(var i = 0, len = __action_names.length; i < len; i++) {
 		ActionCache.set(__action_names[i], null);
 	}
+};
+
+// 查看黑名单
+function showblocking(read_more) {
+    var timeline_type = 'user_timeline';
+    hideReadMore(timeline_type);
+    var $tab = $("#tl_tabs .tab-user_timeline");
+    $tab.attr('statusType', 'blocking');
+    if(!read_more) {
+        var $ul = $("#" + timeline_type + "_timeline ul.list");
+        $ul.find(".tweetItem").remove();
+        $ul.find('.fans').remove();
+    }
+    var c_user = getUser();
+    var page = ($tab.data('page') || 0) + 1;
+    getBackgroundView().BlockingUser.list(c_user, page, PAGE_SIZE, function(users) {
+        hideLoading();
+        hideReadMoreLoading(timeline_type);
+        // 如果用户已经切换，则不处理
+        var now_user = getUser();
+        if(now_user.uniqueKey != c_user.uniqueKey) {
+            return;
+        }
+        if(users.length > 0){
+            for(var i = 0, l = users.length; i < l; i++) {
+                users[i].blocking = true;
+            }
+            users = addPageMsgs(users, timeline_type, true, 'user');
+            // 保存数据，用于翻页
+            $tab.data('page', page);
+        }
+        if(users.length >= PAGE_SIZE / 2) {
+            showReadMore(timeline_type);
+        } else {
+            hideReadMore(timeline_type, true); //没有分页了
+        }
+        checkShowGototop();
+    });
+    return false;
+};
+
+function create_blocking(ele, user_id) {
+    var $ele = $(ele);
+    $ele.hide();
+    getBackgroundView().BlockingUser.create(user_id, function(data) {
+        if(data && !data.error) {
+            showMsg(_u.i18n("create_blocking_success"));
+            $ele.prev('.follow').show();
+        } else {
+            var msg = (data && data.error) || _u.i18n("create_blocking_fail");
+            showMsg(msg);
+            $ele.show();
+        }
+    });
+};
+
+function destroy_blocking(ele, user_id) {
+    var $ele = $(ele);
+    $ele.hide();
+    getBackgroundView().BlockingUser.destroy(user_id, function(data) {
+        if(data && !data.error) {
+            showMsg(_u.i18n("destroy_blocking_success"));
+            $ele.next('.follow').show();
+        } else {
+            var msg = (data && data.error) || _u.i18n("destroy_blocking_fail");
+            showMsg(msg);
+            $ele.show();
+        }
+    });
 };

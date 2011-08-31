@@ -494,27 +494,35 @@
 				<div class="user_head"><img src="#{user.profile_image_url}" /></div>
 				<div class="user_info">
 					<div class="userName"><a href="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?></a>
+					<?js if(show_fullname) { ?><span class="fullname">#{user.name}</span> <?js } ?>
 					<?js if(!user.is_me){ ?>
-					<a class="follow" href="javascript:" onclick="doReply(this, '#{user.screen_name}', '', '#{user.id}')">@</a>
-					<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">#{_u.i18n("abb_direct_message")}</a>
-						<?js if(support_follow) { ?>
-							<a class="follow follow_button_destroy" <?js if(user.followed_by === false) { ?>style="display:none;"<?js } ?> href="javascript:;" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">#{_u.i18n("comm_f_destroy")}</a>
-							<a class="follow follow_button_create" <?js if(user.followed_by === true) { ?>style="display:none;"<?js } ?> href="javascript:;" onclick="f_create('#{user.id}', this, '#{user.screen_name}')"><span class="plus">+</span>#{_u.i18n("comm_f_create")}</a>
-							<?js if(user.followed_by === true) { ?>
-							<span class="followed">
-							    <?js if(user.following === true) { ?>
-							    #{_u.i18n("comm_f_followed_by_and_following")}
-							    <?js } else { ?>
-	                            #{_u.i18n("comm_f_followed_by")}
-	                            <?js } ?>
-							</span>
-						    <?js } else if(user.following === true) { ?>
-						    <span class="followed">
-                                #{_u.i18n("comm_f_following")}
-                            </span>
-						    <?js } ?>
-						    
+					    <a class="follow" href="javascript:" onclick="doReply(this, '#{user.screen_name}', '', '#{user.id}')">@</a>
+                        <a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">#{_u.i18n("abb_direct_message")}</a>
+					    <?js if(support_blocking) { ?>
+					        <a class="follow" href="javascript:;" title='#{_u.i18n("destroy_blocking_title")}' 
+					           style="#{user.blocking ? '' : 'display:none'}"
+					           onclick="destroy_blocking(this, '#{user.id}');">#{_u.i18n("destroy_blocking")}</a>
+						    <a class="follow" href="javascript:;" title='#{_u.i18n("create_blocking_title")}' 
+						       style="#{user.blocking ? 'display:none' : ''}"
+						       onclick="create_blocking(this, '#{user.id}');">#{_u.i18n("create_blocking")}</a>
 						<?js } ?>
+						<?js if(support_follow) { ?>
+                            <a class="follow follow_button_destroy" <?js if(user.followed_by === false) { ?>style="display:none;"<?js } ?> href="javascript:;" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">#{_u.i18n("comm_f_destroy")}</a>
+                            <a class="follow follow_button_create" <?js if(user.followed_by === true) { ?>style="display:none;"<?js } ?> href="javascript:;" onclick="f_create('#{user.id}', this, '#{user.screen_name}')"><span class="plus">+</span>#{_u.i18n("comm_f_create")}</a>
+                            <?js if(user.followed_by === true) { ?>
+                            <span class="followed">
+                                <?js if(user.following === true) { ?>
+                                #{_u.i18n("comm_f_followed_by_and_following")}
+                                <?js } else { ?>
+                                #{_u.i18n("comm_f_followed_by")}
+                                <?js } ?>
+                            </span>
+                            <?js } else if(user.following === true) { ?>
+                            <span class="followed">#{_u.i18n("comm_f_following")}</span>
+                            <?js } ?>
+                        <?js } ?>
+					<?js } else if(support_blocking){ ?>
+					<a class="follow" href="javascript:;" title='#{_u.i18n("showblocking_title")}' onclick="showblocking(false);">#{_u.i18n("showblocking")}</a>
 					<?js } ?>
 					</div>
 					<p>
@@ -555,17 +563,25 @@
 				<div class="user_info" did="#{user.id}">
 					<div class="userName"><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" 
 							rhref="#{user.t_url}">#{user.screen_name}<?js if(user.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?></a>
-						<a class="follow" href="javascript:" onclick="doReply(this, '#{user.screen_name}', '')">@</a>
+						<a class="follow" href="javascript:" onclick="doReply(this, '#{user.screen_name}', '', '#{user.id}')">@</a>
 						<a class="follow" href="javascript:" onclick="doNewMessage(this, '#{user.screen_name}','#{user.id}')">#{_u.i18n("abb_direct_message")}</a>
+					<?js if(support_blocking) { ?>
+                        <a class="follow" href="javascript:;" title='#{_u.i18n("destroy_blocking_title")}' 
+                           style="#{user.blocking ? '' : 'display:none'}"
+                           onclick="destroy_blocking(this, '#{user.id}');">#{_u.i18n("destroy_blocking")}</a>
+                        <a class="follow" href="javascript:;" title='#{_u.i18n("create_blocking_title")}' 
+                           style="#{user.blocking ? 'display:none' : ''}"
+                           onclick="create_blocking(this, '#{user.id}');">#{_u.i18n("create_blocking")}</a>
+                    <?js } ?>
 					<?js if(support_follow) { ?>
-						<a class="follow follow_button_destroy" <?js if(user.followed_by !== true && tType !== 'friends') { ?>style="display:none;"<?js } ?> href="javascript:;#{tType}" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">#{_u.i18n("comm_f_destroy")}</a>
+                        <a class="follow follow_button_destroy" <?js if(user.followed_by !== true && tType !== 'friends') { ?>style="display:none;"<?js } ?> href="javascript:;#{tType}" onclick="f_destroy('#{user.id}', this, '#{user.screen_name}')">#{_u.i18n("comm_f_destroy")}</a>
                         <a class="follow follow_button_create" <?js if(user.followed_by === true || tType === 'friends') { ?>style="display:none;"<?js } ?> href="javascript:;" onclick="f_create('#{user.id}', this, '#{user.screen_name}')"><span class="plus">+</span>#{_u.i18n("comm_f_create")}</a>
                         <?js if((user.followed_by === true || tType === 'friends') && user.following === true) { ?>
                             <span class="followed">
                             #{_u.i18n("comm_f_followed_by_and_following")}
                             </span>
                         <?js } ?>
-					<?js } ?>	
+                    <?js } ?>	
 					</div>
 					<p>
 				     <img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 
@@ -584,12 +600,12 @@
                        &nbsp;&nbsp;&nbsp;#{_u.i18n("comm_favourite")}: <span>#{user.favourites_count}</span>
                         <?js } ?>
 					</p>
-					<?js if(user.url && user.url != 'http://1'){ ?>
+					<?js if(user.url && user.url !== 'http://1'){ ?>
 					<p>#{_u.i18n("comm_blog")}：<a href="#{user.url}">#{user.url}</a></p>
 					<?js } ?>
 				</div>
 				<?js if(user.description){ ?>
-				<div class="des">#{_u.i18n("comm_description")}: #{user.description}</div>
+				<div class="des">#{_u.i18n("comm_description")}: ${user.description}</div>
 				<?js } ?>
 				<?js if(user.tags){ ?>
                 <div class="tags">#{_u.i18n("comm_tags")}: 

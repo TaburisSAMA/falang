@@ -1326,5 +1326,29 @@
     "sett_itemName": {
         "message": "",
         "description": ""
+    },
+    "showblocking": {
+        "message": "Blocking",
+        "description": "黑名单"
+    },
+    "showblocking_title": {
+        "message": "View blocking users",
+        "description": "查看黑名单用户"
+    },
+    "create_blocking": {
+        "message": "Block",
+        "description": "拉黑"
+    },
+    "create_blocking_title": {
+        "message": "Block this user",
+        "description": "将此用户加到黑名单中"
+    },
+    "destroy_blocking": {
+        "message": "Unblock",
+        "description": "取消拉黑"
+    },
+    "destroy_blocking_title": {
+        "message": "Unblock this user",
+        "description": "将此用户从黑名单中删除"
     }
 }

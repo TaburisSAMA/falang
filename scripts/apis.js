@@ -113,6 +113,7 @@ var sinaApi = {
 		comment_need_user_id: false, // 评论是否需要使用到用户id，默认为false，兼容所有旧接口
 		user_timeline_need_user: false, // user_timeline 是否需要调用show_user获取详细用户信息
 		show_fullname: false, // 是否需要显示全名
+		support_blocking: true, // 是否支持黑名单功能
         
 		// api
         public_timeline:      '/statuses/public_timeline',
@@ -147,6 +148,11 @@ var sinaApi = {
         friendships_show:     '/friendships/show',
         reset_count:          '/statuses/reset_count',
         user_show:            '/users/show/{{id}}',
+        blocks_blocking:      '/blocks/blocking',
+        blocks_blocking_ids:  '/blocks/blocking/ids',
+        blocks_create:        '/blocks/create',
+        blocks_destroy:       '/blocks/destroy',
+        blocks_exists:        '/blocks/exists',
         
         // 用户标签
         tags: 				  '/tags',
@@ -535,7 +541,7 @@ var sinaApi = {
         };
         
         // Make a Combo object.
-        var both = this.combo(function(statuses_args, friendship_args, show_user_args) {
+        var both = this.combo(function(statuses_args, friendship_args, show_user_args, blocking_args) {
             var friendship = null;
             if(friendship_args && friendship_args[0]) {
                 var relationship = friendship_args[0];
@@ -562,6 +568,9 @@ var sinaApi = {
             if(statuses_result.items) {
                 statuses_result.user = user_info;
             }
+            if(user_info && blocking_args && blocking_args[0]) {
+                user_info.blocking = blocking_args[0].result;
+            }
             return callback.apply(context, statuses_args);
         });
         var oauth_user = data.user
@@ -571,6 +580,7 @@ var sinaApi = {
         // 获取friendships_show
         var friendship_callback = both.add();
         var user_timeline_callback = both.add();
+        var user_blocking_callback = both.add();
         if(need_friendship) {
             var args = {user: oauth_user};
             args.target_id = user_id;
@@ -592,6 +602,18 @@ var sinaApi = {
             this.user_show(args, user_timeline_callback);
         } else {
             user_timeline_callback();
+        }
+        if(need_friendship && this.config.support_blocking) {
+            var args = {user: oauth_user};
+            if(user_id) {
+                args.user_id = user_id;
+            }
+            if(screen_name) {
+                args.screen_name = screen_name;
+            }
+            this.blocks_exists(args, user_blocking_callback);
+        } else {
+            user_blocking_callback();
         }
 	},
 	
@@ -1125,6 +1147,61 @@ var sinaApi = {
         this._sendRequest(params, callback, context);
     },
     
+    // page, count
+    blocks_blocking: function(data, callback, context) {
+        var params = {
+            url: this.config.blocks_blocking,
+            type: 'get',
+            play_load: 'user',
+            data: data
+        };
+        this._sendRequest(params, callback, context);
+    },
+    
+    // page, count
+    blocks_blocking_ids: function(data, callback, context) {
+        var params = {
+            url: this.config.blocks_blocking_ids,
+            type: 'get',
+            play_load: 'json',
+            data: data
+        };
+        this._sendRequest(params, callback, context);
+    },
+    
+    // user_id
+    blocks_create: function(data, callback, context) {
+        var params = {
+            url: this.config.blocks_create,
+            type: 'post',
+            play_load: 'json',
+            data: data
+        };
+        this._sendRequest(params, callback, context);
+    },
+    
+    // user_id
+    blocks_destroy: function(data, callback, context) {
+        var params = {
+            url: this.config.blocks_destroy,
+            type: 'post',
+            play_load: 'json',
+            data: data
+        };
+        this._sendRequest(params, callback, context);
+    },
+    
+    // user_id
+    blocks_exists: function(data, callback, context) {
+        var params = {
+            url: this.config.blocks_exists,
+            type: 'get',
+            play_load: 'json',
+            data: data
+        };
+        this._sendRequest(params, callback, context);
+    },
+    
     // q, max_id, count
     search: function(data, callback, context) {
     	var params = {
@@ -1464,6 +1541,7 @@ var TQQAPI = Object.inherits({}, sinaApi, {
         user_timeline_need_friendship: false, // show_user信息中已经包含
         user_timeline_need_user: true, 
         show_fullname: true,
+        support_blocking: false,
         
         mentions:             '/statuses/mentions_timeline',
         followers:            '/friends/user_fanslist',
@@ -2095,6 +2173,7 @@ var TSohuAPI = Object.inherits({}, sinaApi, {
 	    mentions: '/statuses/mentions_timeline',
 	    comments: '/statuses/comments/{{id}}',
 	    reply: '/statuses/comment',
+	    support_blocking: false, 
 	    
 	    user_timeline: '/statuses/user_timeline/{{id}}',
 	    
@@ -2242,6 +2321,7 @@ var DiguAPI = Object.inherits({}, sinaApi, {
 	    repost_pre: '转载:',
 	    support_search_max_id: false,
 	    user_timeline_need_friendship: false,
+	    support_blocking: false,
 	    
 	    verify_credentials:   '/account/verify',
 	    
@@ -2560,6 +2640,7 @@ var ZuosaAPI = Object.inherits({}, sinaApi, {
 	    support_search_max_id: false,
 	    support_auto_shorten_url: false,
 	    user_timeline_need_friendship: false,
+	    support_blocking: false,
 	    
 	    upload: '/statuses/update',
 	    repost: '/statuses/update',
@@ -2730,6 +2811,7 @@ var LeiHouAPI = Object.inherits({}, sinaApi, {
 		support_user_search: false,
 		support_auto_shorten_url: false,
 		user_timeline_need_friendship: false,
+		support_blocking: false,
 	
 	    upload: '/statuses/update',
 	    repost: '/statuses/update',
@@ -2875,6 +2957,7 @@ var Follow5API = Object.inherits({}, sinaApi, {
 		support_do_favorite: false, // 判断是否支持收藏功能
 		support_auto_shorten_url: false,
 		user_timeline_need_friendship: false,
+		support_blocking: false,
 
 	    verify_credentials: '/users/verify_credentials',
 	    direct_messages: '/destroy_messages', 
@@ -3025,6 +3108,7 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 	    rt_need_source: false,
 	    user_timeline_need_friendship: true,
 	    show_fullname: true,
+	    support_blocking: false,
 	    oauth_callback: 'oob',
 	    upload: '/statuses/update_with_media', // https://upload.twitter.com/1/statuses/update_with_media.json
 	    search: '/search_statuses',
@@ -3297,6 +3381,7 @@ var StatusNetAPI = Object.inherits({}, TwitterAPI, {
 	    support_sent_direct_messages: false,
 	    support_auto_shorten_url: false,
 	    support_user_search: false, //暂时屏蔽
+	    support_blocking: false,
 	    oauth_callback: 'oob',
 	    search: '/search_statuses',
 	    repost: '/statuses/update',
@@ -3364,6 +3449,7 @@ var TaobaoStatusNetAPI = Object.inherits({}, StatusNetAPI, {
         support_auto_shorten_url: true,
         support_user_search: false, //暂时屏蔽
         show_fullname: false,
+        support_blocking: false,
         upload: '/statuses/update'
     }),
     
@@ -3418,6 +3504,7 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
 	    favorites_create: '/favorites/create/{{id}}',
 	    support_user_search: false,
 	    user_timeline_need_friendship: false,
+	    support_blocking: false,
 
         gender_map:{"男":'m', '女':'f'}
 	}),
@@ -3547,6 +3634,8 @@ var T163API = Object.inherits({}, sinaApi, {
         support_favorites_max_id: true,
         user_timeline_need_friendship: false,
         user_timeline_need_user: true,
+        support_blocking: false,
+        
         max_text_length: 163,
         repost_pre: 'RT', // 转发前缀
         repost_delimiter: '||',
@@ -3901,6 +3990,7 @@ var RenjianAPI = Object.inherits({}, sinaApi, {
 	    followers: '/statuses/followers/{{user_id}}',
 	    direct_messages: '/direct_messages/receive',
 	    user_timeline_need_friendship: false,
+	    support_blocking: false,
         
         gender_map: {0:'n', 1:'m', 2:'f'}
 	}),
@@ -4080,6 +4170,7 @@ var BuzzAPI = Object.inherits({}, sinaApi, {
 		repost_pre: 'RT ',
 		comment_need_user_id: true,
 		user_timeline_need_friendship: false,
+		support_blocking: false,
 		
 		oauth_host: 'https://www.google.com',
 		oauth_authorize: 	  '/accounts/OAuthAuthorizeToken',
@@ -4350,6 +4441,7 @@ var DoubanAPI = Object.inherits({}, sinaApi, {
 		user_timeline_need_friendship: false,
 		user_timeline_need_user: true,
 		show_fullname: true,
+		support_blocking: false,
 		// support_sent_direct_messages: false,
 //		oauth_callback: null,
 		oauth_host: 'http://www.douban.com',
@@ -4611,6 +4703,7 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 		//support_cursor_only: true,
 		support_search: false,
 		support_sent_direct_messages: false,
+		support_blocking: false,
 		oauth_host: 'http://open.tianya.cn',
 		oauth_authorize: 	  '/oauth/authorize.php',
         oauth_request_token:  '/oauth/request_token.php',
@@ -4685,7 +4778,7 @@ var FacebookAPI = Object.inherits({}, sinaApi, {
         support_favorites: false,
         support_auto_shorten_url: false,
         user_timeline_need_friendship: false,
-        
+        support_blocking: false,
         
         direct_messages: '/me/inbox',
         verify_credentials: '/me',
@@ -4957,6 +5050,7 @@ var RenrenAPI = Object.inherits({}, sinaApi, {
         support_max_id: false, // page 翻页
         user_timeline_need_friendship: false,
         use_method_param: true, // only one api path
+        support_blocking: false,
         
         direct_messages: '/me/inbox',
         verify_credentials: 'users.getLoggedInUser', //'users.getLoggedInUser => uid => users.getProfileInfo',
@@ -5494,6 +5588,7 @@ var PlurkAPI = Object.inherits({}, sinaApi, {
         support_cursor_only: true,  // 只支持游标方式翻页
         support_auto_shorten_url: false,
         user_timeline_need_friendship: false,
+        support_blocking: false,
         repost_pre: 'RT', // 转发前缀
         verify_credentials: '/Users/login',
         update: '/Timeline/plurkAdd',
@@ -5999,6 +6094,31 @@ var tapi = {
     // id
     status_show: function(data, callback, context) {
     	return this.api_dispatch(data).status_show(data, callback, context);
+    },
+    
+    // page, count
+    blocks_blocking: function(data, callback, context) {
+        return this.api_dispatch(data).blocks_blocking(data, callback, context);
+    },
+    
+    // page, count
+    blocks_blocking_ids: function(data, callback, context) {
+        return this.api_dispatch(data).blocks_blocking_ids(data, callback, context);
+    },
+    
+    // user_id, screen_name
+    blocks_create: function(data, callback, context) {
+        return this.api_dispatch(data).blocks_create(data, callback, context);
+    },
+    
+    // user_id, screen_name
+    blocks_destroy: function(data, callback, context) {
+        return this.api_dispatch(data).blocks_destroy(data, callback, context);
+    },
+    
+    // user_id, screen_name
+    blocks_exists: function(data, callback, context) {
+        return this.api_dispatch(data).blocks_exists(data, callback, context);
     },
     
     // str
