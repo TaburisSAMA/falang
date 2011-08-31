@@ -64,6 +64,7 @@ function buildStatusHtml(statuses, t, c_user){
     var config = tapi.get_config(c_user);
  	var support_do_comment = config.support_do_comment;
  	var support_do_favorite = config.support_do_favorite;
+ 	var show_fullname = config.show_fullname;
  	var need_set_readed = false; // 必须设置为已读
  	if(t === 'user_timeline' || t === 'favorites') {
  	   need_set_readed = true;
@@ -181,7 +182,7 @@ function buildStatusHtml(statuses, t, c_user){
 	var comments_count_tpl = '<a href="javascript:void(0);" timeline_type="comment" title="'
         + _u.i18n("btn_show_comments_title") 
         + '" onclick="showComments(this, \'{{id}}\');">{{comments_count}}</a>';
-	
+	var support_follow = c_user.blogType != 'douban';
     for(var i = 0, len = statuses.length; i < len; i++) {
     	var status = statuses[i];
     	TWEETS[String(status.id)] = status;
@@ -289,7 +290,8 @@ function buildStatusHtml(statuses, t, c_user){
             account: c_user,
             tweet: status,
             is_rt_rt: false,
-            support_follow: c_user.blogType != 'douban',
+            support_follow: support_follow,
+            show_fullname: show_fullname,
             support_instapaper: support_instapaper,
             support_readitlater: support_readitlater,
             btn: buttons
@@ -352,10 +354,11 @@ function buildUsersHtml(users, t, c_user){
 };
 
 // 生成Tipbox用户信息(鼠标移到用户头像时显示的用户信息)
-function buildTipboxUserInfo(user){
+function buildTipboxUserInfo(user, show_fullname){
     var context = {
 	    provinces: provinces,
-	    user: user
+	    user: user,
+	    show_fullname: show_fullname
 	};
     return Shotenjin.render(TEMPLATE_TIPBOX_USER_INFO, context);
 };

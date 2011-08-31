@@ -298,7 +298,7 @@ function checkTimeline(t, user_uniqueKey) {
       // 腾讯微博的第一次获取加pageflag=0，获取第一页
         params['pageflag'] = 0;
         params['since_id'] = 0;
-        params['lastid'] = 0;
+//        params['lastid'] = 0;
     }
     showLoading();
 //    console.log('bg_checkTimeline', t, params.user.screen_name, 'since_id:', params.since_id, 'pageflag:', params.pageflag);

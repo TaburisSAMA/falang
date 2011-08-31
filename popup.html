@@ -85,7 +85,7 @@
 			<div class="user">
 				<a class="face" href="#"><img class="icon" src="images/1.gif" /><img class="bt" src="images/1.gif" /></a>
 				<span class="info">
-					<span class="name"></span><br/>
+					<a class="name_link" href="#"><span class="name"></span><br/></a>
 					<span class="nums"></span>
 				</span>
 				<span class="top_btns">
@@ -275,7 +275,7 @@
 						<a class="user_head" target="_blank" href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" rhref="#{user.t_url}">
 							<img src="#{user.profile_image_url.replace('24x24', '48x48')}" />
 						</a>
-						#{buildTipboxUserInfo(user)}
+						#{buildTipboxUserInfo(user, show_fullname)}
 				    </span>
 				</div>
 				<div class="mainContent commentWrap">
@@ -284,6 +284,7 @@
 						<a target="_blank" user_id="#{user.id}" user_screen_name="#{user.screen_name}" href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" rhref="#{user.t_url}" title="#{getUserCountsInfo(user)}">
 							#{user.screen_name}<?js if(user.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?>
 						</a>
+						<?js if(show_fullname) { ?><span class="fullname">#{user.name}</span> <?js } ?>
 						<span class="edit">
 							<?js if(tweet.related_dialogue_url){ ?>
 							<a href="#{tweet.related_dialogue_url}" title="#{_u.i18n('comm_show_related_dialogue')}" target="_blank"><img src="images/inreply.png" /></a>
@@ -319,6 +320,7 @@
 									rhref="#{tweet.retweet_me.t_url}">
 									#{tweet.retweet_me.screen_name}<?js if(tweet.retweet_me.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?>
 								</a>
+								<?js if(show_fullname) { ?><span class="fullname">#{tweet.retweet_me.name}</span> <?js } ?>
 							 <?js } ?>
 						     <?js if(tweet.retweet_user){ ?>
 						     	<?js if(tweet.retweet_me){ ?>、<?js } ?>
@@ -327,6 +329,7 @@
 									rhref="#{tweet.retweet_user.t_url}">
 									#{tweet.retweet_user.screen_name}<?js if(tweet.retweet_user.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?>
 								</a>
+								<?js if(show_fullname) { ?><span class="fullname">#{tweet.retweet_user.name}</span> <?js } ?>
 							 <?js } ?> #{_u.i18n("comm_retweet_by_after")}</div>
 						   <?js } ?>
 						</div>
@@ -378,9 +381,14 @@
 				<div class="tweetItem retweeted commentWrap showCounts_#{tweet.retweeted_status.id} <?js if(is_rt_rt){ ?>rt_retweeted<?js } ?>" id="tweet#{tweet.retweeted_status.id}">
 					<div class="userName">
 					    <?js if(is_rt_rt){ ?>
+					    <span class="showtip">
 					    <a user_id='#{retweeted_status_user.id}' user_screen_name="#{retweeted_status_user.screen_name}" 
-					        href="javascript:getUserTimeline('#{retweeted_status_user.screen_name}', '#{retweeted_status_user.id}');">@#{retweeted_status_user.screen_name}</a> 
-					    <?js } ?><?js if(tType=='comments_timeline' && !is_rt_rt){ ?> 
+					        href="javascript:getUserTimeline('#{retweeted_status_user.screen_name}', '#{retweeted_status_user.id}');">@#{retweeted_status_user.screen_name}</a>
+					    <?js if(show_fullname) { ?><span class="fullname">#{retweeted_status_user.name}</span> <?js } ?>
+					    #{buildTipboxUserInfo(retweeted_status_user, show_fullname)}
+					    </span>
+					    <?js } ?>
+					    <?js if(tType=='comments_timeline' && !is_rt_rt){ ?> 
 					        #{_u.i18n('comm_comment_to_before')} 
 					    <?js }else{ ?> 
 					        #{_u.i18n('comm_repost_to_before')}
@@ -391,7 +399,8 @@
 								rhref="#{tweet.retweeted_status.user.t_url}">
 								@#{tweet.retweeted_status.user.screen_name}<?js if(tweet.retweeted_status.user.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?>
 							</a>
-							#{buildTipboxUserInfo(tweet.retweeted_status.user)}
+							<?js if(show_fullname) { ?><span class="fullname">#{tweet.retweeted_status.user.name}</span> <?js } ?>
+							#{buildTipboxUserInfo(tweet.retweeted_status.user, show_fullname)}
 						</span>
 						#{_u.i18n("comm_repost_to_after")}: 
 						<span class="edit">
@@ -453,7 +462,9 @@
 						<p><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');" 
 							rhref="#{user.t_url}">#{user.screen_name}
 							<?js if(user.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?>
-						</a></p>
+						</a>
+						<?js if(show_fullname) { ?><span class="fullname">#{user.name}</span> <?js } ?>
+						</p>
 						<p>
 							<img class="small_icon sicon_gender_#{user.gender}" src="/images/transparent.gif" 
 								title="<?js if(user.gender == 'm'){ ?> #{_u.i18n('comm_man')} <?js }else if(user.gender == 'f'){ ?> #{_u.i18n('comm_female')} <?js }else{ ?> #{_u.i18n('comm_gender_unknow')} <?js } ?>" />

@@ -809,3 +809,9 @@ div.loading_bar span {
 #remember_send_data_ctr * {
     cursor:pointer;
 }
+
+.fullname {
+    color: #999;
+    font-size: 12px;
+    font-weight: normal;
+}

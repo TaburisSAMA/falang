@@ -112,6 +112,7 @@ var sinaApi = {
 		need_processMsg: true, //是否需要处理消息的内容
 		comment_need_user_id: false, // 评论是否需要使用到用户id，默认为false，兼容所有旧接口
 		user_timeline_need_user: false, // user_timeline 是否需要调用show_user获取详细用户信息
+		show_fullname: false, // 是否需要显示全名
         
 		// api
         public_timeline:      '/statuses/public_timeline',
@@ -1462,6 +1463,7 @@ var TQQAPI = Object.inherits({}, sinaApi, {
         repost_timeline: 	  '/t/re_list_repost',
         user_timeline_need_friendship: false, // show_user信息中已经包含
         user_timeline_need_user: true, 
+        show_fullname: true,
         
         mentions:             '/statuses/mentions_timeline',
         followers:            '/friends/user_fanslist',
@@ -3022,6 +3024,7 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 	    support_double_char: false,
 	    rt_need_source: false,
 	    user_timeline_need_friendship: true,
+	    show_fullname: true,
 	    oauth_callback: 'oob',
 	    upload: '/statuses/update_with_media', // https://upload.twitter.com/1/statuses/update_with_media.json
 	    search: '/search_statuses',
@@ -3360,6 +3363,7 @@ var TaobaoStatusNetAPI = Object.inherits({}, StatusNetAPI, {
         support_direct_messages: false,
         support_auto_shorten_url: true,
         support_user_search: false, //暂时屏蔽
+        show_fullname: false,
         upload: '/statuses/update'
     }),
     
@@ -4345,6 +4349,7 @@ var DoubanAPI = Object.inherits({}, sinaApi, {
 		support_auto_shorten_url: false,
 		user_timeline_need_friendship: false,
 		user_timeline_need_user: true,
+		show_fullname: true,
 		// support_sent_direct_messages: false,
 //		oauth_callback: null,
 		oauth_host: 'http://www.douban.com',
@@ -4509,6 +4514,11 @@ var DoubanAPI = Object.inherits({}, sinaApi, {
 					data.id = data.id.substring(data.id.lastIndexOf('/miniblog/') + 10, data.id.length);
 				}
 			}
+			if(data.user) {
+			    // http://shuo.douban.com/#!/fengmk2/status/749236354
+	            data.t_url = 'http://shuo.douban.com/#!/' + data.user.id + '/status/' + data.id;
+			}
+			
 			data.text = data.content['$t'];
 			// saying 和 推荐 才支持评论
 			if(data.category) {

@@ -2465,7 +2465,11 @@ function at_user_autocomplete(ele_id, match_all_text, select_callback) {
         			var html = '';
             		for(var user_id in names) {
             			var item = names[user_id];
-            			html += '<li name="' + item[0] + '" user_id="' + user_id + '">' + item[1] + '</li>';
+            			var showname = item[1];
+            			if(item[0] !== item[1]) {
+            			    showname += '(' + item[0] + ')';
+            			}
+            			html += '<li name="' + item[0] + '" user_id="' + user_id + '">' + showname + '</li>';
             		}
             		if(!html) {
             			$tip_div.hide();

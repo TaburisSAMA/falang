@@ -739,13 +739,16 @@ function initChangeUserList(){
 //头部的用户信息
 function showHeaderUserInfo(c_user){
     var h_user = $("#header .user");
-    h_user.find('.face').attr('href', c_user.t_url);
+    h_user.find('.face, .name_link').attr('href', c_user.t_url);
     h_user.find('.face .icon').attr('src', c_user.profile_image_url);
     h_user.find('.face .bt').attr('src', 'images/blogs/'+c_user.blogType+'_16.png');
     h_user.find('.info .name').html(c_user.screen_name);
-    var nums = '';
-    if(tapi.get_config(c_user).userinfo_has_counts){
-        nums = _u.i18n("comm_counts_info").format(c_user);
+    var nums = '', config = tapi.get_config(c_user);
+    if(config.show_fullname) {
+        nums += c_user.name + '&nbsp;&nbsp;&nbsp;&nbsp;';
+    }
+    if(config.userinfo_has_counts){
+        nums += _u.i18n("comm_counts_info").format(c_user);
         if(c_user.favourites_count != undefined) {
             nums += ', ' + c_user.favourites_count + ' ' + _u.i18n("comm_favourite");
         }
