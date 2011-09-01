@@ -293,12 +293,13 @@ var sinaApi = {
     formatSearchText: function(str) { // 格式化主题
     	return '#' + str.trim() + '#';
     },
+    _at_match_rex: /@([●\w\-\_\u2E80-\u3000\u303F-\u9FFF]+)/g,
     processAt: function (str) { 
     	//@*** u4e00-\u9fa5:中文字符 \u2E80-\u9FFF:中日韩字符
     	//【观点·@任志强】今年提出的1000万套的保障房任务可能根本完不成
     	// http://blog.oasisfeng.com/2006/10/19/full-cjk-unicode-range/
     	// CJK标点符号：3000-303F
-        str = str.replace(/@([●\w\-\_\u2E80-\u3000\u303F-\u9FFF]+)/g, 
+        str = str.replace(this._at_match_rex, 
         	'<a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'
         		+ this.config.user_home_url + '$1" title="'
         		+ _u.i18n("btn_show_user_title") +'">@$1</a>');
@@ -3515,6 +3516,7 @@ var TaobaoStatusNetAPI = Object.inherits({}, StatusNetAPI, {
         });
         return str;
     },
+    _at_match_rex: /@([\(\)●\w\-\_\u2E80-\u3000\u303F-\u9FFF]+)/g
 });
 
 
@@ -3643,6 +3645,8 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
 		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = 'http://fanfou.com/' + (data.id || data.screen_name);
             data.gender = this.config.gender_map[data.gender];
+            data.followed_by = data.following;
+            data.following = false;
 		}
 		return data;
 	}
