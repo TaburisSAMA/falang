@@ -1652,12 +1652,18 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 	    return message || error_msg;
 	},
 	
+	_VIDEO_PADDING: '!!!{{status.video.shorturl}}!!!',
 	processMsg: function(status, notEncode) {
 		if(status.video && status.video.picurl && status.text) {
-		    status.text = status.text.replace(status.video.shorturl, '!!!{{status.video.shorturl}}!!!');
-		    var s = this.super_.processMsg.call(this, status, notEncode);
-		    var video_html = '<a href="' + status.video.realurl + '" title="' + status.video.title + '" target="_blank" class="link">' + status.video.shorturl + '</a>';
-			s = s.replace('!!!{{status.video.shorturl}}!!!', video_html);
+		    // 添加视频链接
+		    if(status.text.indexOf(status.video.shorturl) < 0) {
+		        status.text += ' ' + status.video.shorturl;
+		    }
+		    var text = status.text.replace(status.video.shorturl, this._VIDEO_PADDING);
+		    var s = this.super_.processMsg.call(this, text, notEncode);
+		    var video_html = '<a href="' + status.video.realurl + '" title="' 
+		        + status.video.title + '" target="_blank" class="link">' + status.video.shorturl + '</a>';
+			s = s.replace(this._VIDEO_PADDING, video_html);
 		    s += '<br/><img class="video_image" title="' + status.video.title + '" src="' + status.video.picurl + '" />';
 		    return s;
 		} else {
@@ -2085,7 +2091,7 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 			user.blocking = user.blacked_by = !!data.Ismyblack;
 			if(data.tweet && data.tweet.length > 0) {
 			    data.tweet[0].origtext = data.tweet[0].origtext || data.tweet[0].text;
-			    user.tweet = this.format_result_item(data.tweet[0], 'status', args, users, false);
+			    user.status = this.format_result_item(data.tweet[0], 'status', args, users, false);
 			}
 			data = user;
 		} else if(play_load == 'status' || play_load == 'comment' || play_load == 'message') {

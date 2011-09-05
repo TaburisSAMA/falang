@@ -614,17 +614,17 @@
                     <?js } ?>
                 </div>
                 <?js } ?>
-				<?js if(user.tweet && user.tweet.text) { ?>
+				<?js if(user.status && user.status.text) { ?>
 				<br/>
                 <div class="recent_tweet">#{_u.i18n("comm_recent_tweet")}: 
-                #{user.tweet.text}
+                ${user.status.text}
                 |
-                <?js if(user.tweet.t_url) { ?>
-                <a href="#{user.tweet.t_url}" target="_blank">#{new Date(user.tweet.created_at).format("yyyy-MM-dd hh:mm:ss")}</a>
+                <?js if(user.status.t_url) { ?>
+                <a href="#{user.status.t_url}" target="_blank">#{new Date(user.status.created_at).format("yyyy-MM-dd hh:mm:ss")}</a>
                 <?js } else { ?>
-                #{new Date(user.tweet.created_at).format("yyyy-MM-dd hh:mm:ss")}
+                #{new Date(user.status.created_at).format("yyyy-MM-dd hh:mm:ss")}
                 <?js } ?>
-                #{_u.i18n('comm_post_by')} #{user.tweet.source|| _u.i18n("comm_web_site")}
+                #{_u.i18n('comm_post_by')} #{user.status.source || _u.i18n("comm_web_site")}
                 </div>
                 <?js } ?>
 			</div>

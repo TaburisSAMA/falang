@@ -2607,11 +2607,14 @@ function doRT(ele, is_rt, is_rt_rt) {
 		need_sourcelink = $preview.attr('need_sourcelink');
     }
     
-    if(!original_pic) {
-    	// 没图片，则打开文本框
-        window.imgForUpload = null;
-    	showMsgInput();
-    }
+//    if(!original_pic) {
+//    	// 没图片，则打开文本框
+//        window.imgForUpload = null;
+//    	showMsgInput();
+//    }
+    window.imgForUpload = null;
+    showMsgInput();
+    
     var name = config.rt_at_name ? (_msg_user.name || _msg_user.id) : _msg_user.screen_name;
     val = repost_pre + ' ' + '@' + name + ' ' + val;
     if(data.crosspostSource) {
@@ -2621,7 +2624,10 @@ function doRT(ele, is_rt, is_rt_rt) {
     t.blur().val(val).focus(); //光标在头部
     if(original_pic) {
     	// 有图片，则打开图片上传
-    	openUploadImage(null, original_pic, sourcelink, need_sourcelink);
+//    	openUploadImage(null, original_pic, sourcelink, need_sourcelink);
+    	var file = window.imgForUpload = getImageBlob(original_pic);
+//        window.imgForUpload.fileName = 'fawave.png';
+        _init_image_preview(original_pic, file.size, 'upImgPreview', 'btnUploadPic');
     }
 };
 

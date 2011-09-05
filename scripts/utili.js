@@ -2224,7 +2224,8 @@ var VideoService = {
 	is_qq_support: function(url) {
 		return this.services.youku.url_re.test(url) 
 			|| this.services.ku6.url_re.test(url) 
-			|| this.services.tudou.url_re.test(url);
+			|| this.services.tudou.url_re.test(url)
+			|| this.services.yinyuetai.url_re.test(url);
 	},
 	services: {
 		youku: {
