@@ -127,6 +127,7 @@ var TSINA_API_EMOTIONS = {
 for(var k in TSINA_FACES) {
     TSINA_API_EMOTIONS[k] = TSINA_FACES[k];
 };
+TSINA_API_EMOTIONS['淚'] = "d8/sad.gif";
 //嘀咕的表情
 //http://images.digu.com/web_res_v1/emotion/**.gif
 var DIGU_EMOTIONS = {

@@ -874,6 +874,7 @@ var sinaApi = {
 		    delete data.__upload_url;
 		    delete auth_args.data.__upload_url;
 		}
+		
 		// 设置认证头部
         this.apply_auth(url, auth_args, user);
         for(var key in auth_args.data) {
@@ -900,7 +901,6 @@ var sinaApi = {
 	    builder += 'Content-Type: '+ (pic.file.fileType || pic.file.type);
 	    builder += crlf;
 	    builder += crlf; 
-//	    console.log(builder)
 	    var bb = new BlobBuilder(); //NOTE change to WebKitBlogBuilder
 	    bb.append(builder);
 	    bb.append(pic.file);
@@ -911,7 +911,6 @@ var sinaApi = {
 	    builder += boundary;
 	    builder += dashdash;
 	    builder += crlf;
-	
 	    bb.append(builder);
 	    
 	    if(before_request) {
@@ -1730,6 +1729,8 @@ var TQQAPI = Object.inherits({}, sinaApi, {
             data.content = data.status;
             delete data.status;
         }
+    	data.format = 'json';
+    	delete data.source;
     },
     
     upload: function(user, data, pic, before_request, onprogress, callback, context) {
@@ -4731,7 +4732,7 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 		source: '12d4d19aee679b8713297c2583fe21b204dd9ca0a', 
 		oauth_key: '12d4d19aee679b8713297c2583fe21b204dd9ca0a',
         oauth_secret: '0b3b77ad0586343a18670a18e44d7457',
-        result_format: '', // 豆瓣由alt参数确定返回值格式
+        result_format: '', // 由outformat参数确定返回值格式
         oauth_callback: FAWAVE_OAUTH_CALLBACK_URL,
 		userinfo_has_counts: false, // 用户信息中是否包含粉丝数、微博数等信息
         support_comment: false,
@@ -4742,7 +4743,6 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 		support_favorites: false,
 		support_do_favorite: false,
 		support_mentions: false,
-		support_upload: false,
 		need_processMsg: false,
 		support_auto_shorten_url: false,
 		user_timeline_need_friendship: false,
@@ -4754,8 +4754,10 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 		oauth_authorize: 	  '/oauth/authorize.php',
         oauth_request_token:  '/oauth/request_token.php',
         oauth_access_token:   '/oauth/access_token.php',
-        update: '/yabo/add.php',
-		verify_credentials: '/user/info.php'
+        update: '/weibo/add.php',
+        upload: '/weibo/addimg.php',
+		verify_credentials: '/user/info.php',
+		user_timeline: '/yabo/getmyweibo.php'
 	}),
 	
 	apply_auth: function(url, args, user) {
@@ -4778,6 +4780,10 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 	
 	before_sendRequest: function(args, user) {
 		args.data.outformat = 'json';
+		if(args.url.indexOf('/oauth/') < 0) {
+		    args.data.appkey = args.data.source;
+	        delete args.data.source;
+		}
 		if(args.url === this.config.update) {
 			args.type = 'get';
 			args.data.word = args.data.status;
@@ -4788,6 +4794,13 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 	url_encode: function(text) {
 		return text;
 	},
+	format_upload_params: function(user, data, pic) {
+        pic.keyname = 'media';
+        data.appkey = data.source;
+        delete data.source;
+        data.word = data.status;
+        delete data.status;
+    },
 	format_result_item: function(data, play_load, args) {
 		if(play_load === 'user') {
 			data = data.user;
@@ -4796,6 +4809,18 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 			data.created_at = new Date(data.register_date);
 			data.birthday = new Date(data.birthday);
 			data.profile_image_url = data.head;
+			data.verified = !!data.isvip;
+			// gender: 性别,m--男，f--女,n--未知
+			data.gender = 'n';
+			if(data.sex && data.sex.indexOf) {
+			    if(data.sex.indexOf('男') >= 0) {
+			        data.gender = 'm';
+			    } else if(data.sex.indexOf('女') >= 0) {
+			        data.gender = 'f';
+			    }
+			}
+			data.description = data.describe;
+			data.t_url = 'http://my.tianya.cn/' + data.id;
 		}
 		return data;
 	}

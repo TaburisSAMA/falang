@@ -2154,7 +2154,7 @@ var ImageService = {
                     rhref: url,
                     old_title: old_title,
                     title: title, 
-                    href: 'javascript:;',
+                    //href: 'javascript:;',
                     service: name
                 };
 				if(item.show_link) {
