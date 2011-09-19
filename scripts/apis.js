@@ -4757,8 +4757,11 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
         update: '/weibo/add.php',
         upload: '/weibo/addimg.php',
 		verify_credentials: '/user/info.php',
-		user_timeline: '/yabo/getmyweibo.php'
+		friends_timeline: '/weibo/gethomeline.php',
+		user_timeline: '/weibo/getmyweibo.php',
 	}),
+	
+	user_cache: {},
 	
 	apply_auth: function(url, args, user) {
 		if(url && url.indexOf('access_token.php') < 0 && user.oauth_token_secret) {
@@ -4801,14 +4804,34 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
         data.word = data.status;
         delete data.status;
     },
+    format_result: function(data, play_load, args) {
+        if(data && !data.error && data.data) {
+            data = data.data.items || data.data;
+        }
+        if($.isArray(data)) {
+            for(var i = 0, l = data.length; i < l; i++) {
+                data[i] = this.format_result_item(data[i], play_load, args);
+            }
+        } else {
+            data = this.format_result_item(data, play_load, args);
+        }
+        return data;
+    },
 	format_result_item: function(data, play_load, args) {
 		if(play_load === 'user') {
-			data = data.user;
+			data = data.user || data;
 			data.id = data.user_id;
 			data.screen_name = data.user_name;
-			data.created_at = new Date(data.register_date);
-			data.birthday = new Date(data.birthday);
-			data.profile_image_url = data.head;
+			if(data.register_date) {
+			    data.created_at = new Date(data.register_date);
+			}
+			if(data.birthday) {
+			    data.birthday = new Date(data.birthday);
+			}
+			data.profile_image_url = data.head || '';
+			if(data.profile_image_url) {
+			    this.user_cache[data.id] = data;
+			}
 			data.verified = !!data.isvip;
 			// gender: 性别,m--男，f--女,n--未知
 			data.gender = 'n';
@@ -4821,6 +4844,65 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 			}
 			data.description = data.describe;
 			data.t_url = 'http://my.tianya.cn/' + data.id;
+		} else if(play_load === 'status') {
+		    data.text = data.originContent;
+		    delete data.originContent;
+		    delete data.word;
+		    if(this.user_cache[data.uid]) {
+		        data.user = this.user_cache[data.uid];
+		    } else {
+		        data.user = {
+	                user_id: data.uid,
+	                user_name: data.uname
+	            };
+		        data.user = this.format_result_item(data.user, 'user', args);
+		    }
+		    delete data.uid;
+		    delete data.uname;
+		    
+		    data.created_at = new Date(data.time);
+		    delete data.time;
+		    if(data.medias && data.medias.image && data.medias.image[0]) {
+		        var image = data.medias.image[0];
+		        data.thumbnail_pic = image.sUrl;
+                data.bmiddle_pic = image.mUrl;
+                data.original_pic = image.lUrl;
+		    }
+		    delete data.medias;
+		    delete data.media;
+		    data.t_url = 'http://my.tianya.cn/t/' + data.user.id + '/' + data.id;
+		    data.source = data.from;
+		    delete data.from;
+		    data.repost_count = data.shareCount;
+		    data.comments_count = data.replyCount;
+		    
+		    if(data.sharedId) {
+		        data.retweeted_status = {
+	                id: data.sharedId,
+	                text: data.sharedTitle
+		        };
+		        if(data.sharedMedias && data.sharedMedias.image && data.sharedMedias.image[0]) {
+	                var image = data.sharedMedias.image[0];
+	                data.retweeted_status.thumbnail_pic = image.sUrl;
+	                data.retweeted_status.bmiddle_pic = image.mUrl;
+	                data.retweeted_status.original_pic = image.lUrl;
+	            }
+	            delete data.sharedMedias;
+	            delete data.sharedMedia;
+	            data.retweeted_status.repost_count = data.sharedShareCount;
+	            data.retweeted_status.comments_count = data.sharedReplyCount;
+	            
+	            if(this.user_cache[data.sharedUid]) {
+	                data.retweeted_status.user = this.user_cache[data.sharedUid];
+	            } else {
+	                data.retweeted_status.user = {
+	                    user_id: data.sharedUid,
+	                    user_name: data.sharedUname
+	                };
+	                data.retweeted_status.user = this.format_result_item(data.retweeted_status.user, 'user', args);
+	            }
+	            data.retweeted_status.t_url = 'http://my.tianya.cn/t/' + data.retweeted_status.user.id + '/' + data.retweeted_status.id;
+		    }
 		}
 		return data;
 	}
