@@ -525,22 +525,29 @@ function initIamDoing(){
 			chrome.tabs.getSelected(params.windowId, function(tab){
 	            var loc_url = tab.url;
 	            if(loc_url){
-	            	if(capture) {
-	            		openUploadImage(tab.id);
-	            	} else {
-	            		var title = tab.title || '';
-		                var $txt = $("#txtContent");
-		                var settings = Settings.get();
-		                $txt.val(formatText(settings.lookingTemplate, {title: title, url: loc_url}))
-		                    .data({source_url: '', short_url: ''});
-		                showMsgInput();
-		                _shortenUrl(loc_url, settings, function(shorturl){
-				            if(shorturl) {
-				                $txt.val($txt.val().replace(loc_url, shorturl))
-				                    .data({source_url: loc_url, short_url: shorturl}); // 记录下原始url
-				            }
-				        });
-	            	}
+	                var title = tab.title || '';
+                    var $txt = $("#txtContent")
+                      , value = $txt.val();
+                    if(value) {
+                        value += ' ';
+                    }
+                    var settings = Settings.get();
+                    $txt.val(value + formatText(settings.lookingTemplate, {title: title, url: loc_url}))
+                        .data({source_url: '', short_url: ''});
+                    showMsgInput();
+                    _shortenUrl(loc_url, settings, function(shorturl){
+                        if(shorturl) {
+                            $txt.val($txt.val().replace(loc_url, shorturl))
+                                .data({source_url: loc_url, short_url: shorturl}); // 记录下原始url
+                            countInputText();
+                        }
+                    });
+                    if(capture) {
+                        chrome.tabs.captureVisibleTab(tab.windowId, {format: 'png'}, function(dataurl) {
+                            var file = window.imgForUpload = dataUrlToBlob(dataurl);
+                            _init_image_preview(dataurl, file.size, 'upImgPreview', 'btnUploadPic');
+                        });
+                    }
 	            } else {
 	                showMsg(_u.i18n("msg_wrong_page_url"));
 	            }
