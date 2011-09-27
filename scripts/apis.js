@@ -1316,14 +1316,17 @@ var sinaApi = {
         args.user = user;
         if(args.data && args.data.user) delete args.data.user;
         
-        if(args.data.status){
-        	args.data.status = this.url_encode(args.data.status);
-        }
-        if(args.data.comment){
-        	args.data.comment = this.url_encode(args.data.comment);
-        }
         // 请求前调用
         this.before_sendRequest(args, user);
+        for(var k in args.data) {
+            args.data[k] = this.url_encode(args.data[k]);
+        }
+//        if(args.data.status){
+//            args.data.status = this.url_encode(args.data.status);
+//        }
+//        if(args.data.comment){
+//            args.data.comment = this.url_encode(args.data.comment);
+//        }
         var api = user.apiProxy || args.apiHost || this.config.host;
     	var url = api + args.url.format(args.data);
     	if(args.play_load != 'string' && this.config.result_format) {
@@ -1716,9 +1719,9 @@ var TQQAPI = Object.inherits({}, sinaApi, {
     },
 
 	// urlencode，子类覆盖是否需要urlencode处理
-	url_encode: function(text) {
-		return text;
-	},
+//	url_encode: function(text) {
+//		return text;
+//	},
 	
 	rate_limit_status: function(data, callback, context) {
         callback.call(context, {error: _u.i18n("comm_no_api")});

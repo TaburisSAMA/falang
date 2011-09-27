@@ -34,7 +34,7 @@ var AUTH_TYPE_NAME = {
 var TWEEN_TYPES = ['Quad', 'Cubic', 'Quart', 'Quint', 'Sine', 'Expo', 'Circ', 'Elastic', 'Back', 'Bounce'];
 
 function donateRoll(){
-    $.get('http://s8.hk/json/fawave_donaters.json', function(data){
+    $.get('http://api.yongwo.de/json/fawave_donaters.json', function(data){
         if(data && data.users && data.users.length > 0){
             var _h = '';
             $(data.users).each(function(){
