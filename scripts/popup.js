@@ -2633,11 +2633,20 @@ function doRT(ele, is_rt, is_rt_rt) {
     }
     t.blur().val(val).focus(); //光标在头部
     if(original_pic) {
-    	// 有图片，则打开图片上传
-//    	openUploadImage(null, original_pic, sourcelink, need_sourcelink);
-    	var file = window.imgForUpload = getImageBlob(original_pic);
-//        window.imgForUpload.fileName = 'fawave.png';
-        _init_image_preview(original_pic, file.size, 'upImgPreview', 'btnUploadPic');
+        if(original_pic.indexOf('126.fm') >= 0) {
+            // 163的图片需要先还原
+            ShortenUrl.expand(original_pic, function(data) {
+                var longurl = data.url || data;
+                if(longurl) {
+                    original_pic = longurl.replace('#3', '');
+                    var file = window.imgForUpload = getImageBlob(original_pic);
+                    _init_image_preview(original_pic, file.size, 'upImgPreview', 'btnUploadPic');
+                }
+            });
+        } else {
+            var file = window.imgForUpload = getImageBlob(original_pic);
+            _init_image_preview(original_pic, file.size, 'upImgPreview', 'btnUploadPic');
+        }
     }
 };
 
