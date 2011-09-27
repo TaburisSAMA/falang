@@ -187,7 +187,7 @@ function sendMsg() {
     if(file) {
         stat.pic = file;
     }
-    var matchs = tapi.findSearchText(c_user, msg);
+//    var matchs = tapi.findSearchText(c_user, msg);
     stat.unsupport_uploads = []; // 不支持发送图片的，则等待支持发送图片的获取到图片后，再发送
     // 增加图片链接
     var image_url = $('#imgPreview img').attr('short_url') || $('#imageUrl').val(); // $('#imgPreview img').attr('src');
@@ -210,12 +210,12 @@ function sendMsg() {
         var status = msg;
         var pic = {file: file};
         // 处理主题转化
-    	if(matchs.length > 0 && c_user.blogType !== user.blogType) {
-    		for(var j = 0, jlen = matchs.length; j < jlen; j++) {
-    			var match = matchs[j];
-    			status = status.replace(match[0], tapi.formatSearchText(user, match[1]));
-    		}
-    	}
+//    	if(matchs.length > 0 && c_user.blogType !== user.blogType) {
+//    		for(var j = 0, jlen = matchs.length; j < jlen; j++) {
+//    			var match = matchs[j];
+//    			status = status.replace(match[0], tapi.formatSearchText(user, match[1]));
+//    		}
+//    	}
     	upInfo.append(TP_USER_UPLOAD_INFO.format(user));
         if((config.support_upload && !user.apiProxy) && pic.file) {
         	stat.uploadCount++;

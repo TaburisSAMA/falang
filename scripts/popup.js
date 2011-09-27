@@ -1122,7 +1122,6 @@ function showFollowers(to_t, screen_name, user_id) {
 	} else {
 		$('#followers_timeline').removeAttr('user_id');
 	}
-//	log('show ' + to_t);
 	$("#fans_tab span").unbind('click').click(function() {
 		_getFansList($(this).attr('t'));
 	}).each(function() {
@@ -1226,6 +1225,7 @@ function _getFansList(to_t, read_more){
             	var html = '';
                 for(var i in users){
                 	if(!get_c_user_fans) {
+                	    // 查看其他用的粉丝，无法判断关系，全部默认为未关注
                 		users[i].unfollow = true;
                 	}
                 }
@@ -1861,7 +1861,7 @@ function readMore(t){
  * 如果当前tab是激活的，就返回true，否则返回false(即为未读). 
  * 修改：根据用户设置是否自动提示新消息来返回true or false
  * */
-function addTimelineMsgs(msgs, t, user_uniqueKey, is_first_time){
+function addTimelineMsgs(msgs, t, user_uniqueKey, is_first_time, is_old_data){
     var c_user = getUser();
     if(!user_uniqueKey){
         user_uniqueKey = c_user.uniqueKey;
@@ -1875,11 +1875,14 @@ function addTimelineMsgs(msgs, t, user_uniqueKey, is_first_time){
     var _ul = $("#" + t + "_timeline ul.list");
     
     var unread = getUnreadTimelineCount(t);
-    var c_user_id = String(c_user.id);
-    for(var i=0, len = msgs.length; i < len; i++) {
-        var _msg_user = msgs[i].user || msgs[i].sender;
-        if(_msg_user && String(_msg_user.id) !== c_user_id) {
-        	unread += 1;
+    if(!is_old_data) {
+        // 非旧数据，则需要重新计算未读数
+        var c_user_id = String(c_user.id);
+        for(var i=0, len = msgs.length; i < len; i++) {
+            var _msg_user = msgs[i].user || msgs[i].sender;
+            if(_msg_user && String(_msg_user.id) !== c_user_id) {
+                unread += 1;
+            }
         }
     }
     if(!li.hasClass('active')) {
@@ -2049,7 +2052,7 @@ function sendMsg(msg){
     var use_source_url = source_url && short_url;
     var pic = window.imgForUpload;
     stat.pic = pic;
-    var matchs = tapi.findSearchText(current_user, msg);
+//    var matchs = tapi.findSearchText(current_user, msg);
     for(var i = 0, len = users.length; i < len; i++) {
     	var status = msg, user = users[i];
     	// 判断是否使用缩短网址
@@ -2060,12 +2063,12 @@ function sendMsg(msg){
     		}
     	}
     	// 处理主题转化
-    	if(matchs.length > 0 && current_user.blogType !== user.blogType) {
-    	    for(var j = 0, jlen = matchs.length; j < jlen; j++) {
-    			var match = matchs[j];
-    			status = status.replace(match[0], tapi.formatSearchText(user, match[1]));
-    		}
-    	}
+//    	if(matchs.length > 0 && current_user.blogType !== user.blogType) {
+//    	    for(var j = 0, jlen = matchs.length; j < jlen; j++) {
+//    			var match = matchs[j];
+//    			status = status.replace(match[0], tapi.formatSearchText(user, match[1]));
+//    		}
+//    	}
     	var config = tapi.get_config(user);
     	if(pic && (!config.support_upload || user.apiProxy)) { // twitter代理不兼容图片上传
     	    stat.unsupport_uploads.push([status, user, stat, selLi]);

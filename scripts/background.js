@@ -354,6 +354,8 @@ function checkTimeline(t, user_uniqueKey) {
 			isFirstTime = true;
 			last_id = getLastMsgId(t, user_uniqueKey);
 		}
+//		console.log('ct done', t, c_user.screen_name, 'last_id:', last_id, 
+//	        sinaMsgs.length, 'first id:', sinaMsgs[0] && sinaMsgs[0].id);
         if(last_id && sinaMsgs.length > 0){
         	if(c_user.blogType === 't163' && last_id.indexOf(':') > 0) { // 兼容网易的id
         		last_id = last_id.split(':', 1)[0];
@@ -370,7 +372,7 @@ function checkTimeline(t, user_uniqueKey) {
                 	merge_direct_messages(user_uniqueKey, result.olds);
                 }
         		if(popupView) {
-        			popupView.addTimelineMsgs(result.olds, t, user_uniqueKey, isFirstTime);
+        			popupView.addTimelineMsgs(result.olds, t, user_uniqueKey, isFirstTime, true);
         		}
         	}
         	sinaMsgs = result.news;

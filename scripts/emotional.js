@@ -728,6 +728,7 @@ var YANWENZI = {
     "٩(-̮̮̃-̃)۶": "٩(-̮̮̃-̃)۶",
     "(๑꒪◞౪◟꒪๑)": "(๑꒪◞౪◟꒪๑)",
     "✷(ꇐ‿ꇐ)✷": "✷(ꇐ‿ꇐ)✷",
+    "<( ‵□′)───C＜─___-)||": "捏脸 <( ‵□′)───C＜─___-)||"
 };
 
 var TAOBAO_FACES_URL_PRE = 'http://t.taobao.org/theme/taobao/emotions/';

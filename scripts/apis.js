@@ -4735,14 +4735,14 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
         result_format: '', // 由outformat参数确定返回值格式
         oauth_callback: FAWAVE_OAUTH_CALLBACK_URL,
 		userinfo_has_counts: false, // 用户信息中是否包含粉丝数、微博数等信息
-        support_comment: false,
-		support_repost: false,
+        support_comment: true,
+		support_repost: true,
 		support_comment_repost: false,
-		support_repost_timeline: false,
+		support_repost_timeline: true,
 		support_max_id: false,
 		support_favorites: false,
 		support_do_favorite: false,
-		support_mentions: false,
+//		support_mentions: false,
 		need_processMsg: false,
 		support_auto_shorten_url: false,
 		user_timeline_need_friendship: false,
@@ -4759,6 +4759,8 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 		verify_credentials: '/user/info.php',
 		friends_timeline: '/weibo/gethomeline.php',
 		user_timeline: '/weibo/getmyweibo.php',
+		comments_timeline: '/weibo/getaboutme.php',
+		mentions: '/weibo/getaboutme.php',
 	}),
 	
 	user_cache: {},
@@ -4791,6 +4793,10 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 			args.type = 'get';
 			args.data.word = args.data.status;
 			delete args.data.status;
+		}
+		if(args.data.count) {
+		    args.data.pagesize = args.data.count;
+		    delete args.data.count;
 		}
 	},
 	// urlencode，子类覆盖是否需要urlencode处理
@@ -4828,10 +4834,6 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 			if(data.birthday) {
 			    data.birthday = new Date(data.birthday);
 			}
-			data.profile_image_url = data.head || '';
-			if(data.profile_image_url) {
-			    this.user_cache[data.id] = data;
-			}
 			data.verified = !!data.isvip;
 			// gender: 性别,m--男，f--女,n--未知
 			data.gender = 'n';
@@ -4843,6 +4845,8 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 			    }
 			}
 			data.description = data.describe;
+			// http://tx.tianyaui.com/logo/man/32962113
+			data.profile_image_url = data.userheadphoto || 'http://tx.tianyaui.com/logo/man/' + data.id;
 			data.t_url = 'http://my.tianya.cn/' + data.id;
 		} else if(play_load === 'status') {
 		    data.text = data.originContent;
