@@ -622,7 +622,10 @@ function init(){
     });
 
     //初始化字体选择
-    $("#selFont").val(settings.font);
+    $("#selFont").val(settings.font).change(function() {
+        $("#selFontText").val($(this).val());
+    });
+    $("#selFontText").val(settings.font);
     $("#selFontSize").val(settings.fontSite);
 
 
@@ -1150,7 +1153,7 @@ function saveAll(){
     $("#set_main_height").val(h);
 
     //保存字体
-    var font = $("#selFont").val();
+    var font = $("#selFontText").val();
     settings.font =  font;
     var fontSize = $("#selFontSize").val();
     settings.fontSite = fontSize;
