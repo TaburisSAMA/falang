@@ -960,10 +960,15 @@
         "description": "更新用户信息的说明"
     },
 
-    //外观设置
+    // 外观设置
     "sett_itemName_font": {
         "message": "字体设置：",
         "description": "字体设置"
+    },
+    
+    "sett_itemName_default_language": {
+        "message": "显示语言：",
+        "description": "界面显示语言"
     },
 
     "sett_itemName_WH": {

@@ -276,6 +276,17 @@
 	</table>
 	<!-- 外观设置 -->
 	<ul id="appearance_set" class="set_wrap" style="display:none;">
+	    <li>
+	       <label class="title"><script>_u.wi('sett_itemName_default_language')</script></label>
+	       <span>
+                <select id="selDefaultLanguage">
+                    <option value="">浏览器默认语言</option>
+                    <option value="zh_CN">简体中文</option>
+                    <option value="zh_TW">繁体中文</option>
+                    <option value="en">English</option>
+                </select>
+            </span>
+	    </li>
 		<li>
 			<div>
 				<label class="title"><script>_u.wi('sett_itemName_font')</script></label>
@@ -313,7 +324,6 @@
 					<label for="set_main_width"><script>_u.wi('comm_width')</script>:</label>
 					<input type="text" style="width:50px;" id="set_main_width" value="480" />
 					<span class="jTip" jTitle="">?<span class="c"><script>_u.wi('sett_jTip_WH_width_limit')</script></span></span>
-                    
 				</span>
 			</li>
 			<li>

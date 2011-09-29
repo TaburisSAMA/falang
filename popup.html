@@ -534,10 +534,10 @@
 	                      <?js } ?>
 	                </p>
 					<p>#{_u.i18n("comm_follow")}: <span><a href="javascript:showFollowers('friends', '#{user.screen_name}', '#{user.id}');">#{user.friends_count == undefined ? _u.i18n("comm_view"): user.friends_count}</a></span>
-					   &nbsp;&nbsp;&nbsp;&nbsp;#{_u.i18n("comm_fans")}: <span><a href="javascript:showFollowers('followers', '#{user.screen_name}', '#{user.id}');">#{user.followers_count == undefined ? _u.i18n("comm_view"): user.followers_count}</a></span>
-					   &nbsp;&nbsp;&nbsp;&nbsp;#{_u.i18n("comm_tweet")}: <span><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');">#{user.statuses_count == undefined ? _u.i18n("comm_view"): user.statuses_count}</a></span>
+					&nbsp;&nbsp;#{_u.i18n("comm_fans")}: <span><a href="javascript:showFollowers('followers', '#{user.screen_name}', '#{user.id}');">#{user.followers_count == undefined ? _u.i18n("comm_view"): user.followers_count}</a></span>
+					&nbsp;&nbsp;#{_u.i18n("comm_tweet")}: <span><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');">#{user.statuses_count == undefined ? _u.i18n("comm_view"): user.statuses_count}</a></span>
 						<?js if(user.favourites_count != undefined) { ?>
-                       &nbsp;&nbsp;&nbsp;&nbsp;#{_u.i18n("comm_favourite")}: <span>#{user.favourites_count}</span>
+                       &nbsp;&nbsp;#{_u.i18n("comm_favourite")}: <span>#{user.favourites_count}</span>
                         <?js } ?>
 					</p>
 					<?js if(user.url && user.url != 'http://1'){ ?>
@@ -599,10 +599,10 @@
                      <?js } ?>
                     </p>
 					<p>#{_u.i18n("comm_follow")}: <span><a href="javascript:showFollowers('friends', '#{user.screen_name}', '#{user.id}');">#{user.friends_count == undefined ? _u.i18n("comm_view"): user.friends_count}</a></span>
-					   &nbsp;&nbsp;&nbsp;&nbsp;#{_u.i18n("comm_fans")}: <span><a href="javascript:showFollowers('followers', '#{user.screen_name}', '#{user.id}');">#{user.followers_count == undefined ? _u.i18n("comm_view"): user.followers_count}</a></span>
-					   &nbsp;&nbsp;&nbsp;&nbsp;#{_u.i18n("comm_tweet")}: <span><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');">#{user.statuses_count == undefined ? _u.i18n("comm_view"): user.statuses_count}</a></span>
+					   &nbsp;&nbsp;#{_u.i18n("comm_fans")}: <span><a href="javascript:showFollowers('followers', '#{user.screen_name}', '#{user.id}');">#{user.followers_count == undefined ? _u.i18n("comm_view"): user.followers_count}</a></span>
+					   &nbsp;&nbsp;#{_u.i18n("comm_tweet")}: <span><a href="javascript:getUserTimeline('#{user.screen_name}', '#{user.id}');">#{user.statuses_count == undefined ? _u.i18n("comm_view"): user.statuses_count}</a></span>
 						<?js if(user.favourites_count != undefined) { ?>
-                       &nbsp;&nbsp;&nbsp;#{_u.i18n("comm_favourite")}: <span>#{user.favourites_count}</span>
+                       &nbsp;&nbsp;#{_u.i18n("comm_favourite")}: <span>#{user.favourites_count}</span>
                         <?js } ?>
 					</p>
 					<?js if(user.url && user.url !== 'http://1'){ ?>

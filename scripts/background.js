@@ -4,6 +4,30 @@ window._settings = Settings.init(); //载入设置
 
 Settings.get = function(){ return window._settings; }; //重写get，直接返回，不用再获取background view
 
+window._i18n_messages = null;
+function reload_i18n_messages(language, callback) {
+    if(!language) {
+        window._i18n_messages = null;
+        return callback && callback(messages);
+    }
+    var url = chrome.extension.getURL('/_locales/' + language + '/messages.json');
+    if(url) {
+        $.get(url, function(messages) {
+            messages = eval('[' + messages + ']')[0];
+            window._i18n_messages = messages;
+            callback && callback(messages);
+        });
+    }
+};
+
+// 如果用户设置了默认语言，则加载相应的语言文件
+(function() {
+    var language = window._settings.default_language;
+    if(language) {
+        reload_i18n_messages(language);
+    }
+})();
+
 var tweets = {}
   , new_win_popup = Object()
   , MAX_MSG_ID = {}

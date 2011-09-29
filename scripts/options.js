@@ -627,7 +627,11 @@ function init(){
     });
     $("#selFontText").val(settings.font);
     $("#selFontSize").val(settings.fontSite);
-
+    
+    // display language
+    if(settings.default_language) {
+        $('#selDefaultLanguage').val(settings.default_language);
+    }
 
     //初始化宽高
     var w = settings.popupWidth, h = settings.popupHeight;
@@ -1157,6 +1161,11 @@ function saveAll(){
     settings.font =  font;
     var fontSize = $("#selFontSize").val();
     settings.fontSite = fontSize;
+    
+    var display_language = $("#selDefaultLanguage").val();
+    settings.default_language = display_language;
+    var bg = getBackgroundView();
+    bg.reload_i18n_messages(display_language);
     
     settings.translate_target = $('#translate_target').val();
     settings.shorten_url_service = $('#shorten_url_service').val();

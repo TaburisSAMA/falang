@@ -25,7 +25,17 @@ var _u = {
         $(sel).attr(attr, _u.i18n(s, e));
     },
     //获取本地化语言
-    i18n: function(s, e){
+    i18n: function(s, e) {
+        if(window._i18n_messages_cache === undefined) {
+            var bg = getBackgroundView();
+            window._i18n_messages_cache = bg._i18n_messages;
+        }
+        if(window._i18n_messages_cache) {
+            var msg = window._i18n_messages_cache[s];
+            if(msg) {
+                return msg.message || s;
+            }
+        }
         return chrome.i18n.getMessage(s, e) || s;
     }
 };
@@ -322,8 +332,10 @@ var Settings = {
         geoPosition: null, //获取到的地理位置信息，默认为空
         sent_success_auto_close: true, // 弹出窗口全部发送成功自动关闭
         remember_view_status: true, // 记住上次浏览状态
+        
+        default_language: null, // 默认语言，如果没有设置，则使用i18n自动根据浏览器判断语言
 
-        lookingTemplate: _u.i18n('sett_shared_template')
+        lookingTemplate: '{{title}} {{url}} '
     },
     init: function(){ //只在background载入的时候调用一次并给 _settings 赋值就可以
         var _sets = localStorage.getObject(SETTINGS_KEY);
@@ -357,19 +369,21 @@ var Settings = {
     */
     getRefreshTime: function(user, t){
         var r = 60;
-        if(user && user.refreshTime && user.refreshTime[t]){
+        if(user && user.refreshTime && user.refreshTime[t]) {
             r = user.refreshTime[t];
-        }else{
+        } else {
             r = this.get().globalRefreshTime[t];
         }
-        if(refreshTimeLimit[user.blogType] && refreshTimeLimit[user.blogType][t] && refreshTimeLimit[user.blogType][t] > r){
+        if(refreshTimeLimit[user.blogType] 
+                && refreshTimeLimit[user.blogType][t] 
+                && refreshTimeLimit[user.blogType][t] > r) {
             r = refreshTimeLimit[user.blogType][t];
         }
-        if(isNaN(r)){
+        if(isNaN(r)) {
             r = 60;
-        }else if(r < 30){
+        } else if(r < 30) {
             r = 30;
-        }else if(r > 24 * 60 * 60){
+        } else if(r > 24 * 60 * 60) {
             r = 24 * 60 * 60;
         }
         return r;
@@ -381,17 +395,17 @@ function formatScreenName(user) {
 	return '[' + T_NAMES[user.blogType] + ']' + user.screen_name || user.name;
 }
 
-///获取当前登陆用户信息
-function getUser(){
+/// 获取当前登陆用户信息
+function getUser() {
     var c_user = localStorage.getObject(CURRENT_USER_KEY);
-    if(c_user && c_user.uniqueKey){
+    if(c_user && c_user.uniqueKey) {
         window.c_user = c_user;
-    }else{
+    } else {
         var userList = getUserList();
-        if(userList){
-            for(var key in userList){
+        if(userList) {
+            for(var key in userList) {
                 c_user = userList[key];
-                if(c_user){
+                if(c_user) {
                     setUser(c_user);
                     break;
                 }
@@ -402,24 +416,26 @@ function getUser(){
 };
 
 //设置当前登陆用户
-function setUser(user){
+function setUser(user) {
     localStorage.setObject(CURRENT_USER_KEY, user);
     window.c_user = user;
 };
 
 //获取所有用户列表
 //@t: all: 全部， send:用于发送的用户列表， show:正常显示的用户。默认为show
-function getUserList(t){
-    t = t || 'show'; //默认，获取用于显示的列表
+function getUserList(t) {
+    t = t || 'show'; // 默认，获取用于显示的列表
     var userList = localStorage.getObject(USER_LIST_KEY) || [];
-    if(t==='all' && userList.length != undefined){ // 兼容旧格式
+    if(t === 'all' && userList.length !== undefined) { // 兼容旧格式
     	return userList;
     }
     var items = [], user = null;
-    for(var i in userList){
+    for(var i = 0, l = userList.length; i < l; i++) {
         user = userList[i];
-        if(!user.disabled){
-            if(t==='show' && user.only_for_send){ continue; }
+        if(!user.disabled) {
+            if(t === 'show' && user.only_for_send) { 
+                continue; 
+            }
         	items.push(userList[i]);
         }
     }
@@ -427,60 +443,60 @@ function getUserList(t){
 };
 
 //保存用户列表
-function saveUserList(userlist){
+function saveUserList(userlist) {
     localStorage.setObject(USER_LIST_KEY, userlist);
 };
+
 //根据uniqueKey获取用户
 //@t: all: 全部， send:用于发送的用户列表， show:正常显示的用户。默认为show
-function getUserByUniqueKey(uniqueKey, t){
-    if(!uniqueKey){return null;}
+function getUserByUniqueKey(uniqueKey, t) {
+    if(!uniqueKey) {
+        return null;
+    }
     var userList = getUserList(t);
-    for(var i in userList){
-    	if(userList[i].uniqueKey == uniqueKey){
+    for(var i = 0, l = userList.length; i < l; i++) {
+    	if(userList[i].uniqueKey === uniqueKey) {
     		return userList[i];
     	}
     }
     return null;
 }
 
-//获取用户的全部timeline的未读信息数
-function getUserUnreadTimelineCount(user_uniqueKey){
+// 获取用户的全部timeline的未读信息数
+function getUserUnreadTimelineCount(user_uniqueKey) {
     var user = getUserByUniqueKey(user_uniqueKey);
     if(!user){ return 0; }
-    var total = 0;
-    for(var i in T_LIST[user.blogType]){
+    var total = 0, timelines = T_LIST[user.blogType];
+    for(var i = 0, l = timelines.length; i < l; i++) {
         //key 大概如： tsina#11234598_friends_timeline_UNREAD_TIMELINE_COUNT_KEY
-        var count = localStorage.getObject(user_uniqueKey + T_LIST[user.blogType][i] + UNREAD_TIMELINE_COUNT_KEY);
-        if(!count){
-            count = 0;
-        }
+        var count = localStorage.getObject(user_uniqueKey + timelines[i] + UNREAD_TIMELINE_COUNT_KEY) || 0;
         total += count;
     }
     return total;
 };
 
-//获取用户的某一timeline的未读信息数
-function getUnreadTimelineCount(t, user_uniqueKey){
-    if(!user_uniqueKey){
+// 获取用户的某一timeline的未读信息数
+function getUnreadTimelineCount(t, user_uniqueKey) {
+    if(!user_uniqueKey) {
         var _user = getUser();
         if(_user){
             user_uniqueKey = _user.uniqueKey;
-        }else{
+        }else {
             return 0;
         }
     }
     //key 大概如： tsina#11234598_friends_timeline_UNREAD_TIMELINE_COUNT_KEY
     var count = localStorage.getObject(user_uniqueKey + t + UNREAD_TIMELINE_COUNT_KEY);
-    if(!count){
+    if(!count) {
         count = 0;
     }
     return count;
 };
 
-//@count: 增加的未读数
-//@t: timeline的类型
-function setUnreadTimelineCount(count, t, user_uniqueKey){
-    if(!user_uniqueKey){
+// @count: 增加的未读数
+// @t: timeline的类型
+function setUnreadTimelineCount(count, t, user_uniqueKey) {
+    if(!user_uniqueKey) {
         var _user = getUser();
         if(_user) {
             user_uniqueKey = _user.uniqueKey;
@@ -499,27 +515,26 @@ function setUnreadTimelineCount(count, t, user_uniqueKey){
         if(setBadgeText){
             var total = 0;
             var userList = getUserList();
-            for(var j in userList){
-                var user = userList[j];
-                for(var i in T_LIST[user.blogType]){
-                    if(Settings.get().isSetBadgeText[ T_LIST[user.blogType][i] ]){
-                        total += getUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
+            for(var j = 0, jl = userList.length; j < jl; j++) {
+                var user = userList[j], timelines = T_LIST[user.blogType];
+                for(var i = 0, l = timelines.length; i < l; i++) {
+                    if(Settings.get().isSetBadgeText[timelines[i] ]){
+                        total += getUnreadTimelineCount(timelines[i], user.uniqueKey);
                     }
                 }
             }
-            if(total > 0){
-                total = total.toString();
-                chrome.browserAction.setBadgeText({text: total});
-            }else{
+            if(total > 0) {
+                chrome.browserAction.setBadgeText({text: '' + total});
+            } else {
                 chrome.browserAction.setBadgeText({text: ''});
             }
         }
     }
-    chrome.browserAction.setTitle({title:getTooltip()});
+    chrome.browserAction.setTitle({title: getTooltip()});
 };
 
-function removeUnreadTimelineCount(t, user_uniqueKey){
-    if(!user_uniqueKey){
+function removeUnreadTimelineCount(t, user_uniqueKey) {
+    if(!user_uniqueKey) {
         user_uniqueKey = getUser().uniqueKey;
     }
     var unread = getUnreadTimelineCount(t, user_uniqueKey);
@@ -534,38 +549,37 @@ function removeUnreadTimelineCount(t, user_uniqueKey){
         chrome.browserAction.setIcon({path: 'icons/icon48.png'});
         var total = 0;
         var userList = getUserList();
-        for(var j in userList){
-            var user = userList[j];
-            for(var i in T_LIST[user.blogType]){
-                if(Settings.get().isSetBadgeText[T_LIST[user.blogType][i]]){
-                    total += getUnreadTimelineCount(T_LIST[user.blogType][i], user.uniqueKey);
+        for(var j = 0, jl = userList.length; j < jl; j++) {
+            var user = userList[j], timelines = T_LIST[user.blogType];
+            for(var i = 0, l = timelines.length; i < l; i++) {
+                if(Settings.get().isSetBadgeText[timelines[i]]){
+                    total += getUnreadTimelineCount(timelines[i], user.uniqueKey);
                 }
             }
         }
         if(total > 0){
-            total = total.toString();
-            chrome.browserAction.setBadgeText({text: total});
+            chrome.browserAction.setBadgeText({text: '' + total});
         }else{
             chrome.browserAction.setBadgeText({text: ''});
         }
     }
-    chrome.browserAction.setTitle({title:getTooltip()});
+    chrome.browserAction.setTitle({title: getTooltip()});
 };
 
-//将新浪微博页面的未读信息数清零
-function syncUnreadCountToSinaPage(t, user_uniqueKey){
+// 将新浪微博页面的未读信息数清零
+function syncUnreadCountToSinaPage(t, user_uniqueKey) {
     var c_user = null;
-    if(!user_uniqueKey){
+    if(!user_uniqueKey) {
         c_user = getUser();
         user_uniqueKey = c_user.uniqueKey;
-    }else{
+    } else {
         c_user = getUserByUniqueKey(user_uniqueKey);
     }
-    if(!c_user){
+    if(!c_user) {
         return;
     }
     var tl_type = false;
-    switch(t){
+    switch(t) {
         case 'comments_timeline':
             tl_type = 1;
             break;
@@ -579,44 +593,46 @@ function syncUnreadCountToSinaPage(t, user_uniqueKey){
             tl_type = 4;
             break;
     }
-    if(tl_type){
-        tapi.reset_count({'user':c_user, 'type':tl_type}, function(users, textStatus, statuCode){
-            //TODO: reset success
+    if(tl_type) {
+        tapi.reset_count({user: c_user, type: tl_type}, function(users, textStatus, statuCode){
+            // TODO: reset success
         });
     }
 };
 
 //获取在插件icon上显示的tooltip内容
-function getTooltip(){
-    if(getAlertMode()=='dnd'){
+function getTooltip() {
+    if(getAlertMode()=='dnd') {
         return _u.i18n("comm_dnd_tooltip");
     }
-    var tip = '', _new=0, _mention=0, _comment=0, _direct=0;
+    var tip = '', _new = 0, _mention = 0, _comment = 0, _direct = 0;
     var userList = getUserList();
-    for(var j in userList){
+    for(var j = 0, jl = userList.length; j < jl; j++) {
         var user = userList[j];
         _new = getUnreadTimelineCount('friends_timeline', user.uniqueKey);
         _mention = getUnreadTimelineCount('mentions', user.uniqueKey);
         _comment = getUnreadTimelineCount('comments_timeline', user.uniqueKey);
         _direct = getUnreadTimelineCount('direct_messages', user.uniqueKey);
         var u_tip = '';
-        if(_new){ u_tip += _new + _u.i18n("abb_friends_timeline"); }
-        if(_mention){
+        if(_new) { 
+            u_tip += _new + _u.i18n("abb_friends_timeline"); 
+        }
+        if(_mention) {
             u_tip = u_tip ? u_tip + ',  ' : u_tip;
             u_tip += _mention + '@';
         }
-        if(_comment){
+        if(_comment) {
             u_tip = u_tip ? u_tip + ',  ' : u_tip;
             u_tip += _comment + _u.i18n("abb_comments_timeline");
         }
-        if(_direct){
+        if(_direct) {
             u_tip = u_tip ? u_tip + ',  ' : u_tip;
             u_tip += _direct + _u.i18n("abb_direct_message");
         }
-        if(u_tip){
+        if(u_tip) {
             u_tip = '(' + T_NAMES[user.blogType] + ')' + user.screen_name + ': ' + u_tip;
         }
-        if(tip && u_tip){
+        if(tip && u_tip) {
             tip += '\r\n';
         }
         tip = tip + u_tip;
@@ -625,26 +641,24 @@ function getTooltip(){
     return tip;
 };
 
-
-
 // 获取上次选择的发送账号
 function getLastSendAccounts() {
     return localStorage.getObject(LAST_SELECTED_SEND_ACCOUNTS) || '';
 };
 
 //-- 信息提示模式 (alert or dnd ) --
-function getAlertMode(){
+function getAlertMode() {
     var mode = localStorage.getObject(ALERT_MODE_KEY);
     return mode || 'alert';
 };
 
-function setAlertMode(mode){
+function setAlertMode(mode) {
     localStorage.setObject(ALERT_MODE_KEY, mode);
 };
 //<<--
 
 //-- 新信息是否自动插入，默认不自动插入 --
-function getAutoInsertMode(){
+function getAutoInsertMode() {
     var mode = localStorage.getObject(AUTO_INSERT_MODE_KEY);
     return mode || 'notautoinsert';
 };
@@ -654,7 +668,7 @@ function isNotAutoInsertMode() {
     return getAutoInsertMode() === 'notautoinsert';
 };
 
-function setAutoInsertMode(mode){
+function setAutoInsertMode(mode) {
     localStorage.setObject(AUTO_INSERT_MODE_KEY, mode);
 };
 //<<--
@@ -666,7 +680,7 @@ function getBackgroundView() {
         _bg_view = chrome.extension.getBackgroundPage();
         if(!_bg_view){
             var views = chrome.extension.getViews();
-            for (var i = 0; i < views.length; i++) {
+            for (var i = 0, l = views.length; i < l; i++) {
                 var view = views[i];
                 if (view.theViewName && view.theViewName === 'background') {
                     _bg_view = view;
@@ -680,7 +694,7 @@ function getBackgroundView() {
 
 function getPopupView(){
     var views = chrome.extension.getViews();
-    for (var i = 0; i < views.length; i++) {
+    for (var i = 0, l = views.length; i < l; i++) {
         var view = views[i];
         if (view.theViewName && view.theViewName === 'popup') {
             return view;
@@ -692,7 +706,7 @@ function getPopupView(){
 //获取弹出窗的popup view
 function getNewWinPopupView(){
     var views = chrome.extension.getViews();
-    for (var i = 0; i < views.length; i++) {
+    for (var i = 0, l = views.length; i < l; i++) {
         var view = views[i];
         if (view.is_new_win_popup) {
             return view;
@@ -727,7 +741,7 @@ Date.prototype.format = function(format)
 	return format;
 };
 
-//存储
+// 存储
 Storage.prototype.setObject = function(key, value) {
     //alert(JSON.stringify(value));
     this.setItem(key, JSON.stringify(value));
@@ -790,16 +804,23 @@ function HTMLEnCode(str){
 window.htmlencode = HTMLEnCode;
 
 // html转换为text
-function htmlToText(html){
-   var tmp = document.createElement("DIV");
-   tmp.innerHTML = html;
-   return tmp.innerText;
+function htmlToText(html) {
+    var tmp = document.getElementById('__htmldecode__tmp__');
+    if(!tmp) {
+        // 避免多次创建和销毁对象
+        tmp = document.createElement("DIV");
+        tmp.setAttribute('id', '__htmldecode__tmp__');
+        tmp.setAttribute('style', 'display:none;');
+        document.body.appendChild(tmp);
+    }
+    tmp.innerHTML = html;
+    return tmp.innerText;
 };
 
 window.htmldecode = htmlToText;
 
 ///UBB内容转换
-function ubbCode(str)	{
+function ubbCode(str) {
     var result = "";
     if(str != ""){
         var tmp;

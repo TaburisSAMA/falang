@@ -102,7 +102,7 @@
         "description": "关注"
     },
     "comm_favourite": {
-        "message": "Favourites",
+        "message": "Favs",
         "description": "收藏"
     },
     "comm_female": {
@@ -298,7 +298,7 @@
         "description": "发送"
     },
     "comm_send_success_close_window": {
-        "message": "Auto close window",
+        "message": "Auto close",
         "description": "自动关闭窗口"
     },
     "comm_send_tip": {
@@ -661,7 +661,7 @@
         "description": "右键点击打开原图"
     },
     "btn_select_pic_title": {
-        "message": "Click to select file or image, even drag and drop file here",
+        "message": "Select a file or drop it here",
         "description": "点此选择文件或图片，甚至直接将文件拖放至此"
     },
     "btn_select_file_only_title": {
@@ -669,7 +669,7 @@
         "description": "点此选择文件，甚至直接将文件拖放至此"
     },
     "comm_enter_image_url": {
-        "message": "Enter Image URL",
+        "message": "Image URL",
         "description": "输入图片URL"
     },
     "btn_show_user_title": {
@@ -956,6 +956,11 @@
     "sett_itemName_font": {
         "message": "Font settings: ",
         "description": "字体设置"
+    },
+    
+    "sett_itemName_default_language": {
+        "message": "Display language: ",
+        "description": "界面显示语言"
     },
 
     "sett_itemName_WH": {

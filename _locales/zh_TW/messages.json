@@ -957,6 +957,11 @@
         "message": "字體設置：",
         "description": "字体设置"
     },
+    
+    "sett_itemName_default_language": {
+        "message": "顯示語言：",
+        "description": "界面显示语言"
+    },
 
     "sett_itemName_WH": {
         "message": "高度設置：",
