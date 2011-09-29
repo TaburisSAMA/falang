@@ -2432,11 +2432,13 @@ function doReply(ele, screen_name, tweetId, name) { // @回复
     var $replyText = $('#replyTextarea'), text = $replyText.val();
     if(!text) {
         var tweet = TWEETS[tweetId]
-          , at_users = tapi.find_at_users(getUser(), tweet.text);
+          , user = getUser()
+          , at_users = tapi.find_at_users(user, tweet.text);
         if(at_users) {
             for(var i = 0, l = at_users.length; i < l; i++) {
                 var at_user = at_users[i];
-                if(at_user !== tweet.user.name && at_user !== screen_name) {
+                if(at_user !== tweet.user.name && at_user !== screen_name
+                        && at_user !== user.screen_name && at_user !== user.name) {
                     text += '@' + at_user + ' ';
                 }
             }
