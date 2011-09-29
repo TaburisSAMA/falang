@@ -183,21 +183,13 @@ var sinaApi = {
     
     // 翻译
     translate: function(text, target, callback, context) {
-        // http://translate.google.cn/translate_a/t?client=t&text=I%20fucking%20you&hl=en&sl=en&tl=zh-CN&multires=1&otf=2&ssel=3&tsel=6&sc=1
-//        $.get('http://translate.google.cn/translate_a/t?client=t&text=I%20fucking%20you&tl=zh',
-//                function() {
-//            console.log(arguments)
-//        });
-//    	var api = 'https://www.googleapis.com/language/translate/v2';
     	var api = 'http://translate.google.cn/translate_a/t?client=t&sl=auto';
     	if(!target || target == 'zh-CN' || target == 'zh-TW') {
     		target = 'zh';
     	}
-//    	var params = {key: this.config.google_appkey, target: target, q: text};
     	var params = {tl: target, text: text};
     	$.ajax({
 			url: api,
-//		  	dataType: 'json',
 		  	data: params,
 		  	success: function(data, status) {
 		  	    data = eval(data);
@@ -212,17 +204,6 @@ var sinaApi = {
 		  	        showMsg(_u.i18n("comm_not_need_tran"), true);
 		  	        callback.call(context, null);
 		  	    }
-//				var tran = data.data.translations[0];
-//				var detectedSourceLanguage = tran.detectedSourceLanguage;
-//				if(detectedSourceLanguage == 'zh-CN' || detectedSourceLanguage == 'zh-TW') {
-//		    		detectedSourceLanguage = 'zh';
-//		    	}
-//				if(detectedSourceLanguage == target) {
-//					showMsg(_u.i18n("comm_not_need_tran"), true);
-//					callback.call(context, null);
-//				} else {
-//					callback.call(context, tran.translatedText);
-//				}
 		  	}, 
 		  	error: function(xhr, status) {
 		  		var error = {message: status + ': ' + xhr.statusText};
@@ -248,9 +229,9 @@ var sinaApi = {
     	if(str_or_status.text !== undefined) {
     		str = str_or_status.text;
     	}
-        if(str && this.config.need_processMsg){
+        if(str && this.config.need_processMsg) {
 	        if(!notEncode){
-	            str = HTMLEnCode(str);
+	            str = htmlencode(str);
 	        }
 	        str = str.replace(URL_RE, this._replaceUrl);
 	        
@@ -700,7 +681,7 @@ var sinaApi = {
 	},
 
 	// id
-    favorites_destroy: function(data, callbackFn, context){
+    favorites_destroy: function(data, callbackFn, context) {
 		if(!callbackFn) return;
         var params = {
             url: this.config.favorites_destroy,
@@ -843,6 +824,10 @@ var sinaApi = {
     	var auth_args = {type: 'post', data: {}, headers: {}};
     	pic.keyname = pic.keyname || 'pic';
     	data.source = data.source || this.config.source;
+    	if(data.need_source === false) {
+            delete data.need_source;
+            delete data.source;
+        }
     	var geo = this.get_geo();
     	if(geo) {
 			this.format_geo_arguments(data, geo);
@@ -860,9 +845,8 @@ var sinaApi = {
 	    builder += crlf;
 		
 	    for(var key in data) {
-		    var value = this.url_encode(data[key]);
 		    // set auth params
-		    auth_args.data[key] = value;
+		    auth_args.data[key] = data[key];
 	    }
 	    var api = user.apiProxy || this.config.host;
 		var url = api + this.config.upload + this.config.result_format;
@@ -1315,13 +1299,6 @@ var sinaApi = {
         }
         args.user = user;
         if(args.data && args.data.user) delete args.data.user;
-        
-        if(args.data.status){
-            args.data.status = this.url_encode(args.data.status);
-        }
-        if(args.data.comment){
-            args.data.comment = this.url_encode(args.data.comment);
-        }
         
         // 请求前调用
         this.before_sendRequest(args, user);
@@ -1974,9 +1951,9 @@ var TQQAPI = Object.inherits({}, sinaApi, {
         		}
         	}
         }
-        if(args.data.content) {
-            args.data.content = this.super_.url_encode(args.data.content);
-        }
+//        if(args.data.content) {
+//            args.data.content = this.super_.url_encode(args.data.content);
+//        }
 	},
 	
 	format_result: function(data, play_load, args) {
@@ -2100,7 +2077,7 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 			    user.status = this.format_result_item(data.tweet[0], 'status', args, users, false);
 			}
 			data = user;
-		} else if(play_load == 'status' || play_load == 'comment' || play_load == 'message') {
+		} else if(play_load === 'status' || play_load === 'comment' || play_load === 'message') {
 			// type:微博类型 1-原创发表、2-转载、3-私信 4-回复 5-空回 6-提及 7: 点评
 			var status = {};
 //			status.status_type = data.type;
@@ -2111,6 +2088,14 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 			status.t_url = 'http://t.qq.com/p/t/' + data.id;
 			status.id = data.id;
 			status.text = data.origtext; //data.text;
+			// http://t.qq.com/p/t/28172122700171
+			// 除了fav/list_t， re_list评论数据和私信外, 返回的数据会被htmlencode
+			if(args.url !== this.config.comments 
+			        && args.url !== this.config.favorites  
+			        && play_load !== 'message' 
+			        && status.text) {
+			    status.text = htmldecode(status.text);
+			}
             status.created_at = new Date(data.timestamp * 1000);
             status.timestamp = data.timestamp;
             status.video = data.video;
@@ -2240,22 +2225,38 @@ var TSohuAPI = Object.inherits({}, sinaApi, {
 		callback.call(context);
 	},
 	
+	format_upload_params: function(user, data, pic) {
+        for(var k in data) {
+            data[k] = encodeURIComponent(data[k]);
+        }
+    },
+	
 	before_sendRequest: function(args) {
 		if(args.url == this.config.new_message) {
 			// id => user
 			args.data.user = args.data.id;
 			delete args.data.id;
-		} else if(args.url == this.config.destroy) { 
+		} else if(args.url === this.config.destroy 
+		        || args.url === this.config.destroy_msg) { 
 			// method => delete
 			args.type = 'delete';
-		} else if(args.url == this.config.search) {
+			if(args.url === this.config.destroy_msg) {
+			    // 还需要指定类型type：要删除的私信类型。in表示收件箱，out表示发件箱
+			}
+		} else if(args.url === this.config.search) {
 			args.data.rpp = args.data.count;
 			delete args.data.count;
-		} else if(args.url == this.config.user_timeline) {
+		} else if(args.url === this.config.user_timeline) {
 			if(!args.data.id) {
 				args.data.id = args.data.screen_name;
 			}
 		}
+		if(args.data.comment) {
+		    args.data.comment = encodeURIComponent(args.data.comment);
+		}
+		if(args.data.text) {
+            args.data.text = encodeURIComponent(args.data.text);
+        }
 	},
 	
     format_result: function(data, play_load, args) {
@@ -2287,7 +2288,8 @@ var TSohuAPI = Object.inherits({}, sinaApi, {
 	},
 	
 	format_result_item: function(data, play_load, args) {
-		if(play_load == 'status' && data.id) {
+		if(play_load === 'status' && data.id) {
+		    data.text = htmldecode(data.text);
 			data.thumbnail_pic = data.small_pic;
 			delete data.small_pic;
 			data.bmiddle_pic = data.middle_pic;
@@ -2296,7 +2298,7 @@ var TSohuAPI = Object.inherits({}, sinaApi, {
 			if(data.in_reply_to_status_text) {
 				data.retweeted_status = {
 					id: data.in_reply_to_status_id,
-					text: data.in_reply_to_status_text,
+					text: htmldecode(data.in_reply_to_status_text),
 					has_image: data.in_reply_to_has_image,
 					user: {
 						id: data.in_reply_to_user_id,
@@ -2313,15 +2315,17 @@ var TSohuAPI = Object.inherits({}, sinaApi, {
 		} else if(play_load == 'comment' && data.id) {
 			data.status = {
 				id: data.in_reply_to_status_id,
-				text: data.in_reply_to_status_text,
+				text: htmldecode(data.in_reply_to_status_text),
 				user: {
 					id: data.in_reply_to_user_id,
 					screen_name: data.in_reply_to_screen_name
 				}
 			};
+			data.text = htmldecode(data.text);
 		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = 'http://t.sohu.com/u/' + (data.domain || data.id);
 		} else if(play_load == 'message') {
+		    data.text = htmldecode(data.text);
 			this.format_result_item(data.sender, 'user', args);
 			this.format_result_item(data.recipient, 'user', args);
 		} else if(play_load == 'count') {
@@ -3714,12 +3718,8 @@ var T163API = Object.inherits({}, sinaApi, {
 	    }
 	    return m;
 	},
-	
-	url_encode: function(text) {
-		return text;
-	},
-    
-    reset_count: function(data, callback, context) {
+
+	reset_count: function(data, callback, context) {
 		callback.call(context);
 	},
 	
@@ -3871,6 +3871,9 @@ var T163API = Object.inherits({}, sinaApi, {
 				delete data.to_user_name;
 				delete data.to_status_text;
 			}
+			if(data.text) {
+			    data.text = htmldecode(data.text);
+			}
 			// 获取缩略图
 			// http://oimagec6.ydstatic.com/image?w=120&h=120&url=http://126.fm/cwqG0
 			// http://oimagec6.ydstatic.com/image?w=460&url=http://126.fm/qMYPA
@@ -3960,10 +3963,14 @@ var T163API = Object.inherits({}, sinaApi, {
 				delete data.in_reply_to_screen_name;
 				delete data.in_reply_to_user_name;
 			}
-		} else if(play_load == 'message') {
+		} else if(play_load === 'message') {
+		    // 未进行htmlencode，所以无需decode
 			data.sender = this.format_result_item(data.sender, 'user', args);
 			data.recipient = this.format_result_item(data.recipient, 'user', args);
-		} else if(play_load == 'comment') {
+		} else if(play_load === 'comment') {
+		    if(data.text) {
+                data.text = htmldecode(data.text);
+            }
 			data.user = this.format_result_item(data.user, 'user', args);
 			data.status = {
 				id: data.in_reply_to_status_id,
@@ -4558,7 +4565,7 @@ var DoubanAPI = Object.inherits({}, sinaApi, {
 			args.data.apikey = args.data.source;
 			delete args.data.source;
 			if(args.url == this.config.update) {
-				args.content = '<?xml version="1.0" encoding="UTF-8"?><entry xmlns:ns0="http://www.w3.org/2005/Atom" xmlns:db="http://www.douban.com/xmlns/"><content>{{status}}</content></entry>'.format(args.data);
+				args.content = '<?xml version="1.0" encoding="UTF-8"?><entry xmlns:ns0="http://www.w3.org/2005/Atom" xmlns:db="http://www.douban.com/xmlns/"><content><![CDATA[{{status}}]]></content></entry>'.format(args.data);
 				args.contentType = 'application/atom+xml; charset=utf-8';
 				args.data = {};
 			} else if(args.url == this.config.destroy || args.url == this.config.destroy_msg) {
@@ -4568,11 +4575,11 @@ var DoubanAPI = Object.inherits({}, sinaApi, {
 			} else if(args.url == this.config.friends_timeline || args.url == this.config.user_timeline) {
 				args.data.type = 'all';
 			} else if(args.url == this.config.new_message) {
-			    args.content = '<?xml version="1.0" encoding="UTF-8"?><entry xmlns="http://www.w3.org/2005/Atom" xmlns:db="http://www.douban.com/xmlns/" xmlns:gd="http://schemas.google.com/g/2005" xmlns:opensearch="http://a9.com/-/spec/opensearchrss/1.0/"><db:entity name="receiver"><uri>http://api.douban.com/people/{{id}}</uri></db:entity><content>{{text}}</content><title>{{text}}</title></entry>'.format(args.data);
+			    args.content = '<?xml version="1.0" encoding="UTF-8"?><entry xmlns="http://www.w3.org/2005/Atom" xmlns:db="http://www.douban.com/xmlns/" xmlns:gd="http://schemas.google.com/g/2005" xmlns:opensearch="http://a9.com/-/spec/opensearchrss/1.0/"><db:entity name="receiver"><uri>http://api.douban.com/people/{{id}}</uri></db:entity><content><![CDATA[{{text}}]]></content><title><![CDATA[{{text}}]]></title></entry>'.format(args.data);
 				args.contentType = 'application/atom+xml; charset=utf-8';
 				args.data = {};
 			} else if(args.url == this.config.comment) {
-				args.content = '<?xml version="1.0" encoding="UTF-8"?><entry><content>{{comment}}</content></entry>'.format(args.data);
+				args.content = '<?xml version="1.0" encoding="UTF-8"?><entry><content><![CDATA[{{comment}}]]></content></entry>'.format(args.data);
 				args.contentType = 'application/atom+xml; charset=utf-8';
 				args.data = {id: args.data.id};
 				args.url = args.url.replace('_post', '');

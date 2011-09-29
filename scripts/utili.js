@@ -778,13 +778,12 @@ String.prototype.remove_html_tag = function() {
 };
 
 // HTML 编码
+// test: hard code testing 。。。 '"!@#$%^&*()-=+ |][ {} ~` &&&&&amp; &lt; & C++ c++c + +c &amp;
 function HTMLEnCode(str){
     if(!str){ return ''; }
-    str = str.replace(/</ig, '&lt;').replace(/>/ig, '&gt;')
-      .replace(/&#39;/g, "'");
-//    str = str.replace(/\&lt;br\s*\/?\&gt;/ig, '<br />');
-    // 支持<br/>
-    return str;
+    return str.replace(/&/g, '&amp;')
+             .replace(/</g, '&lt;')
+             .replace(/>/g, '&gt;');
 };
 
 window.htmlencode = HTMLEnCode;
