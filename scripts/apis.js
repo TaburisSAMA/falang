@@ -1553,7 +1553,10 @@ var TQQAPI = Object.inherits({}, sinaApi, {
         favorites:            '/fav/list_t',
         favorites_create:     '/fav/addt',
         favorites_destroy:    '/fav/delt',
-        counts:               '/t/re_count', //仅仅是转播数
+        counts:               '/t/re_count',
+        // 转发的统计接口竟然还是不一样的
+        // http://open.t.qq.com/resource.php?i=1,1#8_100
+        sub_counts:           '/t/sub_re_count',
         status_show:          '/t/show',
         update:               '/t/add',
         upload:               '/t/add_pic',
@@ -1809,6 +1812,16 @@ var TQQAPI = Object.inherits({}, sinaApi, {
             url: this.config.reset_count,
             type: 'get',
             play_load: 'result',
+            data: data
+        };
+        this._sendRequest(params, callback, context);
+    },
+    
+    sub_counts: function(data, callback, context) {
+        var params = {
+            url: this.config.sub_counts,
+            type: 'get',
+            play_load: 'json',
             data: data
         };
         this._sendRequest(params, callback, context);
@@ -3844,7 +3857,7 @@ var T163API = Object.inherits({}, sinaApi, {
     },
     
     format_result_item: function(data, play_load, args) {
-		if(play_load == 'user' && data && data.id) {
+		if(play_load === 'user' && data && data.id) {
 			data.t_url = 'http://t.163.com/' + data.screen_name;
             //163的screen_name是个性网址
             var temp_name = data.screen_name;
@@ -3867,7 +3880,7 @@ var T163API = Object.inherits({}, sinaApi, {
                 }
                 delete data.userTag;
             }
-		} else if(play_load == 'status') {
+		} else if(play_load === 'status') {
 			// search
 			if(!data.user) {
 				data.user = {
@@ -3944,7 +3957,6 @@ var T163API = Object.inherits({}, sinaApi, {
 				data.retweeted_status = {
 					id: data.in_reply_to_status_id,
 					text: data.in_reply_to_status_text,
-//					comments_count: data.comments_count,
 					user: {
 						id: data.in_reply_to_user_id,
 						screen_name: data.in_reply_to_user_name,
@@ -3952,6 +3964,10 @@ var T163API = Object.inherits({}, sinaApi, {
 						profile_image_url: 'http://mimg.126.net/p/butter/1008031648/img/face_big.gif'
 					}
 				};
+				if(data.root_in_reply_to_status_id == data.in_reply_to_status_id) {
+				    data.retweeted_status.retweet_count = data.root_retweet_count;
+				    data.retweeted_status.comments_count = data.root_comments_count;
+				}
 				data.retweeted_status.user = this.format_result_item(data.retweeted_status.user, 'user', args);
 				data.retweeted_status = this.format_result_item(data.retweeted_status, 'status', args);
 				
@@ -3961,7 +3977,8 @@ var T163API = Object.inherits({}, sinaApi, {
 					data.retweeted_status.retweeted_status = {
 						id: data.root_in_reply_to_status_id,
 						text: data.root_in_reply_to_status_text,
-//						comments_count: data.retweeted_status.comments_count,
+						retweet_count: data.root_retweet_count,
+						comments_count: data.root_comments_count,
 						user: {
 							id: data.root_in_reply_to_user_id,
 							screen_name: data.root_in_reply_to_user_name,

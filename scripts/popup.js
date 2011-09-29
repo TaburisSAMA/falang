@@ -1522,27 +1522,18 @@ function getSinaTimeline(t, notCheckNew){
     }
 };
 
-//显示评论数和回复数
+// 显示评论数和回复数
 function showCounts(t, ids){
-	if(!ids || ids.length <= 0){
+	if(!ids || ids.length === 0 || ['direct_messages'].indexOf(t) >= 0){
 		return;
 	}
-    if(['direct_messages'].indexOf(t) >= 0){return;}
-
     var c_user = getUser();
     var config = tapi.get_config(c_user);
     if(!c_user || !config.support_counts){
         return;
     }
-    /* 腾讯每次只能取30个id，腾讯的返回结果里面有，不用重新请求（不实时？）
-    if(c_user.blogType == 'tqq' && ids.length > 30){
-        var ids2 = ids.slice(30);
-        ids = ids.slice(0, 30);
-        showCounts(t, ids2);
-    }
-    */
     ids = ids.join(',');
-    var data = {ids:ids, user:c_user};
+    var data = {ids: ids, user: c_user};
     showLoading();
     tapi.counts(data, function(counts, textStatus){
     	hideLoading();
@@ -1572,7 +1563,7 @@ function showCounts(t, ids){
             }
         }
     });
-}//<<<<<===========
+}
 
 //======>>>>>>> 查看评论 / 转发列表 <<<<<<<
 //@ele: 触发该事件的元素, 如果ele的timeline_type == 'repost'，则代表是转发列表
