@@ -2416,7 +2416,7 @@ function _initText($text, config) {
 	    .data('support_double_char', config.support_double_char);
 }
 
-function doReply(ele, screen_name, tweetId, name){//@回复
+function doReply(ele, screen_name, tweetId, name) { // @回复
 	ActionCache.set('doReply', [null, screen_name, tweetId, name]);
     $('#actionType').val('reply');
     $('#replyTweetId').val(tweetId || '');
@@ -2430,6 +2430,18 @@ function doReply(ele, screen_name, tweetId, name){//@回复
 
     $('#ye_dialog_window').show();
     var $replyText = $('#replyTextarea'), text = $replyText.val();
+    if(!text) {
+        var tweet = TWEETS[tweetId]
+          , at_users = tapi.find_at_users(getUser(), tweet.text);
+        if(at_users) {
+            for(var i = 0, l = at_users.length; i < l; i++) {
+                var at_user = at_users[i];
+                if(at_user !== tweet.user.name && at_user !== screen_name) {
+                    text += '@' + at_user + ' ';
+                }
+            }
+        }
+    }
     $replyText.val('').focus().val(text);
     _initText($replyText);
     countReplyText();

@@ -286,6 +286,21 @@ var sinaApi = {
         		+ _u.i18n("btn_show_user_title") +'">@$1</a>');
         return str;
     },
+    // 获取str里面所有@用户的名称列表，不包含@符合
+    find_at_users: function(str) {
+        var matchs = str.match(this._at_match_rex);
+        if(matchs) {
+            var users = [];
+            for(var i = 0, l = matchs.length; i < l; i++) {
+                var name = matchs[i].substring(1);
+                if(users.indexOf(name) < 0) {
+                    users.push(name);
+                }
+            }
+            return users;
+        }
+        return null;
+    },
     processEmotional: function(str){
         return str.replace(/\[([\u4e00-\u9fff,\uff1f,\w]{1,4})\]/g, this._replaceEmotional);
     },
@@ -6076,6 +6091,10 @@ var tapi = {
 	
 	processMsg: function(user, str_or_status, not_encode) {
 		return tapi.api_dispatch(user).processMsg(str_or_status, not_encode);
+	},
+	
+	find_at_users: function(user, str) {
+	    return tapi.api_dispatch(user).find_at_users(str);
 	},
 
     get_config: function(user) {
