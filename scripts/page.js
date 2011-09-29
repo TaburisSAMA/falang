@@ -170,12 +170,22 @@ function close_fawave_remind(){
     $("#fa_wave_msg_wrap").hide();
 };
 
-// HTML 编码
+//HTML 编码
+//test: hard code testing 。。。 '"!@#$%^&*()-=+ |][ {} ~` &&&&&amp; &lt; & C++ c++c + +c &amp;
 function HTMLEnCode(str){
     if(!str){ return ''; }
-    str = str.replace(/</ig, '&lt;');
-    str = str.replace(/>/ig, '&gt;');
-    return str;
+    return str.replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+};
+
+window.htmlencode = HTMLEnCode;
+
+//html转换为text
+function htmldecode(html){
+    var tmp = document.createElement("DIV");
+    tmp.innerHTML = html;
+    return tmp.innerText;
 };
 
 /**
