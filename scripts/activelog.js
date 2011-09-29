@@ -4,7 +4,7 @@
 		return;
 	}
 	var ActiveLog = {
-		api: 'http://api.yongwo.de:9999/log',
+		api: 'http://api.yongwo.de/log',
 		app: 'fawave',
 		// chrome.extension.getURL('oauth_cb.html')
 		// "chrome-extension://kdkhkblabbkmgfjfpbijlbijdemdodol/"
