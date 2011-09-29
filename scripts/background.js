@@ -442,7 +442,9 @@ function checkTimeline(t, user_uniqueKey) {
                     tweets[_key] = sinaMsgs;
                 } else {
                     // 清空旧数据标致位
-                    tweets[_key][sinaMsgs.length - 1].__clean_cache_status = true;
+                    if(tweets[_key][sinaMsgs.length - 1]) {
+                        tweets[_key][sinaMsgs.length - 1].__clean_cache_status = true;
+                    }
                     view_status.clean_cache = true;
                     set_view_status(t, view_status, user_uniqueKey);
                 }
@@ -451,7 +453,9 @@ function checkTimeline(t, user_uniqueKey) {
     	}
         if(data.next_cursor !== undefined && msg_len > 0) {
             // 保存最新的cursor，用于分页
-            tweets[_key][msg_len - 1].__pagging_cursor = data.next_cursor;
+            if(tweets[_key][msg_len - 1]) {
+                tweets[_key][msg_len - 1].__pagging_cursor = data.next_cursor;
+            }
         }
         // 判断是否需要清除多余的缓存数据，释放内存
         var max_len = PAGE_SIZE * 4;
