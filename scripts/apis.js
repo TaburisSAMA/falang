@@ -2528,15 +2528,21 @@ var DiguAPI = Object.inherits({}, sinaApi, {
 				// id is name
 				args.data.name = args.data.id;
 				delete args.data.id;
-			} 
-//			else if(args.data.screen_name){
-//				args.data.userIdOrName = args.data.screen_name;
-//				delete args.data.screen_name;
-//			}
+			} else if(args.data.screen_name){
+				args.data.userIdOrName = args.data.screen_name;
+				delete args.data.screen_name;
+			}
 		} else if(args.url == this.config.verify_credentials) {
 			args.data.isAllInfo = true;
 			delete args.data.source;
 		}
+		
+        if(args.data.userIdOrName) {
+            args.data.userIdOrName = encodeURIComponent(args.data.userIdOrName);
+        }
+        if(args.data.content) {
+            args.data.content = encodeURIComponent(args.data.content);
+        }
     },
 	
 	/* content[可选]：更新的Digu消息内容， 请确定必要时需要进行UrlEncode编码，另外，不超过140个中文或者英文字。
@@ -2551,6 +2557,9 @@ var DiguAPI = Object.inherits({}, sinaApi, {
     	data.content = data.status;
     	delete data.status;
     	pic.keyname = 'image0';
+    	for(var k in data) {
+            data[k] = encodeURIComponent(data[k]);
+        }
     },
 	
 	format_result: function(data, play_load, args) {
@@ -2612,7 +2621,7 @@ var DiguAPI = Object.inherits({}, sinaApi, {
 	},
 	
 	format_result_item: function(data, play_load, args) {
-		if(play_load == 'status' && data.id) {
+		if(play_load === 'status' && data.id) {
 			data.favorited = data.favorited == 'true';
 			if(data.picPath && data.picPath.length > 0) {
 				// http://img2.digu.com/100x75/u/1290361951998_9a36990561cf56f66c2333ee836d0441.jpg
@@ -2640,7 +2649,7 @@ var DiguAPI = Object.inherits({}, sinaApi, {
 			}
 			data.t_url = tpl + data.id;
 			this.format_result_item(data.user, 'user', args);
-		} else if(play_load == 'user' && data && data.id) {
+		} else if(play_load === 'user' && data && data.id) {
 			data.id = data.name || data.id;
 			data.t_url = data.url || ('http://digu.com/' + (data.name || data.id));
             data.gender = this.config.gender_map[data.gender];
@@ -2650,12 +2659,15 @@ var DiguAPI = Object.inherits({}, sinaApi, {
 					return $1 + '48x48';
 				});
 			}
-		} else if(play_load == 'comment') {
+		} else if(play_load === 'comment') {
 			this.format_result_item(data.user, 'user', args);
-		} else if(play_load == 'message') {
+		} else if(play_load === 'message') {
 			this.format_result_item(data.sender, 'user', args);
 			this.format_result_item(data.recipient, 'user', args);
 		}
+		if(data.text) {
+            data.text = htmldecode(data.text);
+        }
 		return data;
 	}
 	
@@ -3164,9 +3176,8 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 	// 已经支持中文
 	searchMatchReg: /(#([\w\-\_\u2E80-\u3000\u303F-\u9FFF]+))/g,
 	processSearch: function (str) {
-        str = str.replace(this.searchMatchReg,
+        return str.replace(this.searchMatchReg,
         	'<a class="tag" title="$2" href="https://twitter.com/search?q=%23$2" target="_blank">$1</a>');
-        return str;
     },
     
     // return [[hash1, hash_value], ..., [#xxx#, xxx]]
@@ -3188,11 +3199,6 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
     processEmotional: function(str){
         return str;
     },
-	
-	// 无需urlencode
-	url_encode: function(text) {
-		return text;
-	},
 	
 	comments_timeline: function(data, callback, context) {
 		callback.call(context);
@@ -3506,7 +3512,8 @@ var TaobaoStatusNetAPI = Object.inherits({}, StatusNetAPI, {
         upload: '/statuses/update'
     }),
     
-    _emotion_rex: window.TAOBAO_FACES ? new RegExp('\\[\\^(' + Object.keys(window.TAOBAO_FACES).join('|') + ')\\^\\]', 'g') : null,
+    _emotion_rex: window.TAOBAO_FACES ? 
+        new RegExp('\\[\\^(' + Object.keys(window.TAOBAO_FACES).join('|') + ')\\^\\]', 'g') : null,
     processEmotional: function(str) {
         if(!this._emotion_rex) {
             return str;
@@ -3515,7 +3522,8 @@ var TaobaoStatusNetAPI = Object.inherits({}, StatusNetAPI, {
             if(window.TAOBAO_FACES && g1) {
                 var emotion = TAOBAO_FACES[g1];
                 if(emotion) {
-                    var tpl = '<img style="height: 24px;" title="{{title}}" src="' + TAOBAO_FACES_URL_PRE + '{{emotion}}" />';
+                    var tpl = '<img style="height: 24px;" title="{{title}}" src="' 
+                        + TAOBAO_FACES_URL_PRE + '{{emotion}}" />';
                     return tpl.format({title: g1, emotion: emotion});
                 }
             }
@@ -3528,7 +3536,8 @@ var TaobaoStatusNetAPI = Object.inherits({}, StatusNetAPI, {
         str = str.replace(this.searchMatchReg, function(m, g1) {
             // 修复#xxx@xxx#嵌套问题
             var search = g1.remove_html_tag();
-            return '<a target="_blank" href="'+ search_url + '{{search}}" title="Search #{{search}}">#{{search}}#</a>'.format({search: search});
+            return '<a target="_blank" href="'+ search_url 
+                + '{{search}}" title="Search #{{search}}">#{{search}}#</a>'.format({search: search});
         });
         return str;
     },
@@ -3563,11 +3572,6 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
         gender_map:{"男":'m', '女':'f'}
 	}),
 	
-	// 无需urlencode
-	url_encode: function(text) {
-		return text;
-	},
-    
     processAt: function (str) { //@*** ,饭否的用户名支持“.”
         str = str.replace(/^@([\w\-\u4e00-\u9fa5|\_\.]+)/g, ' <a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$1" title="'+ _u.i18n("btn_show_user_title") +'">@$1</a>');
         str = str.replace(/([^\w#])@([\w\-\u4e00-\u9fa5|\_\.]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ this.config.user_home_url +'$2" title="'+ _u.i18n("btn_show_user_title") +'">@$2</a>');
@@ -3657,6 +3661,9 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
    			}
    			if(data.in_reply_to_status_id){
    				data.related_dialogue_url = 'http://fanfou.com/statuses/' + data.in_reply_to_status_id + '?fr=viewreply';
+   			}
+   			if(data.text) {
+   			    data.text = htmldecode(data.text);
    			}
 		} else if(play_load == 'user' && data && data.id) {
 			data.t_url = 'http://fanfou.com/' + (data.id || data.screen_name);
@@ -4747,19 +4754,19 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
         result_format: '', // 由outformat参数确定返回值格式
         oauth_callback: FAWAVE_OAUTH_CALLBACK_URL,
 		userinfo_has_counts: false, // 用户信息中是否包含粉丝数、微博数等信息
-        support_comment: true,
-		support_repost: true,
+        support_comment: false,
+		support_repost: false,
 		support_comment_repost: false,
-		support_repost_timeline: true,
+		support_repost_timeline: false,
 		support_max_id: false,
 		support_favorites: false,
 		support_do_favorite: false,
 //		support_mentions: false,
-		need_processMsg: false,
 		support_auto_shorten_url: false,
 		user_timeline_need_friendship: false,
 		//support_cursor_only: true,
 		support_search: false,
+		support_direct_messages: false,
 		support_sent_direct_messages: false,
 		support_blocking: false,
 		oauth_host: 'http://open.tianya.cn',
@@ -4811,10 +4818,7 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 		    delete args.data.count;
 		}
 	},
-	// urlencode，子类覆盖是否需要urlencode处理
-	url_encode: function(text) {
-		return text;
-	},
+	
 	format_upload_params: function(user, data, pic) {
         pic.keyname = 'media';
         data.appkey = data.source;
@@ -4895,7 +4899,7 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 		    if(data.sharedId) {
 		        data.retweeted_status = {
 	                id: data.sharedId,
-	                text: data.sharedTitle
+	                text: htmldecode(data.sharedTitle || '')
 		        };
 		        if(data.sharedMedias && data.sharedMedias.image && data.sharedMedias.image[0]) {
 	                var image = data.sharedMedias.image[0];
