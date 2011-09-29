@@ -78,13 +78,13 @@ var T_LIST = {
 	'facebook': ['friends_timeline'],
 	'renren': ['friends_timeline'],
 	'plurk': ['friends_timeline'],
-	'douban': ['friends_timeline', 'direct_messages']
+	'douban': ['friends_timeline', 'direct_messages'],
+	'tianya': ['friends_timeline','mentions','comments_timeline']
 };
 T_LIST.tianya = T_LIST.tqq = T_LIST.t163 = T_LIST.tsina = T_LIST.tsohu = T_LIST.all;
 T_LIST.t_taobao = T_LIST.fanfou = T_LIST.renjian = T_LIST.zuosa 
 	= T_LIST.follow5 = T_LIST.leihou = T_LIST.twitter 
 	= T_LIST.identi_ca = T_LIST.tumblr = T_LIST.digu;
-T_LIST.tianya.pop('direct_messages');
 
 var T_NAMES = {
 	'tsina': '新浪微博',
