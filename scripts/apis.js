@@ -4786,14 +4786,15 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
         result_format: '', // 由outformat参数确定返回值格式
         oauth_callback: FAWAVE_OAUTH_CALLBACK_URL,
 		userinfo_has_counts: false, // 用户信息中是否包含粉丝数、微博数等信息
-        support_comment: false,
+		comment_need_user_id: true,
+        support_comment: true,
 		support_repost: false,
 		support_comment_repost: false,
 		support_repost_timeline: false,
 		support_max_id: false,
 		support_favorites: false,
 		support_do_favorite: false,
-//		support_mentions: false,
+		support_mentions: true,
 		support_auto_shorten_url: false,
 		user_timeline_need_friendship: false,
 		//support_cursor_only: true,
@@ -4810,8 +4811,9 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 		verify_credentials: '/user/info.php',
 		friends_timeline: '/weibo/gethomeline.php',
 		user_timeline: '/weibo/getmyweibo.php',
-		comments_timeline: '/weibo/getaboutme.php',
+		comments_timeline: '/weibo/getreceivecomment.php',
 		mentions: '/weibo/getaboutme.php',
+		comment: '/weibo/addcomment.php',
 	}),
 	
 	user_cache: {},
@@ -4848,6 +4850,13 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 		if(args.data.count) {
 		    args.data.pagesize = args.data.count;
 		    delete args.data.count;
+		}
+		if(args.url === this.config.comment) {
+		    // http://open.tianya.cn/wiki/index.php?title=Weibo/addcomment
+		    args.data.word = encodeURIComponent(args.data.comment);
+		    args.data.authorid = args.data.user_id;
+		    delete args.data.comment;
+		    delete args.data.user_id;
 		}
 	},
 	
@@ -4897,8 +4906,9 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 			data.profile_image_url = data.userheadphoto || 'http://tx.tianyaui.com/logo/man/' + data.id;
 			data.t_url = 'http://my.tianya.cn/' + data.id;
 		} else if(play_load === 'status') {
-		    data.text = data.originContent;
+		    data.text = data.originContent || data.titleOrigin;
 		    delete data.originContent;
+		    delete data.titleOrigin;
 		    delete data.word;
 		    if(this.user_cache[data.uid]) {
 		        data.user = this.user_cache[data.uid];
@@ -4912,8 +4922,11 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 		    delete data.uid;
 		    delete data.uname;
 		    
-		    data.created_at = new Date(data.time);
-		    delete data.time;
+		    if(data.time) {
+		        data.created_at = new Date(data.time);
+	            delete data.time;
+		    }
+		    
 		    if(data.medias && data.medias.image && data.medias.image[0]) {
 		        var image = data.medias.image[0];
 		        data.thumbnail_pic = image.sUrl;
@@ -4955,6 +4968,62 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 	            }
 	            data.retweeted_status.t_url = 'http://my.tianya.cn/t/' + data.retweeted_status.user.id + '/' + data.retweeted_status.id;
 		    }
+		} else if(play_load === 'comment') {
+		    data.text = data.wordOrigin;
+            delete data.wordOrigin;
+            delete data.word;
+            data.user = {
+                user_id: data.uid,
+                user_name: data.uname
+            };
+            data.user = this.format_result_item(data.user, 'user', args);
+            delete data.uid;
+            delete data.uname;
+            data.created_at = new Date(data.time);
+            delete data.time;
+            
+            if(data.twId) {
+                data.status = {
+                    id: data.twId,
+                    media: data.twMedia,
+                    mediaFlag: data.twMediaFlag,
+                    medias: data.twMedias,
+                    replyCount: data.twReplyCount,
+                    shareCount: data.twShareCount,
+                    star: data.twStar,
+                    title: data.twTitle,
+                    titleOrigin: data.twTitleOrigin,
+                    uid: data.twUid,
+                    uname: data.twUname
+                };
+                data.status = this.format_result_item(data.status, 'status', args);
+                for(var k in data) {
+                    if(k.indexOf('tw') === 0) {
+                        delete data[k];
+                    }
+                }
+                if(data.sharedTwId) {
+                    data.status.retweeted_status = {
+                        id: data.sharedTwId,
+                        media: data.sharedTwMedia,
+                        mediaFlag: data.sharedTwMediaFlag,
+                        medias: data.sharedTwMedias,
+                        replyCount: data.sharedTwReplyCount,
+                        shareCount: data.sharedTwShareCount,
+                        star: data.sharedTwStar,
+                        title: data.sharedTwTitle,
+                        titleOrigin: data.sharedTwTitleOrigin || htmldecode(data.sharedTwTitle || ''),
+                        uid: data.sharedTwUid,
+                        uname: data.sharedTwUname
+                    };
+                    data.status.retweeted_status = this.format_result_item(data.status.retweeted_status, 'status', args);
+                    for(var k in data) {
+                        if(k.indexOf('sharedTw') === 0) {
+                            delete data[k];
+                        }
+                    }
+                }
+            }
 		}
 		return data;
 	}
