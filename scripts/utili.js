@@ -33,7 +33,14 @@ var _u = {
         if(window._i18n_messages_cache) {
             var msg = window._i18n_messages_cache[s];
             if(msg) {
-                return msg.message || s;
+                var message = msg.message || s;
+                if(msg.placeholders && e && e.length > 0 && msg.message) {
+                    for(var k in msg.placeholders) {
+                        var index = parseInt(msg.placeholders[k].content.substring(1)) - 1;
+                        message = message.replace(new RegExp('\\$' + k + '\\$', 'g'), e[index]);
+                    }
+                }
+                return message;
             }
         }
         return chrome.i18n.getMessage(s, e) || s;
