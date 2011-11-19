@@ -2192,11 +2192,26 @@ var QQImage = {
 	}
 };
 
+var SohuImage = {
+    host: 't.itc.cn',
+    url_re: /t\.itc\.cn\/.+\/(\w+(\.(png|jpg|gif|jpeg)))/i,
+    sync: true,
+    get: function(url, callback, ele) {
+        var m = this.url_re.exec(url);
+        callback({
+            thumbnail_pic: url.replace(m[1], 'f_' + m[1]),
+            bmiddle_pic: url.replace(m[1], 'm_' + m[1]),
+            original_pic: url
+        });
+    }
+};
+
 // 图片服务
 var ImageService = {
 	services: {
 		SinaImage: SinaImage,
 		QQImage: QQImage,
+		SohuImage: SohuImage,
 		Instagram: Instagram, 
 		Instagram2: Instagram2,
 		Plixi: Plixi, 
