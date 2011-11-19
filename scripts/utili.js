@@ -1338,9 +1338,17 @@ var ShortenUrl = {
 	expand: function(shorturl, callback, context) {
 		var m = this.SINAURL_RE.exec(shorturl);
 		if(m) {
+		    var b_view = getBackgroundView();
+            if(b_view.__enable_expand_sinaurl === false) {
+                this._expand(shorturl, callback, context);
+                return;
+            }
 			this.expand_sinaurl(shorturl, function(data) {
 			    if(data && data.url && this.SHORT_SERVICE_RE.test(data.url)) {
 			        this._expand(data.url, callback, context);
+			    } else if(!data || !data.url) {
+			        // 新版本新浪微博无法使用此接口还原
+			        this._expand(shorturl, callback, context);
 			    } else {
 			        callback.call(context, data);
 			    }
@@ -1381,6 +1389,11 @@ var ShortenUrl = {
 					callback.call(context, data);
 				}, 
 				error: function(xhr, status) {
+				    if(status === 'parsererror') {
+				        // 使用了新版本的新浪微博，无法调用还原接口
+				        var b_view = getBackgroundView();
+				        b_view.__enable_expand_sinaurl = false;
+				    }
 					callback.call(context, null);
 				}
 			});
@@ -1662,6 +1675,47 @@ var Camplus = {
             },
             error: function() {
                 callback(null);
+            }
+        });
+    }
+};
+
+var Nodebox = {
+    host: 'upload.cnodejs.net',
+    url_re: /http:\/\/upload\.cnodejs.net\/\w\/\w\/\w+\.(jpg|png|bmp|gif|webp|jpeg)/i,
+    show_link: true,
+    sync: true,
+    get: function(url, callback) {
+        var pics = {
+            thumbnail_pic: url,
+            bmiddle_pic: url,
+            original_pic: url
+        };
+        callback(pics);
+    },
+    upload: function(data, pic, callback, onprogress, context) {
+        var url = 'http://upload.cnodejs.net/store';
+        pic.keyname = 'file';
+        var blobbuilder = build_upload_params(data, pic);
+        $.ajax({
+            url: url,
+            data: blobbuilder.getBlob(),
+            type: 'post',
+            dataType: 'json',
+            contentType: blobbuilder.contentType,
+            processData: false,
+            xhr: xhr_provider(onprogress),
+            success: function(result) {
+                var error = null, info = null;
+                if(result.success) {
+                    info = result.payload;
+                } else {
+                    error = new Error(JSON.stringify(result));
+                }
+                callback.call(context, error, info);
+            },
+            error: function(xhr, status, err) {
+                callback.call(context, err);
             }
         });
     }
@@ -2155,6 +2209,7 @@ var ImageService = {
 		Flickr: Flickr,
 		DoubanImage: DoubanImage,
 		Immio: Immio,
+		Nodebox: Nodebox,
 		Yupoo: Yupoo,
 		FanfouImage: FanfouImage,
 		Camplus: Camplus,

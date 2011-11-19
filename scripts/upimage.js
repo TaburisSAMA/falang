@@ -405,12 +405,12 @@ function handleFile(file, handle_image) {
         }
         var settings = Settings.get()
           , user = settings.vdisk_user;
-        if(!user) {
-            // 提示用戶綁定帳號
-            return false;
-        }
+//        if(!user) {
+//            // 提示用戶綁定帳號
+//            return false;
+//        }
         disabledUpload();
-        VDiskAPI.upload(user, file, function(err, result) {
+        Nodebox.upload({}, file, function(err, result) {
             enabledUpload();
             resetFileUpload();
             $("#progressBar")[0].style.width = "0%";
@@ -418,7 +418,7 @@ function handleFile(file, handle_image) {
             if(err) {
                 return _showMsg(err.message);
             }
-            var url = result.download_page;
+            var url = result.url;
             var $txt = $('#txtContent'), text = $txt.val();
             if(text) {
                 text += ' ';
@@ -435,6 +435,31 @@ function handleFile(file, handle_image) {
             $("#progressBar")[0].style.width = precent + "%";
             $("#progressBar span").html(precent + "%");
         });
+//        VDiskAPI.upload(user, file, function(err, result) {
+//            enabledUpload();
+//            resetFileUpload();
+//            $("#progressBar")[0].style.width = "0%";
+//            $("#progressBar span").html("");
+//            if(err) {
+//                return _showMsg(err.message);
+//            }
+//            var url = result.download_page;
+//            var $txt = $('#txtContent'), text = $txt.val();
+//            if(text) {
+//                text += ' ';
+//            }
+//            $txt.val(text + file.fileName + ' ' + url).focus();
+//            $('#imageFileWrap').attr('uploaded', '1');
+//            _shortenUrl(url, settings, function(shorturl) {
+//                if(shorturl) {
+//                    $txt.val($txt.val().replace(url, shorturl));
+//                }
+//            });
+//        }, function onprogress(rpe){
+//            var precent = parseInt((rpe.loaded / rpe.total) * 100);
+//            $("#progressBar")[0].style.width = precent + "%";
+//            $("#progressBar span").html(precent + "%");
+//        });
         return true;
     }
     return false;

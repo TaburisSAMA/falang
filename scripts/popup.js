@@ -384,13 +384,14 @@ function sendMsgByActionType(c) { // c:要发送的内容
     $("#replySubmit, #replyTextarea").attr('disabled', true);
     if(window.imgForUpload_reply) {
         // 增加图片链接
-        Immio.upload({}, window.imgForUpload_reply, function(error, info) {
-            if(info && info.link) {
+        Nodebox.upload({}, window.imgForUpload_reply, function(error, info) {
+            if(info && (info.link || info.url)) {
+                var picurl = info.link || info.url;
                 if($('#repostTweetId').val()) {
                     // repost
-                    c = info.link + ' ' + c; // 图片放前面
+                    c = picurl + ' ' + c; // 图片放前面
                 } else {
-                    c += ' ' + info.link;
+                    c += ' ' + picurl;
                 }
             }
             __sendMsgByActionType(c);
@@ -2103,9 +2104,9 @@ function _get_image_url(stat, callback, onprogress, context) {
                 };
             }
         }
-        Immio.upload({}, stat.pic, function(error, info) {
-            if(info && info.link) {
-                image_url = info.link;
+        Nodebox.upload({}, stat.pic, function(error, info) {
+            if(info && (info.link || info.url)) {
+                image_url = info.link || info.url;
             }
             callback.call(context, image_url);
         }, onprogress, context);
