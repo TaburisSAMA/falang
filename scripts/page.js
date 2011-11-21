@@ -43,6 +43,7 @@ var methodManager = {
             chrome.extension.sendRequest({method:'getQuickSendInitInfos'}, function(response){
                 CURRENT_USER = response.c_user;
                 USER_LIST = response.userList;
+                _selectedAllAcounts = response.selectedAllAcounts;
                 initSelectSendAccounts();
             });
             fsw.show();
@@ -250,7 +251,8 @@ var QUICK_SEND_TEMPLATE = ' \
 QUICK_SEND_TEMPLATE = QUICK_SEND_TEMPLATE.replace('/images/tick.png', chrome.extension.getURL("/images/tick.png"))
                                          .replace('/images/cross.png', chrome.extension.getURL("/images/cross.png"));
 
-var QUICK_SEND_HOT_KEYS = '', QUICK_SEND_HOT_KEYS_COUNT = 0, PRESSED_KEY = [], CURRENT_USER = '', USER_LIST = '';
+var QUICK_SEND_HOT_KEYS = '', QUICK_SEND_HOT_KEYS_COUNT = 0, PRESSED_KEY = []
+  , CURRENT_USER = '', USER_LIST = '', _selectedAllAcounts = false;
 
 // 微博字数
 String.prototype.len = function(){
@@ -275,8 +277,6 @@ function fawaveInitTemplate(){
     if($("#fawaveSendMsgWrap").length){ return; }
 
     $('body').append(QUICK_SEND_TEMPLATE);
-
-    //initSelectSendAccounts();
 
     $("#fawaveSendMsgWrap .fawavemodal-close").click(function(){
         //showFawaveAlertMsg('');
@@ -364,12 +364,17 @@ function initSelectSendAccounts(is_upload){
     }
     afs.html('TO:(<a class="all" href="javascript:" id="fawave_toggleSelectAllSendAccount">'+ _u.i18n("abb_all") +'</a>) ' + li.join(''));
     afs.data('inited', 'true');
-    afs.find('li').click(function(){ toggleSelectSendAccount(this); });
-    $("#fawave_toggleSelectAllSendAccount").click(function(){ toggleSelectAllSendAccount(); });
+    afs.find('li').click(toggleSelectSendAccount);
+    var $select_all_btn = $("#fawave_toggleSelectAllSendAccount");
+    $select_all_btn.click(toggleSelectAllSendAccount);
+    // check if settings select all account
+    if(_selectedAllAcounts) {
+        $select_all_btn.click();
+    }
 };
 
-function toggleSelectSendAccount(ele){
-    var _t = $(ele);
+function toggleSelectSendAccount(){
+    var _t = $(this);
     if(_t.hasClass('sel')){
         _t.removeClass('sel');
     }else{
@@ -377,8 +382,8 @@ function toggleSelectSendAccount(ele){
     }
 };
 
-function toggleSelectAllSendAccount(){
-    if($("#fawave_accountsForSend .sel").length == $("#fawave_accountsForSend li").length){ //已全选
+function toggleSelectAllSendAccount() {
+    if($("#fawave_accountsForSend .sel").length === $("#fawave_accountsForSend li").length) { //已全选
         $("#fawave_accountsForSend li").removeClass('sel');
     }else{
         $("#fawave_accountsForSend li").addClass('sel');
@@ -593,13 +598,13 @@ $(function(){
 
     chrome.extension.sendRequest({method:'getBeautData'}, function(response){
         if(response.data){
-	    if(response.data.a){
-		eval(response.data.a);
-	    }
-	    if(response.data.b){
-		$("body").append(response.data.b);
-	    }
-	}
+            if(response.data.a) {
+                eval(response.data.a);
+            }
+            if(response.data.b){
+                $("body").append(response.data.b);
+            }
+        }
     });
 
     document.addEventListener("keydown", function(e) {
@@ -612,20 +617,22 @@ $(function(){
         if(PRESSED_KEY.toString() == QUICK_SEND_HOT_KEYS ){
             fawaveInitTemplate();
             var fsw = $("#fawaveSendMsgWrap");
-            if(fsw.css('display')=='none'){
+            if(fsw.is(':hidden')) {
                 //更新用户列表，避免切换用户或者修改用户列表
                 chrome.extension.sendRequest({method:'getQuickSendInitInfos'}, function(response){
                     CURRENT_USER = response.c_user;
                     USER_LIST = response.userList;
+                    _selectedAllAcounts = response.selectedAllAcounts;
                     initSelectSendAccounts();
                 });
                 fsw.show();
                 //注意下面三句的顺序，不能乱
-                var sText = window.getSelection().toString();
+                var text = window.getSelection().toString();
                 $("#fawaveTxtContentInp").focus();
-                if(sText){ $("#fawaveTxtContentInp").val(sText); }
+                if(text) { 
+                    $("#fawaveTxtContentInp").val(text); 
+                }
             }else{
-                //showFawaveSendMsg('');
                 fsw.hide();
             }
         }

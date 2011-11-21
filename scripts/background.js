@@ -1026,11 +1026,17 @@ var r_method_manager = {
             sendResponse({short_url: ''});
         }
     },
-    getQuickSendInitInfos: function(request, sender, sendResponse){
-        var hotkeys = Settings.get().quickSendHotKey;
+    getQuickSendInitInfos: function(request, sender, sendResponse) {
+        var settings = Settings.get();
+        var hotkeys = settings.quickSendHotKey;
         var c_user = getUser();
         var userList = getUserList('send');
-        sendResponse({hotkeys: hotkeys, c_user:c_user, userList:userList});
+        sendResponse({
+            hotkeys: hotkeys, 
+            c_user:c_user, 
+            userList:userList,
+            selectedAllAcounts: settings.sendAccountsDefaultSelected === 'all'
+        });
     },
     publicQuickSendMsg: function(request, sender, sendResponse){
         var msg = request.sendMsg;

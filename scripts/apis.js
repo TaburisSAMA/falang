@@ -3410,12 +3410,18 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 	            			data.thumbnail_pic = media.media_url;
 	        				data.bmiddle_pic = data.thumbnail_pic;
 	        				data.original_pic = data.thumbnail_pic;
-	        				data.text = data.text.replace(media.url, ''); // 去除图片链接尾巴
+	        				if(data.text) {
+	        				    data.text = data.text.replace(media.url, ''); // 去除图片链接尾巴
+	        				}
 	            			break;
 	            		}
 	            	}
             	}
             	delete data.entities;
+            }
+            // 修复&lt; &gt; 被转移问题 #302 http://code.google.com/p/falang/issues/detail?id=302
+            if(data.text) {
+                data.text = data.text.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
             }
 			var tpl = this.config.user_home_url + '{{user.screen_name}}/status/{{id}}';
 			if(data.retweeted_status) {
