@@ -2480,14 +2480,7 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){ // 转发
     if(!value) {
     	if(reTweetId && TWEETS[tweetId]) {
     	    var rt = TWEETS[tweetId];
-            if(user.blogType=='tqq'){
-//                var data = $(ele).closest('li').find('.msgObjJson').text();
-//                data = unescape(data);
-//                try{
-//                    data = JSON.parse(data);
-//                    userName = data.user.name || userName;
-//                }catch(err){
-//                }
+            if(user.blogType=='tqq') {
                 userName = rt.user.name || userName;
             }
             value = config.repost_delimiter + '@' + userName + ':' + rt.text;
@@ -2632,7 +2625,8 @@ function doRT(ele, is_rt, is_rt_rt) {
     showMsgInput();
     
     var name = config.rt_at_name ? (_msg_user.name || _msg_user.id) : _msg_user.screen_name;
-    val = repost_pre + ' ' + '@' + name + ' ' + val;
+    val = 'RT @' + name + ' ' + val;
+//    val = repost_pre + ' ' + '@' + name + ' ' + val;
     if(data.crosspostSource) {
     	var longurl = data.crosspostSource;
     	val += ' ' + longurl;

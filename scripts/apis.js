@@ -2097,9 +2097,9 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 			// Ismyidol: 是否为accesstoken用户的收听的人
 			// Ismyfans: 是否为accesstoken 用户的听众
 			// Ismyblack: 是否在 accesstoken 用户的黑名单内
-			user.following = !!data.Ismyfans;
-			user.followed_by = !!data.Ismyidol;
-			user.blocking = user.blacked_by = !!data.Ismyblack;
+			user.following = !!data.ismyfans;
+			user.followed_by = !!data.ismyidol;
+			user.blocking = user.blacked_by = !!data.ismyblack;
 			if(data.tweet && data.tweet.length > 0) {
 			    data.tweet[0].origtext = data.tweet[0].origtext || data.tweet[0].text;
 			    user.status = this.format_result_item(data.tweet[0], 'status', args, users, false);
@@ -4932,7 +4932,6 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 		        data.created_at = new Date(data.time);
 	            delete data.time;
 		    }
-		    
 		    if(data.medias && data.medias.image && data.medias.image[0]) {
 		        var image = data.medias.image[0];
 		        data.thumbnail_pic = image.sUrl;
