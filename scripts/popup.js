@@ -912,20 +912,23 @@ function toggleSelectSendAccount(ele){
     if(_t.hasClass('sel')){
         _t.removeClass('sel');
     }else{
-        if(is_tsina) {
-           _t.siblings().each(function() {
-               var $this = $(this);
-               if($this.attr('blogType') !== 'tsina') {
-                   $this.removeClass('sel');
-               }
-           });
-        } else {
-            _t.siblings().each(function() {
-                var $this = $(this);
-                if($this.attr('blogType') === 'tsina') {
-                    $this.removeClass('sel');
-                }
-            });
+        var settings = Settings.get();
+        if(settings.__allow_select_all !== true) {
+            if(is_tsina) {
+                _t.siblings().each(function() {
+                    var $this = $(this);
+                    if($this.attr('blogType') !== 'tsina') {
+                        $this.removeClass('sel');
+                    }
+                });
+             } else {
+                 _t.siblings().each(function() {
+                     var $this = $(this);
+                     if($this.attr('blogType') === 'tsina') {
+                         $this.removeClass('sel');
+                     }
+                 });
+             }
         }
         _t.addClass('sel');
     }
