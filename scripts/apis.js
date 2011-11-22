@@ -302,7 +302,7 @@ var sinaApi = {
         return null;
     },
     processEmotional: function(str){
-        return str.replace(/\[([\u4e00-\u9fff,\uff1f,\w]{1,4})\]/g, this._replaceEmotional);
+        return str.replace(/\[([\u4e00-\u9fff,\uff1f,\w]{1,6})\]/g, this._replaceEmotional);
     },
     _replaceUrl: function(m, g1, g2){
         var _url = g1;

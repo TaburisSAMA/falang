@@ -6,6 +6,8 @@
 
 获取表情数据,
 直接运行脚本，让回复制粘贴就可以了。
+
+再将结果翻译成繁体 http://translate.google.com/
 """
 import urllib2
 import json
