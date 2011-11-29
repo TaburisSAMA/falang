@@ -1683,7 +1683,6 @@ var Camplus = {
 var Nodebox = {
     host: 'upload.cnodejs.net',
     url_re: /http:\/\/upload\.cnodejs.net\/\w\/\w\/\w+\.(jpg|png|bmp|gif|webp|jpeg)/i,
-    show_link: true,
     sync: true,
     get: function(url, callback) {
         var pics = {
@@ -2022,6 +2021,39 @@ var Twipple = {
 	}
 };
 
+var Topit = {
+    host: 'topit.me',
+    url_re: /topit\.me\/item\/\w+/i,
+    sync: true,
+    show_link: true,
+    get: function(url, callback) {
+        $.ajax({
+            url: url,
+            success: function(html, status, xhr) {
+                var $a = $(html).find('#item-tip');
+                var original_pic = $a.attr('href');
+                var bmiddle_pic = $a.find('img').attr('src');
+                var thumbnail_pic = original_pic;
+                var index = thumbnail_pic.indexOf('.me/l');
+                if(index > 0) {
+                    index += 4;
+                    thumbnail_pic = thumbnail_pic.substring(0, index) + 't' + 
+                        thumbnail_pic.substring(index + 1);
+                }
+                var pics = {
+                    thumbnail_pic: thumbnail_pic,
+                    bmiddle_pic: bmiddle_pic,
+                    original_pic: original_pic
+                };
+                callback(pics);
+            },
+            error: function() {
+                callback(null);
+            }
+        });
+    }
+};
+
 // https://groups.google.com/group/plixi/web/fetch-photos-from-url
 var Plixi = {
 	/*
@@ -2229,6 +2261,7 @@ var ImageService = {
 		FanfouImage: FanfouImage,
 		Camplus: Camplus,
 		Photo163: Photo163,
+        Topit: Topit,
 		Picplz: Picplz
 	},
 	
