@@ -785,6 +785,15 @@
         "description": "未读微博是否桌面弹出窗提示的说明"
     },
 
+    "sett_itemName_show_network_error": {
+        "message": "顯示網絡錯誤：",
+        "description": "當出現網絡錯誤時是否顯示"
+    },
+    "sett_jTip_show_network_error": {
+        "message": "顯示網絡錯誤，將看到類似如下的錯誤提示<br/><br/><img src=\"http://ww1.sinaimg.cn/large/6cfc7910jw1dnlatq8i9aj.jpg\" />",
+        "description": "顯示網絡錯誤的說明"
+    },
+
     "sett_itemName_sync_to_page": {
         "message": "同步設置：",
         "description": "已读数是否同步到相应的微博"
@@ -794,7 +803,7 @@
         "description": "同时将新浪微博页面的未读提示置零"
     },
     "sett_jTip_sync_to_page": {
-        "message": "<span class=\"note\">暫時只支持新浪微博</span>。如果已經通過FaWave(發微)看過的信息，<br/>則同時將新浪微博的頁面提示數置零<br/><br/><img src=\"/images/setting/page_unread_tip. png\" />",
+        "message": "<span class=\"note\">暫時只支持新浪微博</span>。如果已經通過FaWave(發微)看過的信息，<br/>則同時將新浪微博的頁面提示數置零<br/><br/><img src=\"/images/setting/page_unread_tip.png\" />",
         "description": "同时将新浪微博页面的未读提示置零的说明"
     },
 

@@ -180,6 +180,12 @@ $(function(){
     } else {
     	$('#enableImageService').removeAttr('checked');
     }
+
+    if(settings.show_network_error) {
+        $('#show_network_error').attr('checked', true);
+    } else {
+        $('#show_network_error').removeAttr('checked');
+    }
     
     // 设在instapaper, read it later, vdisk 帐号
     var settings = Settings.get();
@@ -1037,7 +1043,7 @@ function saveAll(){
 
     //保存全局信息刷新时间间隔
     var gr = null, grv = null;
-    for(var i in T_LIST.all){
+    for (var i in T_LIST.all) {
         gr = $("#gRefreshTime_" + T_LIST.all[i]);
         grv = Number(gr.val());
         if(isNaN(grv)){
@@ -1049,10 +1055,9 @@ function saveAll(){
         gr.val(grv);
     }
     var b_view = getBackgroundView();
-    if(b_view){
+    if (b_view) {
         b_view.RefreshManager.restart(); //TODO: 需要确认
     }
-
 
     settings.isSharedUrlAutoShort = !!$("#autoShortUrl").attr("checked");
     var asuwc = $("#autoShortUrlCount").val(); //自动缩短网址
@@ -1179,9 +1184,11 @@ function saveAll(){
     // 上次浏览状态设置
     settings.remember_view_status = !!$('#remember_view_status_cb').attr('checked');
 
-    Settings.save();
+    // show_network_error
+    settings.show_network_error = !!$('#show_network_error').attr('checked');
 
-    _showMsg(_u.i18n("msg_save_success"));
+    Settings.save();
+    _showMsg(_u.i18n("msg_save_success"), true);
 };
 
 //平滑滚动

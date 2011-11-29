@@ -222,25 +222,27 @@ var refreshTimeLimit = {
 refreshTimeLimit.tianya = refreshTimeLimit.digu = refreshTimeLimit.twitter = refreshTimeLimit.identi_ca = refreshTimeLimit.tsohu = refreshTimeLimit.t163 = refreshTimeLimit.fanfou = refreshTimeLimit.plurk = refreshTimeLimit.tsina;
 refreshTimeLimit.renjian = refreshTimeLimit.zuosa = refreshTimeLimit.follow5 = refreshTimeLimit.leihou = refreshTimeLimit.douban = refreshTimeLimit.buzz = refreshTimeLimit.tqq;
 
-function showMsg(msg, show_now){
+function showMsg(msg, show_now, is_error) {
     var popupView = getPopupView();
-    if(popupView) {
-        popupView._showMsg(msg, show_now);
+    if (popupView) {
+        popupView._showMsg(msg, show_now, is_error);
     }
 };
 // 缓冲错误信息，不要一次过显示一堆
 var __msg_next = null;
 // show_now: 是否马上显示，用于非错误提示
-function _showMsg(msg, show_now) {
-//    show_now = msg.indexOf('error:') < 0;
+function _showMsg(msg, show_now, is_error) {
     if(show_now) {
         return __displayMessage(msg, show_now);
     }
-    if(__msg_next) {
-        __msg_next = msg;
-    } else {
-        __displayMessage(msg);
-        __msg_next = msg;
+    // 非马上显示的，需要根据配置判断是否要显示
+    if(!is_error || Settings.get().show_network_error) {
+        if(__msg_next) {
+            __msg_next = msg;
+        } else {
+            __displayMessage(msg);
+            __msg_next = msg;
+        }
     }
 };
 
@@ -342,6 +344,7 @@ var Settings = {
         
         default_language: null, // 默认语言，如果没有设置，则使用i18n自动根据浏览器判断语言
         __allow_select_all: false, // 是否允许同时选择新浪和其他微博
+        show_network_error: true, // 是否显示网络错误信息
         lookingTemplate: '{{title}} {{url}} '
     },
     init: function(){ //只在background载入的时候调用一次并给 _settings 赋值就可以

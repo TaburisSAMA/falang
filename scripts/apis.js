@@ -960,7 +960,7 @@ var sinaApi = {
 	                	data.error = error;
 	                	textStatus = 'error';
 	                	var message = that.format_error(error, error_code, data);
-	                    _showMsg('error: ' + message + ', error_code: ' + error_code, false);
+	                    _showMsg('error: ' + message + ', error_code: ' + error_code, false, true);
 	                }
 	            } else {
 	                error_code = 400;
@@ -978,16 +978,18 @@ var sinaApi = {
 	                    try {
 	                        r = JSON.parse(r);
 	                    }
-	                    catch(err) {
+	                    catch (err) {
 	                        r = null;
 	                    }
-	                    if(r){_showMsg('error_code:' + r.error_code + ', error:' + r.error, false);}
+	                    if (r) {
+                            _showMsg('error_code:' + r.error_code + ', error:' + r.error, false, true);
+                        }
 	                }
 	            }
-	            if(!r){
+	            if (!r) {
 	                textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';
 	                errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
-	                _showMsg('error: ' + textStatus + errorThrown + 'statuCode: ' + status, false);
+	                _showMsg('error: ' + textStatus + errorThrown + 'statuCode: ' + status, false, true);
 	            }
 	            callback.call(context, r || {}, 'error', status); //不管什么状态，都返回 error
 	        }
@@ -1427,7 +1429,7 @@ var sinaApi = {
                     		error_msg += ', error_code: ' + error_code;
                     	}
                         error_code = error_code || 'unknow';
-                        showMsg(error_msg, false);
+                        showMsg(error_msg, false, true);
                     } else {
                         //成功再去格式化结果
                     	data = this.format_result(data, play_load, args);
@@ -1464,23 +1466,23 @@ var sinaApi = {
                                     if(!r.error && error_code){ // 错误为空，才显示错误代码
                                         error_msg += ', error_code: ' + error_code;
                                     }
-                                    showMsg(error_msg, false);
+                                    showMsg(error_msg, false, true);
                             	}
                             }
                         }
                     }
-                }catch(err){
+                } catch(err) {
                     r = null;
                 }
-                if(!r){
+                if (!r) {
                     textStatus = textStatus ? ('textStatus: ' + textStatus + '; ') : '';
                     errorThrown = errorThrown ? ('errorThrown: ' + errorThrown + '; ') : '';
                     r = {error:callmethod + ' error: ' + textStatus + errorThrown + ' statuCode: ' + status};
                     if(!args.dont_show_error) {
-                        showMsg(r.error, false);
+                        showMsg(r.error, false, true);
                     }
                 }
-                callbackFn.call(context, r||{}, 'error', status); //不管什么状态，都返回 error
+                callbackFn.call(context, r||{}, 'error', status); // 不管什么状态，都返回 error
                 hideLoading();
             }
         });

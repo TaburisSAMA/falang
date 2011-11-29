@@ -793,6 +793,15 @@
         "description": "未读微博是否桌面弹出窗提示的说明"
     },
 
+    "sett_itemName_show_network_error": {
+        "message": "显示网络错误：",
+        "description": "当出现网络错误的时候，是否显示"
+    },
+    "sett_jTip_show_network_error": {
+        "message": "显示网络错误，将看到类似如下错误提示<br/><br/><img src=\"http://ww1.sinaimg.cn/large/6cfc7910jw1dnlatq8i9aj.jpg\" />",
+        "description": "显示网络错误的说明"
+    },
+
     "sett_itemName_sync_to_page": {
         "message": "同步设置：",
         "description": "已读数是否同步到相应的微博"
