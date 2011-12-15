@@ -2377,7 +2377,7 @@ var DiguAPI = Object.inherits({}, sinaApi, {
 	// 覆盖不同的参数
 	config: Object.inherits({}, sinaApi.config, {
 		host: 'http://api.minicloud.com.cn',
-        user_home_url: 'http://digu.com/',
+        user_home_url: 'http://t.digu.com/',
         search_url: 'http://digu.com/search/',
 		source: 'fawave', 
 	    support_comment: false,
@@ -2545,7 +2545,8 @@ var DiguAPI = Object.inherits({}, sinaApi, {
 			args.data.message = 0;
 			delete args.data.text;
 			delete args.data.id;
-		} else if(args.url == this.config.friendships_create || args.url == this.config.friendships_destroy) {
+		} else if(args.url == this.config.friendships_create || 
+              args.url == this.config.friendships_destroy) {
 			// id => userIdOrName
 			args.data.userIdOrName = args.data.id;
 			// method change to get
@@ -2594,10 +2595,10 @@ var DiguAPI = Object.inherits({}, sinaApi, {
 	
 	format_result: function(data, play_load, args) {
 		// digu {"wrong":"no data"}
-		if(data.wrong == 'no data') {
+		if (data.wrong === 'no data') {
 			data = [];
 		}
-		if(args.url == this.config.friendships_create) {
+		if (args.url === this.config.friendships_create) {
 			// new api: http://code.google.com/p/digu-api/wiki/User
 			// result : 操作结果 返回结果为11时表示用户不存存 
 			// 当type=1时，返回结果为：
@@ -2631,7 +2632,7 @@ var DiguAPI = Object.inherits({}, sinaApi, {
 			}
 			return data;
 		}
-		if($.isArray(data)) {
+		if ($.isArray(data)) {
 	    	for(var i in data) {
 	    		data[i] = this.format_result_item(data[i], play_load);
 	    	}
@@ -2641,9 +2642,13 @@ var DiguAPI = Object.inherits({}, sinaApi, {
 		// 若是follwers api，则需要封装成cursor接口
 		// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
 		// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
-		if(args.url == this.config.followers || args.url == this.config.friends) {
-			data = {users: data, next_cursor: Number(args.data.page) + 1, previous_cursor: args.data.page};
-			if(data.users.length == 0) {
+		if (args.url === this.config.followers || args.url === this.config.friends) {
+			data = {
+                users: data, 
+                next_cursor: Number(args.data.page) + 1, 
+                previous_cursor: args.data.page
+            };
+			if (data.users.length === 0) {
 				data.next_cursor = '0';
 			}
 		}
@@ -2651,8 +2656,8 @@ var DiguAPI = Object.inherits({}, sinaApi, {
 	},
 	
 	format_result_item: function(data, play_load, args) {
-		if(play_load === 'status' && data.id) {
-			data.favorited = data.favorited == 'true';
+		if (play_load === 'status' && data.id) {
+			data.favorited = data.favorited === 'true';
 			if(data.picPath && data.picPath.length > 0) {
 				// http://img2.digu.com/100x75/u/1290361951998_9a36990561cf56f66c2333ee836d0441.jpg
 				// http://pic.digu.com:80/file/12/93/99/27/201011/d144f3f76aaebf5df71c0003ca0767e9_100x75.JPEG
@@ -2663,39 +2668,32 @@ var DiguAPI = Object.inherits({}, sinaApi, {
 				data.original_pic = data.thumbnail_pic.replace(/[\/_]100x75/, '');
 			}
 			delete data.picPath;
-			var tpl = 'http://digu.com/detail/';
-			if(data.in_reply_to_status_id != '0' && data.in_reply_to_status_id != '') {
-//				data.retweeted_status = {
-//					id: data.in_reply_to_status_id,
-//					user: {
-//						id: data.in_reply_to_user_id,
-//						screen_name: data.in_reply_to_screen_name,
-//						name: data.in_reply_to_user_name
-//					}
-//				};
-				//data.retweeted_status.t_url = tpl + data.in_reply_to_status_id;
+			var tpl = 'http://t.digu.com/detail/';
+			if(data.in_reply_to_status_id !== '0' && data.in_reply_to_status_id !== '') {
 				// 查看相关对话的url
-				data.related_dialogue_url = 'http://digu.com/relatedDialogue/' + data.id;
+				data.related_dialogue_url = 'http://t.digu.com/relatedDialogue/' + data.id;
 			}
 			data.t_url = tpl + data.id;
 			this.format_result_item(data.user, 'user', args);
-		} else if(play_load === 'user' && data && data.id) {
+		} else if (play_load === 'user' && data && data.id) {
 			data.id = data.name || data.id;
-			data.t_url = data.url || ('http://digu.com/' + (data.name || data.id));
+			// data.t_url = data.url || ('http://t.digu.com/' + (data.name || data.id));
+            // data.url change
+            data.t_url = 'http://t.digu.com/' + (data.name || data.id);
             data.gender = this.config.gender_map[data.gender];
 			// 将小头像从 _24x24 => _48x48
-			if(data.profile_image_url) {
+			if (data.profile_image_url) {
 				data.profile_image_url = data.profile_image_url.replace(/([\/_])24x24/, function(m, $1) {
 					return $1 + '48x48';
 				});
 			}
-		} else if(play_load === 'comment') {
+		} else if (play_load === 'comment') {
 			this.format_result_item(data.user, 'user', args);
-		} else if(play_load === 'message') {
+		} else if (play_load === 'message') {
 			this.format_result_item(data.sender, 'user', args);
 			this.format_result_item(data.recipient, 'user', args);
 		}
-		if(data.text) {
+		if (data.text) {
             data.text = htmldecode(data.text);
         }
 		return data;
