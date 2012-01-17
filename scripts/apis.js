@@ -836,19 +836,19 @@ var sinaApi = {
      * callback: finish callback function
      * */
     upload: function(user, data, pic, before_request, onprogress, callback, context) {
-    	var auth_args = {type: 'post', data: {}, headers: {}};
+    	var auth_args = { type: 'post', data: {}, headers: {} };
     	pic.keyname = pic.keyname || 'pic';
     	data.source = data.source || this.config.source;
-    	if(data.need_source === false) {
+    	if (data.need_source === false) {
             delete data.need_source;
             delete data.source;
         }
     	var geo = this.get_geo();
-    	if(geo) {
+    	if (geo) {
 			this.format_geo_arguments(data, geo);
 		}
     	this.format_upload_params(user, data, pic);
-	    var boundary = '----multipartformboundary' + (new Date).getTime();
+	    var boundary = '----multipartformboundary' + new Date().getTime();
 	    var dashdash = '--';
 	    var crlf = '\r\n';
 	
@@ -859,16 +859,16 @@ var sinaApi = {
 	    builder += boundary;
 	    builder += crlf;
 		
-	    for(var key in data) {
+	    for (var key in data) {
 		    // set auth params
 		    auth_args.data[key] = data[key];
 	    }
 	    var api = user.apiProxy || this.config.host;
 		var url = api + this.config.upload + this.config.result_format;
-		if(this.config.use_method_param) {
+		if (this.config.use_method_param) {
 			// 只使用method 做参数, 走rest api
 			url = api;
-		} else if(data.__upload_url) {
+		} else if (data.__upload_url) {
 		    url = data.__upload_url  + this.config.result_format;
 		    delete data.__upload_url;
 		    delete auth_args.data.__upload_url;
@@ -876,7 +876,7 @@ var sinaApi = {
 		
 		// 设置认证头部
         this.apply_auth(url, auth_args, user);
-        for(var key in auth_args.data) {
+        for (var key in auth_args.data) {
 	    	/* Generate headers. key */            
 		    builder += 'Content-Disposition: form-data; name="' + key + '"';
 		    builder += crlf;
@@ -1542,6 +1542,7 @@ var TQQAPI = Object.inherits({}, sinaApi, {
         user_timeline_need_user: true, 
         show_fullname: true,
         support_blocking: true,
+        syncflag: 1, // 微博同步到空间分享标记（可选，0-同步，1-不同步，默认为0）
         
         blocks_blocking:      '/friends/blacklist',
         blocks_blocking_ids:  '/friends/blacklist/ids',
@@ -1675,11 +1676,11 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 	//page.js里面调用的时候没有加载表情字典,所以需要判断
 	_emotion_rex: window.TQQ_EMOTIONS ? new RegExp('\/(' + Object.keys(window.TQQ_EMOTIONS).join('|') + ')', 'g') : null,
 	processEmotional: function(str) {
-	    if(!this._emotion_rex) {
+	    if (!this._emotion_rex) {
 	        return str;
 	    }
         return str.replace(this._emotion_rex, function(m, g1){
-	        if(window.TQQ_EMOTIONS && g1) {
+	        if (window.TQQ_EMOTIONS && g1) {
 	        	var emotion = window.TQQ_EMOTIONS[g1];
 	            if(emotion) {
 	                var tpl = '<img title="{{title}}" src="' + TQQ_EMOTIONS_URL_PRE + '{{emotion}}" />';
@@ -1733,7 +1734,11 @@ var TQQAPI = Object.inherits({}, sinaApi, {
     },
     
     upload: function(user, data, pic, before_request, onprogress, callback, context) {
-        this.super_.upload.call(this, user, data, pic, before_request, onprogress, function(result, text_status, error_code) {
+        if (data && data.syncflag == null) {
+            data.syncflag = this.config.syncflag;
+        }
+        this.super_.upload.call(this, user, data, pic, before_request, onprogress, 
+        function(result, text_status, error_code) {
             if(result && result.data) {
                 result = result.data;
             }
@@ -1799,11 +1804,11 @@ var TQQAPI = Object.inherits({}, sinaApi, {
     reset_count: function(data, callback, context) {
         // Type：5 首页未读消息记数，6 @页消息记数 7 私信页消息计数 8 新增听众数 9 首页广播数（原创的）
         // 1 comments 2 metions 3 messages 4 fans
-        if(data.type === 1) {
+        if (data.type === 1) {
             return callback.call(context, true);
         }
         data.op = 1;
-        if(data.type === 2) {
+        if (data.type === 2) {
             data.type = 6;
         } else if(data.type === 3) {
             data.type = 7;
@@ -1830,40 +1835,42 @@ var TQQAPI = Object.inherits({}, sinaApi, {
     },
 	
 	before_sendRequest: function(args, user) {
-		if(args.play_load == 'string') {
+		if (args.play_load == 'string') {
 			// oauth
 			return;
 		}
 		args.data.format = 'json';
-		if(args.data.count) {
+		if (args.data.count) {
 			args.data.reqnum = args.data.count;
 			delete args.data.count;
 		}
-        if(args.data.since_id) {
+        if (args.data.since_id) {
 			args.data.pagetime = args.data.since_id;
             args.data.pageflag = args.data.pageflag === undefined ? 2 : args.data.pageflag;
 			delete args.data.since_id;
 		}
-        if(args.data.max_id) {
+        if (args.data.max_id) {
 			args.data.pagetime = args.data.max_id;
             args.data.pageflag = 1;
 			delete args.data.max_id;
 		}
-        if(args.data.status || args.data.text || args.data.comment){
-            args.data.content = args.data.status || args.data.text || args.data.comment;
+        var content = args.data.status || args.data.text || args.data.comment;
+        if (content) {
+            args.data.content = content;
             delete args.data.status;
             delete args.data.text;
             delete args.data.comment;
         }
         
-        if(args.url === this.config.user_timeline || args.url === this.config.mentions
-                || args.url === this.config.friends_timeline) {
+        if (args.url === this.config.user_timeline || 
+            args.url === this.config.mentions || 
+            args.url === this.config.friends_timeline) {
             // type: 拉取类型, 0x1 原创发表 0x2 转载 0x8 回复 0x10 空回 0x20 提及 0x40 点评
             // 如需拉取多个类型请|上(0x1|0x2) 得到3，type=3即可,填零表示拉取所有类型
             args.data.type = 0x1 | 0x2 | 0x8 | 0x10 | 0x20;
         }
         
-        switch(args.url){
+        switch(args.url) {
             case this.config.counts:
                 args.data.flag = 2;
                 break;
@@ -1946,7 +1953,7 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 		        break;
             case this.config.update:
             	// 判断是否@回复
-	            if(args.data.sina_id) {
+	            if (args.data.sina_id) {
 		        	args.data.reid = args.data.sina_id;
 		        	delete args.data.sina_id;
 		        	args.url = '/t/reply';
@@ -1967,53 +1974,55 @@ var TQQAPI = Object.inherits({}, sinaApi, {
                 args.data.type = 0x40;
                 break;
         }
-        if(args.url === this.config.update) {
+        if (args.url === this.config.update) {
         	// 判断是否有视频链接
-        	if(args.data.content) {
+        	if (args.data.content) {
         		var urls = UrlUtil.findUrls(args.data.content) || [];
-        		for(var i = 0, len = urls.length; i < len; i++) {
+        		for (var i = 0, len = urls.length; i < len; i++) {
         			var url = urls[i];
-        			if(VideoService.is_qq_support(url)) {
+        			if (VideoService.is_qq_support(url)) {
         				args.url = '/t/add_video';
         				args.data.url = url;
         				break;
         			}
         		}
         	}
+            if (args.data.syncflag == null) {
+                args.data.syncflag = this.config.syncflag;
+            }
         }
-//        if(args.data.content) {
-//            args.data.content = this.super_.url_encode(args.data.content);
-//        }
 	},
 	
 	format_result: function(data, play_load, args) {
-		if(play_load == 'string') {
+		if (play_load == 'string') {
 			return data;
 		}
-		if(args.url == this.config.friendships_create || args.url == this.config.friendships_destroy) {
+		if (args.url == this.config.friendships_create || args.url == this.config.friendships_destroy) {
 			return true;
 		}
-		if(!data.data && data.msg === 'ok') {
+		if (!data.data && data.msg === 'ok') {
 		    return true;
 		}
 		data = data.data;
-        if(!data){ return data; }
+        if (!data) { 
+            return data; 
+        }
 		var items = data.info || data;
 		delete data.info;
 		var users = data.user || {};
-		if(!$.isArray(items)) {
+		if (!$.isArray(items)) {
 			items = data.results || data.users;
 		}
-		if($.isArray(items)) {
-	    	for(var i=0; i<items.length; i++) {
+		if ($.isArray(items)) {
+	    	for (var i = 0, l = items.length; i < l; i++) {
 	    		items[i] = this.format_result_item(items[i], play_load, args, users);
 	    	}
 	    	data.items = items;
-            if(data.user && !data.user.id){
+            if (data.user && !data.user.id){
                 delete data.user;
             }
-	    	if(args.url == this.config.followers || args.url == this.config.friends) {
-	    		if(data.items.length >= parseInt(args.data.reqnum)) {
+	    	if (args.url === this.config.followers || args.url === this.config.friends) {
+	    		if (data.items.length >= parseInt(args.data.reqnum)) {
 	    			var start_index = parseInt(args.data.startindex || '0');
 		    		if(start_index == -1) {
 		    			start_index = 0;
@@ -2026,7 +2035,7 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 	    } else {
 	    	data = this.format_result_item(data, play_load, args, users);
 	    }
-		if(args.url === this.config.friendships_show) {
+		if (args.url === this.config.friendships_show) {
 		    /** 
 		     * {"data":{"debehe":{"isfans":true,"isidol":false}},"errcode":0,"msg":"ok","ret":0}
 		     * =>
@@ -2052,10 +2061,10 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 		            data = data[keys[0]];
 		        }
 		    }
-		} else if(args.url === this.config.counts) {
-		    if(data) {
+		} else if (args.url === this.config.counts) {
+		    if (data) {
 		        var items = [];
-                for(var key in data) {
+                for (var key in data) {
                     var item = {}, d = data[key];
                     item.id = key;
                     item.rt = d.count;
@@ -2070,7 +2079,7 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 	},
 
 	format_result_item: function(data, play_load, args, users, need_user) {
-		if(play_load == 'user' && data && data.name) {
+		if (play_load == 'user' && data && data.name) {
 			var user = {};
 			user.t_url = 'http://t.qq.com/' + data.name;
 			user.screen_name = data.nick;
@@ -2102,16 +2111,16 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 			user.following = !!data.ismyfans;
 			user.followed_by = !!data.ismyidol;
 			user.blocking = user.blacked_by = !!data.ismyblack;
-			if(data.tweet && data.tweet.length > 0) {
+			if (data.tweet && data.tweet.length > 0) {
 			    data.tweet[0].origtext = data.tweet[0].origtext || data.tweet[0].text;
 			    user.status = this.format_result_item(data.tweet[0], 'status', args, users, false);
 			}
 			data = user;
-		} else if(play_load === 'status' || play_load === 'comment' || play_load === 'message') {
+		} else if (play_load === 'status' || play_load === 'comment' || play_load === 'message') {
 			// type:微博类型 1-原创发表、2-转载、3-私信 4-回复 5-空回 6-提及 7: 点评
 			var status = {};
 //			status.status_type = data.type;
-			if(data.type == 7) {
+			if (data.type == 7) {
 				// 腾讯的点评会今日hometimeline，很不给力
 				status.status_type = 'comments_timeline';
 			}
@@ -2120,23 +2129,22 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 			status.text = data.origtext; //data.text;
 			// http://t.qq.com/p/t/28172122700171
 			// 除了fav/list_t， re_list评论数据和私信外, 返回的数据会被htmlencode
-			if(args.url !== this.config.comments 
-			        && args.url !== this.config.favorites  
-			        && play_load !== 'message' 
-			        && status.text) {
+			if (args.url !== this.config.comments && 
+                args.url !== this.config.favorites && 
+                play_load !== 'message' && status.text) {
 			    status.text = htmldecode(status.text);
 			}
             status.created_at = new Date(data.timestamp * 1000);
             status.timestamp = data.timestamp;
             status.video = data.video;
             status.music = data.music;
-            if(data.image){
+            if (data.image){
                 status.thumbnail_pic = data.image[0] + '/160';
                 status.bmiddle_pic = data.image[0] + '/460';
                 status.original_pic = data.image[0] + '/2000';
             }
-			if(data.source) {
-				if(data.type == 4) { 
+			if (data.source) {
+				if (data.type == 4) { 
 					// 回复
 					status.text = '@' + data.source.name + ' ' + status.text;
 					status.related_dialogue_url = 'http://t.qq.com/p/r/' + status.id;
@@ -2155,7 +2163,10 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 			status.repost_count = data.count || 0;
 			status.comments_count = data.mcount || 0; // 评论数
 			status.source = data.from;
-			if(need_user !== false) {
+            if (data.fromurl) {
+                status.source = '<a href="' + data.fromurl + '">' + status.source + '</a>';
+            }
+			if (need_user !== false) {
 			    status.user = this.format_result_item(data, 'user', args, users);
 			}
 			// 收件人
@@ -2163,7 +2174,7 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 //			toisvip: 0
 //			toname: "macgirl"
 //			tonick: "美仪"
-			if(data.toname) {
+			if (data.toname) {
 				status.recipient = {
 					name: data.toname,
 					nick: data.tonick,
@@ -2174,10 +2185,9 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 			}
 			
 			// 如果有text属性，则替换其中的@xxx 为 中文名(@xxx)
-    		if(status && status.text) {
+    		if (status && status.text) {
     			var matchs = status.text.match(this.ONLY_AT_USER_RE);
-    			if(matchs) {
-
+    			if (matchs) {
     				status.users = {};
     				for(var j=0; j<matchs.length; j++) {
     					var name = $.trim(matchs[j]).substring(1);
@@ -2185,7 +2195,7 @@ var TQQAPI = Object.inherits({}, sinaApi, {
     				}
     			}
     		}
-    		if(!status.text && data.status === 3) {
+    		if (!status.text && data.status === 3) {
     		    // 对不起，原文已经被作者删除。 http://t.qq.com/p/t/39599091698961
     		    status.text = '对不起，原文已经被作者删除。';
     		}
