@@ -2515,9 +2515,13 @@ function doComment(ele, userName, userId, tweetId,
     $('#commentCommentId').val(cid||'');
     $('#ye_dialog_title').html(_u.i18n("msg_comment_who").format({username:userName}));
     $('#ye_dialog_window').show();
-    var _txt = $('#replyTextarea').val();
+    var _txt = $('#replyTextarea').val(), _txtRep = '';
     if(!_txt) {
     	_txt = replyUserName ? (_u.i18n("msg_comment_reply_default").format({username:replyUserName})) : '';
+		if(cid){
+			_txtRep = $(ele).parent().find('.commentContent').text();
+			_txtRep = _txtRep ? ('//' + _txtRep) : '';
+		}
     }
     var user = getUser();
 	var config = tapi.get_config(user);
@@ -2532,7 +2536,7 @@ function doComment(ele, userName, userId, tweetId,
     $('#txt_sendOneMore2').text('').hide();
     
     var $replyText = $('#replyTextarea');
-    $replyText.val('').focus().val(_txt);
+    $replyText.val('').focus().val(_txt).blur().val(_txt + _txtRep).focus();
     _initText($replyText, config);
     countReplyText();
 };

@@ -460,9 +460,9 @@ function buildComment(comment, status_id, status_user_screen_name, status_user_i
     }
     var reply_user = ('<a target="_blank" href="javascript:getUserTimeline(\'{{screen_name}}\', \'{{id}}\');" rhref="{{t_url}}" title="'
         + _u.i18n("btn_show_user_title") +'">@{{screen_name}}{{verified}}</a>').format(comment.user);
-    return '<li>' 
+    return '<li><span class="commentContent">' 
             + reply_user + ': ' + tapi.processMsg(c_user, comment) 
-            + '<span class="msgInfo">(' + datetime + ')</span>'
+            + '</span><span class="msgInfo">(' + datetime + ')</span>'
             + comment_btn
             + '</li>';
 }
