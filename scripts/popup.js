@@ -53,6 +53,9 @@ function init(){
             var url = $.trim($(this).attr('rhref'));
             if(url){
                 chrome.tabs.create({url:url, selected:isNewTabSelected});
+				//禁用右键菜单
+				e.srcElement.oncontextmenu = function(){ return false; };
+				return false;
             }
         }
     });
@@ -3065,6 +3068,8 @@ function rOpenPic(event, ele){
         var url = $.trim($(ele).attr('original'));
         if(url){
             chrome.tabs.create({url:url, selected:isNewTabSelected});
+			ele.oncontextmenu = function(){ return false; };
+			return false;
         }
     }
 };
