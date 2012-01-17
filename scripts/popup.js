@@ -2519,8 +2519,17 @@ function doComment(ele, userName, userId, tweetId,
     if(!_txt) {
     	_txt = replyUserName ? (_u.i18n("msg_comment_reply_default").format({username:replyUserName})) : '';
 		if(cid){
+			//查看某条微博的评论列表里
 			_txtRep = $(ele).parent().find('.commentContent').text();
-			_txtRep = _txtRep ? ('//' + _txtRep) : '';
+			if(_txtRep){
+				_txtRep = '//' + _txtRep;
+			}else{
+				// 我的评论列表
+				var _tmpP = $(ele).parents('.commentWrap');
+				if(_tmpP.length && _tmpP.eq(0).find('.msg .tweet .tweet_text').length){
+					_txtRep = '//@' + replyUserName + ':' + $.trim(_tmpP.eq(0).find('.msg .tweet .tweet_text').text());
+				}
+			}
 		}
     }
     var user = getUser();
