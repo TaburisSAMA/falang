@@ -72,7 +72,6 @@ function init(){
 
     $('#ye_dialog_close').click(function(){
         hideReplyInput();
-        $("#chk_originalComment, #txt_originalComment").hide();
     });
 
     initTabs();
@@ -150,6 +149,12 @@ function init(){
         }else{
             localStorage.setObject(INCLUDE_ORIGINAL_COMMENT, "");
         }
+		var action_args = ActionCache.get('doComment');
+        if(action_args) {
+			$('#replyTextarea').val('');
+			action_args[0] = window._currentCommentElement;
+            window['doComment'].apply(this, action_args);
+		}
     });
     
     $(window).unload(function(){ initOnUnload(); }); 
@@ -2402,6 +2407,8 @@ function hideReplyInput(){
     cleanActionCache();
     window.imgForUpload_reply = null;
     $('#upImgPreview_reply').hide().find('.img').html('');
+	// 隐藏带上原评论选项
+	$("#chk_originalComment, #txt_originalComment").hide();
 };
 
 function resizeFawave(w, h){
@@ -2536,6 +2543,7 @@ function doComment(ele, userName, userId, tweetId,
     	_txt = replyUserName ? (_u.i18n("msg_comment_reply_default").format({username:replyUserName})) : '';
         if(cid){
             // 带上原评论内容
+			window._currentCommentElement = ele; //搓劣的做法，赶时间，暂时这样了
             $("#chk_originalComment, #txt_originalComment").show();
             if(localStorage.getObject(INCLUDE_ORIGINAL_COMMENT)===1){
                 $("#chk_originalComment").attr("checked", true);
