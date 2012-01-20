@@ -1339,26 +1339,27 @@ var ShortenUrl = {
 	// MAX_INDEX => http://yongwo.de:1235/api?u=http://is.gd/imWyT&cb=foo
 	MAX_INDEX: 56,
 	expand: function(shorturl, callback, context) {
-		var m = this.SINAURL_RE.exec(shorturl);
-		if(m) {
-		    var b_view = getBackgroundView();
-            if(b_view.__enable_expand_sinaurl === false) {
-                this._expand(shorturl, callback, context);
-                return;
-            }
-			this.expand_sinaurl(shorturl, function(data) {
-			    if(data && data.url && this.SHORT_SERVICE_RE.test(data.url)) {
-			        this._expand(data.url, callback, context);
-			    } else if(!data || !data.url) {
-			        // 新版本新浪微博无法使用此接口还原
-			        this._expand(shorturl, callback, context);
-			    } else {
-			        callback.call(context, data);
-			    }
-			}, this);
-		} else {
-		    this._expand(shorturl, callback, context);
-		}
+        this._expand(shorturl, callback, context);
+		// var m = this.SINAURL_RE.exec(shorturl);
+		// if(m) {
+		//     var b_view = getBackgroundView();
+  //           if(b_view.__enable_expand_sinaurl === false) {
+  //               this._expand(shorturl, callback, context);
+  //               return;
+  //           }
+		// 	this.expand_sinaurl(shorturl, function(data) {
+		// 	    if(data && data.url && this.SHORT_SERVICE_RE.test(data.url)) {
+		// 	        this._expand(data.url, callback, context);
+		// 	    } else if(!data || !data.url) {
+		// 	        // 新版本新浪微博无法使用此接口还原
+		// 	        this._expand(shorturl, callback, context);
+		// 	    } else {
+		// 	        callback.call(context, data);
+		// 	    }
+		// 	}, this);
+		// } else {
+		//     this._expand(shorturl, callback, context);
+		// }
 	},
 	
 	_expand: function(shorturl, callback, context) {
