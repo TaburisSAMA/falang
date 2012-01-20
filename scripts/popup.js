@@ -70,7 +70,10 @@ function init(){
     changeAlertMode(getAlertMode());
     changeAutoInsertMode(getAutoInsertMode());
 
-    $('#ye_dialog_close').click(function(){ hideReplyInput(); });
+    $('#ye_dialog_close').click(function(){
+        hideReplyInput();
+        $("#chk_originalComment, #txt_originalComment").hide();
+    });
 
     initTabs();
     initTxtContentEven();
@@ -138,6 +141,16 @@ function init(){
             }
         });
     }
+
+    // 评论是否带上原评论
+    $("#chk_originalComment, #txt_originalComment").hide();
+    $("#chk_originalComment").click(function(){
+        if($(this).attr("checked")){
+            localStorage.setObject(INCLUDE_ORIGINAL_COMMENT, 1);
+        }else{
+            localStorage.setObject(INCLUDE_ORIGINAL_COMMENT, "");
+        }
+    });
     
     $(window).unload(function(){ initOnUnload(); }); 
     
@@ -2521,7 +2534,17 @@ function doComment(ele, userName, userId, tweetId,
     var _txt = $('#replyTextarea').val(), _txtRep = '';
     if(!_txt) {
     	_txt = replyUserName ? (_u.i18n("msg_comment_reply_default").format({username:replyUserName})) : '';
-		if(cid){
+        if(cid){
+            // 带上原评论内容
+            $("#chk_originalComment, #txt_originalComment").show();
+            if(localStorage.getObject(INCLUDE_ORIGINAL_COMMENT)===1){
+                $("#chk_originalComment").attr("checked", true);
+            }else{
+                $("#chk_originalComment").removeAttr("checked");
+            }
+        }
+        // 回复是否带上原评论内容
+		if(cid && localStorage.getObject(INCLUDE_ORIGINAL_COMMENT)===1){
 			//查看某条微博的评论列表里
 			_txtRep = $(ele).parent().find('.commentContent').text();
 			if(_txtRep){

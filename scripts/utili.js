@@ -86,6 +86,7 @@ var THEME_LIST = {
 
 var ALERT_MODE_KEY = 'idi_ALERT_MODE_KEY'; //信息提醒模式key
 var AUTO_INSERT_MODE_KEY = 'idi_AUTO_INSERT_MODE_KEY'; //新信息是否自动插入
+var INCLUDE_ORIGINAL_COMMENT = 'idi_INCLUDE_ORIGINAL_COMMENT'; // 回复评论的时候，是否带上原评论
 
 //需要不停检查更新的timeline的分类列表
 var T_LIST = {
