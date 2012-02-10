@@ -1653,7 +1653,7 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 	
 	_VIDEO_PADDING: '!!!{{status.video.shorturl}}!!!',
 	processMsg: function(status, notEncode) {
-		if(status.video && status.video.picurl && status.text) {
+		if (status.video && status.video.picurl && status.text) {
 		    // 添加视频链接
 		    if(status.text.indexOf(status.video.shorturl) < 0) {
 		        status.text += ' ' + status.video.shorturl;
@@ -1675,14 +1675,22 @@ var TQQAPI = Object.inherits({}, sinaApi, {
 	
 	//page.js里面调用的时候没有加载表情字典,所以需要判断
 	_emotion_rex: window.TQQ_EMOTIONS ? new RegExp('\/(' + Object.keys(window.TQQ_EMOTIONS).join('|') + ')', 'g') : null,
-	processEmotional: function(str) {
+	_shuoshuo_emotion_rex: /\[em\](\w+)\[\/em\]/g,
+    processEmotional: function(str) {
 	    if (!this._emotion_rex) {
 	        return str;
 	    }
-        return str.replace(this._emotion_rex, function(m, g1){
+        // show shuoshuo faces : http://code.google.com/p/falang/issues/detail?id=318
+        str = str.replace(this._shuoshuo_emotion_rex, function(m, g1) {
+            if (g1) {
+                return '<img src="http://qzonestyle.gtimg.cn/qzone/em/' + g1 + '.gif" />';
+            }
+        });
+
+        return str.replace(this._emotion_rex, function(m, g1) {
 	        if (window.TQQ_EMOTIONS && g1) {
 	        	var emotion = window.TQQ_EMOTIONS[g1];
-	            if(emotion) {
+	            if (emotion) {
 	                var tpl = '<img title="{{title}}" src="' + TQQ_EMOTIONS_URL_PRE + '{{emotion}}" />';
 	                return tpl.format({title: g1, emotion: emotion});
 	            }
