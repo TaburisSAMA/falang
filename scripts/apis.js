@@ -1319,6 +1319,9 @@ var sinaApi = {
         
         // 请求前调用
         this.before_sendRequest(args, user);
+
+		// 不缓存。需要加入oauth验证，所以放在oauth之前。
+		args.data['nocache'] = (new Date).getTime();
         
         var api = user.apiProxy || args.apiHost || this.config.host;
     	var url = api + args.url.format(args.data);
