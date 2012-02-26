@@ -2,7 +2,7 @@
 * @author qleelulu@gmail.com
 */
 
-if(typeof BlobBuilder === 'undefined' && typeof WebKitBlobBuilder !== 'undefined') {
+if (typeof BlobBuilder === 'undefined' && typeof WebKitBlobBuilder !== 'undefined') {
 	var BlobBuilder = WebKitBlobBuilder;
 }
 
@@ -3362,7 +3362,7 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
     },
     
     apply_auth: function(url, auth_args, user) {
-        if(url.indexOf(this.config.upload) > 0 && this.config.host === 'https://api.twitter.com') {
+        if (url.indexOf(this.config.upload) > 0 && this.config.host === 'https://api.twitter.com') {
             // https://dev.twitter.com/discussions/1059
             var data = auth_args.data;
             auth_args.data = {};
@@ -3608,6 +3608,10 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
         user_home_url: 'http://fanfou.com/',
         search_url: 'http://fanfou.com/q/',
 		source: 'fawave',
+        oauth_host: 'http://fanfou.com',
+        oauth_key: '2f6d311aaa5779bc956310698a0a989b',
+        oauth_secret: 'bdf029681e94c8ab9f7bc43d3d41435e',
+        // oauth_params_by_get: true,
 		repost_pre: '转',
 	    support_comment: false,
 	    support_do_comment: false,
@@ -3646,6 +3650,18 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
 		data.location = geo.latitude + ',' + geo.longitude;
 	},
 	
+    apply_auth: function(url, auth_args, user) {
+        if (url.indexOf(this.config.upload) > 0) {
+            // 图片上传无需签名
+            var data = auth_args.data;
+            auth_args.data = {};
+            this.super_.apply_auth.call(this, url, auth_args, user);
+            auth_args.data = data;
+        } else {
+            this.super_.apply_auth.call(this, url, auth_args, user);
+        }
+    },
+
 	before_sendRequest: function(args, user) {
 		if(args.url == this.config.new_message) {
 			// id => user
@@ -3679,7 +3695,7 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
     },
     
     format_result: function(data, play_load, args) {
-		if($.isArray(data)) {
+		if ($.isArray(data)) {
 	    	for(var i in data) {
 	    		data[i] = this.format_result_item(data[i], play_load);
 	    	}
@@ -4851,6 +4867,13 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 			// oauth_token_secret
 			args.data.oauth_token = user.oauth_token_key;
 			args.data.oauth_token_secret = user.oauth_token_secret;
+            // timestamp: time()
+            // tempkey: strtoupper(md5($timestamp.$appkey.$oauth_token.$oauth_token_secret.$appsecret))
+            var timestamp = (new Date().getTime() / 1000).toFixed(0);
+            var tempkey = hex_md5(timestamp + this.config.oauth_key + 
+                user.oauth_token_key + user.oauth_token_secret + this.config.oauth_secret).toUpperCase();
+            args.data.timestamp = timestamp;
+            args.data.tempkey = tempkey;
 		} else {
 			this.super_.apply_auth.call(this, url, args, user);
 		}
@@ -4865,20 +4888,19 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 	
 	before_sendRequest: function(args, user) {
 		args.data.outformat = 'json';
-		if(args.url.indexOf('/oauth/') < 0) {
+		if (args.url.indexOf('/oauth/') < 0) {
 		    args.data.appkey = args.data.source;
 	        delete args.data.source;
 		}
-		if(args.url === this.config.update) {
-			args.type = 'get';
+		if (args.url === this.config.update) {
 			args.data.word = args.data.status;
 			delete args.data.status;
 		}
-		if(args.data.count) {
+		if (args.data.count) {
 		    args.data.pagesize = args.data.count;
 		    delete args.data.count;
 		}
-		if(args.url === this.config.comment) {
+		if (args.url === this.config.comment) {
 		    // http://open.tianya.cn/wiki/index.php?title=Weibo/addcomment
 		    args.data.word = encodeURIComponent(args.data.comment);
 		    args.data.authorid = args.data.user_id;

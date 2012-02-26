@@ -1,3 +1,7 @@
+## v
+
+1. 使用jquery1.7.1
+
 ## V20120117
     
 ### New Features
