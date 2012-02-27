@@ -3127,6 +3127,9 @@ var SmoothScroller = {
         SmoothScroller.status.d = 0;
     },
     start: function(e){
+        if(e.originalEvent){
+            e.wheelDelta = e.originalEvent.wheelDelta;
+        }
         if(e.wheelDelta == 0){ return; }
         clearTimeout(this.T);
         e.preventDefault();
