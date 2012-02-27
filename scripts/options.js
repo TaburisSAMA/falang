@@ -651,6 +651,7 @@ function init(){
 //初始化Tab标签
 function initTab(){
     $("ul#navigation li a").click(function() {
+        if($(this).hasClass('ignore')){ return }
         var old_t = $("ul#navigation li.selected").attr('target_id');
         $(old_t).hide();
 		$("ul#navigation li").removeClass("selected");
