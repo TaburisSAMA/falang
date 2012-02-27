@@ -48,7 +48,7 @@ Object.inherits = function(destination) {
 };
 
 var OAUTH_CALLBACK_URL = chrome.extension.getURL('oauth_cb.html');
-var FAWAVE_OAUTH_CALLBACK_URL = 'http://fawave.net4team.net/';
+var FAWAVE_OAUTH_CALLBACK_URL = 'http://fawave.net4team.net/fawave/client/oauth_callback';
 var RE_JSON_BAD_WORD = /[\u000B\u000C]/ig; //具体见：http://www.cnblogs.com/rubylouvre/archive/2011/02/12/1951760.html
 var URL_RE = new RegExp('(?:\\[url\\s*=\\s*|)((?:www\\.|http[s]?://)[\\w\\.\\?%&\\-/#=;:!\\+~]+)(?:\\](.+)\\[/url\\]|)', 'ig');
 
