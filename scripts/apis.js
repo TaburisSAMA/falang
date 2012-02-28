@@ -1295,7 +1295,7 @@ var sinaApi = {
 	},
 	
     _sendRequest: function(params, callbackFn, context) {
-    	var args = {type: 'get', play_load: 'status', headers: {}};
+    	var args = { type: 'get', play_load: 'status', headers: {} };
     	$.extend(args, params);
     	args.data = args.data || {};
     	args.data.source = args.data.source || this.config.source;
@@ -1315,13 +1315,15 @@ var sinaApi = {
             return;
         }
         args.user = user;
-        if(args.data && args.data.user) delete args.data.user;
-        
+        if (args.data && args.data.user) delete args.data.user;        
+
         // 请求前调用
         this.before_sendRequest(args, user);
 
-		// 不缓存。需要加入oauth验证，所以放在oauth之前。
-		args.data['nocache'] = (new Date).getTime();
+        if (!args.type || args.type.toUpperCase() === 'GET') {
+            // 不缓存。需要加入oauth验证，所以放在oauth之前。
+            args.data['nocache'] = new Date().getTime();
+        }
         
         var api = user.apiProxy || args.apiHost || this.config.host;
     	var url = api + args.url.format(args.data);
@@ -4623,54 +4625,55 @@ var DoubanAPI = Object.inherits({}, sinaApi, {
 	 * max-results的最大值为50，参数值超过50返回50个结果
 	 */
 	before_sendRequest: function(args) {
-		if(args.url != this.config.oauth_request_token && args.url != this.config.oauth_access_token) {
-			args.data.alt = 'json';
-			if(args.data.count) {
-				args.data['max-results'] = args.data.count;
-				if(args.data.cursor) {
-					args.data['start-index'] = args.data.cursor;
-					// 设置下一页
-					args.data.cursor = Number(args.data.cursor);
-					if(args.data.cursor == -1) {
-						args.data.cursor = 1;
-					}
-					args.next_cursor = args.data.cursor + args.data.count;
-					delete args.data.cursor;
-				} else {
-					args.next_cursor = args.data.count + 1;
-				}
-				delete args.data.count;
-			}
-			delete args.data.screen_name;
-			delete args.data.since_id;
-			// args.data.source => args.data.apikey
-			args.data.apikey = args.data.source;
-			delete args.data.source;
-			if(args.url == this.config.update) {
-				args.content = '<?xml version="1.0" encoding="UTF-8"?><entry xmlns:ns0="http://www.w3.org/2005/Atom" xmlns:db="http://www.douban.com/xmlns/"><content><![CDATA[{{status}}]]></content></entry>'.format(args.data);
-				args.contentType = 'application/atom+xml; charset=utf-8';
-				args.data = {};
-			} else if(args.url == this.config.destroy || args.url == this.config.destroy_msg) {
-				delete args.data.apikey;
-				delete args.data.alt;
-				args.type = 'DELETE';
-			} else if(args.url == this.config.friends_timeline || args.url == this.config.user_timeline) {
-				args.data.type = 'all';
-			} else if(args.url == this.config.new_message) {
-			    args.content = '<?xml version="1.0" encoding="UTF-8"?><entry xmlns="http://www.w3.org/2005/Atom" xmlns:db="http://www.douban.com/xmlns/" xmlns:gd="http://schemas.google.com/g/2005" xmlns:opensearch="http://a9.com/-/spec/opensearchrss/1.0/"><db:entity name="receiver"><uri>http://api.douban.com/people/{{id}}</uri></db:entity><content><![CDATA[{{text}}]]></content><title><![CDATA[{{text}}]]></title></entry>'.format(args.data);
-				args.contentType = 'application/atom+xml; charset=utf-8';
-				args.data = {};
-			} else if(args.url == this.config.comment) {
-				args.content = '<?xml version="1.0" encoding="UTF-8"?><entry><content><![CDATA[{{comment}}]]></content></entry>'.format(args.data);
-				args.contentType = 'application/atom+xml; charset=utf-8';
-				args.data = {id: args.data.id};
-				args.url = args.url.replace('_post', '');
-				args.is_comment_post = true;
-			} else if(args.url == this.config.comments) {
-				// 记录下评论id填充
-				args.miniblog_id = args.data.id;
-			}
-		}
+        if (args.url === this.config.oauth_request_token || args.url === this.config.oauth_access_token) {
+            return;
+        }
+		args.data.alt = 'json';
+        if(args.data.count) {
+            args.data['max-results'] = args.data.count;
+            if(args.data.cursor) {
+                args.data['start-index'] = args.data.cursor;
+                // 设置下一页
+                args.data.cursor = Number(args.data.cursor);
+                if(args.data.cursor == -1) {
+                    args.data.cursor = 1;
+                }
+                args.next_cursor = args.data.cursor + args.data.count;
+                delete args.data.cursor;
+            } else {
+                args.next_cursor = args.data.count + 1;
+            }
+            delete args.data.count;
+        }
+        delete args.data.screen_name;
+        delete args.data.since_id;
+        // args.data.source => args.data.apikey
+        args.data.apikey = args.data.source;
+        delete args.data.source;
+        if (args.url === this.config.update) {
+            args.content = '<?xml version="1.0" encoding="UTF-8"?><entry xmlns:ns0="http://www.w3.org/2005/Atom" xmlns:db="http://www.douban.com/xmlns/"><content><![CDATA[{{status}}]]></content></entry>'.format(args.data);
+            args.contentType = 'application/atom+xml; charset=utf-8';
+            args.data = {};
+        } else if (args.url === this.config.destroy || args.url === this.config.destroy_msg) {
+            delete args.data.apikey;
+            delete args.data.alt;
+            args.type = 'DELETE';
+        } else if (args.url === this.config.friends_timeline || args.url == this.config.user_timeline) {
+            args.data.type = 'all';
+        } else if (args.url == this.config.new_message) {
+            args.content = '<?xml version="1.0" encoding="UTF-8"?><entry xmlns="http://www.w3.org/2005/Atom" xmlns:db="http://www.douban.com/xmlns/" xmlns:gd="http://schemas.google.com/g/2005" xmlns:opensearch="http://a9.com/-/spec/opensearchrss/1.0/"><db:entity name="receiver"><uri>http://api.douban.com/people/{{id}}</uri></db:entity><content><![CDATA[{{text}}]]></content><title><![CDATA[{{text}}]]></title></entry>'.format(args.data);
+            args.contentType = 'application/atom+xml; charset=utf-8';
+            args.data = {};
+        } else if (args.url === this.config.comment) {
+            args.content = '<?xml version="1.0" encoding="UTF-8"?><entry><content><![CDATA[{{comment}}]]></content></entry>'.format(args.data);
+            args.contentType = 'application/atom+xml; charset=utf-8';
+            args.data = { id: args.data.id };
+            args.url = args.url.replace('_post', '');
+            args.is_comment_post = true;
+        } else if (args.url === this.config.comments) {
+            // 记录下评论id填充
+            args.miniblog_id = args.data.id;
+        }
 	},
 	
 	format_result: function(data, play_load, args) {
