@@ -1322,7 +1322,11 @@ var sinaApi = {
 
         if (!args.type || args.type.toUpperCase() === 'GET') {
             // 不缓存。需要加入oauth验证，所以放在oauth之前。
-            args.data['nocache'] = new Date().getTime();
+            if(args.data['oauth_callback'] && args.data['oauth_callback'] !== 'oob'){ // 腾讯直接加额外参数的话oauth通不过
+				args.data['oauth_callback'] += '?_=' + new Date().getTime();
+			}else{
+				args.data['nocache'] = new Date().getTime();
+			}
         }
         
         var api = user.apiProxy || args.apiHost || this.config.host;
