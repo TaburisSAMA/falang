@@ -1321,10 +1321,9 @@ var sinaApi = {
         this.before_sendRequest(args, user);
 
         if (!args.type || args.type.toUpperCase() === 'GET') {
-            // 不缓存。需要加入oauth验证，所以放在oauth之前。
-            if(args.data['oauth_callback'] && args.data['oauth_callback'] !== 'oob'){ // 腾讯直接加额外参数的话oauth通不过
-				args.data['oauth_callback'] += '?_=' + new Date().getTime();
-			}else{
+            // 腾讯直接加额外参数的话oauth通不过
+            if(user['blogType'] !== 'tqq'){ 
+				// 不缓存。需要加入oauth验证，所以放在oauth之前。
 				args.data['nocache'] = new Date().getTime();
 			}
         }
