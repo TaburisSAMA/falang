@@ -334,13 +334,13 @@ var sinaApi = {
 //				args.data.source = appkey[1];
 //			}
 //		}
-	    if(user.blogType === 'tsina') {
+	    if (user.blogType === 'tsina') {
 	        delete args.data.source;
 	    }
         user.authType = user.authType || 'baseauth'; //兼容旧版本
-		if(user.authType == 'baseauth') {
+		if (user.authType == 'baseauth') {
 			args.headers['Authorization'] = make_base_auth_header(user.userName, user.password);
-		} else if(user.authType == 'oauth' || user.authType == 'xauth') {
+		} else if (user.authType == 'oauth' || user.authType == 'xauth') {
 			var oauth_secret = this.config.oauth_secret;
 			var oauth_key = this.config.oauth_key;
 //			if(appkey) {
@@ -354,6 +354,7 @@ var sinaApi = {
 			if(user.oauth_token_secret) {
 				accessor.tokenSecret = user.oauth_token_secret;
 			}
+            delete args.data.nocache;
 			var parameters = {};
 			for(var k in args.data) {
 				parameters[k] = args.data[k];
@@ -1303,7 +1304,7 @@ var sinaApi = {
     		delete args.need_source;
     		delete args.data.source;
     	}
-    	if(!args.url) {
+    	if (!args.url) {
     		showMsg('url未指定', true);
             callbackFn({}, 'error', '400');
             return;
