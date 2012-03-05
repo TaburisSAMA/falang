@@ -3621,7 +3621,7 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
 		repost_pre: '转',
 	    support_comment: false,
 	    support_do_comment: false,
-	    support_repost: false,
+	    // support_repost: false,
 	    support_comment_repost: false,
 	    support_repost_timeline: false,
 	    support_sent_direct_messages: false,
@@ -3634,10 +3634,10 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
 	    user_timeline_need_friendship: false,
 	    support_blocking: false,
 
-        gender_map:{"男":'m', '女':'f'}
+        gender_map: { '男': 'm', '女': 'f' }
 	}),
 	
-    processAt: function (str) { //@*** ,饭否的用户名支持“.”
+    processAt: function(str) { //@*** ,饭否的用户名支持“.”
         str = str.replace(/^@([\w\-\u4e00-\u9fa5|\_\.]+)/g, ' <a target="_blank" href="javascript:getUserTimeline(\'$1\');" rhref="'+ this.config.user_home_url +'$1" title="'+ _u.i18n("btn_show_user_title") +'">@$1</a>');
         str = str.replace(/([^\w#])@([\w\-\u4e00-\u9fa5|\_\.]+)/g, '$1<a target="_blank" href="javascript:getUserTimeline(\'$2\');" rhref="'+ this.config.user_home_url +'$2" title="'+ _u.i18n("btn_show_user_title") +'">@$2</a>');
         
@@ -3669,23 +3669,27 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
     },
 
 	before_sendRequest: function(args, user) {
-		if(args.url == this.config.new_message) {
+		if (args.url === this.config.new_message) {
 			// id => user
 			args.data.user = args.data.id;
 			delete args.data.id;
-		} else if(args.url == this.config.update){
-			if(args.data.sina_id){
+		} else if (args.url === this.config.update) {
+			if (args.data.sina_id) {
 				args.data.in_reply_to_status_id = args.data.sina_id;
 				delete args.data.sina_id;
 			}
-		} else if(args.url == this.config.friends || args.url == this.config.followers) {
+		} else if (args.url === this.config.repost) {
+            args.url = this.config.update;
+            args.data.repost_status_id = args.data.id;
+            delete args.data.id;
+        } else if (args.url === this.config.friends || args.url === this.config.followers) {
 			// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
 			// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
 			args.data.page = args.data.cursor == '-1' ? 1 : args.data.cursor;
-			if(!args.data.page) {
+			if (!args.data.page) {
 				args.data.page = 1;
 			}
-			if(args.data.user_id) {
+			if (args.data.user_id) {
 				args.data.id = args.data.user_id;
 			}
 			delete args.data.cursor;
@@ -3694,15 +3698,16 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
 		}
     },
 	
-	/* photo（必须）- 照片文件。和<input type="file" name="photo" />效果一样
-	 * */
+	/** 
+     * photo（必须）- 照片文件。和<input type="file" name="photo" />效果一样
+	 */
 	format_upload_params: function(user, data, pic) {
     	pic.keyname = 'photo';
     },
     
     format_result: function(data, play_load, args) {
 		if ($.isArray(data)) {
-	    	for(var i in data) {
+	    	for (var i in data) {
 	    		data[i] = this.format_result_item(data[i], play_load);
 	    	}
 	    } else {
@@ -3711,9 +3716,13 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
 		// 若是follwers api，则需要封装成cursor接口
 		// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
 		// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
-		if(args.url == this.config.followers || args.url == this.config.friends) {
-			data = {users: data, next_cursor: Number(args.data.page) + 1, previous_cursor: args.data.page};
-			if(data.users.length == 0) {
+		if (args.url === this.config.followers || args.url === this.config.friends) {
+			data = { 
+                users: data, 
+                next_cursor: Number(args.data.page) + 1, 
+                previous_cursor: args.data.page 
+            };
+			if (data.users.length === 0) {
 				data.next_cursor = '0';
 			}
 		}
@@ -3721,14 +3730,18 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
 	},
 	_FANFOU_IMAGEURL_RE: /http:\/\/fanfou\.com\/photo\/[\w\-]+$/i,
 	format_result_item: function(data, play_load, args) {
-		if(play_load == 'status' && data.id) {
+		if (play_load === 'status' && data && data.id) {
 			var tpl = 'http://fanfou.com/statuses/{{id}}';
 			data.t_url = tpl.format(data);
 			this.format_result_item(data.user, 'user', args);
+            if (data.repost_status && data.repost_status.photo) {
+                // 删除当前status 重复出现的 photo
+                delete data.photo;
+            }
 			// 'photo': {u'largeurl': u'http://photo.fanfou.com/n0/00/as/vd_161837.jpg', 
 			// u'imageurl': u'http://photo.fanfou.com/m0/00/as/vd_161837.jpg', // 太小了
 			// u'thumburl': u'http://photo.fanfou.com/t0/00/as/vd_161837.jpg'},
-   			if(data.photo){
+   			if (data.photo) {
    				data.thumbnail_pic = data.photo.thumburl;
 				data.bmiddle_pic = data.photo.largeurl;
 				data.original_pic = data.photo.largeurl;
@@ -3736,13 +3749,17 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
 				// 删除图片 http://fanfou.com/photo/b0QRkVL6-2Y
 				data.text = data.text.replace(this._FANFOU_IMAGEURL_RE, '');
    			}
-   			if(data.in_reply_to_status_id){
+   			if (data.in_reply_to_status_id) {
    				data.related_dialogue_url = 'http://fanfou.com/statuses/' + data.in_reply_to_status_id + '?fr=viewreply';
    			}
-   			if(data.text) {
+   			if (data.text) {
    			    data.text = htmldecode(data.text);
    			}
-		} else if(play_load == 'user' && data && data.id) {
+            if (data.repost_status) {
+                data.retweeted_status = this.format_result_item(data.repost_status, 'status', args);
+                delete data.repost_status;
+            }
+		} else if (play_load === 'user' && data && data.id) {
 			data.t_url = 'http://fanfou.com/' + (data.id || data.screen_name);
             data.gender = this.config.gender_map[data.gender];
             data.followed_by = data.following;

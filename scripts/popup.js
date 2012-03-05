@@ -96,12 +96,19 @@ function init(){
     	var $this = $(this);
     	var user = getUser();
     	var t = getCurrentTab().replace('#', '').replace(/_timeline$/i, '');
-    	var params = {id: $(this).attr('status_id'), user: user};
+    	var params = { id: $(this).attr('status_id'), user: user };
     	$this.hide();
     	tapi.status_show(params, function(data) {
-    		if(data && data.id) {
+    		if (data && data.id) {
     			var html = buildStatusHtml([data], t, user).join('');
     			$this.parents('.mainContent').after(html);
+                var $main = $this.parents('.mainContent');
+                if ($main.length > 0) {
+                    $main.after(html);
+                } else {
+                    // repost @回复
+                    $this.parents('.tweetItem').append(html);
+                }
     			// 处理缩址
         		ShortenUrl.expandAll();
     		} else {
@@ -1569,8 +1576,8 @@ function showCounts(t, ids){
                     $('#'+ t +'_timeline .showCounts_'+item.id).each(function(){
                         var _li = $(this);
                         var _edit = _li.find('.edit:eq(0)');
-                        if(_edit){
-                        	if(config.support_repost_timeline) {
+                        if (_edit) {
+                        	if (config.support_repost_timeline) {
                         		_edit.find('.repostCounts a').html(item.rt);
                         	} else {
                         		_edit.find('.repostCounts').html('('+ item.rt +')');

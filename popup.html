@@ -290,12 +290,12 @@
 							<?js if(tweet.related_dialogue_url){ ?>
 							<a href="#{tweet.related_dialogue_url}" title="#{_u.i18n('comm_show_related_dialogue')}" target="_blank"><img src="images/inreply.png" /></a>
 							<?js } ?>
-							<?js if(support_instapaper){ ?>
+							<?js if (support_instapaper) { ?>
 							<a href="javascript:void(0);" onclick="javascript:read_later(this, 'instapaper');" title="#{_u.i18n('btn_read_later_title')}">RL</a>
 							<?js } ?>
-							<?js if(support_readitlater){ ?>
-                            <a href="javascript:void(0);" onclick="javascript:read_later(this, 'readitlater');" title="#{_u.i18n('btn_read_it_later_title')}">RIL</a>
-                            <?js } ?>
+							<?js if (support_readitlater) { ?>
+              <a href="javascript:void(0);" onclick="javascript:read_later(this, 'readitlater');" title="#{_u.i18n('btn_read_it_later_title')}">RIL</a>
+              <?js } ?>
 							#{ btn.addFavoritesMsgBtn + btn.delFavoritesMsgBtn + btn.replyBtn + btn.retweetBtn + btn.oretweetBtn + btn.repostBtn + btn.repostCounts + btn.commentBtn + btn.commentCounts + btn.new_msgBtn + btn.delTweetBtn + btn.delCommentBtn + btn.delDirectMsgBtn }
 							<a href="javascript:void(0);" onclick="javascript:translate(this);" title="#{_u.i18n('btn_translate_title')}">#{_u.i18n("btn_translate")}</a>
 						</span>
@@ -303,38 +303,38 @@
 					<div class="msg">
 						<div class="tweet">
 							<div class="tweet_text">#{processMsg(account, tweet)} #{btn.showMapBtn}
-								<?js if(tweet.crosspostSource) { ?>
+								<?js if (tweet.crosspostSource) { ?>
 								<a target="_blank" href="#{tweet.crosspostSource}" title="#{_u.i18n('comm_show_original')}">#{_u.i18n('comm_show_original')}</a>
 								<?js } ?>
 							</div>
-							<?js if(tweet.thumbnail_pic){ ?>
+							<?js if (tweet.thumbnail_pic) { ?>
 							<div>
 								<a target="_blank" onclick="showFacebox(this);return false;" href="javascript:void(0);" bmiddle="#{tweet.bmiddle_pic}" original="#{tweet.original_pic}" onmousedown="rOpenPic(event, this)" title="#{_u.i18n("btn_show_original_pic_title")}" class="thumbnail_pic" >
 									<img class="imgicon pic" src="#{tweet.thumbnail_pic}" />
 								</a>
 							</div>
 							<?js } ?>
-							<?js if(tweet.retweet_me || tweet.retweet_user){ ?>
+							<?js if (tweet.retweet_me || tweet.retweet_user) { ?>
 						   <div class="retweet_info">#{_u.i18n("comm_retweet_by_before")} <?js if(tweet.retweet_me){ ?>
 								<a target="_blank" 
 									href="javascript:getUserTimeline('#{tweet.retweet_me.screen_name}', '#{tweet.retweet_me.id}');" 
 									rhref="#{tweet.retweet_me.t_url}">
-									#{tweet.retweet_me.screen_name}<?js if(tweet.retweet_me.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?>
+									#{tweet.retweet_me.screen_name}<?js if (tweet.retweet_me.verified) { ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?>
 								</a>
-								<?js if(show_fullname) { ?><span class="fullname">#{tweet.retweet_me.name}</span> <?js } ?>
+								<?js if (show_fullname) { ?><span class="fullname">#{tweet.retweet_me.name}</span> <?js } ?>
 							 <?js } ?>
-						     <?js if(tweet.retweet_user){ ?>
-						     	<?js if(tweet.retweet_me){ ?>、<?js } ?>
+						     <?js if (tweet.retweet_user) { ?>
+						     	<?js if (tweet.retweet_me) { ?>、<?js } ?>
 						     	<a target="_blank" 
 									href="javascript:getUserTimeline('#{tweet.retweet_user.screen_name}', '#{tweet.retweet_user.id}');" 
 									rhref="#{tweet.retweet_user.t_url}">
-									#{tweet.retweet_user.screen_name}<?js if(tweet.retweet_user.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?>
+									#{tweet.retweet_user.screen_name}<?js if (tweet.retweet_user.verified) { ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?>
 								</a>
 								<?js if(show_fullname) { ?><span class="fullname">#{tweet.retweet_user.name}</span> <?js } ?>
 							 <?js } ?> #{_u.i18n("comm_retweet_by_after")}</div>
 						   <?js } ?>
 						</div>
-						<?js if(tweet.retweeted_status && tweet.retweeted_status.text){ ?>
+						<?js if (tweet.retweeted_status && tweet.retweeted_status.text) { ?>
 						<!-- 转发 -->
 						<!-- {{retweeted_status_in}} -->
 						<!-- 转发 End -->
@@ -349,15 +349,15 @@
 						</div>
 						<br />
 					</div>
-					<?js if(tweet.created_at){ ?>
+					<?js if (tweet.created_at) { ?>
 					<div class="msgInfo">
-					   <?js if(tweet.t_url){ ?>
+					   <?js if (tweet.t_url) { ?>
 					   <a href="#{tweet.t_url}" target="_blank">#{new Date(tweet.created_at).format("yyyy-MM-dd hh:mm:ss")}</a> 
 					   <?js } else { ?>
 					   #{new Date(tweet.created_at).format("yyyy-MM-dd hh:mm:ss")}
 					   <?js } ?>
 					   #{_u.i18n('comm_post_by')} #{tweet.source|| _u.i18n("comm_web_site")}
-					   <?js if(!tweet.retweeted_status && tweet.in_reply_to_status_id && tweet.in_reply_to_screen_name){ ?>
+					   <?js if (!tweet.retweeted_status && tweet.in_reply_to_status_id && tweet.in_reply_to_screen_name) { ?>
 					   <a href="javascript:void(0);" class="show_source_status_btn" status_id="#{tweet.in_reply_to_status_id}" 
 					       title="#{_u.i18n('comm_show_original_status')}">#{_u.i18n("btn_show_source_status", [tweet.in_reply_to_screen_name])}</a>
 					   <?js } ?>
@@ -400,12 +400,12 @@
 								rhref="#{tweet.retweeted_status.user.t_url}">
 								@#{tweet.retweeted_status.user.screen_name}<?js if(tweet.retweeted_status.user.verified){ ?><img title="#{_u.i18n('comm_verified')}" src="/images/verified.gif" /><?js } ?>
 							</a>
-							<?js if(show_fullname) { ?><span class="fullname">#{tweet.retweeted_status.user.name}</span> <?js } ?>
+							<?js if (show_fullname) { ?><span class="fullname">#{tweet.retweeted_status.user.name}</span> <?js } ?>
 							#{buildTipboxUserInfo(tweet.retweeted_status.user, show_fullname)}
 						</span>
 						#{_u.i18n("comm_repost_to_after")}: 
 						<span class="edit">
-						    <?js if(support_instapaper){ ?>
+						    <?js if (support_instapaper) { ?>
                             <a href="javascript:void(0);" onclick="javascript:read_later(this, 'instapaper');" title="#{_u.i18n('btn_read_later_title')}">RL</a>
                             <?js } ?>
                             <?js if(support_readitlater){ ?>
@@ -416,7 +416,7 @@
 						</span>
 					</div>
 					<div class="tweet_text">#{processMsg(account, tweet.retweeted_status)} #{btn.rtShowMapBtn}
-						<?js if(tweet.crosspostSource) { ?>
+						<?js if (tweet.crosspostSource) { ?>
 						<a target="_blank" href="#{tweet.crosspostSource}" title="#{_u.i18n('comm_show_original')}">#{_u.i18n('comm_show_original')}</a>
 						<?js } ?>
 					</div>
@@ -431,14 +431,18 @@
 					</div>
 					<?js } ?>
 					<!-- {{retweeted_retweeted_status_in}} -->
-					<?js if(tweet.retweeted_status.created_at){ ?>
+					<?js if (tweet.retweeted_status.created_at) { ?>
 					<div class="msgInfo">
-						<?js if(tweet.retweeted_status.t_url){ ?>
+						<?js if (tweet.retweeted_status.t_url) { ?>
 						<a href="#{tweet.retweeted_status.t_url}" target="_blank">#{new Date(tweet.retweeted_status.created_at).format("yyyy-MM-dd hh:mm:ss")}</a>
 						<?js } else { ?>
 						#{new Date(tweet.retweeted_status.created_at).format("yyyy-MM-dd hh:mm:ss")}
 						<?js } ?>
-						#{_u.i18n('comm_post_by')} #{tweet.retweeted_status.source|| _u.i18n("comm_web_site")}
+						#{_u.i18n('comm_post_by')} #{tweet.retweeted_status.source || _u.i18n("comm_web_site")}
+						<?js if (!tweet.retweeted_status.retweeted_status && tweet.retweeted_status.in_reply_to_status_id && tweet.retweeted_status.in_reply_to_screen_name) { ?>
+					   <a href="javascript:void(0);" class="show_source_status_btn" status_id="#{tweet.retweeted_status.in_reply_to_status_id}" 
+					       title="#{_u.i18n('comm_show_original_status')}">#{_u.i18n("btn_show_source_status", [tweet.retweeted_status.in_reply_to_screen_name])}</a>
+					   <?js } ?>
 					</div>
 					<?js } ?>
 					<div class="comments">
