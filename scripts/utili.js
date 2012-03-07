@@ -690,7 +690,7 @@ function getBackgroundView() {
     if(!_bg_view) {
         _bg_view = chrome.extension.getBackgroundPage();
         if(!_bg_view){
-            var views = chrome.extension.getViews();
+            var views = chrome.extension.getViews({});
             for (var i = 0, l = views.length; i < l; i++) {
                 var view = views[i];
                 if (view.theViewName && view.theViewName === 'background') {
@@ -704,7 +704,7 @@ function getBackgroundView() {
 };
 
 function getPopupView(){
-    var views = chrome.extension.getViews();
+    var views = chrome.extension.getViews({});
     for (var i = 0, l = views.length; i < l; i++) {
         var view = views[i];
         if (view.theViewName && view.theViewName === 'popup') {
@@ -716,7 +716,7 @@ function getPopupView(){
 
 //获取弹出窗的popup view
 function getNewWinPopupView(){
-    var views = chrome.extension.getViews();
+    var views = chrome.extension.getViews({});
     for (var i = 0, l = views.length; i < l; i++) {
         var view = views[i];
         if (view.is_new_win_popup) {

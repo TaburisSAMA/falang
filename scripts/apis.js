@@ -354,7 +354,6 @@ var sinaApi = {
 			if(user.oauth_token_secret) {
 				accessor.tokenSecret = user.oauth_token_secret;
 			}
-            delete args.data.nocache;
 			var parameters = {};
 			for(var k in args.data) {
 				parameters[k] = args.data[k];
