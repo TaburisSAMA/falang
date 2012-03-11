@@ -17,6 +17,12 @@ function initOnLoad(){
 };
 
 function init() {
+    // 图片滤镜
+    window.imageFilterBuilder = new ImageFilterBuilder();
+    imageFilterBuilder.filterResult = function (dataurl) {
+        $("#imgPreview img")[0].src = dataurl;
+    };
+
 	// 判断是否截图
     var params = decodeForm(window.location.search);
 	initSelectSendAccounts();
@@ -139,9 +145,17 @@ function sendMsg() {
         check = false;
     }
     var file = $("#imageFile").length > 0 ? $("#imageFile")[0].files[0] : null;
+    // 如果使用了滤镜功能，全部都通过预览图获取图片数据
+    if (imageFilterBuilder.filtered && imageFilterBuilder.filteredName && imageFilterBuilder.filteredName !== 'none') {
+        file = null;
+    };
     var image_url = null; // 是否通过图片url发送
     if(!file) {
     	image_url = $('#imageUrl').val();
+        // 如果使用了滤镜功能，全部都通过预览图获取图片数据
+        if (imageFilterBuilder.filtered && imageFilterBuilder.filteredName && imageFilterBuilder.filteredName !== 'none') {
+            image_url = null;
+        };
     	if(image_url) {
     		file = getImageBlob(image_url);
     	} else {
@@ -498,6 +512,7 @@ function selectFile(fileEle, file_only){
             var reader = new FileReader();
             reader.onload = function(e){
                 $("#imgPreview").html('<span>file size: ' + display_size(file.size) + '</span><br/><img class="pic" src="' + e.target.result + '" />');
+                showImageFilters();
             };
             reader.readAsDataURL(file);
         }
@@ -516,8 +531,13 @@ function selectUrl(ele){
     $("#progressBar span").html("");
     if(url){
     	$("#imgPreview").html('<img class="pic" src="' + url + '" />');
+        showImageFilters();
     }
 };
+
+function showImageFilters () {
+    imageFilterBuilder.listFilters($("#imgPreview img")[0], $("#imgFilterList")[0], $("#imgFilterRange")[0]);
+}
 
 function disabledUpload(){
     $("#btnSend").attr('disabled', true);

@@ -3209,3 +3209,172 @@ var xhr_provider = function(onprogress) {
     };
     
 })();
+
+
+var FILTER_TYPES = [
+    [ '原图',         'none',               {dft: null} ],
+    [ '伽玛',         'gamma',              {dft: 2, range: [0, 255]} ],   // "brightness|contrast|gamma|exposure" Multiplier of existing values (0-255)
+    [ '高亮',         'brightness',         {dft: 2, range: [0, 255]} ],
+    [ '对比增强',     'contrast',           {dft: 2, range: [0, 255]} ],
+    [ '曝光增强',     'exposure',           {dft: 2, range: [0, 255]} ],
+    //[ '反转',         'invert',             {dft: null} ],   
+    [ '全音',         'tritone',            {dft: null} ], // [[0,0,0], [0,0,0],[0,0,0]]  if f=="tritone" low|mid|high range colors as rgb triplets [0-255,0-255,0-255]
+    [ '曝光过度',     'solarize',           {dft: null} ],
+    [ '灰度',         'grayscale',          {dft: null} ],
+    [ '怀旧',         'sepia',              {dft: null} ],
+    [ '阈值',         'threshold',          {dft: 1} ],   // "threshold" Multiplier of 127 (0-2)
+    [ '平滑模糊',     'smooth',             {dft: 1, range: [1, 10]} ],  // "smooth" Radius (px 1-10)
+    [ '旋转模糊',     'spinblur',           {dft: 4, range: [1, 64]} ], // "zoomblur|spinblur" Distance (px 1-64)
+    [ '缩放模糊',     'zoomblur',           {dft: 15, range: [1, 64]} ], // "zoomblur|spinblur" Distance (px 1-64)
+    [ '动态模糊',     'motionblur',         {dft: [32, 180]} ],   // [1,0]     if f=="motionblur" Distance (px 1-64) and angle (0-360)
+    //[ 'invertalpha',        null ],
+    //[ 'RGB混合',      'mixrgb',             {dft: null} ],
+    [ '冷色',         'adjustrgba',         {dft: [.5,1,1.5,1]} ],   // [1,1,1,1] if f=="adjustrgba" red, green, blue, alpha. Multipliers of existing values (0-255)
+    //[ 'HSBA调整',     'adjusthsba',         {dft: [1,1,1,1]} ],   // [1,1,1,1] if f=="adjusthsba" hue, saturation, brightness, alpha. Multipliers (0-255)
+    //[ 'YUVA调整',     'adjustyuva',         {dft: [1,1,1,1]} ],   // [1,1,1,1] if f=="adjustyuva" luminance, blue–yellow chrominance, red–cyan chrominance, alpha. Multipliers of existing values (0-255)
+    [ '色调分离',     'posterize',          {dft: 8, range: [1, 16]} ],  // "posterize" Number of levels (1-16)
+    //[ '色基',         'colorkey',           {dft: [[0,0,0], [0,0,0]]} ],   // [[0,0,0], [0,0,0]]  if f=="colorkey" equals rgb min and rgb max triplet (0-255)
+    //[ '色度键',       'chromakey',          {dft: [0,0,0,0,0]} ],   // [0,0,0,0,0]  f=="chromakey" hue (0-360) and hue tolerance, min saturation, min brightness, max brightness (0-100)
+    //[ '轮廓',         'outline',            {dft: [1,0,'sobel']} ],   // [1,0,'name']     if f=="outline" Divisor of convolution result, bias (0-255) and operator ('sobel'|'scharr'|'prewitt'|'kirsh'|'roberts') 
+    //[ '缠绕',         'convolve',           {dft: [-1,0]} ],   // [auto,0]  if f=="convolve" or m!=null. Divisor of convolution result (-1==auto), useable for normalization and bias (0-255) for brightness addition
+    [ '浮雕',         'anaglyph',           {dft: null} ],
+    [ '阿尔法遮罩',   'alphamask',          {dft: null} ],
+    [ '上下模糊',     'tiltshift',          {dft: [0.5,0.4,0,5]} ],   //[0.5,0.4,0,4] if f=="tiltshift" Unmask position (0.0-1.0) and size (0.0-1.0) and horizontal or vertical orientation (0|1) and blur radius (px 1-8) 
+    [ '左右模糊',     'tiltshift-2',          {dft: [0.5,0.4,1,5]} ], 
+    //[ 'stackblur', [] ],
+    //[ '多重阿尔法',   'multiplyalpha',      {dft: null} ],
+    //[ '非多重阿尔法', 'unmultiplyalpha',    {dft: null} ]
+];
+
+function ImageFilterBuilder () {
+    this.hiddenFilterImgId = "hiddenFilterImg";
+}
+
+ImageFilterBuilder.prototype = {
+    onload: function () {
+        var thumbnails = this.resizeImage(32, 32);
+        this.thumbnailsDataURL = thumbnails.toDataURL("image/png");
+
+        this.previewContainer.innerHTML = '';
+
+        for (var i = 0, l = FILTER_TYPES.length; i < l; i++) {
+            this.addFilterPreview(FILTER_TYPES[i]);
+        };
+    },
+    resizeImage: function (w, h) {
+        var canvas = document.createElement('canvas');
+
+        canvas.width = w;               
+        canvas.height = h; 
+
+        var context = canvas.getContext('2d');
+
+        context.drawImage(this.img, 0,0, w,h);
+
+        return canvas;
+    },
+
+    getFilterTypeByName: function (filterType) {
+        for (var i = 0, l = FILTER_TYPES.length; i < l; i++) {
+            if (FILTER_TYPES[i][1] === filterType) {
+                return FILTER_TYPES[i];
+            }
+        }
+        return null;
+    },
+
+    addFilterPreview: function (filterType) {
+        var img = new Image(),
+            id = 'imgFilterPre_' + filterType[1];
+        img.id = id;
+        img.title = filterType[0];
+        this.previewContainer.appendChild(img);
+        img.onload = function () {
+            cvi_corner.add(img, { shadow: 0, shade: 0 });
+            cvi_corner.modify($("#"+id)[0], {filter:[{f:filterType[1], s:filterType[2]['dft']}]});
+        }
+        img.src = this.thumbnailsDataURL;
+    },
+
+    rebuildHiddenFilterImg: function () {
+        var img = $("#" + this.hiddenFilterImgId);
+        if(img.length){
+            img.remove();
+        }
+        img = new Image();
+        img.id = this.hiddenFilterImgId;
+        img.style.display = "none";
+        img.onload = function () {
+            cvi_corner.add(img);
+        }
+        img.src = this.originalImg.src;
+        document.body.appendChild(img);
+    },
+
+    applyFilter: function (filterTypeName, filterValue) {
+        this.filteredName = filterTypeName;
+        this.filtered = true;
+
+        var me = this,
+            filterType = me.getFilterTypeByName(filterTypeName),
+            filterValue = filterValue || filterType[2]['dft'];
+        cvi_corner.modify($("#"+me.hiddenFilterImgId)[0], {filter:[{f:filterType[1].split('-')[0], s: filterValue}]});
+
+        setTimeout(function () {
+            if (filterType[1] === 'none') {
+                me.filterResult && me.filterResult(me.originalImg.src);
+            } else {
+                me.filterResult && me.filterResult($("#"+me.hiddenFilterImgId)[0].toDataURL("image/png"));
+            }
+        }, 350);
+    },
+
+    listFilters: function (img, previewContainer, rangeControl) {
+        var me = this;
+        this.filtered = false;
+        this.filteredName = 'none';
+
+        this.previewContainer = previewContainer;
+
+        this.rangeControl = rangeControl;
+        $(rangeControl).off('mouseup');
+        $(rangeControl).on('mouseup', function (ev) {
+            me.applyFilter(this.filterType, Number(this.value));
+        });
+
+        this.originalImg = new Image();
+        this.originalImg.src = img.src;
+
+        this.rebuildHiddenFilterImg();
+
+        this.img = new Image();
+        this.img.onload = function () {
+            me.onload();
+        };
+        this.img.src = img.src;
+
+        $(previewContainer).off('click', 'canvas');
+
+        $(previewContainer).on('click', 'canvas', function (e) {
+            $(previewContainer).find('.active').removeClass("active");
+            $(this).addClass("active");
+
+            var filterTypeName = this.id.split('_')[1];
+            filterType = me.getFilterTypeByName(filterTypeName);
+            var v = filterType[2];
+            if (me.rangeControl) {
+                if (v.range) {
+                    me.rangeControl.filterType = filterTypeName;
+                    me.rangeControl.min = v.range[0];
+                    me.rangeControl.max = v.range[1];
+                    me.rangeControl.value = v.dft;
+                    me.rangeControl.style.display = "block";
+                } else {
+                    me.rangeControl.filterType = '';
+                    me.rangeControl.style.display = "none";
+                }
+            };
+            me.applyFilter(filterTypeName);
+        });
+    }
+};

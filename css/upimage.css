@@ -126,3 +126,14 @@ html, body{ height:100%; }
 #success_close * {
 	cursor: pointer;
 }
+
+#imgFilterList canvas{
+    cursor: pointer;
+    margin: 2px;
+    padding: 1px;
+    border: solid 1px #ddd;
+}
+
+#imgFilterList canvas.active{
+    border-color: #8c1c2a;
+}
