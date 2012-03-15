@@ -1127,7 +1127,7 @@ function saveAll(){
     var _soundFile = $.trim($("#inpSoundFile").val());
     if(_soundFile){
         settings.soundSrc = _soundFile;
-        bg.AlertaAudioFile.src = _soundFile;
+        bg.AlertaAudioFile && bg.AlertaAudioFile.src = _soundFile;
     }
 
     //初始化是否桌面显示
