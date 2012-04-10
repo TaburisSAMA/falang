@@ -1365,7 +1365,7 @@ var ShortenUrl = {
 	
 	_expand: function(shorturl, callback, context) {
 	    // var url = 'http://api.yongwo.de/api/e?f=json&u=' + shorturl;
-        var url = 'http://api.longurl.org/v2/expand?format=json&title=1&url=' + shorturl;
+        var url = 'http://api.longurl.org/v2/expand?format=json&title=1&url=' + encodeURIComponent(shorturl);
         // {"long-url":"http:\/\/www.douban.com\/event\/16186934\/","content-type":"text\/html; charset=utf-8","response-code":"200","title":"\u8c46\u74e3-\u4ed6\u4e61\u65e2\u543e\u57ce\u2014\u9053\u683c.\u6851\u5fb7\u65af\u4e0e\u718a\u57f9\u4e91\u5bf9\u8c08"}
         $.ajax({
             url: url,
