@@ -1140,7 +1140,7 @@ var popupBox = {
     box: null,
     checkBox: function(){
         if(!this.box){
-            $("body").append(this.tp);
+            $("body div:eq(0)").append(this.tp);
             this.box = $("#popup_box");
             this.overlay = $("#popup_box_overlay ");
         }

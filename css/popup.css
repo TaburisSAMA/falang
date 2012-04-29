@@ -744,7 +744,7 @@ div.loading_bar span {
 	border-radius:5px;
 	-webkit-box-shadow: 0 0px 15px rgba(0,0,0,.7);
 	position:absolute;
-	z-index:100;
+	z-index:150;
 }
 #popup_box .pb_title{
 	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#DDD));
@@ -776,7 +776,7 @@ div.loading_bar span {
   left: 0px;
   height:100%;
   width:100%;
-  z-index:99;
+  z-index:149;
 }
 /*浮动层图片旋转按钮*/
 #popup_box .image .rotate_btn{position: absolute; top: 8px; left: 10px; display:none;}

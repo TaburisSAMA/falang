@@ -892,8 +892,9 @@ var sinaApi = {
 	    }
 	    /* Generate headers. [PIC] */            
 	    builder += 'Content-Disposition: form-data; name="' + pic.keyname + '"';
-	    if(pic.file.fileName) {
-	      builder += '; filename="' + this.url_encode(pic.file.fileName) + '"';
+        var fileName = pic.file.fileName || pic.file.name;
+	    if(fileName) {
+	      builder += '; filename="' + this.url_encode(fileName) + '"';
 	    }
 	    builder += crlf;
 	
