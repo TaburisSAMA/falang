@@ -73,6 +73,12 @@ $(function(){
     
     initExportImport();
 
+    // 显示版本号
+    var version;
+    $.get(chrome.extension.getURL('manifest.json'), function(info){
+        $("#header .logo h1").append('<br/><span style="color:#D51920">V' + info.version + '</span>');
+    }, 'json');
+
     $("#refresh-account").click(function(){
         refreshAccountInfo();
     });
