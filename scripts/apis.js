@@ -240,7 +240,10 @@ var sinaApi = {
 	        str = this.processEmotional(str); 
 	
 	        str = this.processSearch(str); //#xxXX#
-	
+	        
+            // TODO: 支持 IOS5 的emoji表情
+            //    iOS 5 and OS X 10.7 (Lion) use the Unicode 6.0 standard ‘unified’ code points for emoji.
+            //    参考： http://code.iamcal.com/php/emoji/
 	        str = str.replace( /([\uE001-\uE537])/gi, this.getIphoneEmoji);
         }
         return str || '&nbsp;';
