@@ -83,7 +83,7 @@ var TSINA_FACES = {
 "织": "41/zz2_thumb.gif",
 "围观": "f2/wg_thumb.gif",
 "威武": "70/vw_thumb.gif",
-"爱心专递": "c9/axcd_thumb.gif",
+"爱心传递": "c9/axcd_thumb.gif",
 "奥特曼": "bc/otm_thumb.gif",
 // 亚运
 "国旗": "dc/flag_thumb.gif",
