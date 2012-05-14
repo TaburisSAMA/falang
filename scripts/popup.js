@@ -941,7 +941,7 @@ function toggleSelectSendAccount(ele){
         _t.removeClass('sel');
     }else{
         var settings = Settings.get();
-        if(settings.__allow_select_all !== true) {
+        if(false && settings.__allow_select_all !== true) {
             if(is_tsina) {
                 _t.siblings().each(function() {
                     var $this = $(this);

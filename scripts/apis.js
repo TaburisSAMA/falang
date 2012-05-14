@@ -2301,7 +2301,7 @@ var TSohuAPI = Object.inherits({}, sinaApi, {
 	},
 
 	format_upload_params: function(user, data, pic) {
-        for(var k in data) {
+        for (var k in data) {
             // 需要2次encode才能正确写入 + 号
             data[k] = encodeURIComponent(encodeURIComponent(data[k]));
         }

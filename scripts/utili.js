@@ -344,7 +344,7 @@ var Settings = {
         remember_view_status: true, // 记住上次浏览状态
         
         default_language: null, // 默认语言，如果没有设置，则使用i18n自动根据浏览器判断语言
-        __allow_select_all: false, // 是否允许同时选择新浪和其他微博
+        __allow_select_all: true, // 是否允许同时选择新浪和其他微博
         show_network_error: true, // 是否显示网络错误信息
         lookingTemplate: '{{title}} {{url}} '
     },
