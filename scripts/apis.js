@@ -24,7 +24,7 @@ Combo.prototype = {
     check: function (id, arguments) {
       this.results[id] = Array.prototype.slice.call(arguments);
       this.items--;
-      if (this.items == 0) {
+      if (this.items === 0) {
         this.callback.apply(this, this.results);
       }
     }
@@ -32,15 +32,15 @@ Combo.prototype = {
 
 //destination, source1[, source2, ...]
 Object.inherits = function(destination) {
-    for(var i = 1, len = arguments.length; i < len; i++) {
+    for (var i = 1, len = arguments.length; i < len; i++) {
         var source = arguments[i];
         if(!source) {
             continue;
         }
-        for(var property in source) {
+        for (var property in source) {
             destination[property] = source[property];
         }
-        if(destination.super_ === undefined) {
+        if (destination.super_ === undefined) {
             destination.super_ = source;
         }
     }
@@ -118,8 +118,8 @@ var sinaApi = {
 		// api
         public_timeline:      '/statuses/public_timeline',
         friends_timeline:     '/statuses/friends_timeline',
-        comments_timeline: 	  '/statuses/comments_timeline',
-        user_timeline: 	      '/statuses/user_timeline',
+        comments_timeline: '/statuses/comments_timeline',
+        user_timeline: '/statuses/user_timeline',
         mentions:             '/statuses/mentions',
         followers:            '/statuses/followers',
         friends:              '/statuses/friends',
@@ -155,16 +155,16 @@ var sinaApi = {
         blocks_exists:        '/blocks/exists',
         
         // 用户标签
-        tags: 				  '/tags',
-        create_tag: 	      '/tags/create',
-        destroy_tag:          '/tags/destroy',
-        tags_suggestions:	  '/tags/suggestions',
+        tags: '/tags',
+        create_tag: '/tags/create',
+        destroy_tag: '/tags/destroy',
+        tags_suggestions: '/tags/suggestions',
         
         // 搜索
-        search:               '/statuses/search',
-        user_search:               '/users/search',
+        search: '/statuses/search',
+        user_search: '/users/search',
         
-        oauth_authorize: 	  '/oauth/authorize',
+        oauth_authorize: '/oauth/authorize',
         oauth_request_token:  '/oauth/request_token',
         oauth_callback: OAUTH_CALLBACK_URL,
         oauth_access_token:   '/oauth/access_token',
@@ -173,11 +173,11 @@ var sinaApi = {
         searchUrl:        '/search/',
         
         ErrorCodes: {
-        	"40025:Error: repeated weibo text!": "重复发送",
-        	"40028:": "新浪微博接口内部错误",
-        	"40031:Error: target weibo does not exist!": "不存在的微博ID",
-        	"40015:Error: not your own comment!": "评论ID不在登录用户的comments_by_me列表中",
-        	"40303:Error: already followed": "已跟随"
+            "40025:Error: repeated weibo text!": "重复发送",
+            "40028:": "新浪微博接口内部错误",
+            "40031:Error: target weibo does not exist!": "不存在的微博ID",
+            "40015:Error: not your own comment!": "评论ID不在登录用户的comments_by_me列表中",
+            "40303:Error: already followed": "已跟随"
         }
     },
     
@@ -225,10 +225,10 @@ var sinaApi = {
      * 处理内容
      */
     processMsg: function(str_or_status, notEncode) {
-    	var str = str_or_status;
-    	if(str_or_status.text !== undefined) {
-    		str = str_or_status.text;
-    	}
+        var str = str_or_status;
+        if (str_or_status.text !== undefined) {
+            str = str_or_status.text;
+        }
         if(str && this.config.need_processMsg) {
 	        if(!notEncode){
 	            str = htmlencode(str);
@@ -768,13 +768,16 @@ var sinaApi = {
 	},
 
     /*data的参数列表：
-    content 待发送消息的正文，请确定必要时需要进行URL编码 ( encode ) ，另外，不超过140英文或140汉字。
+    text 待发送消息的正文，请确定必要时需要进行URL编码 ( encode ) ，另外，不超过140英文或140汉字。
     message 必须 0 表示悄悄话 1 表示戳一下
     receiveUserId 必须，接收方的用户id
     source 可选，显示在网站上的来自哪里对应的标识符。如果想显示指定的字符，请与官方人员联系。
     */
-    new_message: function(data, callbackFn, context){//悄悄话
-		if(!callbackFn) return;
+    new_message: function(data, callbackFn, context) { // 私信
+		if (!callbackFn) return;
+        if (data && data.text) {
+            data.text = this.url_encode(data.text);
+        }
         var params = {
             url: this.config.new_message,
             type: 'post',
@@ -812,9 +815,12 @@ var sinaApi = {
     
     update: function(data, callback, context){
 		var geo = this.get_geo();
-		if(geo) {
+		if (geo) {
 			this.format_geo_arguments(data, geo);
 		}
+        if (data && data.status) {
+            data.status = this.url_encode(data.status);
+        }
         var params = {
             url: this.config.update,
             type: 'post',
@@ -896,7 +902,7 @@ var sinaApi = {
 	    /* Generate headers. [PIC] */            
 	    builder += 'Content-Disposition: form-data; name="' + pic.keyname + '"';
         var fileName = pic.file.fileName || pic.file.name;
-	    if(fileName) {
+	    if (fileName) {
 	      builder += '; filename="' + this.url_encode(fileName) + '"';
 	    }
 	    builder += crlf;
@@ -916,14 +922,14 @@ var sinaApi = {
 	    builder += crlf;
 	    bb.append(builder);
 	    
-	    if(before_request) {
+	    if (before_request) {
 	    	before_request();
 	    }
 		var that = this;
 	    $.ajax({
 	        url: url,
 	        cache: false,
-	        timeout: 5*60*1000, //5分钟超时
+	        timeout: 5 * 60 * 1000, //5分钟超时
 	        type : 'post',
 	        data: bb.getBlob(),
 	        dataType: 'text',
@@ -1001,7 +1007,10 @@ var sinaApi = {
     },
 
     repost: function(data, callback, context){
-        if(!callback) return;
+        if (!callback) return;
+        if (data && data.status) {
+            data.status = this.url_encode(data.status);
+        }
         var params = {
             url: this.config.repost,
             type: 'post',
@@ -1012,7 +1021,10 @@ var sinaApi = {
     },
 
     comment: function(data, callback, context){
-        if(!callback) return;
+        if (!callback) return;
+        if (data && data.comment) {
+            data.comment = this.url_encode(data.comment);
+        }
         var params = {
             url: this.config.comment,
             type: 'post',
@@ -1023,7 +1035,10 @@ var sinaApi = {
     },
 
     reply: function(data, callback, context){
-        if(!callback) return;
+        if (!callback) return;
+        if (data && data.comment) {
+            data.comment = this.url_encode(data.comment);
+        }
         var params = {
             url: this.config.reply,
             type: 'post',
@@ -1284,7 +1299,7 @@ var sinaApi = {
 	
 	// urlencode，子类覆盖是否需要urlencode处理
 	url_encode: function(text) {
-		return OAuth.percentEncode(text);
+		return encodeURIComponent(text);
 	},
     
 	before_sendRequest: function(args, user) {
@@ -1292,7 +1307,7 @@ var sinaApi = {
 	},
 	
 	format_error: function(error, error_code, data) {
-		if(this.config.ErrorCodes){
+		if (this.config.ErrorCodes) {
 			error = this.config.ErrorCodes[error] || error;
 		}
 		return error;
@@ -1303,7 +1318,7 @@ var sinaApi = {
     	$.extend(args, params);
     	args.data = args.data || {};
     	args.data.source = args.data.source || this.config.source;
-    	if(args.need_source === false) {
+    	if (args.need_source === false) {
     		delete args.need_source;
     		delete args.data.source;
     	}
@@ -1360,8 +1375,8 @@ var sinaApi = {
             processData: processData,
             dataType: 'text',
             context: this,
-            beforeSend: function(req) {
-        		for(var key in args.headers) {
+            beforeSend: function (req) {
+        		for (var key in args.headers) {
         			req.setRequestHeader(key, args.headers[key]);
         		}
         	},
@@ -1378,7 +1393,7 @@ var sinaApi = {
                  *   800: JSON解析错误
                  *   999: 服务器返回结果不对，未知错误
                  */
-            	if(play_load != 'string' && !no_net_work) {
+            	if (play_load !== 'string' && !no_net_work) {
                     data = data.replace(RE_JSON_BAD_WORD, '');
             		try {
                         data = JSON.parse(data);
@@ -1745,7 +1760,7 @@ var TQQAPI = Object.inherits({}, sinaApi, {
     },
 
 	format_upload_params: function(user, data, pic) {
-    	if(data.status){
+    	if (data.status) {
             data.content = data.status;
             delete data.status;
         }
@@ -1890,13 +1905,13 @@ var TQQAPI = Object.inherits({}, sinaApi, {
             args.data.type = 0x1 | 0x2 | 0x8 | 0x10 | 0x20;
         }
         
-        switch(args.url) {
+        switch (args.url) {
             case this.config.counts:
                 args.data.flag = 2;
                 break;
             case this.config.new_message:
             case this.config.user_timeline:
-            	if(args.data.id) {
+            	if (args.data.id) {
             		args.data.name = args.data.id;
 			    	delete args.data.id;
             	} else if(args.data.screen_name) {
@@ -2284,23 +2299,24 @@ var TSohuAPI = Object.inherits({}, sinaApi, {
 	reset_count: function(data, callback, context) {
 		callback.call(context);
 	},
-	
+
 	format_upload_params: function(user, data, pic) {
         for(var k in data) {
-            data[k] = encodeURIComponent(data[k]);
+            // 需要2次encode才能正确写入 + 号
+            data[k] = encodeURIComponent(encodeURIComponent(data[k]));
         }
     },
 	
 	before_sendRequest: function(args) {
-		if(args.url == this.config.new_message) {
+		if (args.url == this.config.new_message) {
 			// id => user
 			args.data.user = args.data.id;
 			delete args.data.id;
 		} else if(args.url === this.config.destroy 
-		        || args.url === this.config.destroy_msg) { 
+	        || args.url === this.config.destroy_msg) { 
 			// method => delete
 			args.type = 'delete';
-			if(args.url === this.config.destroy_msg) {
+			if (args.url === this.config.destroy_msg) {
 			    // 还需要指定类型type：要删除的私信类型。in表示收件箱，out表示发件箱
 			}
 		} else if(args.url === this.config.search) {
@@ -2311,12 +2327,6 @@ var TSohuAPI = Object.inherits({}, sinaApi, {
 				args.data.id = args.data.screen_name;
 			}
 		}
-		if(args.data.comment) {
-		    args.data.comment = encodeURIComponent(args.data.comment);
-		}
-		if(args.data.text) {
-            args.data.text = encodeURIComponent(args.data.text);
-        }
 	},
 	
     format_result: function(data, play_load, args) {
@@ -2539,26 +2549,26 @@ var DiguAPI = Object.inherits({}, sinaApi, {
 	/* content[可选]：更新的Digu消息内容， 请确定必要时需要进行UrlEncode编码，另外，不超过140个中文或者英文字。
 	 */
 	before_sendRequest: function(args) {
-		if(args.url == this.config.update) { // repost, update, reply
+		if (args.url == this.config.update) { // repost, update, reply
 			// status => content
 			// sina_id => digu_id @回应 reply
-			if(args.data.status) {
+			if (args.data.status) {
 				args.data.content = args.data.status;
 				delete args.data.status;
 			}
-			if(args.data.sina_id) {
+			if (args.data.sina_id) {
 				args.data.digu_id = args.data.sina_id;
 				delete args.data.sina_id;
 			}
-		} else if(args.url == this.config.friends || args.url == this.config.followers) {
+		} else if (args.url == this.config.friends || args.url == this.config.followers) {
 			// cursor. 选填参数. 单页只能包含100个粉丝列表，为了获取更多则cursor默认从-1开始，
 			// 通过增加或减少cursor来获取更多的，如果没有下一页，则next_cursor返回0
 			args.data.page = args.data.cursor == '-1' ? 1 : args.data.cursor;
 			delete args.data.cursor;
-			if(!args.data.page){
+			if (!args.data.page){
 				args.data.page = 1;
 			}
-			if(args.data.user_id){
+			if (args.data.user_id){
 				//args.data.friendUserId = args.data.user_id;
 				args.data.friendUserIdOrName = args.data.user_id;
 			}
@@ -2575,7 +2585,7 @@ var DiguAPI = Object.inherits({}, sinaApi, {
 			args.data.message = 0;
 			delete args.data.text;
 			delete args.data.id;
-		} else if(args.url == this.config.friendships_create || 
+		} else if (args.url == this.config.friendships_create || 
               args.url == this.config.friendships_destroy) {
 			// id => userIdOrName
 			args.data.userIdOrName = args.data.id;
@@ -2583,26 +2593,23 @@ var DiguAPI = Object.inherits({}, sinaApi, {
 			args.type = 'get';
 			delete args.data.source;
 			delete args.data.id;
-		} else if(args.url == this.config.user_timeline) {
-			if(args.data.id) {
+		} else if (args.url == this.config.user_timeline) {
+			if (args.data.id) {
 				// args.data.userIdOrName = args.data.id;
 				// id is name
 				args.data.name = args.data.id;
 				delete args.data.id;
-			} else if(args.data.screen_name){
+			} else if (args.data.screen_name){
 				args.data.userIdOrName = args.data.screen_name;
 				delete args.data.screen_name;
 			}
-		} else if(args.url == this.config.verify_credentials) {
+		} else if (args.url == this.config.verify_credentials) {
 			args.data.isAllInfo = true;
 			delete args.data.source;
 		}
 		
-        if(args.data.userIdOrName) {
-            args.data.userIdOrName = encodeURIComponent(args.data.userIdOrName);
-        }
-        if(args.data.content) {
-            args.data.content = encodeURIComponent(args.data.content);
+        if (args.data.userIdOrName) {
+            args.data.userIdOrName = this.url_encode(args.data.userIdOrName);
         }
     },
 	
@@ -2619,7 +2626,7 @@ var DiguAPI = Object.inherits({}, sinaApi, {
     	delete data.status;
     	pic.keyname = 'image0';
     	for(var k in data) {
-            data[k] = encodeURIComponent(data[k]);
+            data[k] = this.url_encode(data[k]);
         }
     },
 	
@@ -3391,6 +3398,10 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
             }
         }, context);
     },
+
+    url_encode: function(text) {
+        return text;
+    },
 	
 	before_sendRequest: function(args, user) {
 	    if(args.url.indexOf('/oauth') < 0) {
@@ -3516,6 +3527,10 @@ var StatusNetAPI = Object.inherits({}, TwitterAPI, {
 	
 	format_upload_params: function(user, data, pic) {
         pic.keyname = 'media';
+    },
+
+    url_encode: function(text) {
+        return text;
     },
 	
     format_result_item: function(data, play_load, args) {
@@ -3654,6 +3669,10 @@ var FanfouAPI = Object.inherits({}, sinaApi, {
 	counts: function(data, callback, context) {
 		callback.call(context);
 	},
+
+    url_encode: function(text) {
+        return text;
+    },
 	
 	format_geo_arguments: function(data, geo) {
 		data.location = geo.latitude + ',' + geo.longitude;
@@ -3865,6 +3884,10 @@ var T163API = Object.inherits({}, sinaApi, {
 			callback.call(context, data, text_status, code);
 		});
 	},
+
+    url_encode: function(text) {
+        return text;
+    },
 	
 	before_sendRequest: function(args, user) {
 		delete args.data.source;
@@ -4911,6 +4934,10 @@ var TianyaAPI = Object.inherits({}, sinaApi, {
 
     rate_limit_status: function(data, callback, context) {
         callback.call(context, {error: _u.i18n("comm_no_api")});
+    },
+
+    url_encode: function(text) {
+        return text;
     },
 	
 	before_sendRequest: function(args, user) {
