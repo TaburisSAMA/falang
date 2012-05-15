@@ -92,28 +92,28 @@ function init () {
 
     // 注册 查看原始围脖的按钮事件
     $('a.show_source_status_btn').live('click', function() {
-    	var $this = $(this);
-    	var user = getUser();
-    	var t = getCurrentTab().replace('#', '').replace(/_timeline$/i, '');
-    	var params = { id: $(this).attr('status_id'), user: user };
-    	$this.hide();
-    	tapi.status_show(params, function(data) {
-    		if (data && data.id) {
-    			var html = buildStatusHtml([data], t, user).join('');
-    			$this.parents('.mainContent').after(html);
-                var $main = $this.parents('.mainContent');
-                if ($main.length > 0) {
-                    $main.after(html);
-                } else {
-                    // repost @回复
-                    $this.parents('.tweetItem').append(html);
-                }
-    			// 处理缩址
-        		ShortenUrl.expandAll();
-    		} else {
-    			$this.show();
-    		}
-    	});
+        var $this = $(this);
+        var user = getUser();
+        var t = getCurrentTab().replace('#', '').replace(/_timeline$/i, '');
+        var params = { id: $(this).attr('status_id'), user: user };
+        $this.hide();
+        tapi.status_show(params, function (data) {
+            if (data && data.id) {
+                var html = buildStatusHtml([data], t, user).join('');
+                $this.parents('.mainContent').after(html);
+                // var $main = $this.parents('.mainContent');
+                // if ($main.length > 0) {
+                //     $main.after(html);
+                // } else {
+                //     // repost @回复
+                //     $this.parents('.tweetItem').append(html);
+                // }
+                // 处理缩址
+                ShortenUrl.expandAll();
+            } else {
+                $this.show();
+            }
+        });
     });
     
     // support @ autocomplete
