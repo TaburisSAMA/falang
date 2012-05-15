@@ -832,8 +832,12 @@ var sinaApi = {
     
     // 格式上传参数，方便子类覆盖做特殊处理
     // 子类可以增加自己的参数
-    format_upload_params: function(user, data, pic) {
+    format_upload_params: function (user, data, pic) {
     	
+    },
+
+    parse_upload_result: function (data) {
+        return JSON.parse(data);
     },
     
     /* 上传图片
@@ -844,7 +848,7 @@ var sinaApi = {
      * onprogress: on_progress_callback function
      * callback: finish callback function
      * */
-    upload: function(user, data, pic, before_request, onprogress, callback, context) {
+    upload: function (user, data, pic, before_request, onprogress, callback, context) {
     	var auth_args = { type: 'post', data: {}, headers: {} };
     	pic.keyname = pic.keyname || 'pic';
     	data.source = data.source || this.config.source;
@@ -873,12 +877,17 @@ var sinaApi = {
 		    auth_args.data[key] = data[key];
 	    }
 	    var api = user.apiProxy || this.config.host;
-		var url = api + this.config.upload + this.config.result_format;
+        var resultFormat = this.config.result_format;
+        if ('__uploadFormat' in data) {
+            resultFormat = data.__uploadFormat;
+            delete data.__uploadFormat;
+        }
+		var url = api + this.config.upload + resultFormat;
 		if (this.config.use_method_param) {
 			// 只使用method 做参数, 走rest api
 			url = api;
 		} else if (data.__upload_url) {
-		    url = data.__upload_url  + this.config.result_format;
+		    url = data.__upload_url  + resultFormat;
 		    delete data.__upload_url;
 		    delete auth_args.data.__upload_url;
 		}
@@ -937,36 +946,36 @@ var sinaApi = {
 	        processData: false,
 	        xhr: xhr_provider(onprogress),
 	        beforeSend: function(req) {
-		    	for(var k in auth_args.headers) {
+		    	for (var k in auth_args.headers) {
 		    		req.setRequestHeader(k, auth_args.headers[k]);
 	    		}
 	        },
-	        success: function(data, textStatus, xhr) {
+	        success: function (data, textStatus, xhr) {
 	         // 如果没有网络，则会返回['', 'success', xhr.status === 0, xhr.statusText === '']
                 var no_net_work = false;
-                if(data === '' && textStatus === 'success' && xhr.status === 0 && xhr.statusText === '') {
+                if (data === '' && textStatus === 'success' && xhr.status === 0 && xhr.statusText === '') {
                     no_net_work = true;
                     textStatus = 'error';
                     data = {error: 'No network', error_code: 10000};
                 }
-                if(!no_net_work) {
+                if (!no_net_work) {
                     try {
-                        data = JSON.parse(data);
+                        data = that.parse_upload_result(data);
                     }
                     catch(err) {
-                        data = {error: _u.i18n("comm_error_return") + ' [json parse error]', error_code: 500};
+                        data = { error: _u.i18n("comm_error_return") + ' [json parse error]', error_code: 500 };
                         textStatus = 'error';
                     }
                 }
 	            var error_code = null;
-	            if(data) {
+	            if (data) {
 	                error_code = data.error_code;
                     var error = data.errors || data.error || data.wrong || data.error_msg;
-                    if(data.ret && data.ret !== 0) { //腾讯
+                    if (data.ret && data.ret !== 0) { //腾讯
                         error = data.msg;
                         error_code = data.ret;
                     }
-	                if(error){
+	                if (error) {
 	                	data.error = error;
 	                	textStatus = 'error';
 	                	var message = that.format_error(error, error_code, data);
@@ -979,11 +988,11 @@ var sinaApi = {
 	        },
 	        error: function (xhr, textStatus, errorThrown) {
 	            var r = null, status = 'unknow';
-	            if(xhr) {
-	                if(xhr.status) {
+	            if (xhr) {
+	                if (xhr.status) {
 	                    status = xhr.status;
 	                }
-	                if(xhr.responseText) {
+	                if (xhr.responseText) {
 	                    var r = xhr.responseText;
 	                    try {
 	                        r = JSON.parse(r);
@@ -1006,7 +1015,7 @@ var sinaApi = {
 	    });
     },
 
-    repost: function(data, callback, context){
+    repost: function(data, callback, context) {
         if (!callback) return;
         if (data && data.status) {
             data.status = this.url_encode(data.status);
@@ -1266,10 +1275,13 @@ var sinaApi = {
 	},
 	
 	format_result_item: function(data, play_load, args) {
-		if(play_load == 'user' && data && data.id) {
+        if (!data) {
+            return data;
+        }
+		if (play_load === 'user' && data && data.id) {
 			data.t_url = 'http://weibo.com/' + (data.domain || data.id);
-		} else if(play_load == 'status') {
-			if(!data.user) { // search data
+		} else if(play_load === 'status') {
+			if (!data.user) { // search data
 				data.user = {
 					screen_name: data.from_user,
 					profile_image_url: data.profile_image_url,
@@ -1284,7 +1296,7 @@ var sinaApi = {
 //			// 设置status的t_url
 //			data.t_url = tpl.format(data);
 			data.t_url = 'http://weibo.com/' + data.user.id + '/' + WeiboUtil.mid2url(data.mid); 
-			if(data.retweeted_status) {
+			if (data.retweeted_status) {
 				data.retweeted_status = this.format_result_item(data.retweeted_status, 'status', args);
 			}
 		} else if(play_load == 'message') {
@@ -1328,14 +1340,15 @@ var sinaApi = {
             return;
     	}
     	var user = args.user || args.data.user || localStorage.getObject(CURRENT_USER_KEY);
-    	if(!user) {
+    	if (!user) {
             showMsg('用户未指定', true);
             callbackFn({}, 'error', 400);
             return;
         }
         args.user = user;
-        if (args.data && args.data.user) delete args.data.user;        
-
+        if (args.data && args.data.user) { 
+            delete args.data.user;
+        }
         // 请求前调用
         this.before_sendRequest(args, user);
 
@@ -3230,7 +3243,7 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 	    oauth_callback: 'oob',
 	    upload: '/statuses/update_with_media', // https://upload.twitter.com/1/statuses/update_with_media.json
 	    search: '/search_statuses',
-	    repost: '/statuses/update',
+	    // repost: '/statuses/update',
         retweet: '/statuses/retweet/{{id}}',
         favorites_create: '/favorites/create/{{id}}',
         friends_timeline: '/statuses/home_timeline',
@@ -3404,15 +3417,15 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
     },
 	
 	before_sendRequest: function(args, user) {
-	    if(args.url.indexOf('/oauth') < 0) {
+	    if (args.url.indexOf('/oauth') < 0) {
 	        args.data.include_entities = 'true';
 	        args.data.contributor_details = 'true';
 	    }
-		if(args.url == this.config.repost) {
-			if(args.data.sina_id) {
+		if (args.url == this.config.repost) {
+			if (args.data.sina_id) {
 				args.data.in_reply_to_status_id = args.data.sina_id;
 				delete args.data.sina_id;
-			} else if(args.data.id) {
+			} else if (args.data.id) {
 //				args.data.in_reply_to_status_id = args.data.id;
 				delete args.data.id;
 			}
@@ -3501,7 +3514,7 @@ var StatusNetAPI = Object.inherits({}, TwitterAPI, {
         user_home_url: 'http://identi.ca/',
         status_prev_url: 'http://identi.ca/notice/',
         search_url: 'http://identi.ca/tag/',
-		source: 'FaWave', //Basic Auth 会显示这个，不过显示不了链接
+		source: 'FaWave', // Basic Auth 会显示这个，不过显示不了链接
         oauth_key: 'c71100649f6c6cfb4eebbacca18de8f6',
         oauth_secret: 'f3ef411594e624f7eda7e1c0ae6b9029',
         repost_pre: 'RT',
@@ -3525,24 +3538,24 @@ var StatusNetAPI = Object.inherits({}, TwitterAPI, {
         search: '/search.json?q='
 	}),
 	
-	format_upload_params: function(user, data, pic) {
+	format_upload_params: function (user, data, pic) {
         pic.keyname = 'media';
     },
 
-    url_encode: function(text) {
+    url_encode: function (text) {
         return text;
     },
 	
     format_result_item: function(data, play_load, args) {
         data = this.super_.format_result_item.apply(this, [data, play_load, args]);
-		if(play_load === 'user' && data && data.id) {
+		if (play_load === 'user' && data && data.id) {
 		    data.following = false;
 		    if(data.statusnet_profile_url) {
 		        data.t_url = data.statusnet_profile_url;
 		    } else {
 		        data.t_url = this.config.user_home_url + data.screen_name;
 		    }
-		} else if(play_load === 'status') {
+		} else if (play_load === 'status' && data) {
 		    data.t_url = this.config.status_prev_url + data.id;
 			if(!data.user) { // search data
 				data.user = {
@@ -3554,15 +3567,30 @@ var StatusNetAPI = Object.inherits({}, TwitterAPI, {
 				delete data.from_user;
 				delete data.from_user_id;
 			}
-			if(data.attachments) {
-                for(var i = 0, l = data.attachments.length; i < l; i++) {
-                    var attachment = data.attachments[i];
-                    if(attachment.mimetype && attachment.mimetype.indexOf('image') >= 0) {
-                        data.thumbnail_pic = attachment.url;
-                        data.bmiddle_pic = data.thumbnail_pic;
-                        data.original_pic = data.thumbnail_pic;
+			if (data.attachments) {
+                if (data.attachments.length) {
+                    for (var i = 0, l = data.attachments.length; i < l; i++) {
+                        var attachment = data.attachments[i];
+                        if (attachment.mimetype && attachment.mimetype.indexOf('image') >= 0) {
+                            data.thumbnail_pic = attachment.url;
+                            data.bmiddle_pic = data.thumbnail_pic;
+                            data.original_pic = data.thumbnail_pic;
+                        }
                     }
+                } else if (data.attachments.ori_pic) {
+                    data.thumbnail_pic = data.attachments.small_pic.url;
+                    data.bmiddle_pic = data.attachments.middle_pic.url;
+                    data.original_pic = data.attachments.ori_pic.url;
+                    delete data.attachments;
                 }
+            }
+            // repeat_count => repost_count
+            // reply_count => comments_count
+            if (!data.repost_count) {
+                data.repost_count = data.repeat_count || 0;
+            }
+            if (!data.comments_count) {
+                data.comments_count = data.reply_count || 0;
             }
 		}
 		return data;
@@ -3582,25 +3610,91 @@ var TaobaoStatusNetAPI = Object.inherits({}, StatusNetAPI, {
         repost_pre: 'RT',
         support_double_char: false,
         support_upload: true,
-        support_repost_timeline: true,
+        support_repost_timeline: false,
+        support_repost: true,
         support_direct_messages: false,
         support_auto_shorten_url: true,
-        support_user_search: false, //暂时屏蔽
+        support_user_search: false, // 暂时屏蔽
+        support_comment: false, // 不支持评论列表
+        support_comment_pic: true, // 评论支持图片
+        support_do_comment: true,
+        comment_reply_need_original: true, // 评论回复默认带上原始的
         show_fullname: false,
         support_blocking: false,
-        upload: '/statuses/update'
+        repost: '/statuses/retweet/{{id}}',
+        upload: '/statusnet/media/upload'
     }),
+
+    parse_upload_result: function (data) {
+        if (!data) {
+            return data;
+        }
+        // parse xml to json
+        // <mediaid>3007</mediaid>
+        // @see http://t.taobao.org/opendoc/media_upload.php
+        var re = /<(\w+)>([^<]+)<\/\w+>/ig;
+        var matchs = data.match(re);
+        var result = {};
+        if (matchs) {
+            for (var i = matchs.length; i--;) {
+                var m = re.exec(matchs[i]);
+                re.lastIndex = 0;
+                result[m[1]] = m[2];
+            }
+        } else {
+            result = { error: 'parse error: ' + data };
+        }
+        return result;
+    },
+
+    upload: function (user, params, pic, before_request, onprogress, callback, context) {
+        this.super_.upload.call(this, user, { __uploadFormat: '' }, pic, before_request, onprogress, 
+        function (data) {
+            if (data && data.mediaid) {
+                params.user = user;
+                params.mediaId = data.mediaid;
+                this.update(params, callback, context);
+            } else {
+                callback.apply(context, arguments);
+            }
+        }, this);
+    },
+
+    before_sendRequest: function (args, user) {
+        if (args.url == this.config.comment || args.url === this.config.reply) {
+            if (args.data.id) {
+                args.data.in_reply_to_status_id = args.data.id;
+                delete args.data.id;
+            }
+            args.data.status = args.data.comment;
+            args.url = '/statuses/update';
+        } else if (args.url == this.config.new_message) {
+            // id => user
+            args.data.user = args.data.id;
+            delete args.data.id;
+        } else if (args.url == this.config.search) {
+            args.data.rpp = args.data.count;
+            args.data.show_user = 'true';
+            delete args.data.source;
+            delete args.data.count;
+        } else if (args.url === this.config.user_search || args.url === this.config.blocks_blocking) {
+            args.data.per_page = args.data.count;
+            delete args.data.count;
+        } else if (args.url === this.config.blocks_exists) {
+            args.dont_show_error = true;
+        }
+    },
     
     _emotion_rex: window.TAOBAO_FACES ? 
         new RegExp('\\[\\^(' + Object.keys(window.TAOBAO_FACES).join('|') + ')\\^\\]', 'g') : null,
-    processEmotional: function(str) {
-        if(!this._emotion_rex) {
+    processEmotional: function (str) {
+        if (!this._emotion_rex) {
             return str;
         }
-        return str.replace(this._emotion_rex, function(m, g1){
-            if(window.TAOBAO_FACES && g1) {
+        return str.replace(this._emotion_rex, function (m, g1){
+            if (window.TAOBAO_FACES && g1) {
                 var emotion = TAOBAO_FACES[g1];
-                if(emotion) {
+                if (emotion) {
                     var tpl = '<img style="height: 24px;" title="{{title}}" src="' 
                         + TAOBAO_FACES_URL_PRE + '{{emotion}}" />';
                     return tpl.format({title: g1, emotion: emotion});

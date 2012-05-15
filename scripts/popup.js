@@ -15,54 +15,53 @@ var POPUP_CACHE = {};
 function get_current_user_cache(cache, t) {
 	var c_user = getUser();
 	var key = c_user.uniqueKey;
-	if(t != undefined) {
+	if (t) {
 		key += '_' + t;
 	}
-	if(!cache) {
+	if (!cache) {
 		cache = POPUP_CACHE;
 	}
 	var _cache = cache[key];
-	if(!_cache) {
+	if (!_cache) {
 		_cache = {};
 		cache[key] = _cache;
 	}
 	return _cache;
-};
+}
 
 var isNewTabSelected = window.is_new_win_popup ? true : false; //如果是弹出窗，则激活新打开的标签
 
-function init(){
+function init () {
     var c_user = getUser();
-    if(!c_user){
+    if (!c_user) {
         chrome.tabs.create({url: 'options.html#user_set'});
         return;
-    }else if(!c_user.uniqueKey){
+    } else if (!c_user.uniqueKey) {
         chrome.tabs.create({url: 'options.html#no_uniqueKey'});
         return;
     }
     
-    //$('a').attr('target', '_blank');
     $('a').live('click', function(e){
         var url = $.trim($(this).attr('href'));
-        if(url && !url.toLowerCase().indexOf('javascript')==0){
+        if (url && url.toLowerCase().indexOf('javascript') !== 0) {
             chrome.tabs.create({url:$(this).attr('href'), selected:isNewTabSelected});
             return false;
         }
     }).live('mousedown', function(e){
-        if(e.button == 2){ //右键点击
+        if (e.button == 2) { //右键点击
             var url = $.trim($(this).attr('rhref'));
             if(url){
-                chrome.tabs.create({url:url, selected:isNewTabSelected});
+                chrome.tabs.create({ url: url, selected: isNewTabSelected });
 				//禁用右键菜单
-				e.srcElement.oncontextmenu = function(){ return false; };
+				e.srcElement.oncontextmenu = function() { return false; };
 				return false;
             }
         }
     });
 
-    if(window.is_new_win_popup){
+    if (window.is_new_win_popup) {
         resizeFawave();
-        $(window).resize(function(){
+        $(window).resize(function() {
             resizeFawave();
         });
     }
@@ -70,7 +69,7 @@ function init(){
     changeAlertMode(getAlertMode());
     changeAutoInsertMode(getAutoInsertMode());
 
-    $('#ye_dialog_close').click(function(){
+    $('#ye_dialog_close').click(function() {
         hideReplyInput();
     });
 
@@ -160,7 +159,7 @@ function init(){
         if(action_args) {
 			$('#replyTextarea').val('');
 			action_args[0] = window._currentCommentElement;
-            window['doComment'].apply(this, action_args);
+            window.doComment.apply(this, action_args);
 		}
     });
     
@@ -171,22 +170,23 @@ function init(){
     script.type = "text/javascript"; 
     script.src = "http://maps.google.com/maps/api/js?sensor=false&callback=initializeMap"; 
     document.body.appendChild(script);
-};
+}
 
-function initializeMap(){};//给载入地图api调用
+function initializeMap() {}//给载入地图api调用
 
 function initTabs() {
     window.currentTab = '#friends_timeline_timeline';
     $('#tl_tabs li').click(function() {
-        var t = $(this), currentIsActive = t.hasClass('active');
-        //不进行任何操作							 
-        if(t.hasClass('tab-none')) {
+        var t = $(this);
+        var currentIsActive = t.hasClass('active');
+        // 不进行任何操作
+        if (t.hasClass('tab-none')) {
             return;
-        };
+        }
         //切换tab前先保护滚动条位置
         var old_t = getCurrentTab().replace('#', '').replace(/_timeline$/i, '');
         var c_t = t.attr('href').replace('#','').replace(/_timeline$/i,'');
-        if(!currentIsActive) { // 如果是数据类型不一样了，才需要记录当前位置
+        if (!currentIsActive) { // 如果是数据类型不一样了，才需要记录当前位置
             saveScrollTop(old_t);
         }
         //添加当前激活的状态
@@ -227,7 +227,7 @@ function initTabs() {
     });
     
     checkSupportedTabs();
-};
+}
 
 // 判断是否需要加载新数据
 function _load_new_data(t, is_current_tab) {
@@ -260,9 +260,9 @@ function _load_new_data(t, is_current_tab) {
         getSinaTimeline(t);
     }
     return load_new;
-};
+}
 
-function initOnUnload(){
+function initOnUnload() {
     var c = $("#txtContent").val(), $reply_text = $("#replyTextarea");
     if(!c || !$reply_text.is(':hidden')) {
         // 没有输入或者是对话框模式，则隐藏文本输入
@@ -287,7 +287,7 @@ function initOnUnload(){
         c_t = c_t.replace('#','').replace(/_timeline$/i,'');
         saveScrollTop(c_t);
     }
-};
+}
 
 function _get_clipboard_file(e, callback) {
     var f = null, items = e.clipboardData && e.clipboardData.items;
@@ -307,7 +307,7 @@ function _get_clipboard_file(e, callback) {
     } else {
         callback();
     }
-};
+}
 
 function _init_image_preview(image_src, size, preview_id, btn_id, top_padding, left_padding) {
     $("#" + preview_id + " .img").html('<img class="pic" src="' + image_src + '" />');
@@ -320,9 +320,9 @@ function _init_image_preview(image_src, size, preview_id, btn_id, top_padding, l
     }).show()
     .find('.loading_bar div').css({'border-left-width': '0px'})
     .find('span').html(display_size(size));
-};
+}
 
-function initTxtContentEven(){
+function initTxtContentEven() {
     //>>>发送微博事件初始化 开始<<<
     var unsendTweet = localStorage.getObject(UNSEND_TWEET_KEY);
     var $txtContent = $("#txtContent"), $replyText = $("#replyTextarea");
@@ -2442,7 +2442,7 @@ function _initText($text, config) {
 }
 
 function doReply(ele, screen_name, tweetId, name) { // @回复
-	ActionCache.set('doReply', [null, screen_name, tweetId, name]);
+	ActionCache.set('doReply', [ null, screen_name, tweetId, name ]);
     $('#actionType').val('reply');
     $('#replyTweetId').val(tweetId || '');
     $('#replyUserName').val(name);
@@ -2454,13 +2454,14 @@ function doReply(ele, screen_name, tweetId, name) { // @回复
     $('#txt_sendOneMore2').text('').hide();
 
     $('#ye_dialog_window').show();
-    var $replyText = $('#replyTextarea'), text = $replyText.val();
-    if(!text) {
-        var tweet = TWEETS[tweetId]
-          , user = getUser()
-          , at_users = tapi.find_at_users(user, tweet.text);
-        if(at_users) {
-            for(var i = 0, l = at_users.length; i < l; i++) {
+    var $replyText = $('#replyTextarea');
+    var text = $replyText.val();
+    if (!text) {
+        var tweet = TWEETS[tweetId];
+        var user = getUser();
+        var at_users = tapi.find_at_users(user, tweet.text);
+        if (at_users) {
+            for (var i = 0, l = at_users.length; i < l; i++) {
                 var at_user = at_users[i];
                 if(at_user !== tweet.user.name && at_user !== screen_name
                         && at_user !== user.screen_name && at_user !== user.name) {
@@ -2529,14 +2530,16 @@ function doRepost(ele, userName, tweetId, rtUserName, reTweetId){ // 转发
 };
 
 /* 评论
- * cid:回复的评论ID
+ * cid: 回复的评论ID
  */
-function doComment(ele, userName, userId, tweetId, 
-		replyUserName, replyUserId, cid) {
-	if(typeof ele === 'string') {
+function doComment(ele, userName, userId, tweetId, replyUserName, replyUserId, cid) {
+	if (typeof ele === 'string') {
 		ele = document.getElementById(ele);
 	}
-	ActionCache.set('doComment', [$(ele).attr('id'), userName, userId, tweetId, replyUserName, replyUserId, cid]);
+	ActionCache.set('doComment', [
+        $(ele).attr('id'), userName, userId, tweetId, 
+        replyUserName, replyUserId, cid
+    ]);
 	$('#actionType').val('comment');
     $('#commentTweetId').val(tweetId);
     $('#commentUserId').val(userId);
@@ -2545,37 +2548,42 @@ function doComment(ele, userName, userId, tweetId,
     $('#commentCommentId').val(cid||'');
     $('#ye_dialog_title').html(_u.i18n("msg_comment_who").format({username:userName}));
     $('#ye_dialog_window').show();
-    var _txt = $('#replyTextarea').val(), _txtRep = '';
-    if(!_txt) {
+    var _txt = $('#replyTextarea').val();
+    var _txtRep = '';
+    var user = getUser();
+    var config = tapi.get_config(user);
+    if (!_txt) {
     	_txt = replyUserName ? (_u.i18n("msg_comment_reply_default").format({username:replyUserName})) : '';
-        if(cid){
+        var needOriginal = false;
+        if (cid) {
+            needOriginal = config.comment_reply_need_original || 
+                localStorage.getObject(INCLUDE_ORIGINAL_COMMENT) === 1;
             // 带上原评论内容
 			window._currentCommentElement = ele; //搓劣的做法，赶时间，暂时这样了
             $("#chk_originalComment, #txt_originalComment").show();
-            if(localStorage.getObject(INCLUDE_ORIGINAL_COMMENT)===1){
+            if (needOriginal) {
                 $("#chk_originalComment").attr("checked", true);
-            }else{
+            } else {
                 $("#chk_originalComment").removeAttr("checked");
             }
         }
         // 回复是否带上原评论内容
-		if(cid && localStorage.getObject(INCLUDE_ORIGINAL_COMMENT)===1){
+		if (needOriginal) {
 			//查看某条微博的评论列表里
 			_txtRep = $(ele).parent().find('.commentContent').text();
-			if(_txtRep){
+			if (_txtRep) {
 				_txtRep = '//' + _txtRep;
-			}else{
+			} else {
 				// 我的评论列表
 				var _tmpP = $(ele).parents('.commentWrap');
-				if(_tmpP.length && _tmpP.eq(0).find('.msg .tweet .tweet_text').length){
+				if (_tmpP.length && _tmpP.eq(0).find('.msg .tweet .tweet_text').length) {
 					_txtRep = '//@' + replyUserName + ':' + $.trim(_tmpP.eq(0).find('.msg .tweet .tweet_text').text());
 				}
 			}
 		}
     }
-    var user = getUser();
-	var config = tapi.get_config(user);
-	if(config.support_comment_repost) { // 支持repost才显示
+    
+	if (config.support_comment_repost) { // 支持repost才显示
 		$('#chk_sendOneMore').attr("checked", false).val(tweetId).show();
     	$('#txt_sendOneMore').text(_u.i18n("msg_repost_too")).show();
 	} else {
