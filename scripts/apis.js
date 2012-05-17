@@ -3421,31 +3421,31 @@ var TwitterAPI = Object.inherits({}, sinaApi, {
 	        args.data.include_entities = 'true';
 	        args.data.contributor_details = 'true';
 	    }
-		if (args.url == this.config.repost) {
+		if (args.url === this.config.update) {
 			if (args.data.sina_id) {
 				args.data.in_reply_to_status_id = args.data.sina_id;
 				delete args.data.sina_id;
 			} else if (args.data.id) {
-//				args.data.in_reply_to_status_id = args.data.id;
+				args.data.in_reply_to_status_id = args.data.id;
 				delete args.data.id;
 			}
-		} else if(args.url == this.config.new_message) {
+		} else if (args.url === this.config.new_message) {
 			// id => user
 			args.data.user = args.data.id;
 			delete args.data.id;
-		} else if(args.url == this.config.search) {
+		} else if (args.url === this.config.search) {
 			args.data.rpp = args.data.count;
 			args.data.show_user = 'true';
 			delete args.data.source;
 			delete args.data.count;
-		} else if(args.url === this.config.user_search || args.url === this.config.blocks_blocking) {
+		} else if (args.url === this.config.user_search || args.url === this.config.blocks_blocking) {
 		    args.data.per_page = args.data.count;
 		    delete args.data.count;
 		} else if(args.url === this.config.blocks_exists) {
 		    args.dont_show_error = true;
 		}
 		var hasAPI = user && user.apiProxy;
-		if(!hasAPI && this.config.host === 'https://api.twitter.com' && args.url.indexOf('/oauth') < 0) {
+		if (!hasAPI && this.config.host === 'https://api.twitter.com' && args.url.indexOf('/oauth') < 0) {
 		    args.url = '/1' + args.url;
 		}
     },
