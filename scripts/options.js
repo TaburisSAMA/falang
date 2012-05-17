@@ -928,9 +928,8 @@ function saveAccount(){
     				// 在当前页保存 request token
         			$('#account-request-token-key').val(user.oauth_token_key);
         			$('#account-request-token-secret').val(user.oauth_token_secret);
-            		var l = (window.screen.availWidth-510)/2;
-            		window.open(login_url, 'FaWaveOAuth', 'left=' + l 
-            	    		+ ',top=30,width=600,height=450,menubar=no,location=yes,resizable=no,scrollbars=yes,status=yes');
+            		var l = (window.screen.availWidth - 510) / 2;
+                    chrome.tabs.create({ url: login_url });
     			}
     		});
     	}
@@ -1311,10 +1310,12 @@ function cleanLocalStorageData(){
 // 监控oauth callback url，获取认证码
 // facebook: 
 // https://chrome.google.com/extensions/detail/aicelmgbddfgmpieedjiggifabdpcnln/?code=3362948c9a062a22ef18c6d5-1013655641|T7VuPCHU79f6saU7MiQwHGG_mVc
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
-	if(changeInfo.status == 'loading' && (tab.url.indexOf(OAUTH_CALLBACK_URL) == 0 
-			|| tab.url.indexOf(FAWAVE_OAUTH_CALLBACK_URL) == 0
-			|| tab.url.indexOf(FacebookAPI.config.oauth_callback + '?code=') == 0)) {
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+	if (changeInfo.status === 'loading' && 
+        (tab.url.indexOf(OAUTH_CALLBACK_URL) === 0 || 
+        tab.url.indexOf(FAWAVE_OAUTH_CALLBACK_URL) === 0 || 
+        tab.url.indexOf(FacebookAPI.config.oauth_callback + '?code=') == 0)) {
+
 		var d = decodeForm(tab.url);
 		var pin = d.oauth_verifier || d.code || 'impin';
 		if(pin.indexOf('#') > 0) {
@@ -1322,7 +1323,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
 		}
 		$('#account-pin').val(pin);
 		$('#save-account').click();
-		chrome.windows.remove(tab.windowId);
+        chrome.tabs.remove(tabId);
 	}
 });
 
