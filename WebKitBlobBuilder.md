@@ -1,0 +1,1 @@
+http://www.guao.hk/posts/chrome-beta-11069650.html
